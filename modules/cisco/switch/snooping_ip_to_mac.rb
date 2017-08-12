@@ -3,6 +3,7 @@ module Cisco::Switch; end
 
 
 require 'set'
+require_relative '../../aca/mac_lookup.rb'
 
 
 class Cisco::Switch::SnoopingIpToMac
@@ -22,8 +23,18 @@ class Cisco::Switch::SnoopingIpToMac
              wait_ready: ':'
     clear_queue_on_disconnect!
 
+    default_settings username: :cisco, password: :cisco
+
+
     def on_load
         @check_interface = ::Set.new
+
+        ::Aca::MacLookup.ensure_design_document!
+        query = ::Aca::MacLookup.find_by_switch_ip(remote_address)
+        query.stream do |detail|
+            self[detail.interface] = [detail.device_ip, detail.mac_address]
+        end
+
         on_update
     end
 
@@ -32,11 +43,14 @@ class Cisco::Switch::SnoopingIpToMac
     end
 
     def connected
-        logger.debug "Connected to switch"
         @username = setting(:username) || 'cisco'
         do_send(@username, priority: 99)
 
-        schedule.every('1m') { update_mappings }
+        schedule.every('1m') { query_connected_devices }
+    end
+
+    def disconnected
+        schedule.clear
     end
 
     # Don't want the every day user using this method
@@ -45,9 +59,23 @@ class Cisco::Switch::SnoopingIpToMac
         do_send command, **options
     end
 
-    def update_mappings
+    def query_snooping_bindings
         do_send 'show ip dhcp snooping binding'
     end
+
+    def query_interface_status
+        do_send 'show interfaces status'
+    end
+
+    def query_connected_devices
+        logger.debug { "Querying for connected devices" }
+        query_interface_status
+        schedule.in(3000) { query_snooping_bindings }
+    end
+
+
+    protected
+
 
     def received(data, resolve, command)
         logger.debug { "Switch sent #{data}" }
@@ -57,6 +85,7 @@ class Cisco::Switch::SnoopingIpToMac
             logger.debug { "Authenticating" }
             # Don't want to log the password ;)
             send("#{setting(:password)}\n", priority: 99)
+            schedule.in(2000) { query_connected_devices }
             return :success
         end
 
@@ -88,11 +117,12 @@ class Cisco::Switch::SnoopingIpToMac
             if data =~ /Up:/
                 logger.debug { "Interface Up: #{interface}" }
                 @check_interface << interface
-                schedule.in(3000) { update_mappings }
+                schedule.in(3000) { query_snooping_bindings }
             elsif data =~ /Down:/
                 logger.debug { "Interface Down: #{interface}" }
                 @check_interface.delete(interface)
             end
+
             return :success
         end
 
@@ -103,19 +133,17 @@ class Cisco::Switch::SnoopingIpToMac
         # gi1      1G-Copper    Full    1000  Enabled  Off  Up          Disabled On
         # gi2      1G-Copper      --      --     --     --  Down           --     --
         if entries.include?('Up')
-            logger.debug { "Interface Up: #{entries[0]}" }
-            @check_interface << entries[0]
+            interface = entries[0].downcase
+            logger.debug { "Interface Up: #{interface}" }
+            @check_interface << interface.downcase
             return :success
-        elsif entries.include?('Down')
-            interface = entries[0]
-            logger.debug { "Interface Down: #{interface}" }
-            @check_interface.delete(interface)
 
-            # TODO:: Create an actual couchbase model
-            # We need to be able to delete these records if the control server restarts
-            ip, mac = self[interface]
-            self[interface] = nil
-            ::User.bucket.delete("inmac-#{mac}")
+        elsif entries.include?('Down')
+            interface = entries[0].downcase
+            logger.debug { "Interface Down: #{interface}" }
+            
+            # Delete the lookup records
+            remove_lookup(interface)
             return :success
         end
 
@@ -135,25 +163,26 @@ class Cisco::Switch::SnoopingIpToMac
                 # Ensure the data is valid
                 mac = entries[0]
                 if mac =~ /^(?:[[:xdigit:]]{1,2}([-:]))(?:[[:xdigit:]]{1,2}\1){4}[[:xdigit:]]{1,2}$/
+                    mac.downcase!
                     ip = entries[1]
                     if ::IPAddress.valid? ip
-                        logger.debug { "Recording mapping #{ip} => #{mac}" }
+                        logger.debug { "Recording lookup for #{ip} => #{mac}" }
 
                         if self[ip] != mac
                             self[ip] = mac
-                            ::User.bucket.set("ipmac-#{ip}", mac.downcase, expire_in: 1.week)
+                            ::User.bucket.set("ipmac-#{ip}", mac, expire_in: 1.week)
                         end
 
                         if self[interface] != [ip, mac]
                             self[interface] = [ip, mac]
-
-                            # TODO:: Create an actual couchbase model
-                            ::User.bucket.set("inmac-#{mac}", {
-                                switch: remote_address,
-                                hostname: @hostname,
-                                interface: interface,
-                                switch_name: @switch_name
-                            }, expire_in: 1.week)
+                            lookup = ::Aca::MacLookup.find_by_id("inmac-#{mac}") || ::Aca::MacLookup.new
+                            lookup.mac_address = mac
+                            lookup.device_ip   = ip
+                            lookup.switch_ip   = remote_address
+                            lookup.hostname    = @hostname
+                            lookup.switch_name = @switch_name
+                            lookup.interface   = interface
+                            lookup.save!(expire_in: 1.week)
                         end
                     end
                 end
@@ -164,12 +193,31 @@ class Cisco::Switch::SnoopingIpToMac
         :success
     end
 
-
-    protected
-
-
     def do_send(cmd, **options)
         logger.debug { "requesting #{cmd}" }
         send("#{cmd}\n", options)
+    end
+
+    def remove_lookup(interface)
+        ip, mac = self[interface]
+        return unless mac
+
+        @check_interface.delete(interface)
+
+        # Delete the IP to MAC lookup
+        logger.debug { "Removing lookup for #{ip} => #{mac}" }
+        ipmac = "ipmac-#{ip}"
+        mac_address = ::Aca::MacLookup.bucket.get(ipmac)
+        ::Aca::MacLookup.bucket.delete(ipmac) if mac == mac_address
+
+        # Make sure this MAC address hasn't been found somewhere else
+        model = ::Aca::MacLookup.find_by_id("inmac-#{mac}")
+        if model && model.switch_ip == remote_address && model.interface == interface
+            # CAS == Compare and Swap
+            # don't delete if the record has been updated
+            model.destroy(with_cas: true)
+        end
+
+        self[interface] = nil
     end
 end
