@@ -58,4 +58,6 @@ Total number of binding: 2
 c4:54:44:38:e1:58  192.168.1.16    172522       learned    1    gi2
 SNOOPING
 
+    # Database writes
+    wait(300)
 end

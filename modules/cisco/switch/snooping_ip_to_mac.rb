@@ -4,6 +4,7 @@ module Cisco::Switch; end
 
 require 'set'
 require_relative '../../aca/mac_lookup.rb'
+::Aca::MacLookup.ensure_design_document!
 
 
 class Cisco::Switch::SnoopingIpToMac
@@ -29,10 +30,10 @@ class Cisco::Switch::SnoopingIpToMac
     def on_load
         @check_interface = ::Set.new
 
-        ::Aca::MacLookup.ensure_design_document!
         query = ::Aca::MacLookup.find_by_switch_ip(remote_address)
         query.stream do |detail|
             self[detail.interface] = [detail.device_ip, detail.mac_address]
+            self[detail.device_ip] = detail.mac_address
         end
 
         on_update
@@ -127,7 +128,7 @@ class Cisco::Switch::SnoopingIpToMac
         end
 
         # Grab the parts of the response
-        entries = data.split(/\s/)
+        entries = data.split(/\s+/)
 
         # show interfaces status
         # gi1      1G-Copper    Full    1000  Enabled  Off  Up          Disabled On
@@ -165,6 +166,7 @@ class Cisco::Switch::SnoopingIpToMac
                 if mac =~ /^(?:[[:xdigit:]]{1,2}([-:]))(?:[[:xdigit:]]{1,2}\1){4}[[:xdigit:]]{1,2}$/
                     mac.downcase!
                     ip = entries[1]
+
                     if ::IPAddress.valid? ip
                         logger.debug { "Recording lookup for #{ip} => #{mac}" }
 
