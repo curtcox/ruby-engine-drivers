@@ -172,7 +172,7 @@ class Cisco::Switch::SnoopingIpToMac
 
                         if self[ip] != mac
                             self[ip] = mac
-                            ::User.bucket.set("ipmac-#{ip}", mac, expire_in: 1.week)
+                            ::Aca::MacLookup.bucket.set("ipmac-#{ip}", mac, expire_in: 1.week)
                         end
 
                         if self[interface] != [ip, mac]
