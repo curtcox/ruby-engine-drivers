@@ -1,10 +1,10 @@
 module Aca; end
 
-class Aca::LocateUser
+class Aca::LocateUserArp
     include ::Orchestrator::Constants
 
 
-    descriptive_name 'IP and Username to MAC lookup'
+    descriptive_name 'IP and Username to MAC lookup using ARP'
     generic_name :LocateUser
     implements :logic
 
