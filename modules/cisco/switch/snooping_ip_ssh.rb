@@ -7,12 +7,12 @@ require_relative '../../aca/mac_lookup.rb'
 ::Aca::MacLookup.ensure_design_document!
 
 
-class Cisco::Switch::SnoopingIpToMac
+class Cisco::Switch::SnoopingIpSsh
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
 
-    descriptive_name 'Cisco Switch Snooping'
+    descriptive_name 'Cisco Switch IP Snooping over SSH'
     generic_name :Snooping
 
     # Discovery Information

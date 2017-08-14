@@ -1,4 +1,4 @@
-Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingIpToMac' do
+Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingIpSsh' do
 
     transmit "\n\n\nUser Name:"
     should_send "cisco\n"
