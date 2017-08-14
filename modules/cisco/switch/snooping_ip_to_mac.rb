@@ -33,7 +33,7 @@ class Cisco::Switch::SnoopingIpToMac
         query = ::Aca::MacLookup.find_by_switch_ip(remote_address)
         query.stream do |detail|
             self[detail.interface] = [detail.device_ip, detail.mac_address]
-            self[detail.device_ip] = detail.mac_address
+            self[detail.device_ip] = ::Aca::MacLookup.bucket.get("ipmac-#{detail.device_ip}")
         end
 
         on_update
@@ -168,16 +168,22 @@ class Cisco::Switch::SnoopingIpToMac
                     ip = entries[1]
 
                     if ::IPAddress.valid? ip
-                        logger.debug { "Recording lookup for #{ip} => #{mac}" }
-
                         if self[ip] != mac
+                            logger.debug { "Recording lookup for #{ip} => #{mac}" }
                             self[ip] = mac
                             ::Aca::MacLookup.bucket.set("ipmac-#{ip}", mac, expire_in: 1.week)
                         end
 
                         if self[interface] != [ip, mac]
-                            self[interface] = [ip, mac]
-                            lookup = ::Aca::MacLookup.find_by_id("inmac-#{mac}") || ::Aca::MacLookup.new
+                            lookup = ::Aca::MacLookup.find_by_id("inmac-#{mac}")
+                            if lookup
+                                # detect IP address change
+                                logger.debug { "Updating location of #{mac}" }
+                                remove_ip_to_mac_lookup(lookup.device_ip, mac) if lookup.device_ip != ip
+                            else
+                                logger.debug { "Recording location of #{mac}" }
+                                lookup = ::Aca::MacLookup.new
+                            end
                             lookup.mac_address = mac
                             lookup.device_ip   = ip
                             lookup.switch_ip   = remote_address
@@ -185,6 +191,7 @@ class Cisco::Switch::SnoopingIpToMac
                             lookup.switch_name = @switch_name
                             lookup.interface   = interface
                             lookup.save!(expire_in: 1.week)
+                            self[interface] = [ip, mac]
                         end
                     end
                 end
@@ -207,10 +214,7 @@ class Cisco::Switch::SnoopingIpToMac
         @check_interface.delete(interface)
 
         # Delete the IP to MAC lookup
-        logger.debug { "Removing lookup for #{ip} => #{mac}" }
-        ipmac = "ipmac-#{ip}"
-        mac_address = ::Aca::MacLookup.bucket.get(ipmac)
-        ::Aca::MacLookup.bucket.delete(ipmac) if mac == mac_address
+        remove_ip_to_mac_lookup(ip, mac)
 
         # Make sure this MAC address hasn't been found somewhere else
         model = ::Aca::MacLookup.find_by_id("inmac-#{mac}")
@@ -218,8 +222,23 @@ class Cisco::Switch::SnoopingIpToMac
             # CAS == Compare and Swap
             # don't delete if the record has been updated
             model.destroy(with_cas: true)
+            logger.debug { "Removing location of #{mac}" }
         end
-
         self[interface] = nil
+    end
+
+    def remove_ip_to_mac_lookup(ip, mac)
+        logger.debug { "Removing lookup for #{ip} => #{mac}" }
+
+        bucket = ::Aca::MacLookup.bucket
+        key = "ipmac-#{ip}"
+        resp = bucket.get(key, quiet: true, extended: true)
+        if resp.value == mac
+            begin
+                bucket.delete(key, cas: resp.cas)
+            rescue Libcouchbase::Error::KeyExists
+                # CAS failed we can safely ignore this
+            end
+        end
     end
 end
