@@ -32,6 +32,7 @@ class Aca::Slack
         messages.delete_if{ |message|
             !((!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message')
         }
+        self["threads"] = messages
     end
 
     def get_thread(thread_id)
@@ -44,21 +45,7 @@ class Aca::Slack
         }
         response = slack_api.post(path: 'https://slack.com/api/channels.replies', body: req).value
         messages = JSON.parse(response.body)['messages']
-    end
-
-    # Client replying to a thread via the app
-    def client_reply(data)
-        self['new_client_reply'] = data
-    end
-
-    # Concierge replying to a client via the Slack client
-    def concierge_reply(data)
-        self['new_concierge_reply'] = data
-    end
-
-    # This is the first message incoming from a client using the client app
-    def client_new_message(data)
-        self['new_client_thread'] = data
+        self["thread_#{thread_id}"] = messages
     end
 
     protected
@@ -84,7 +71,14 @@ class Aca::Slack
             logger.debug "Got message!"
             begin
                 #@client.typing channel: data.channel
-                on_message(data)
+                # Disregard if we have a subtype key and it's a reply to a message
+                if data.key?('subtype') && data['subtype'] == 'message_replied'
+                    next
+                end
+                get_threads
+                if data.key?('thread_ts')
+                    get_thread(data['thread_ts'])
+                end
             rescue Exception => e
                 logger.debug e.message
                 logger.debug e.backtrace
@@ -92,6 +86,6 @@ class Aca::Slack
         end
 
     @client.start!
-    
+
     end
 end
