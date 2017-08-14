@@ -16,7 +16,7 @@ class Aca::LocateUser
     end
 
     def lookup(ip, username, domain = '.')
-        login = "#{domain}\\#{username}"
+        login = "#{domain}/#{username}"
 
         # prevents concurrent and repeat lookups for the one IP and user
         return if @looking_up[ip] || self[ip] == login
