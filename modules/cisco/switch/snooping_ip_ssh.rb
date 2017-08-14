@@ -133,13 +133,17 @@ class Cisco::Switch::SnoopingIpSsh
         # show interfaces status
         # gi1      1G-Copper    Full    1000  Enabled  Off  Up          Disabled On
         # gi2      1G-Copper      --      --     --     --  Down           --     --
-        if entries.include?('Up')
+        # OR
+        # Port    Name               Status       Vlan       Duplex  Speed Type
+        # Gi1/1                      notconnect   1            auto   auto No Gbic
+        # Fa6/1                      connected    1          a-full  a-100 10/100BaseTX
+        if entries.include?('Up') || entries.include?('connected')
             interface = entries[0].downcase
             logger.debug { "Interface Up: #{interface}" }
             @check_interface << interface.downcase
             return :success
 
-        elsif entries.include?('Down')
+        elsif entries.include?('Down') || entries.include?('notconnect')
             interface = entries[0].downcase
             logger.debug { "Interface Down: #{interface}" }
             
