@@ -33,7 +33,7 @@ class Cisco::Switch::SnoopingIpSsh
         query = ::Aca::MacLookup.find_by_switch_ip(remote_address)
         query.stream do |detail|
             self[detail.interface] = [detail.device_ip, detail.mac_address]
-            self[detail.device_ip] = ::Aca::MacLookup.bucket.get("ipmac-#{detail.device_ip}")
+            self[detail.device_ip] = ::Aca::MacLookup.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
         end
 
         on_update
