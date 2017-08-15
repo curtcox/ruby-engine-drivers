@@ -591,14 +591,16 @@ class Aca::ExchangeBooking
                 if now_int > start_integer && now_int < end_integer
                     meeting.get_all_properties!
 
-                    # Lync: <a name="OutJoinLink">
-                    # Skype: <a name="x_OutJoinLink">
-                    body_parts = meeting.body.split('OutJoinLink"')
-                    if body_parts.length > 1
-                        links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
-                        if links[0].present?
-                            set_skype_url = false
-                            system[:Skype].set_uri(links[0])
+                    if meeting.body
+                        # Lync: <a name="OutJoinLink">
+                        # Skype: <a name="x_OutJoinLink">
+                        body_parts = meeting.body.split('OutJoinLink"')
+                        if body_parts.length > 1
+                            links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
+                            if links[0].present?
+                                set_skype_url = false
+                                system[:Skype].set_uri(links[0])
+                            end
                         end
                     end
                 end
