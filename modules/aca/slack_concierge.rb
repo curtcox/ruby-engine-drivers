@@ -1,7 +1,7 @@
 require 'slack-ruby-client'
 require 'slack/real_time/concurrency/libuv'
 
-class Aca::Slack
+class Aca::SlackConcierge
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
@@ -12,14 +12,19 @@ class Aca::Slack
     implements :logic
 
     def on_load
-        create_websocket
-
         on_update
     end
 
     def on_update
+        on_unload   
+        create_websocket
         self[:building] = setting(:building) || :barangaroo
         self[:channel] = setting(:channel) || :concierge
+    end
+
+    def on_unload
+        @client.stop! if @client && @client.started?
+        @client = nil
     end
 
     # Message from the concierge frontend
@@ -32,7 +37,25 @@ class Aca::Slack
         messages.delete_if{ |message|
             !((!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message')
         }
+        messages.each_with_index{|message, i|            
+            if message['username'].include?('(')
+                messages[i]['name'] = message['username'].split(' (')[0] if message.key?('username')
+                messages[i]['email'] = message['username'].split(' (')[1][0..-2] if message.key?('username')
+            else
+                messages[i]['name'] = message['username']
+            end
+
+            if message.key?('replies')
+                messages[i]['last_reply'] = get_message(message['replies'].pop['ts'])
+            else
+                messages[i]['last_reply'] = nil
+            end
+        }
         self["threads"] = messages
+    end
+
+    def get_message(ts)
+        messages = @client.web_client.channels_history({channel: setting(:channel), latest: ts, inclusive: true})['messages'][0]
     end
 
     def get_thread(thread_id)
@@ -53,17 +76,25 @@ class Aca::Slack
     # Create a realtime WS connection to the Slack servers
     def create_websocket
 
+        logger.debug "Creating websocket"
+
         ::Slack.configure do |config|
             config.token = setting(:slack_api_token)
-            config.logger = Logger.new(STDOUT)
-            config.logger.level = Logger::INFO
+            config.logger = logger
             fail 'Missing slack api token setting!' unless config.token
         end
+
+        logger.debug "Configured slack"
+
         ::Slack::RealTime.configure do |config|
             config.concurrency = Slack::RealTime::Concurrency::Libuv
         end
+        logger.debug "Configured slack concurrency"
+        
 
         @client = ::Slack::RealTime::Client.new
+        
+        get_threads
 
         logger.debug "Created client!!"
 
@@ -85,7 +116,7 @@ class Aca::Slack
             end
         end
 
-    @client.start!
+        @client.start!
 
     end
 end
