@@ -237,7 +237,7 @@ class Cisco::Switch::SnoopingIpSsh
         bucket = ::Aca::MacLookup.bucket
         key = "ipmac-#{ip}"
         resp = bucket.get(key, quiet: true, extended: true)
-        if resp.value == mac
+        if resp&.value == mac
             begin
                 bucket.delete(key, cas: resp.cas)
             rescue Libcouchbase::Error::KeyExists
