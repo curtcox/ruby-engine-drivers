@@ -33,7 +33,7 @@ class Cisco::Switch::SnoopingIpSsh
         query = ::Aca::MacLookup.find_by_switch_ip(remote_address)
         query.stream do |detail|
             self[detail.interface] = [detail.device_ip, detail.mac_address]
-            self[detail.device_ip] = ::Aca::MacLookup.bucket.get("ipmac-#{detail.device_ip}")
+            self[detail.device_ip] = ::Aca::MacLookup.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
         end
 
         on_update
@@ -237,7 +237,7 @@ class Cisco::Switch::SnoopingIpSsh
         bucket = ::Aca::MacLookup.bucket
         key = "ipmac-#{ip}"
         resp = bucket.get(key, quiet: true, extended: true)
-        if resp.value == mac
+        if resp&.value == mac
             begin
                 bucket.delete(key, cas: resp.cas)
             rescue Libcouchbase::Error::KeyExists
