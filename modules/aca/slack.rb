@@ -12,16 +12,21 @@ class Aca::Slack
     implements :logic
 
     def on_load
-        create_websocket
-
         on_update
     end
 
     def on_update
+        on_unload   
+        create_websocket
         self[:building] = setting(:building) || :barangaroo
         self[:channel] = setting(:channel) || :concierge
     end
 
+    def on_unload
+        @client.stop! if @client && @client.started?
+        @client = nil
+    end
+    
     # Message coming in from Slack API
     def on_message(data)
         logger.debug "------------------ Message from Slack API:  ------------------"

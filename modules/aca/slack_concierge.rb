@@ -33,10 +33,11 @@ class Aca::SlackConcierge
     end
 
     def get_threads
-        messages = @client.web_client.channels_history({channel: setting(:channel), count: 1000})['messages']
+        messages = @client.web_client.channels_history({channel: setting(:channel), oldest: (Time.now - 1.month).to_i, count: 1000})['messages']
         messages.delete_if{ |message|
             !((!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message')
         }
+        logger.debug "Processing messages in get_threads"
         messages.each_with_index{|message, i|            
             if message['username'].include?('(')
                 messages[i]['name'] = message['username'].split(' (')[0] if message.key?('username')
@@ -44,13 +45,10 @@ class Aca::SlackConcierge
             else
                 messages[i]['name'] = message['username']
             end
-
-            if message.key?('replies')
-                messages[i]['last_reply'] = get_message(message['replies'].pop['ts'])
-            else
-                messages[i]['last_reply'] = nil
-            end
+            messages[i]['replies'] = get_message(message['ts'])
         }
+        logger.debug "Finished processing messages in get_threads"
+        logger.debug messages[0]
         self["threads"] = messages
     end
 
@@ -69,6 +67,7 @@ class Aca::SlackConcierge
         response = slack_api.post(path: 'https://slack.com/api/channels.replies', body: req).value
         messages = JSON.parse(response.body)['messages']
         self["thread_#{thread_id}"] = messages
+        return nil
     end
 
     protected
@@ -80,7 +79,9 @@ class Aca::SlackConcierge
 
         ::Slack.configure do |config|
             config.token = setting(:slack_api_token)
-            config.logger = logger
+            # config.logger = logger
+            config.logger = Logger.new(STDOUT)
+            config.logger.level = Logger::INFO
             fail 'Missing slack api token setting!' unless config.token
         end
 
@@ -99,17 +100,36 @@ class Aca::SlackConcierge
         logger.debug "Created client!!"
 
         @client.on :message do |data|
-            logger.debug "Got message!"
+            logger.debug "----------------- Got message! -----------------"
+            logger.debug data
+            logger.debug "------------------------------------------------"
+
             begin
                 #@client.typing channel: data.channel
                 # Disregard if we have a subtype key and it's a reply to a message
                 if data.key?('subtype') && data['subtype'] == 'message_replied'
                     next
                 end
-                get_threads
+                # # This is not a reply 
                 if data.key?('thread_ts')
+                    get_thread(data['ts'])
                     get_thread(data['thread_ts'])
+                else
+                    logger.info "Adding thread too binding"
+                    if data['username'].include?('(')
+                        data['name'] = data['username'].split(' (')[0] if data.key?('username')
+                        data['email'] = data['username'].split(' (')[1][0..-2] if data.key?('username')
+                    else
+                        data['name'] = data['username']
+                    end
+                    messages = self["threads"].dup.unshift(data)
+                    self["threads"] = messages
+                    logger.debug "Getting threads! "
+                    get_threads
                 end
+
+                
+                
             rescue Exception => e
                 logger.debug e.message
                 logger.debug e.backtrace
