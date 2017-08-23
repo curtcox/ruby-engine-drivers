@@ -31,6 +31,32 @@ class Qsc::QSysControl
     def on_update
         @username = setting(:username)
         @password = setting(:password)
+
+        em_id = setting(:emergency)
+
+        # Emergency ID changed
+        if @emergency_subscribe && @em_id != em_id
+            unsubscribe(@emergency_subscribe)
+        end
+
+        # Emergency ID exists
+        if em_id
+            group = create_change_group(:emergency)
+            group_id = group[:id]
+            controls = group[:controls]
+
+            # Add id to change group as required
+            if not controls.include? em_id
+                # subscribe to changes
+                @em_id = em_id
+                @emergency_subscribe = subscribe(em_id) do |notice|
+                    self[:emergency] = notice.value
+                end
+                
+                group[:controls] = Set.new([em_id])
+                send "cga #{group_id} #{em_id}\n", wait: false
+            end
+        end
     end
 
     def connected
@@ -211,12 +237,8 @@ class Qsc::QSysControl
     def phone_watch(control_ids)
         ids = Array(control_ids)
 
-        # Check change group exists
-        group = @change_groups[:phone]
-        if group.nil?
-            group = create_change_group(:phone)
-        end
-
+        # Ensure change group exists
+        group = create_change_group(:phone)
         group_id = group[:id]
         controls = group[:controls]
 
