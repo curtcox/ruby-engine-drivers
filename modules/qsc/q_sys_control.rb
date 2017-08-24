@@ -128,7 +128,7 @@ class Qsc::QSysControl
     # Used to set a dial number / string
     def set_string(control_id, text)
         Array(control_id).each do |id|
-            send("css #{id} \"#{text}\"\n").then do
+            send("css \"#{id}\" \"#{text}\"\n").then do
                 self[id] = text
             end
         end
