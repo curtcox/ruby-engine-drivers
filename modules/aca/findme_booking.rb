@@ -285,6 +285,10 @@ class Aca::FindmeBooking
 
     def cancel_meeting(start_time, *args)
         task {
+            if start_time.is_a?(String)
+                start_time = start_time.chop
+                start_time = Time.parse(start_time).to_i * 1000
+            end
             delete_ews_booking (start_time / 1000).to_i
         }.then(proc { |count|
             logger.debug { "successfully removed #{count} bookings" }
