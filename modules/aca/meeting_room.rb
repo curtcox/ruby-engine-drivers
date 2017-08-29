@@ -195,7 +195,7 @@ class Aca::MeetingRoom < Aca::Joiner
             time = setting(:shutdown_time)
             unless is_negatory?(time)
                 schedule.cron(time || '30 23 * * *') do
-                    shutdown(scheduled_shutdown: true)
+                    shutdown
                 end
             end
 
@@ -630,7 +630,7 @@ class Aca::MeetingRoom < Aca::Joiner
     end
 
 
-    def shutdown(all = false, scheduled_shutdown: false)
+    def shutdown(all = false)
         if all
             perform_action(mod: :System, func: :shutdown_actual).then do
                 unjoin
@@ -638,7 +638,7 @@ class Aca::MeetingRoom < Aca::Joiner
         else
             unjoin.then do
                 thread.schedule do
-                    shutdown_actual(scheduled_shutdown: scheduled_shutdown)
+                    shutdown_actual
                 end
             end
         end
@@ -646,11 +646,8 @@ class Aca::MeetingRoom < Aca::Joiner
 
     def shutdown_actual(scheduled_shutdown: false)
         # Shudown action on Lights
-        if scheduled_shutdown && @light_scheduled_shutdown
-            lights_to_actual(@light_scheduled_shutdown)
-            @lights_set = false
-        elsif @light_shutdown
-            lights_to_actual(@light_shutdown)
+        if @light_scheduled_shutdown || @light_shutdown
+            lights_to_actual(@light_scheduled_shutdown || @light_shutdown)
             @lights_set = false
         end
 
