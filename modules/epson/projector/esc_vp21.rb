@@ -23,15 +23,15 @@ class Epson::Projector::EscVp21
 
         self[:power] = false
         self[:stable_state] = true  # Stable by default (allows manual on and off)
-        
+
         # Meta data for inquiring interfaces
         self[:type] = :projector
     end
 
     def on_update
-        
+
     end
-    
+
     def connected
         # Have to init comms
         send("ESC/VP.net\x10\x03\x00\x00\x00\x00")
@@ -43,9 +43,9 @@ class Epson::Projector::EscVp21
         self[:power] = false
         schedule.clear
     end
-    
-    
-    
+
+
+
     #
     # Power commands
     #
@@ -69,9 +69,9 @@ class Epson::Projector::EscVp21
         options[:name] = :power_state
         do_send(:PWR, options)
     end
-    
-    
-    
+
+
+
     #
     # Input selection
     #
@@ -80,23 +80,23 @@ class Epson::Projector::EscVp21
         :hdbaset => 80
     }
     INPUTS.merge!(INPUTS.invert)
-    
-    
+
+
     def switch_to(input)
         input = input.to_sym
         return unless INPUTS.has_key? input
-        
+
         do_send(:SOURCE, INPUTS[input].to_s(16), {:name => :inpt_source})
         do_send(:SOURCE, {:name => :inpt_query})
-        
+
         logger.debug "-- epson LCD, requested to switch to: #{input}"
-        
+
         self[:input] = input    # for a responsive UI
         self[:mute] = false
     end
-    
-    
-    
+
+
+
     #
     # Volume commands are sent using the inpt command
     #
@@ -107,11 +107,11 @@ class Epson::Projector::EscVp21
 
         # Seems to only return ':' for this command
         self[:volume] = vol
-        self[:unmute_volume] = vol if vol > 0 # Store the 'pre mute' volume, so it can be restored on unmute  
+        self[:unmute_volume] = vol if vol > 0 # Store the 'pre mute' volume, so it can be restored on unmute
         do_send(:VOL, vol, options)
     end
-    
-    
+
+
     #
     # Mute Audio and Video
     #
@@ -122,11 +122,11 @@ class Epson::Projector::EscVp21
     end
 
     def unmute
-        logger.debug "-- epson Proj, requested to mute"
+        logger.debug "-- epson Proj, requested to unmute"
         do_send(:MUTE, :OFF, {:name => :video_mute})
         do_send(:MUTE)
     end
-    
+
     # Audio mute
     def mute_audio(state = true)
         val = is_affirmative?(state) ? 0 : self[:unmute_volume]
@@ -136,7 +136,7 @@ class Epson::Projector::EscVp21
     def unmute_audio
         mute_audio(false)
     end
-    
+
 
     def input?
         do_send(:SOURCE, {
@@ -144,8 +144,8 @@ class Epson::Projector::EscVp21
             :priority => 0
         })
     end
-    
-    
+
+
     ERRORS = {
         0 => '00: no error'.freeze,
         1 => '01: fan error'.freeze,
@@ -169,7 +169,7 @@ class Epson::Projector::EscVp21
         21 => '15: obstacle detection error'.freeze,
         22 => '16: IF board discernment error'.freeze
     }
-    
+
     #
     # epson Response code
     #
@@ -215,7 +215,7 @@ class Epson::Projector::EscVp21
         when :VOL
             vol = data[1].to_i
             self[:volume] = vol
-            self[:unmute_volume] = vol if vol > 0 # Store the 'pre mute' volume, so it can be restored on unmute      
+            self[:unmute_volume] = vol if vol > 0 # Store the 'pre mute' volume, so it can be restored on unmute
         when :LAMP
             self[:lamp_usage] = data[1].to_i
         when :SOURCE
@@ -228,11 +228,11 @@ class Epson::Projector::EscVp21
     def inspect_error
         do_send(:ERR, priority: 0)
     end
-    
-    
+
+
     protected
-    
-    
+
+
     def do_poll(*args)
         power?({:priority => 0}) do
             if self[:power]
@@ -277,4 +277,3 @@ class Epson::Projector::EscVp21
         end
     end
 end
-
