@@ -163,7 +163,7 @@ class Aca::GoogleRefreshBooking
             @google_connect_type = (setting(:google_connect_type) || :SMTP).to_sym
             @timezone = setting(:room_timezone)
         else
-            logger.warn "oauth2 gem not available" if setting(:google_creds)
+            logger.warn "oauth2 gem not available"
         end
 
         # Load the last known values (persisted to the DB)
@@ -319,9 +319,14 @@ class Aca::GoogleRefreshBooking
         # client = OAuth2::Client.new(@google_client_id, @google_secret, {site: @google_site, token_url: @google_token_url})
 
         # Create an instance of the calendar.
+        params = {:client_id => @google_client_id,
+                                   :client_secret => @google_secret,
+                                   :calendar      => @google_room,
+                                   :redirect_url  => @google_redirect_uri}.to_json
+        logger.debug params
         begin
             cal = Google::Calendar.new(:client_id     => @google_client_id,
-                                       :client_secret => @google_client_secret,
+                                       :client_secret => @google_secret,
                                        :calendar      => @google_room,
                                        :redirect_url  => @google_redirect_uri # this is what Google uses for 'applications'
                                        )
@@ -559,11 +564,9 @@ class Aca::GoogleRefreshBooking
     end
 
     def todays_bookings(events)
+        results = []
 
         events.each{|event| 
-
-            # start_time = Time.parse(event['start']['dateTime']).utc.iso8601[0..18] + 'Z'
-            # end_time = Time.parse(event['end']['dateTime']).utc.iso8601[0..18] + 'Z'
             start_time = ActiveSupport::TimeZone.new('UTC').parse(event.start_time).iso8601[0..18]
             end_time = ActiveSupport::TimeZone.new('UTC').parse(event.end_time).iso8601[0..18]
 
@@ -573,7 +576,7 @@ class Aca::GoogleRefreshBooking
                 :Start => start_time,
                 :End => end_time,
                 :Subject => event.title,
-                :owner => organizer
+                :owner => organiser
                 # :setup => 0,
                 # :breakdown => 0
             })
