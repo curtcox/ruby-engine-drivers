@@ -1,6 +1,7 @@
 # encoding: ASCII-8BIT
 
 require 'uv-rays'
+require 'google_calendar'
 
 # For rounding up to the nearest 15min
 # See: http://stackoverflow.com/questions/449271/how-to-round-a-time-down-to-the-nearest-15-minutes-in-ruby
