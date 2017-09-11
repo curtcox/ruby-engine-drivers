@@ -15,9 +15,6 @@ class Aca::DeviceProbe
     # Restrict sending on arbitrary commands to admin / tech support only
     protect_method :send_data
 
-    # Log all the things!
-    before_transmit :log_tx
-
     def on_load
         # Log instantiation events so we have an audit trail if this is ever
         # added to a prod system.
@@ -41,31 +38,45 @@ class Aca::DeviceProbe
     end
 
     def send_data(data, opts = {}, &block)
+        log_tx data, current_user
+
         opts[:emit] = block if block_given?
         opts[:hex_string] = true if transcode?
         opts[:wait] = false
+
         send data, opts
     end
 
     protected
 
     def received(data, resolve, command)
-        logger.debug "<- \"#{transcode? ? humanify(data) : data}\""
+        log_rx data
         :success
     end
 
-    def log_tx(data, command)
-        logger.warn "-> \"#{data}\""
-        return data
+    def log_tx(data, user)
+        logger.warn { "-> \"#{humanify data}\" (#{user.name} <#{user.email}>)" }
+    end
+
+    def log_rx(data)
+        logger.info { "<- \"#{humanify data}\"" }
     end
 
     def transcode?
         is_affirmative? setting(:hex)
     end
 
+    def humanify(data)
+        if transcode?
+            as_hex data
+        else
+            data
+        end
+    end
+
     # Map raw binary data returned from a device, into a nice human readable
     # string with the data represented as cleanly spaced hex bytes.
-    def humanify(data)
+    def as_hex(data)
         byte_to_hex(data)
             .scan(/../)
             .map { |byte| "0x#{byte}" }
