@@ -42,7 +42,7 @@ class Aca::DeviceProbe
 
         opts[:emit] = block if block_given?
         opts[:hex_string] = true if transcode?
-        opts[:wait] = false
+        opts[:wait] ||= false
 
         send data, opts
     end
