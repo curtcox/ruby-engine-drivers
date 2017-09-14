@@ -103,30 +103,31 @@ module X3m::Displays::WallDisplay::Protocol
     module_function
 
     MARKER = {
-        :SOH => 0x01,
-        :STX => 0x02,
-        :ETX => 0x03,
-        :delimiter => 0x0d,
-        :reserved => 0x30
+        SOH: 0x01,
+        STX: 0x02,
+        ETX: 0x03,
+        delimiter: 0x0d,
+        reserved: 0x30
     }
 
     MONITOR_ID = {
-        :all => 0x2a
+        all: 0x2a
     }.merge Hash[(1..9).zip(0x41..0x49)]
 
     MESSAGE_SENDER = {
-        :pc => 0x30
+        pc: 0x30
     }
 
     MESSAGE_TYPE = {
-        :set_parameter_command => 0x45,
-        :set_parameter_reply => 0x46
+        set_parameter_command: 0x45,
+        set_parameter_reply: 0x46
     }
 
     COMMAND = {
-        :brightness => 0x0110,
-        :contrast => 0x0112,
-        :power => 0x0003
+        brightness: 0x0110,
+        contrast: 0x0112,
+        volume: 0x0062,
+        power: 0x0003
     }
 
     # Build a 'set_parameter_command' packet ready for transmission to the
