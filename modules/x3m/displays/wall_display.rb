@@ -1,4 +1,4 @@
-# encoding: ASCII-8BIT
+# frozen_string_literal: true, encoding: ASCII-8BIT
 
 module X3m; end
 module X3m::Displays; end
@@ -50,13 +50,7 @@ class X3m::Displays::WallDisplay
     end
 
     def power(state)
-        logger.debug "Setting power #{state}"
-
-        if is_affirmative? state
-            set :power, 1
-        else
-            set :power, 0
-        end
+        set :power, is_affirmative?(state)
     end
 
     def volume(level)
@@ -79,7 +73,11 @@ class X3m::Displays::WallDisplay
     protected
 
     def set(command, param, opts = {}, &block)
-        packet = Protocol.build_packet(command, param)
+        logger.debug { "Setting #{command} -> #{param}" }
+
+        op_code, value = Protocol.lookup(command, param)
+
+        packet = Protocol.build_packet(op_code, value)
 
         opts[:emit] = block if block_given?
         opts[:name] ||= command
@@ -123,13 +121,28 @@ module X3m::Displays::WallDisplay::Protocol
         power: 0x0003
     }
 
+    # Definitions for non-numeric command arguments
+    PARAMS = {
+        power: {
+            false => 0,
+            true => 1
+        }
+    }
+
+    # Map a symbolic command and parameter value to an [op_code, value]
+    def lookup(command, param)
+        op_code = COMMAND[command]
+        value = PARAMS[command] && PARAMS[command][param] || param
+        [op_code, value]
+    end
+
     # Build a 'set_parameter_command' packet ready for transmission to the
-    # device(s). Command should be one of the symbols from the COMMAND hash.
-    def build_packet(command, param, monitor_id: :all)
+    # device(s).
+    def build_packet(op_code, value, monitor_id: :all)
         message = [
             MARKER[:STX],
-            *Util.byte_arr(COMMAND[command], length: 4),
-            *Util.byte_arr(param, length: 4),
+            *Util.byte_arr(op_code, length: 4),
+            *Util.byte_arr(value, length: 4),
             MARKER[:ETX]
         ]
 
