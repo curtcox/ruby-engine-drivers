@@ -60,15 +60,8 @@ class X3m::Displays::WallDisplay
     end
 
     def volume(level)
-
-    end
-
-    def mute(state = true)
-
-    end
-
-    def unmute
-
+        target = Protocol::Util.scale level, 100, 30
+        set :volume, target
     end
 
     def switch_to(input)
@@ -180,6 +173,12 @@ module X3m::Displays::WallDisplay::Protocol::Util
     def byte_arr(value, length:)
         as_hex(value, width: length)
             .bytes
+    end
+
+    # Scale a value previous on a 0..old_max scale to it's equivalent within
+    # 0..new_max
+    def scale(value, old_max, new_max)
+        (new_max * value) / old_max
     end
 
     # Expand a hashmap to provide inverted k/v pairs for bi-directional lookup
