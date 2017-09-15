@@ -86,7 +86,14 @@ class X3m::Displays::WallDisplay
     end
 
     def received(response, resolve, command)
+        logger.debug {
+            byte_to_hex(response)
+                .scan(/../)
+                .map { |byte| "0x#{byte}" }
+                .join ' '
+        }
 
+        :success
     end
 end
 
