@@ -59,7 +59,7 @@ class X3m::Displays::WallDisplay
     end
 
     def switch_to(input)
-
+        set :input, input.to_sym
     end
 
     def mute_audio(state = true)
@@ -125,14 +125,21 @@ module X3m::Displays::WallDisplay::Protocol
         brightness: 0x0110,
         contrast: 0x0112,
         volume: 0x0062,
-        power: 0x0003
+        power: 0x0003,
+        input: 0x02CB
     }
 
     # Definitions for non-numeric command arguments
     PARAMS = {
         power: {
-            false => 0,
-            true => 1
+            false: 0,
+            true: 1
+        },
+        input: {
+            vga: 0,
+            dvi: 1,
+            hdmi: 2,
+            dp: 3
         }
     }
 
