@@ -171,8 +171,8 @@ module X3m::Displays::WallDisplay::Protocol
             *Util.byte_arr(message.length, length: 2)
         ]
 
-        # XOR of all bytes in header and message for checksum
-        bcc = (header + message).reduce(:^)
+        # XOR of byte 1 -> end of message payload for checksum
+        bcc = (header.drop(1) + message).reduce(:^)
 
         header + message << bcc << MARKER[:delimiter]
     end
