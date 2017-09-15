@@ -134,8 +134,8 @@ module X3m::Displays::WallDisplay::Protocol
     # Definitions for non-numeric command arguments
     PARAMS = {
         power: {
-            false: 0,
-            true: 1
+            false => 0,
+            true => 1
         },
         input: {
             vga: 0,
