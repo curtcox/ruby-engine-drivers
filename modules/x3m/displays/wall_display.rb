@@ -148,7 +148,7 @@ module X3m::Displays::WallDisplay::Protocol
     # Map a symbolic command and parameter value to an [op_code, value]
     def lookup(command, param)
         op_code = COMMAND[command]
-        value = PARAMS[command] && PARAMS[command][param] || param
+        value = PARAMS.dig command, param || param
         [op_code, value]
     end
 
