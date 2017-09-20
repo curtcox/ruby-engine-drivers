@@ -77,9 +77,9 @@ class X3m::Displays::WallDisplay
     def set(command, param, opts = {}, &block)
         logger.debug { "Setting #{command} -> #{param}" }
 
-        op_code, value = Protocol.lookup(command, param)
+        op_code, value = Protocol.lookup command, param
 
-        packet = Protocol.build_packet(op_code, value, monitor_id: @id)
+        packet = Protocol.build_packet op_code, value, monitor_id: @id
 
         opts[:emit] = block if block_given?
         opts[:name] ||= command
@@ -88,16 +88,12 @@ class X3m::Displays::WallDisplay
     end
 
     def received(data, resolve, command)
-        logger.debug {
-            byte_to_hex(data)
-                .scan(/../)
-                .map { |byte| "0x#{byte}" }
-                .join ' '
-        }
-
         begin
+            # Re-append the delimiter that the tokenizer splits on to allow the
+            # parser to deal with complete packets.
+            data << "\r"
             response = Protocol.parse_response data
-        rescue => parse_error
+        rescue StandardError => parse_error
             logger.warn parse_error.message
             return :fail
         end
@@ -109,27 +105,23 @@ end
 module X3m::Displays::WallDisplay::Util
     module_function
 
-    # Convert an integral value into a string with its hexadecimal
-    # representation.
-    #
-    # as_hex(10, width: 2)
-    #  => "0A"
-    def as_hex_string(value, width:)
-        value
-            .to_s(16)
-            .rjust(width, '0')
-            .upcase
-    end
-
     # Convert an integral value to a byte array, with each element containing
     # the ASCII character code that represents the original value at that
     # offset (big-endian).
     #
-    # byte_arr(10, width: 2)
+    # encode(10, length: 2)
     #  => [48, 65]
-    def byte_arr(value, length:)
-        as_hex_string(value, width: length)
+    def encode(value, length:)
+        value
+            .to_s(16)
+            .upcase
+            .rjust(length, '0')
             .bytes
+    end
+
+    # Decode a section of an rx packet back to a usable value.
+    def decode(value)
+        value.length > 1 ? value.hex : value.ord
     end
 
     # Scale a value previous on a 0..old_max scale to it's equivalent within
@@ -198,12 +190,18 @@ module X3m::Displays::WallDisplay::Protocol
     PARAMS.transform_values! { |param| Util.bidirectional(param) }
     PARAMS.freeze
 
-    # Map a symbolic command and parameter value to an [op_code, value] or an
-    # op_code and value back to a [command, param]
+    # Map a symbolic command and parameter value to an [op_code, value]
     def lookup(command, param)
         op_code = COMMAND[command]
         value = PARAMS.dig command, param || param
         [op_code, value]
+    end
+
+    # Resolve an op_code and value back to a [command, param]
+    def resolve(op_code, value)
+        command = COMMAND[op_code]
+        param = PARAMS.dig command, value || value
+        [command, param]
     end
 
     # Build a 'set_parameter_command' packet ready for transmission to the
@@ -211,8 +209,8 @@ module X3m::Displays::WallDisplay::Protocol
     def build_packet(op_code, value, monitor_id: :all)
         message = [
             MARKER[:STX],
-            *Util.byte_arr(op_code, length: 4),
-            *Util.byte_arr(value, length: 4),
+            *Util.encode(op_code, length: 4),
+            *Util.encode(value, length: 4),
             MARKER[:ETX]
         ]
 
@@ -222,7 +220,7 @@ module X3m::Displays::WallDisplay::Protocol
             MONITOR_ID[monitor_id],
             MESSAGE_SENDER[:pc],
             MESSAGE_TYPE[:set_parameter_command],
-            *Util.byte_arr(message.length, length: 2)
+            *Util.encode(message.length, length: 2)
         ]
 
         # XOR of byte 1 -> end of message payload for checksum
@@ -231,26 +229,28 @@ module X3m::Displays::WallDisplay::Protocol
         header + message << bcc << MARKER[:delimiter]
     end
 
-    # Parse a response packet out to a nice readable structure.
+    # Parse a response packet to a hash of its decoded components.
     def parse_response(packet)
         capture = ->(name, len = 1) { "(?<#{name}>.{#{len}})" }
 
+        marker = ->(key) { "\\x#{MARKER[key].to_s(16).rjust(2, '0')}" }
+
         structure = %r{
-            #{MARKER[:SOH]}
-            #{MARKER[:reserved]}
+            #{marker[:SOH]}
+            #{marker[:reserved]}
             #{capture['receiver']}
             #{capture['monitor_id']}
             #{capture['message_type']}
             #{capture['message_len', 2]}
-            #{MARKER[:STX]}
+            #{marker[:STX]}
             #{capture['result_code', 2]}
             #{capture['op_code', 4]}
-            #{capture['message_type', 2]}
+            #{capture['op_code_type', 2]}
             #{capture['max_value', 4]}
             #{capture['value', 4]}
-            #{MARKER[:ETX]}
+            #{marker[:ETX]}
             #{capture['bcc']}
-            #{MARKER[:delimiter]}
+            #{marker[:delimiter]}
         }x
 
         rx = packet.match structure
@@ -259,25 +259,19 @@ module X3m::Displays::WallDisplay::Protocol
         end
 
         bcc = packet.bytes[1..-3].reduce(:^)
-        if bcc != rx[:bcc]
+        if bcc != rx[:bcc].ord
             raise 'invalid checksum'
         end
 
-        decode = ->(capture_name) { rx[capture_name].hex }
+        rx_data = rx.named_captures.transform_values { |val| Util.decode val }
 
-        resolve = lambda do |hash, capture_name|
-            raw_value = rx[capture_name]
-            value = raw_value.length > 1 ? raw_value.hex : raw_value.ord
-            hash[value] || value
-        end
-
-        command, param = lookup decode[:opcode], decode[:value]
+        command, param = resolve rx_data['op_code'], rx_data['value']
 
         {
-            receiver: resolve[MESSAGE_SENDER, :receiver],
-            monitor_id: resolve[MONITOR_ID, :monitor_id],
-            message_type: resolve[MESSAGE_TYPE, :message_type],
-            success: decode[:result_code] == 0,
+            receiver: MESSAGE_SENDER[rx_data.fetch 'receiver'],
+            monitor_id: MONITOR_ID[rx_data.fetch 'monitor_id'],
+            message_type: MESSAGE_TYPE[rx_data.fetch 'message_type'],
+            success: rx_data.fetch('result_code') == 0,
             command: command,
             value: param
         }
