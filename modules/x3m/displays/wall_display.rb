@@ -56,7 +56,7 @@ class X3m::Displays::WallDisplay
     end
 
     def volume(level)
-        target = Protocol::Util.scale level, 100, 30
+        target = Util.scale level, 100, 30
         set :volume, target
     end
 
@@ -87,20 +87,69 @@ class X3m::Displays::WallDisplay
         send packet, opts
     end
 
-    def received(response, resolve, command)
+    def received(data, resolve, command)
         logger.debug {
-            byte_to_hex(response)
+            byte_to_hex(data)
                 .scan(/../)
                 .map { |byte| "0x#{byte}" }
                 .join ' '
         }
 
+        begin
+            response = Protocol.parse_response data
+        rescue => parse_error
+            logger.warn parse_error.message
+            return :fail
+        end
+
         :success
+    end
+end
+
+module X3m::Displays::WallDisplay::Util
+    module_function
+
+    # Convert an integral value into a string with its hexadecimal
+    # representation.
+    #
+    # as_hex(10, width: 2)
+    #  => "0A"
+    def as_hex_string(value, width:)
+        value
+            .to_s(16)
+            .rjust(width, '0')
+            .upcase
+    end
+
+    # Convert an integral value to a byte array, with each element containing
+    # the ASCII character code that represents the original value at that
+    # offset (big-endian).
+    #
+    # byte_arr(10, width: 2)
+    #  => [48, 65]
+    def byte_arr(value, length:)
+        as_hex_string(value, width: length)
+            .bytes
+    end
+
+    # Scale a value previous on a 0..old_max scale to it's equivalent within
+    # 0..new_max
+    def scale(value, old_max, new_max)
+        (new_max * value) / old_max
+    end
+
+    # Expand a hashmap to provide inverted k/v pairs for bi-directional lookup
+    def bidirectional(hash)
+        hash
+            .merge(hash.invert)
+            .freeze
     end
 end
 
 module X3m::Displays::WallDisplay::Protocol
     module_function
+
+    Util = ::X3m::Displays::WallDisplay::Util
 
     MARKER = {
         SOH: 0x01,
@@ -108,28 +157,30 @@ module X3m::Displays::WallDisplay::Protocol
         ETX: 0x03,
         delimiter: 0x0d,
         reserved: 0x30
-    }
+    }.freeze
 
-    MONITOR_ID = {
+    MONITOR_ID = Util.bidirectional({
         all: 0x2a
-    }.merge Hash[(1..9).zip(0x41..0x49)]
+    }.merge(
+        Hash[(1..9).zip(0x41..0x49)]
+    ))
 
-    MESSAGE_SENDER = {
+    MESSAGE_SENDER = Util.bidirectional({
         pc: 0x30
-    }
+    })
 
-    MESSAGE_TYPE = {
+    MESSAGE_TYPE = Util.bidirectional({
         set_parameter_command: 0x45,
         set_parameter_reply: 0x46
-    }
+    })
 
-    COMMAND = {
+    COMMAND = Util.bidirectional({
         brightness: 0x0110,
         contrast: 0x0112,
         volume: 0x0062,
         power: 0x0003,
         input: 0x02CB
-    }
+    })
 
     # Definitions for non-numeric command arguments
     PARAMS = {
@@ -144,8 +195,11 @@ module X3m::Displays::WallDisplay::Protocol
             dp: 3
         }
     }
+    PARAMS.transform_values! { |param| Util.bidirectional(param) }
+    PARAMS.freeze
 
-    # Map a symbolic command and parameter value to an [op_code, value]
+    # Map a symbolic command and parameter value to an [op_code, value] or an
+    # op_code and value back to a [command, param]
     def lookup(command, param)
         op_code = COMMAND[command]
         value = PARAMS.dig command, param || param
@@ -176,44 +230,56 @@ module X3m::Displays::WallDisplay::Protocol
 
         header + message << bcc << MARKER[:delimiter]
     end
-end
 
-module X3m::Displays::WallDisplay::Protocol::Util
-    module_function
+    # Parse a response packet out to a nice readable structure.
+    def parse_response(packet)
+        capture = ->(name, len = 1) { "(?<#{name}>.{#{len}})" }
 
-    # Convert an integral value into a string with its hexadecimal
-    # representation.
-    #
-    # as_hex(10, width: 2)
-    #  => "0A"
-    def as_hex(value, width:)
-        value
-            .to_s(16)
-            .rjust(width, '0')
-            .upcase
-    end
+        structure = %r{
+            #{MARKER[:SOH]}
+            #{MARKER[:reserved]}
+            #{capture['receiver']}
+            #{capture['monitor_id']}
+            #{capture['message_type']}
+            #{capture['message_len', 2]}
+            #{MARKER[:STX]}
+            #{capture['result_code', 2]}
+            #{capture['op_code', 4]}
+            #{capture['message_type', 2]}
+            #{capture['max_value', 4]}
+            #{capture['value', 4]}
+            #{MARKER[:ETX]}
+            #{capture['bcc']}
+            #{MARKER[:delimiter]}
+        }x
 
-    # Convert an integral value to a byte array, with each element containing
-    # the ASCII character code that represents the original value at that
-    # offset (big-endian).
-    #
-    # byte_arr(10, width: 2)
-    #  => [48, 65]
-    def byte_arr(value, length:)
-        as_hex(value, width: length)
-            .bytes
-    end
+        rx = packet.match structure
+        if rx.nil?
+            raise 'invalid packet structure'
+        end
 
-    # Scale a value previous on a 0..old_max scale to it's equivalent within
-    # 0..new_max
-    def scale(value, old_max, new_max)
-        (new_max * value) / old_max
-    end
+        bcc = packet.bytes[1..-3].reduce(:^)
+        if bcc != rx[:bcc]
+            raise 'invalid checksum'
+        end
 
-    # Expand a hashmap to provide inverted k/v pairs for bi-directional lookup
-    def two_way_hash(hash)
-        hash
-            .merge(hash.invert)
-            .freeze
+        decode = ->(capture_name) { rx[capture_name].hex }
+
+        resolve = lambda do |hash, capture_name|
+            raw_value = rx[capture_name]
+            value = raw_value.length > 1 ? raw_value.hex : raw_value.ord
+            hash[value] || value
+        end
+
+        command, param = lookup decode[:opcode], decode[:value]
+
+        {
+            receiver: resolve[MESSAGE_SENDER, :receiver],
+            monitor_id: resolve[MONITOR_ID, :monitor_id],
+            message_type: resolve[MESSAGE_TYPE, :message_type],
+            success: decode[:result_code] == 0,
+            command: command,
+            value: param
+        }
     end
 end
