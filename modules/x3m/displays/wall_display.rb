@@ -97,6 +97,21 @@ class X3m::Displays::WallDisplay
             return :fail
         end
 
+        unless response[:success]
+            logger.warn { "Device error: #{response.inspect}" }
+            return :abort
+        end
+
+        logger.debug { "Device response received: #{response.inspect}" }
+
+        state = response[:command]
+        value = response[:value]
+
+        # Volume is the only numeric value that's not 0-100. Normalise to match.
+        value = Util.scale value, 30, 100 if state == :volume
+
+        self[state] = value
+
         :success
     end
 end
