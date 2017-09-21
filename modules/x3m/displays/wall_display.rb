@@ -31,8 +31,7 @@ class X3m::Displays::WallDisplay
     end
 
     def on_update
-        @id = setting(:monitor_id) || :all
-
+        self[:monitor_id] = setting(:monitor_id) || :all
         self[:volume_min] = setting(:volume_min) || 0
         self[:volume_max] = setting(:volume_max) || 100
     end
@@ -79,7 +78,7 @@ class X3m::Displays::WallDisplay
 
         op_code, value = Protocol.lookup command, param
 
-        packet = Protocol.build_packet op_code, value, monitor_id: @id
+        packet = Protocol.build_packet op_code, value, self[:monitor_id]
 
         opts[:emit] = block if block_given?
         opts[:name] ||= command
@@ -206,7 +205,7 @@ module X3m::Displays::WallDisplay::Protocol
 
     # Build a 'set_parameter_command' packet ready for transmission to the
     # device(s).
-    def build_packet(op_code, value, monitor_id: :all)
+    def build_packet(op_code, value, monitor_id = :all)
         message = [
             MARKER[:STX],
             *Util.encode(op_code, length: 4),
