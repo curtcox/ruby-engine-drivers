@@ -18,6 +18,8 @@ class Aca::TelevisionLogic
     end
 
     def on_update
+        # for Admin UI. long term fix is to have a default self[:module] (e.g. "IPTV_1") and have admin UI check 'connected' on self[:module] - but then need to update settings for any affected systems.
+        self[:connected] = true
         @start_channel = setting(:start_channel)
         @tv_input = setting(:tv_input) || :hdmi
         @module = setting(:tv_mod)
