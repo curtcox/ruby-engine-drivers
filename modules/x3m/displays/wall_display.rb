@@ -228,13 +228,11 @@ module X3m::Displays::WallDisplay::Protocol
         header + message << bcc << MARKER[:delimiter]
     end
 
-    # Parse a response packet to a hash of its decoded components.
-    def parse_response(packet)
+    private def build_rx_parser
         capture = ->(name, len = 1) { "(?<#{name}>.{#{len}})" }
+        marker = ->(key) { '\x' + MARKER[key].to_s(16).rjust(2, '0') }
 
-        marker = ->(key) { "\\x#{MARKER[key].to_s(16).rjust(2, '0')}" }
-
-        structure = %r{
+        %r{
             #{marker[:SOH]}
             #{marker[:reserved]}
             #{capture['receiver']}
@@ -251,8 +249,13 @@ module X3m::Displays::WallDisplay::Protocol
             #{capture['bcc']}
             #{marker[:delimiter]}
         }x
+    end
 
-        rx = packet.match structure
+    RX_STRUCTURE = build_rx_parser
+
+    # Parse a response packet to a hash of its decoded components.
+    def parse_response(packet)
+        rx = packet.match RX_STRUCTURE
         if rx.nil?
             raise 'invalid packet structure'
         end
