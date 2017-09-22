@@ -78,9 +78,6 @@ class X3m::Displays::WallDisplay
         op_code, value = Protocol.lookup command, param
 
         packet = Protocol.build_packet op_code, value, self[:monitor_id]
-        # Volume is the only numeric value that's not 0-100. Normalise to match.
-        value = Util.scale level, 100, 30 if command == :volume
-
 
         opts[:emit] = block if block_given?
         opts[:name] ||= command
@@ -106,11 +103,7 @@ class X3m::Displays::WallDisplay
 
         logger.debug { "Device response received: #{response.inspect}" }
 
-        state = response[:command]
-        value = response[:value]
-
-        # Volume is the only numeric value that's not 0-100. Normalise to match.
-        value = Util.scale value, 30, 100 if state == :volume
+        state, value = response.values_at :command, :value
 
         self[state] = value
 
@@ -207,14 +200,30 @@ module X3m::Displays::WallDisplay::Protocol
     # Map a symbolic command and parameter value to an [op_code, value]
     def lookup(command, param)
         op_code = COMMAND[command]
-        value = PARAMS.dig command, param || param
+
+        # Volume is the only numeric value that's not 0-100. Normalise to match.
+        value = if command == :volume
+                    Util.scale param, 100, 30
+                else
+                    PARAMS.dig command, param || param
+                end
+
         [op_code, value]
     end
 
     # Resolve an op_code and value back to a [command, param]
+    # (inverse of lookup)
     def resolve(op_code, value)
         command = COMMAND[op_code]
-        param = PARAMS.dig command, value || value
+
+        # As above, normalise volume to match the same range as other
+        # parameters.
+        param = if command == :volume
+                    Util.scale value, 30, 100
+                else
+                    PARAMS.dig command, value || value
+                end
+
         [command, param]
     end
 
