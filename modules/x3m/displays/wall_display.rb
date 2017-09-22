@@ -20,9 +20,7 @@ class X3m::Displays::WallDisplay
 
     def on_load
         on_update
-
         self[:power] = false
-
         # Meta data for inquiring interfaces
         self[:type] = :lcd
     end
@@ -38,7 +36,6 @@ class X3m::Displays::WallDisplay
 
     def connected
         do_poll
-
         schedule.every '30s', method(:do_poll)
     end
 
@@ -51,23 +48,47 @@ class X3m::Displays::WallDisplay
     end
 
     def power(state)
-        set :power, is_affirmative?(state)
-    end
-
-    def volume(level)
-        set :volume, level
+        state = is_affirmative? state
+        set :power, state
     end
 
     def switch_to(input)
-        set :input, input.to_sym
+        input = input.to_sym
+        set :input, input
     end
 
     def mute_audio(state = true)
-
+        state = is_affirmative? state
+        set :audio_mute, state
     end
 
     def unmute_audio
+        mute_audio false
+    end
 
+    def volume(level)
+        level = in_range level, 100
+        set :volume, level
+    end
+
+    def brightness(value)
+        value = in_range value, 100
+        set :brightness, value
+    end
+
+    def contrast(value)
+        value = in_range value, 100
+        set :contrast, value
+    end
+
+    def sharpness(value)
+        value = in_range value, 100
+        set :sharpness, value
+    end
+
+    def colour_temp(value)
+        value = value.to_sym
+        set :colour_temp, value
     end
 
     protected
@@ -176,14 +197,23 @@ module X3m::Displays::WallDisplay::Protocol
     COMMAND = Util.bidirectional({
         brightness: 0x0110,
         contrast: 0x0112,
+        sharpness: 0x018c,
+        colour_temp: 0x0254,
         volume: 0x0062,
-        power: 0x0003,
-        input: 0x02CB
+        audio_mute: 0x008d,
+        input: 0x02cb,
+        aspect_ratio: 0x02df,
+        power: 0x0003
     })
 
     # Definitions for non-numeric command arguments
     PARAMS = {
-        power: {
+        colour_temp: {
+            _9300K: 0,
+            _6500K: 1,
+            user: 2
+        },
+        audio_mute: {
             false => 0,
             true => 1
         },
@@ -192,6 +222,15 @@ module X3m::Displays::WallDisplay::Protocol
             dvi: 1,
             hdmi: 2,
             dp: 3
+        },
+        aspect_ratio: {
+            full: 0,
+            _16_10: 1,
+            _4_3: 2
+        },
+        power: {
+            false => 0,
+            true => 1
         }
     }
     PARAMS.transform_values! { |param| Util.bidirectional(param) }
