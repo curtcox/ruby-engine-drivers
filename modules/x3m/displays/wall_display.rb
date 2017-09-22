@@ -55,8 +55,7 @@ class X3m::Displays::WallDisplay
     end
 
     def volume(level)
-        target = Util.scale level, 100, 30
-        set :volume, target
+        set :volume, level
     end
 
     def switch_to(input)
@@ -79,6 +78,9 @@ class X3m::Displays::WallDisplay
         op_code, value = Protocol.lookup command, param
 
         packet = Protocol.build_packet op_code, value, self[:monitor_id]
+        # Volume is the only numeric value that's not 0-100. Normalise to match.
+        value = Util.scale level, 100, 30 if command == :volume
+
 
         opts[:emit] = block if block_given?
         opts[:name] ||= command
@@ -154,8 +156,6 @@ end
 
 module X3m::Displays::WallDisplay::Protocol
     module_function
-
-    Util = ::X3m::Displays::WallDisplay::Util
 
     MARKER = {
         SOH: 0x01,
@@ -243,31 +243,6 @@ module X3m::Displays::WallDisplay::Protocol
         header + message << bcc << MARKER[:delimiter]
     end
 
-    private def build_rx_parser
-        capture = ->(name, len = 1) { "(?<#{name}>.{#{len}})" }
-        marker = ->(key) { '\x' + MARKER[key].to_s(16).rjust(2, '0') }
-
-        %r{
-            #{marker[:SOH]}
-            #{marker[:reserved]}
-            #{capture['receiver']}
-            #{capture['monitor_id']}
-            #{capture['message_type']}
-            #{capture['message_len', 2]}
-            #{marker[:STX]}
-            #{capture['result_code', 2]}
-            #{capture['op_code', 4]}
-            #{capture['op_code_type', 2]}
-            #{capture['max_value', 4]}
-            #{capture['value', 4]}
-            #{marker[:ETX]}
-            #{capture['bcc']}
-            #{marker[:delimiter]}
-        }x
-    end
-
-    RX_STRUCTURE = build_rx_parser
-
     # Parse a response packet to a hash of its decoded components.
     def parse_response(packet)
         rx = packet.match RX_STRUCTURE
@@ -293,4 +268,32 @@ module X3m::Displays::WallDisplay::Protocol
             value: param
         }
     end
+
+    private
+
+    # Compile a regexp for parsing device response packets
+    def build_rx_parser
+        capture = ->(name, len = 1) { "(?<#{name}>.{#{len}})" }
+        marker = ->(key) { '\x' + MARKER[key].to_s(16).rjust(2, '0') }
+
+        %r{
+            #{marker[:SOH]}
+            #{marker[:reserved]}
+            #{capture['receiver']}
+            #{capture['monitor_id']}
+            #{capture['message_type']}
+            #{capture['message_len', 2]}
+            #{marker[:STX]}
+            #{capture['result_code', 2]}
+            #{capture['op_code', 4]}
+            #{capture['op_code_type', 2]}
+            #{capture['max_value', 4]}
+            #{capture['value', 4]}
+            #{marker[:ETX]}
+            #{capture['bcc']}
+            #{marker[:delimiter]}
+        }x
+    end
+
+    RX_STRUCTURE = build_rx_parser
 end
