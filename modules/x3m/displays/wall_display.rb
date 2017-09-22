@@ -20,9 +20,18 @@ class X3m::Displays::WallDisplay
 
     def on_load
         on_update
-        self[:power] = false
+
         # Meta data for inquiring interfaces
         self[:type] = :lcd
+
+        # The device API not does provide any idempotent method to query state
+        # so mark everything as an unknown until we know otherwise.
+        Protocol::COMMAND
+            .keys
+            .select { |entry| entry.is_a? Symbol }
+            .each do |state|
+                self[state] = :unknown
+            end
     end
 
     def on_unload
