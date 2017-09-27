@@ -53,7 +53,10 @@ class X3m::Displays::WallDisplay
     end
 
     def do_poll
-
+        # The device does not provide any query only methods for interaction.
+        # Re-apply the current known power state to provide a comms heartbeat
+        # if we can do it safely.
+        power self[:power] unless self[:power] == :unknown
     end
 
     def power(state)
