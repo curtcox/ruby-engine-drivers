@@ -44,8 +44,7 @@ class X3m::Displays::WallDisplay
     end
 
     def connected
-        do_poll
-        schedule.every '30s', method(:do_poll)
+        schedule.every('30s') { do_poll }
     end
 
     def disconnected
@@ -53,6 +52,8 @@ class X3m::Displays::WallDisplay
     end
 
     def do_poll
+        logger.debug 'Polling device for connectivity heartbeat'
+
         # The device does not provide any query only methods for interaction.
         # Re-apply the current known power state to provide a comms heartbeat
         # if we can do it safely.
