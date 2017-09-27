@@ -352,7 +352,8 @@ module X3m::Displays::WallDisplay::Protocol
             raise 'invalid checksum'
         end
 
-        rx_data = rx.named_captures.transform_values { |val| Util.decode val }
+        rx_data = Hash[rx.names.zip rx.captures]
+        rx_data.transform_values! { |val| Util.decode val }
 
         command, param = resolve rx_data['op_code'], rx_data['value']
 
