@@ -175,6 +175,17 @@ module X3m::Displays::WallDisplay::Util
             .merge(hash.invert)
             .freeze
     end
+
+    # Recursive dig into nested hash maps (pointfree version of Hash#dig
+    # availble in Ruby 2.3+).
+    def dig(hash, key, *keys)
+        value = hash[key]
+        if value.nil? || keys.empty?
+            value
+        else
+            dig value, *keys
+        end
+    end
 end
 
 module X3m::Displays::WallDisplay::Protocol
@@ -255,7 +266,7 @@ module X3m::Displays::WallDisplay::Protocol
         value = if command == :volume
                     Util.scale param, 100, 30
                 else
-                    PARAMS.dig command, param || param
+                    Util.dig(PARAMS, command, param) || param
                 end
 
         [op_code, value]
@@ -271,7 +282,8 @@ module X3m::Displays::WallDisplay::Protocol
         param = if command == :volume
                     Util.scale value, 30, 100
                 else
-                    PARAMS.dig command, value || value
+                    mapped_value = Util.dig(PARAMS, command, value)
+                    mapped_value.nil? ? value : mapped_value
                 end
 
         [command, param]
