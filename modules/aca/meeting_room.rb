@@ -629,7 +629,15 @@ class Aca::MeetingRoom < Aca::Joiner
         preview(self[self[:tab]][0]) if self[:has_preview] && self[:tab]
     end
 
-
+    def emergency_shutdown(active = true)
+        if active
+            shutdown
+            self[:show_emergency_popup] = true
+        else
+            self[:show_emergency_popup] = false
+        end
+    end
+    
     def shutdown(all = false, scheduled_shutdown = false)
         if all
             perform_action(mod: :System, func: :shutdown_actual).then do
