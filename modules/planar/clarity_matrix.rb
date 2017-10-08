@@ -47,7 +47,7 @@ class Planar::ClarityMatrix
         send("op A1 display.power ? \r", options)
     end
 
-    def power(state, options = {})
+    def power(state, broadcast_ip = false, options = {})
         power? do
             result = self[:power]
 
