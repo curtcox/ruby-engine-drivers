@@ -18,11 +18,15 @@ class Aca::SkypeLogic
 
 
     def set_uri(uri)
-        self[:uri] = uri
+        if uri.present?
+            self[:uri] = uri
+        else
+            self[:uri] = nil
+        end
     end
 
     def call_uri(uri = nil)
-        self[:uri] = uri if uri
+        set_uri(uri)
         return unless self[:uri].present?
         self[:call_uri] += 1
     end
