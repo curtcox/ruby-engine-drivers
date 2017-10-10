@@ -23,6 +23,7 @@ class X3m::Displays::WallDisplay
 
         # Meta data for inquiring interfaces
         self[:type] = :lcd
+        self[:power_target] = setting(:power_target)
 
         # The device API not does provide any idempotent method to query state
         # so mark everything as an unknown until we know otherwise.
@@ -44,7 +45,7 @@ class X3m::Displays::WallDisplay
     end
 
     def connected
-        schedule.every('30s') { do_poll }
+        schedule.every('15s') { do_poll }
     end
 
     def disconnected
@@ -57,12 +58,17 @@ class X3m::Displays::WallDisplay
         # The device does not provide any query only methods for interaction.
         # Re-apply the current known power state to provide a comms heartbeat
         # if we can do it safely.
-        power self[:power] unless self[:power] == :unknown
+        power(self[:power_target], priority: 0) unless self[:power_target].nil?
     end
 
-    def power(state)
+    def power(state, **options)
         state = is_affirmative? state
-        set :power, state
+        if state != self[:power_target]
+            # Define setting for polling
+            self[:power_target] = state
+            define_setting(:power_target, state)
+        end
+        set :power, state, options
     end
 
     def switch_to(input)
@@ -106,7 +112,7 @@ class X3m::Displays::WallDisplay
 
     protected
 
-    def set(command, param, opts = {}, &block)
+    def set(command, param, **opts, &block)
         logger.debug { "Setting #{command} -> #{param}" }
 
         op_code, value = Protocol.lookup command, param

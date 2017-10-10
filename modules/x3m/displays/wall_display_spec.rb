@@ -81,14 +81,16 @@ Orchestrator::Testing.mock_device 'X3m::Displays::WallDisplay' do
     end
 
     describe 'Testing device interaction' do
-        exec(:power, true)
+        exec(:power, true, priority: 0)
             .should_send("\x010*0E0A\x0200030001\x03\x1d\r")
             .responds("\x0100*F12\x020000030000010001\x03\x6d\r")
         expect(status[:power]).to be true
+        expect(status[:power_target]).to be true
 
         exec(:power, false)
             .should_send("\x010*0E0A\x0200030000\x03\x1c\r")
             .responds("\x0100*F12\x020000030000010000\x03\x6c\r")
         expect(status[:power]).to be false
+        expect(status[:power_target]).to be false
     end
 end
