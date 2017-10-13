@@ -77,7 +77,7 @@ class Epson::Projector::EscVp21
     #
     INPUTS = {
         :hdmi => 0x30,
-        :hdbaset => 80
+        :hdbaset => 0x80
     }
     INPUTS.merge!(INPUTS.invert)
 
