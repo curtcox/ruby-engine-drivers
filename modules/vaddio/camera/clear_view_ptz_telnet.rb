@@ -1,6 +1,7 @@
 module Vaddio; end
 module Vaddio::Camera; end
 
+# Documentation: https://aca.im/driver_docs/Vaddio/vaddio+clearveiw+hd+camera.pdf
 
 class Vaddio::Camera::ClearViewPtzTelnet
     include ::Orchestrator::Constants    # these provide optional helper methods

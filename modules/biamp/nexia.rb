@@ -1,5 +1,7 @@
 module Biamp; end
 
+# Documentation: https://aca.im/driver_docs/Biamp/Nexia_RS232_Control_(Jan10).pdf
+
 class Biamp::Nexia
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder

@@ -1,6 +1,7 @@
 module Amx; end
 module Amx::Svsi; end
 
+# Documentation: https://aca.im/driver_docs/AMX/SVSIN1000N2000Series.APICommandList.pdf
 
 class Amx::Svsi::NSeriesDecoder
     include ::Orchestrator::Constants

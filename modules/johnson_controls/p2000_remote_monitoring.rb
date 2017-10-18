@@ -2,6 +2,9 @@ require 'nokogiri'
 
 module JohnsonControls; end
 
+# Documentation: https://aca.im/driver_docs/Johnson+Controls/P2000+v4+remote+monitoring.pdf
+#  also https://aca.im/driver_docs/Johnson+Controls/p2000+v3+remote+monitoring.pdf
+
 # Works with both the HTTP and raw ASCII protocols
 class JohnsonControls::P2000RemoteMonitoring
     include ::Orchestrator::Constants

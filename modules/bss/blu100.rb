@@ -1,5 +1,7 @@
 module Bss; end
 
+# Documentation: https://aca.im/driver_docs/BSS/London+DI+Kit.pdf
+
 class Bss::Blu100
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder

@@ -1,6 +1,7 @@
 require 'protocols/oauth'
 require 'nokogiri' # xml parsing
 
+# Documentation: https://aca.im/driver_docs/Haivision/furnace_api.pdf
 
 module Haivision; end
 class Haivision::FurnaceServer

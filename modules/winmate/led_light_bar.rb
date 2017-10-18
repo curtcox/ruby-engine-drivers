@@ -1,5 +1,6 @@
 module Winmate; end
 
+# Documentation: https://aca.im/driver_docs/Winmate/LED+Light+Bar+SDK.pdf
 
 class Winmate::LedLightBar
     include ::Orchestrator::Constants

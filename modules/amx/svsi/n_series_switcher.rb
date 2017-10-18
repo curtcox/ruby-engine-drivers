@@ -1,6 +1,7 @@
 module Amx; end
 module Amx::Svsi; end
 
+# Documentation: https://aca.im/driver_docs/AMX/N8000SeriesAPICommandListRev1.1.pdf
 
 class Amx::Svsi::NSeriesSwitcher
     include ::Orchestrator::Constants

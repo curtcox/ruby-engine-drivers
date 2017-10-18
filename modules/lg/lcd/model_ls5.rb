@@ -1,7 +1,9 @@
 module Lg; end
 module Lg::Lcd; end
 
-
+# Documentation: https://aca.im/driver_docs/LG/LS5_models.pdf
+#  also https://aca.im/driver_docs/LG/SM_models.pdf
+#
 # There is a secret menu that allows you to disable power management
 # 1. Press and hold the 'Setting' button on the remote for 7 seconds
 # 2. Press: 0 0 0 0 OK (Press Zero four times and then OK)

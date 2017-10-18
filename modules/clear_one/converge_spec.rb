@@ -1,3 +1,6 @@
+
+# Protocol: https://aca.im/driver_docs/ClearOne/800-151-880-Rev4.3_Converge_Pro_Manual.pdf
+
 Orchestrator::Testing.mock_device 'ClearOne::Converge' do
     transmit "\r\n************\r\n* Converge *\r\n************\r\nVersion 4.4.0.2\r\n\r\n"
     transmit "\r\nuser: "

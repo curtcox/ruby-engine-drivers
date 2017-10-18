@@ -2,6 +2,7 @@
 
 module HuddleCam; end
 
+# Documentation: https://aca.im/driver_docs/HuddleCam/HuddlecamHD-VISCA-Commands.pdf
 
 class HuddleCam::Visca
     include ::Orchestrator::Constants    # these provide optional helper methods

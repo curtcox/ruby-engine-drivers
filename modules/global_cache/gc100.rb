@@ -1,5 +1,6 @@
 module GlobalCache; end
 
+# Documentation: https://aca.im/driver_docs/Global+Cache/Global+Cache+GC-100.pdf
 
 class GlobalCache::Gc100
     include ::Orchestrator::Constants

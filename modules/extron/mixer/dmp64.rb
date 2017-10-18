@@ -2,17 +2,7 @@ load File.expand_path('../base.rb', File.dirname(__FILE__))
 module Extron::Mixer; end
 
 
-# :title:Extron DSP
-#
-# Status information avaliable:
-# -----------------------------
-#
-# (built in)
-# connected
-#
-# (module defined)
-#
-#
+# Documentation: https://aca.im/driver_docs/Extron/Extron+DMP64+DSP.pdf
 #
 # Volume outputs
 # 60000 == volume 1
@@ -21,7 +11,6 @@ module Extron::Mixer; end
 # Pre-mix gain inputs
 # 40100 == Mic1
 # 40105 == Mic6
-#
 
 
 class Extron::Mixer::Dmp64 < Extron::Base

@@ -1,5 +1,6 @@
 module Chiyu; end
 
+# Documentation: https://aca.im/driver_docs/chiyu/CYT-133SC+User+Manual.pdf
 
 # Normal state for inputs == open
 # IO Operations mode TCP server

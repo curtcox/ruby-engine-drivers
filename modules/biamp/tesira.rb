@@ -2,6 +2,8 @@
 
 module Biamp; end
 
+# Documentation: https://aca.im/driver_docs/Biamp/tesira_commands.pdf
+
 require 'shellwords'
 require 'protocols/telnet'
 

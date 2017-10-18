@@ -2,6 +2,7 @@
 
 module Symetrix; end
 
+# Documentation: https://aca.im/driver_docs/Symetrix/SymNet_Composer_control_prot_2.0.pdf
 # Protocol 2 - supports both TCP and UDP operations
 # port 48631
 

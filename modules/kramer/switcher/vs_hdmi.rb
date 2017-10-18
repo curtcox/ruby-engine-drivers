@@ -2,23 +2,7 @@ module Kramer; end
 module Kramer::Switcher; end
 
 
-# :title:Kramer video switches
-#
-# Status information avaliable:
-# -----------------------------
-#
-# (built in)
-# connected
-#
-# (module defined)
-# video_inputs
-# video_outputs
-#
-# video1 => input
-# video2
-# video3
-#
-
+# Documentation: https://aca.im/driver_docs/Kramer/Kramer+protocol+2000+v0.51.pdf
 #
 # NOTE:: These devices should be marked as make and break!
 #

@@ -3,7 +3,7 @@
 module Sony; end
 module Sony::Camera; end
 
-# See the EVI-H100V-S-Tech-Manual
+# Documentation: https://aca.im/driver_docs/Sony/EVI-H100V-S-Tech-Manual.pdf
 
 class Sony::Camera::Visca
     include ::Orchestrator::Constants    # these provide optional helper methods

@@ -1,6 +1,7 @@
 load File.expand_path('./base.rb', File.dirname(__FILE__))
 module Extron; end
 
+# Documentation: https://aca.im/driver_docs/Extron/PDU_IPL_T_PCS4.pdf
 
 class Extron::Iplt < Extron::Base
     descriptive_name 'Extron IPL T IP to Relay/IO Gateway'

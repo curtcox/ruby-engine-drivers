@@ -668,8 +668,8 @@ class Aca::MeetingRoom < Aca::Joiner
 
         # Hangup any softphone calls and blank the phone number on the UI and DSP
         if self[:phone_settings] && !mixer.nil?
-          mixer.phone_hangup(self[:phone_settings][:hangup_id])
-          mixer.phone_number('', self[:phone_settings][:number_id])
+            mixer.phone_hangup(self[:phone_settings][:hangup_id])
+            mixer.phone_number('', self[:phone_settings][:number_id])
         end
 
         # Unroutes

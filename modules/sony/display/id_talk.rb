@@ -1,6 +1,7 @@
 module Sony; end
 module Sony::Display; end
 
+# Documentation: https://aca.im/driver_docs/Sony/FWDS42-47H1protocol.pdf
 
 class Sony::Display::IdTalk
     include ::Orchestrator::Constants

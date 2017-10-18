@@ -1,5 +1,6 @@
 module Tripleplay; end
 
+# Documentation: https://aca.im/driver_docs/TriplePlay/JSON+XMLRPC+Handler+2.2.0.pdf
 # default URL: http://<serverIP>
 # Settings: none
 

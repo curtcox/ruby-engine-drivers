@@ -1,6 +1,8 @@
 module Denon; end
 module Denon::Bluray; end
 
+# Documentation: https://aca.im/driver_docs/Denon/DBT3313_RS232C_Protocol_binary_Rev1.10.pdf
+
 class Denon::Bluray::Dbt3313
 	include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder

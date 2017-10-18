@@ -1,6 +1,7 @@
 module Lightware; end
 module Lightware::Switcher; end
 
+# Documentation: https://aca.im/driver_docs/Lightware/lightware+protocol+(MX-FR+series).pdf
 
 class Lightware::Switcher::LightwareProtocol
     include ::Orchestrator::Constants

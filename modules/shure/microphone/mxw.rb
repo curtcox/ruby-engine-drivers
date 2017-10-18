@@ -1,6 +1,7 @@
 ﻿module Shure; end
 module Shure::Microphone; end
 
+# Documentation: https://aca.im/driver_docs/Shure/mxw_strings.pdf
 
 class Shure::Microphone::Mxw
     include ::Orchestrator::Constants

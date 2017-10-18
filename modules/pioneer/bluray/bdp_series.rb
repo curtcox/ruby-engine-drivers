@@ -1,10 +1,10 @@
 module Pioneer; end
 module Pioneer::Bluray; end
 
-
+# Documentation: https://aca.im/driver_docs/Pioneer/2011+Blu-ray+IP+%26+RS-232+Commands+BDP140_BDP52FD.pdf
+#  also https://aca.im/driver_docs/Pioneer/2010+USA+AVR+RS-232C+%26+IP+Commands+for+CI.pdf
 # Seems to support the protocol on ports 23 and 8102, 8102 being offical
 # Requires "Quick Start" to be enabled in setup
-
 
 class Pioneer::Bluray::BdpSeries
 	include ::Orchestrator::Constants

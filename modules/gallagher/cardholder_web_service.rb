@@ -2,6 +2,8 @@ require 'httpi/adapter/libuv'
 require 'savon'
 HTTPI.adapter = :libuv
 
+# Documentation: https://aca.im/driver_docs/Gallagher+Security+API.zip
+
 module Gallagher; end
 
 =begin

@@ -1,22 +1,9 @@
 # encoding: ASCII-8BIT
 
-
 module Extron; end
 module Extron::UsbExtenderPlus; end
 
-
-# :title:Extron USB Switcher
-#
-# Status information avaliable:
-# -----------------------------
-#
-# (built in)
-# connected
-#
-# (module defined)
-# input
-
-
+# Documentation: https://aca.im/driver_docs/Extron/usb_extender_plus.pdf
 
 class Extron::UsbExtenderPlus::Endpoint
     include ::Orchestrator::Constants

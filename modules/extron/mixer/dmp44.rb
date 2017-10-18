@@ -1,18 +1,7 @@
 load File.expand_path('../base.rb', File.dirname(__FILE__))
 module Extron::Mixer; end
 
-
-# :title:Extron DSP 44
-#
-# Status information avaliable:
-# -----------------------------
-#
-# (built in)
-# connected
-#
-# (module defined)
-#
-
+# Documentation: https://aca.im/driver_docs/Extron/Extron+DMP+44+LC.pdf
 
 class Extron::Mixer::Dmp44 < Extron::Base
     descriptive_name 'Extron DSP DMP44'

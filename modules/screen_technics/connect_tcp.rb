@@ -1,9 +1,8 @@
 module ScreenTechnics; end
 
-
+# Documentation: https://aca.im/driver_docs/Screen+Technics/Screen+Technics+IP+Connect+module.pdf
 # Default user: Admin
 # Default pass: Connect
-
 
 class ScreenTechnics::ConnectTcp
     include ::Orchestrator::Constants

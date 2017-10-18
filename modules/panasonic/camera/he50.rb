@@ -1,6 +1,7 @@
 module Panasonic; end
 module Panasonic::Camera; end
 
+# Documentation: https://aca.im/driver_docs/Panasonic/Camera+Specifications+V1.03E.pdf
 
 class Panasonic::Camera::He50
     include ::Orchestrator::Constants

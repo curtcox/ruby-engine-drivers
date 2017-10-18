@@ -1,5 +1,7 @@
 module Planar; end
 
+# Documentation: https://aca.im/driver_docs/Planar/020-1028-00+RS232+for+Matrix.pdf
+#  also https://aca.im/driver_docs/Planar/020-0567-05_WallNet_guide.pdf
 
 class Planar::ClarityMatrix
     include ::Orchestrator::Constants

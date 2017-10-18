@@ -1,5 +1,7 @@
 module Clipsal; end
 
+# Protocol: https://aca.im/driver_docs/Clipsal/DALIcontrol+Application+Note+3rd+Party+Interface+Rev1.3.pdf
+
 class Clipsal::DaliControl
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder

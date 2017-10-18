@@ -1,6 +1,7 @@
 module Axis; end
 module Axis::Camera; end
 
+# Documentation: https://aca.im/driver_docs/Axis/vapix_ptz_52933_en_1307.pdf
 
 class Axis::Camera::Vapix
     include ::Orchestrator::Constants

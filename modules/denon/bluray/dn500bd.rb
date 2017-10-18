@@ -3,11 +3,11 @@
 module Denon; end
 module Denon::Bluray; end
 
-
+# Documentation: https://aca.im/driver_docs/Denon/dn-500bd_codes.pdf
+#
 # returns: "nack" on invalid command
 # returns: "ack" on valid request
 # returns: "ack+@0PCAP00"
-
 
 class Denon::Bluray::Dn500bd
     include ::Orchestrator::Constants

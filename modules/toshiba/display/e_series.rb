@@ -1,6 +1,7 @@
 module Toshiba; end
 module Toshiba::Display; end
 
+# Documentation: https://aca.im/driver_docs/Toshiba/ESeries1+RS232+v8.pdf
 
 class Toshiba::Display::ESeries
     include ::Orchestrator::Constants

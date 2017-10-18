@@ -3,6 +3,8 @@
 module Hitachi; end
 module Hitachi::Projector; end
 
+# Documentation: https://aca.im/driver_docs/Hitachi/cp-tw-series.pdf
+#
 # NOTE:: For implementing auth for this device.
 # See the manual and the Panasonic Projector implementation (similar)
 

@@ -3,8 +3,8 @@
 module IBM; end
 module IBM::Domino; end
 
-# https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=JSON_representation_of_an_event_das901&content=apicontent
-# https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=Calendar_events_GET&content=apicontent
+# Documentation: https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=Calendar_events_GET&content=apicontent
+#  also https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=JSON_representation_of_an_event_das901&content=apicontent
 
 class IBM::Domino::NotesCalendar
     include ::Orchestrator::Constants

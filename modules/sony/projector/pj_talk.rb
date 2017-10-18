@@ -1,6 +1,8 @@
 module Sony; end
 module Sony::Projector; end
 
+# Documentation: https://aca.im/driver_docs/Sony/Sony_Q004_R1_protocol.pdf
+#  also https://aca.im/driver_docs/Sony/TCP_CMDs.pdf
 
 class Sony::Projector::PjTalk
     include ::Orchestrator::Constants

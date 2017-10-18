@@ -1,48 +1,7 @@
 module Nec; end
 module Nec::Projector; end
 
-
-# :title:All NEC Control Module (default port - )
-#
-# Controls all NEC projectors as of 9/01/2011
-# Status information avaliable:
-# -----------------------------
-#
-# (built in)
-# connected
-#
-# (module defined)
-# error (array of strings)
-#
-# lamp_status
-# lamp_target
-# lamp_warming
-# lamp_cooling
-# lamp_usage (array of integers representing hours)
-# filter_usage
-#
-# volume
-# volume_min == 0
-# volume_max == 63
-#
-# zoom
-# zoom_min
-# zoom_max
-# 
-# mute (picture and audio)
-# picture_mute
-# audio_mute
-# onscreen_mute
-# picture_freeze
-# 
-# target_input
-# input_selected
-# 
-# model_name
-# model_series
-#
-#
-
+# Documentation: https://aca.im/driver_docs/NEC/2014+Control_Commands_for_NEC_Projector_rev_3.4.09b.pdf
 
 class Nec::Projector::NpSeries
     include ::Orchestrator::Constants

@@ -1,9 +1,10 @@
+require 'digest/md5'
+
 module Panasonic; end
 module Panasonic::Projector; end
 
-
-require 'digest/md5'
-
+# Documentation: https://aca.im/driver_docs/Panasonic/panasonic_pt-vw535n_manual.pdf
+#  also https://aca.im/driver_docs/Panasonic/pt-ez580_en.pdf
 
 class Panasonic::Projector::Tcp
     include ::Orchestrator::Constants

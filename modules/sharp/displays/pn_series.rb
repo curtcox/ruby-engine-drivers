@@ -1,39 +1,9 @@
 ﻿module Sharp; end
 module Sharp::Displays; end
 
+# Documentation: https://aca.im/driver_docs/Sharp/pnl601b.pdf
+#  also https://aca.im/driver_docs/Sharp/PN_L802B_operation_guide.pdf
 
-# :title:All Sharp Control Module
-#
-# Controls all LCD displays as of 1/10/2011
-# Status information avaliable:
-# -----------------------------
-#
-# (built in)
-# connected
-#
-# (module defined)
-# power
-# warming
-# power_on_delay
-#
-# volume
-# volume_min == 0
-# volume_max == 31
-#
-# brightness
-# brightness_min == 0
-# brightness_max == 31
-#
-# contrast
-# contrast_min == 0
-# contrast_max == 60
-# 
-# audio_mute
-# 
-# input (video input)
-# audio (audio input)
-#
-#
 class Sharp::Displays::PnSeries
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder

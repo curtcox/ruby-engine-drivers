@@ -1,6 +1,8 @@
 module Epson; end
 module Epson::Projector; end
 
+# Documentation: https://aca.im/driver_docs/Epson/ESCVP21_e_P.pdf
+
 class Epson::Projector::EscVp21
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
