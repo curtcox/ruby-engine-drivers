@@ -3,6 +3,8 @@
 module X3m; end
 module X3m::Displays; end
 
+# Protocol: https://aca.im/driver_docs/X3M/RS-232+Instructions.pdf
+
 class X3m::Displays::WallDisplay
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
