@@ -3,7 +3,8 @@
 module IBM; end
 module IBM::Domino; end
 
-# Documentation: https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=Calendar_events_GET&content=apicontent
+# Documentation: https://aca.im/driver_docs/IBM/Domino+Freebusy+Service.pdf
+#  also https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=Calendar_events_GET&content=apicontent
 #  also https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=JSON_representation_of_an_event_das901&content=apicontent
 
 class IBM::Domino::NotesCalendar
@@ -37,13 +38,75 @@ class IBM::Domino::NotesCalendar
         symbolize_names: true
     }.freeze
 
-    def events(starting: nil, ending: nil, timezone: @timezone, count: 100, start: 0, fields: nil, **opts)
+
+    # =================
+    # Free Busy Service
+    # =================
+    def free_rooms(building:, starting:, ending:, capacity: nil, timezone: @timezone)
+        starting, ending = get_time_range(starting, ending, timezone)
+        params = {
+            :site => building,
+            :start => starting.utc.iso8601,
+            :end => ending.utc.iso8601
+        }
+        params[:capacity] = capacity.to_i if capacity
+
+        get('/api/freebusy/freerooms', query: params) do |data|
+            return :retry unless data.status == 200
+            JSON.parse(data.body, DECODE_OPTIONS)[:rooms]
+        end
+    end
+
+    def user_busy(email:, starting: nil, ending: nil, days: nil, timezone: @timezone)
+        since, before = get_time_range(starting, ending, timezone)
+        params = {
+            name: email,
+            since: since.utc.iso8601
+        }
+        if days
+            params[:days] = days
+        else
+            params[:before] = before.utc.iso8601
+        end
+
+        get('/api/freebusy/busytime', query: params) do |data|
+            return :retry unless data.status == 200
+            times = JSON.parse(data.body, DECODE_OPTIONS)[:busyTimes]
+            times.collect do |period|
+                s = period[:start]
+                e = period[:end]
+                {
+                    starting: Time.iso8601("#{s[:date]}T#{s[:time]}Z"),
+                    ending: Time.iso8601("#{e[:date]}T#{e[:time]}Z")
+                }
+            end
+        end
+    end
+
+    def directories
+        get('/api/freebusy/directories') do |data|
+            return :retry unless data.status == 200
+            JSON.parse(data.body, DECODE_OPTIONS)
+        end
+    end
+
+    def sites(directory)
+        get("/api/freebusy/sites/#{directory}") do |data|
+            return :retry unless data.status == 200
+            JSON.parse(data.body, DECODE_OPTIONS)
+        end
+    end
+
+    # =====================
+    # Domino Access Service
+    # =====================
+    def bookings(starting: nil, ending: nil, timezone: @timezone, count: 100, start: 0, fields: nil, **opts)
         since, before = get_time_range(starting, ending, timezone)
         query = {
             start: start,
             count: count,
-            since: since,
-            before: before,
+            since: since.utc.iso8601,
+            before: before.utc.iso8601,
             headers: {
                 authorization: [@username, @password]
             }
@@ -55,7 +118,7 @@ class IBM::Domino::NotesCalendar
         end
     end
 
-    def remove(id:, recurrenceId: nil, email_attendees: false, **opts)
+    def cancel_booking(id:, recurrenceId: nil, email_attendees: false, **opts)
         query = {}
         query[:workflow] = false unless email_attendees
 
@@ -71,7 +134,7 @@ class IBM::Domino::NotesCalendar
         end
     end
 
-    def create_event(starting:, ending:, summary:, location: nil, description: nil, organizer: nil, email_attendees: false, attendees: [], timezone: @timezone, **opts)
+    def create_booking(starting:, ending:, summary:, location: nil, description: nil, organizer: nil, email_attendees: false, attendees: [], timezone: @timezone, **opts)
         event = {
             :summary => summary,
             :class => :public,
