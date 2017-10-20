@@ -4,6 +4,6 @@ If you're new to working with ACAEngine, the [developer guide](https://developer
 
 Developers working on integrations can contact a human at developer@acaprojects.com.
 
-# Operations Support
+## Operations Support
 
 If you have an existing ACAEngine deployment and require assistance, please reach out to support@acaprojects.com.
