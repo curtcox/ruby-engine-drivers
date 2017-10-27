@@ -181,7 +181,7 @@ class IBM::Domino::NotesCalendar
         post("/mail/#{@database}/api/calendar/events", {
             query: query,
             headers: @headers.merge(headers),
-            body: event.to_json
+            body: { events: [event] }.to_json
         }) do |data|
             if data.status == 201
                 parse(JSON.parse(data.body, DECODE_OPTIONS))
