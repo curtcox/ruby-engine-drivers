@@ -360,6 +360,25 @@ class Aca::FindmeBooking
         })
     end
 
+    def send_email(subject, body, recipients)
+        task {
+            cli = Viewpoint::EWSClient.new(*@ews_creds)
+            opts = {}
+
+            if @use_act_as
+                opts[:act_as] = @ews_room if @ews_room
+            else
+                cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
+            end
+
+            cli.send_message subject: subject, body: body, to_recipients: Array(recipients)
+        }.then(proc { |id|
+            logger.info { "successfully sent email titled #{subject}" }
+        }, proc { |error|
+            logger.print_error error, 'sending email'
+        })
+    end
+
 
     protected
 
