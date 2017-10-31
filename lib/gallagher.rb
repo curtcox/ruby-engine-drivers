@@ -199,5 +199,33 @@ class Gallagher
             return e.message
         end
     end
+
+
+    def set_pdf(vivant_id, pdf_name, pdf_value)
+        # Add five minutes to time start 
+        method_name = 'cif_update_cardholder_pdf'
+        begin
+            response = @client.call(method_name.to_sym,
+                message: {
+                'wsdl:sessionToken': { 'web:Value': gallagher_token},
+                'wsdl:id': {
+                    'wsdl:PdfName': 'Unique ID',
+                    'wsdl:Value': "cardholder--#{vivant_id}"
+                },
+                'wsdl:pdfValue': {
+                    :'@i:type' => 'web:PdfGeneralValue',
+                    :'@xmlns:i' => 'http://www.w3.org/2001/XMLSchema-instance',
+                    'web:Name': pdf_name,
+                    'web:Type': 'StrEnum',
+                    'web:Value': pdf_value
+                }
+            })
+            return response.body[(method_name + '_response').to_sym]
+        rescue Savon::SOAPFault => e
+            return e.message
+        end
+    end
 end
+
+
 
