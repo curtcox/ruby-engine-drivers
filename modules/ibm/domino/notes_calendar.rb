@@ -28,10 +28,14 @@ class IBM::Domino::NotesCalendar
     end
 
     def on_update
-        @timezone = setting(:timezone)
-        @username = setting(:username)
+        self[:timezone] = @timezone = setting(:timezone)
+        self[:timezone] = @username = setting(:username)
         @password = setting(:password)
-        @database = setting(:database)
+        self[:timezone] = @database = setting(:database)
+
+        @headers = {
+            authorization: [@username, @password]
+        }
     end
 
     DECODE_OPTIONS = {
@@ -51,9 +55,10 @@ class IBM::Domino::NotesCalendar
         }
         params[:capacity] = capacity.to_i if capacity
 
-        get('/api/freebusy/freerooms', query: params) do |data|
-            return :retry unless data.status == 200
-            JSON.parse(data.body, DECODE_OPTIONS)[:rooms]
+        get('/api/freebusy/freerooms', query: params, headers: @headers) do |data|
+            if data.status == 200
+                JSON.parse(data.body, DECODE_OPTIONS)[:rooms]
+            else; :retry; end
         end
     end
 
@@ -69,31 +74,34 @@ class IBM::Domino::NotesCalendar
             params[:before] = before.utc.iso8601
         end
 
-        get('/api/freebusy/busytime', query: params) do |data|
-            return :retry unless data.status == 200
-            times = JSON.parse(data.body, DECODE_OPTIONS)[:busyTimes]
-            times.collect do |period|
-                s = period[:start]
-                e = period[:end]
-                {
-                    starting: Time.iso8601("#{s[:date]}T#{s[:time]}Z"),
-                    ending: Time.iso8601("#{e[:date]}T#{e[:time]}Z")
-                }
-            end
+        get('/api/freebusy/busytime', query: params, headers: @headers) do |data|
+            if data.status == 200
+                times = JSON.parse(data.body, DECODE_OPTIONS)[:busyTimes]
+                times.collect do |period|
+                    s = period[:start]
+                    e = period[:end]
+                    {
+                        starting: Time.iso8601("#{s[:date]}T#{s[:time]}Z"),
+                        ending: Time.iso8601("#{e[:date]}T#{e[:time]}Z")
+                    }
+                end
+            else; :retry; end
         end
     end
 
     def directories
-        get('/api/freebusy/directories') do |data|
-            return :retry unless data.status == 200
-            JSON.parse(data.body, DECODE_OPTIONS)
+        get('/api/freebusy/directories', headers: @headers) do |data|
+            if data.status == 200
+                JSON.parse(data.body, DECODE_OPTIONS)
+            else; :retry; end
         end
     end
 
     def sites(directory)
-        get("/api/freebusy/sites/#{directory}") do |data|
-            return :retry unless data.status == 200
-            JSON.parse(data.body, DECODE_OPTIONS)
+        get("/api/freebusy/sites/#{directory}", headers: @headers) do |data|
+            if data.status == 200
+                JSON.parse(data.body, DECODE_OPTIONS)
+            else; :retry; end
         end
     end
 
@@ -107,14 +115,11 @@ class IBM::Domino::NotesCalendar
             count: count,
             since: since.utc.iso8601,
             before: before.utc.iso8601,
-            headers: {
-                authorization: [@username, @password]
-            }
         }
         query[:fields] = Array(fields).join(',') if fields.present?
-        get("/mail/#{@database}/api/calendar/events", query: query) do |data|
+        get("/mail/#{@database}/api/calendar/events", query: query, headers: @headers) do |data|
             return :retry unless data.status == 200
-            parse(JSON.parse(data.body, DECODE_OPTIONS))
+            parse(JSON.parse("[#{data.body}]", DECODE_OPTIONS)[0])
         end
     end
 
@@ -128,7 +133,7 @@ class IBM::Domino::NotesCalendar
             "/mail/#{@database}/api/calendar/events/#{id}"
         end
 
-        delete(uri, query: query) do |data|
+        delete(uri, query: query, headers: @headers) do |data|
             logger.warn "unable to delete meeting #{id} as it could not be found" if data.status == 404
             :success
         end
@@ -175,11 +180,12 @@ class IBM::Domino::NotesCalendar
 
         post("/mail/#{@database}/api/calendar/events", {
             query: query,
-            headers: headers,
-            body: event.to_json
+            headers: @headers.merge(headers),
+            body: { events: [event] }.to_json
         }) do |data|
-            return parse(JSON.parse(data.body, DECODE_OPTIONS)) if data.status == 201
-            :retry
+            if data.status == 201
+                parse(JSON.parse(data.body, DECODE_OPTIONS))
+            else; :retry; end
         end
     end
 
@@ -197,6 +203,13 @@ class IBM::Domino::NotesCalendar
     end
 
     def to_date(time)
+        if time.is_a?(String)
+            Time.zone = @timezone
+            time = Time.zone.parse(time)
+        elsif time.is_a?(Integer)
+            time = Time.at(time)
+        end
+
         utctime = time.getutc
         {
             date: utctime.strftime("%Y-%m-%d"),
@@ -210,6 +223,8 @@ class IBM::Domino::NotesCalendar
     }
 
     def parse(response)
+        return [] if response.nil?
+
         events = response[:events]
         Array(events).collect do |event|
             ev = {

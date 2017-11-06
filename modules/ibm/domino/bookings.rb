@@ -189,12 +189,11 @@ class IBM::Domino::Bookings
 
     def cancel_meeting(start_time)
         calendar = system[:Calendar]
-        events = calendar.events.value
-        events.keep_if do |event|
+        events = calendar.events.value.keep_if do |event|
             event[:start].to_i == start_time
         end
         events.each do |event|
-            calendar.remove(event)
+            calendar.cancel_booking(event)
         end
     end
 
