@@ -41,17 +41,17 @@ class Aca::LocateUser
                 user_key = "usermacs-#{old_login}"
                 user_macs = bucket.get(user_key, quiet: true)
                 if user_macs
-                    user_macs[:macs].delete(mac)
+                    user_macs.delete(mac)
                     bucket.set(user_key, user_macs, expire_at: expire)
                 end
             end
 
             # Update the users list of MAC addresses
             user_key = "usermacs-#{login}"
-            user_macs = bucket.get(user_key, quiet: true) || {macs: []}
-            if not user_macs[:macs].include?(mac)
-                user_macs[:macs].unshift(mac)
-                user_macs[:macs].pop if user_macs[:macs].length > 10
+            user_macs = bucket.get(user_key, quiet: true) || []
+            if not user_macs.include?(mac)
+                user_macs.unshift(mac)
+                user_macs.pop if user_macs.length > 10
                 bucket.set(user_key, user_macs, expire_at: expire)
             end
 
