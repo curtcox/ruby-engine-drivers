@@ -8,7 +8,7 @@ Metrics/PerceivedComplexity:
   Max: 10
 
 Metrics/CyclomaticComplexity:
-  Max: 8
+  Max: 15
 
 Metrics/BlockNesting:
   Max: 4
