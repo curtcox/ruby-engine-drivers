@@ -39,3 +39,8 @@ TooManyConstants:
 # Suppress warning about parameter length within reason.
 LongParameterList:
   max_params: 4
+  
+# Prevent from flagging multiple calls to utility methods
+# (e.g. is_affirmative?).
+RepeatedConditional:
+  enabled: false
