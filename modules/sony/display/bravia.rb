@@ -72,7 +72,7 @@ class Sony::Display::Bravia
         index ||= '1'
 
         inp = type.to_sym
-        raise ArgumentError, "unknown input #{input}" unless INPUTS.has_key? inp
+        raise ArgumentError, "unknown input #{input}" unless INPUTS.key? inp
 
         request(:input, "#{INPUTS[inp]}#{index.rjust(4, '0')}")
         logger.debug { "requesting to switch to: #{input}" }
