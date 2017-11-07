@@ -171,11 +171,11 @@ class Sony::Display::Bravia
         when :input
             input_num = param[7..11]
             index_num = param[12..-1].to_i
-            if index_num == 1
-                self[:input] = INPUTS[input_num]
-            else
-                self[:input] = :"#{INPUTS[input_num]}#{index_num}"
-            end
+            self[:input] = if index_num == 1
+                               INPUTS[input_num]
+                           else
+                               :"#{INPUTS[input_num]}#{index_num}"
+                           end
         end
 
         # Ignore notify as we might be expecting a response and don't want to
