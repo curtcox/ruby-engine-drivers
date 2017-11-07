@@ -56,13 +56,12 @@ class Sony::Display::Bravia
         query(:power, options)
     end
 
-    INPUTS = {
+    INPUTS = ->(hash) { hash.merge!(hash.invert).freeze } [{
         tv:     '00000',
         hdmi:   '10000',
         mirror: '50000',
         vga:    '60000'
-    }
-    INPUTS.merge!(INPUTS.invert)
+    }]
 
     # switch to input on display
     #
@@ -186,7 +185,7 @@ class Sony::Display::Bravia
     protected
 
 
-    COMMANDS = {
+    COMMANDS = ->(hash) { hash.merge!(hash.invert).freeze } [{
         ir_code: 'IRCC',
         power: 'POWR',
         volume: 'VOLU',
@@ -201,16 +200,14 @@ class Sony::Display::Bravia
         position_pip: 'TPPP',
         broadcast_address: 'BADR',
         mac_address: 'MADR'
-    }
-    COMMANDS.merge!(COMMANDS.invert)
+    }]
 
-    TYPES = {
+    TYPES = ->(hash) { hash.merge!(hash.invert).freeze } [{
         control: "\x43",
         enquiry: "\x45",
         answer: "\x41",
         notify: "\x4E"
-    }
-    TYPES.merge! TYPES.invert
+    }]
 
     def request(command, parameter = nil, **options) # :nodoc:
         cmd = command.to_sym
