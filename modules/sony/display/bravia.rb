@@ -212,20 +212,23 @@ class Sony::Display::Bravia
         notify: "\x4E"
     }]
 
-    def request(command, parameter = nil, **options) # :nodoc:
-        cmd = command.to_sym
+    def request(command, parameter, **options) # :nodoc:
+        cmd = COMMANDS[command.to_sym]
+        param = parameter.to_s.rjust(16, '0')
         options[:name] = cmd
-        do_send(:control, COMMANDS[cmd], parameter, options)
+        do_send(:control, cmd, param, options)
     end
 
     def query(state, **options) # :nodoc:
+        cmd = COMMANDS[state.to_sym]
+        param = '#' * 16
         options[:name] = :"#{state}_query"
-        do_send(:enquiry, COMMANDS[state.to_sym], nil, options)
+        do_send(:enquiry, cmd, param, options)
     end
 
-    def do_send(type, command, parameter = nil, **options) # :nodoc:
-        param = parameter.nil? ? '#' * 16 : parameter.to_s.rjust(16, '0')
-        cmd = "\x2A\x53#{TYPES[type]}#{command}#{param}\n"
+    def do_send(type, command, parameter, **options) # :nodoc:
+        cmd_type = TYPES[type.to_sym]
+        cmd = "\x2A\x53#{cmd_type}#{command}#{parameter}\n"
         send(cmd, options)
     end
 end
