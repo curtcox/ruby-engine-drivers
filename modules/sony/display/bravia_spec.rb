@@ -48,7 +48,7 @@ Orchestrator::Testing.mock_device 'Sony::Display::Bravia' do
     # Test notify
     exec(:volume, 50)
         .should_send("\x2A\x53\x43VOLU0000000000000050\n")
-        .responds("\x2A\x53\x4EPMUT0000000000000000\n")  # mix in a notify
+        .responds("\x2A\x53\x4EPMUT0000000000000000\n") # mix in a notify
         .responds("\x2A\x53\x41VOLU0000000000000000\n")
         .should_send("\x2A\x53\x45VOLU################\n")
         .responds("\x2A\x53\x41VOLU0000000000000050\n")
