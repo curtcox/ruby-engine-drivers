@@ -32,17 +32,17 @@ class Sony::Display::Bravia
         # Stop polling
         schedule.clear
     end
-    
+
     # Power the display on or off
     #
     # @param [Boolean] the desired power state
     def power(state, _ = nil)
         if is_affirmative?(state)
             request(:power, 1)
-            logger.debug "-- sony display requested to power on"
+            logger.debug '-- sony display requested to power on'
         else
             request(:power, 0)
-            logger.debug "-- sony display requested to power off"
+            logger.debug '-- sony display requested to power off'
         end
 
         # Request status update
@@ -57,10 +57,10 @@ class Sony::Display::Bravia
     end
 
     INPUTS = {
-        tv:     "00000",
-        hdmi:   "10000",
-        mirror: "50000",
-        vga:    "60000"
+        tv:     '00000',
+        hdmi:   '10000',
+        mirror: '50000',
+        vga:    '60000'
     }
     INPUTS.merge!(INPUTS.invert)
 
@@ -177,7 +177,7 @@ class Sony::Display::Bravia
             end
         end
 
-        # Ignore notify as we might be expecting a response and don't want to process 
+        # Ignore notify as we might be expecting a response and don't want to process
         return :ignore if type == :notify
         :success
     end
