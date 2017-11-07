@@ -155,7 +155,9 @@ class Sony::Display::Bravia
         return :abort if param[0] == 'F'
 
         # If this is a response to a control request then it must have succeeded
-        return :success if type == :answer && command && TYPES[command[:data][2]] == :control
+        return :success if
+            type == :answer &&
+            command && TYPES[command[:data][2]] == :control
 
         # Data request response or notify
         cmd_type = COMMANDS[cmd]
@@ -176,7 +178,8 @@ class Sony::Display::Bravia
             end
         end
 
-        # Ignore notify as we might be expecting a response and don't want to process
+        # Ignore notify as we might be expecting a response and don't want to
+        # process
         return :ignore if type == :notify
         :success
     end
@@ -221,7 +224,7 @@ class Sony::Display::Bravia
     end
 
     def do_send(type, command, parameter = nil, **options) # :nodoc:
-        param = parameter.nil? ? '################' : parameter.to_s.rjust(16, '0')
+        param = parameter.nil? ? '#' * 16 : parameter.to_s.rjust(16, '0')
         cmd = "\x2A\x53#{TYPES[type]}#{command}#{param}\n"
         send(cmd, options)
     end
