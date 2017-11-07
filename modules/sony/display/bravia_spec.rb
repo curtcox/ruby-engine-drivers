@@ -1,4 +1,5 @@
-# frozen_string_literal: true, encoding: ASCII-8BIT
+# frozen_string_literal: true
+# encoding: ASCII-8BIT
 
 Orchestrator::Testing.mock_device 'Sony::Display::Bravia' do
     exec(:power, true)
