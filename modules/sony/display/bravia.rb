@@ -68,7 +68,7 @@ class Sony::Display::Bravia
     #
     # @param [Symbol, String] the desired power state. i.e. hdmi2
     def switch_to(input)
-        type, index = input.to_s.scan /[^0-9]+|\d+/
+        type, index = input.to_s.scan(/[^0-9]+|\d+/)
         index ||= '1'
 
         inp = type.to_sym
