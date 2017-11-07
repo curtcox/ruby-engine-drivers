@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module Aca; end
-
 class Aca::MacLookup < CouchbaseOrm::Base
     design_document :inmac
 

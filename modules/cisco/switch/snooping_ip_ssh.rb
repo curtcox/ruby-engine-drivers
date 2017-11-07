@@ -1,11 +1,9 @@
 module Cisco; end
 module Cisco::Switch; end
 
-
 require 'set'
-require_relative '../../aca/mac_lookup.rb'
+::Orchestrator::DependencyManager.load('Aca::MacLookup', :model, :force)
 ::Aca::MacLookup.ensure_design_document!
-
 
 class Cisco::Switch::SnoopingIpSsh
     include ::Orchestrator::Constants
