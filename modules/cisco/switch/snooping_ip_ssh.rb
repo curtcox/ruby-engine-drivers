@@ -119,8 +119,10 @@ class Cisco::Switch::SnoopingIpSsh
                 schedule.in(3000) { query_snooping_bindings }
             elsif data =~ /Down:/
                 logger.debug { "Interface Down: #{interface}" }
-                @check_interface.delete(interface)
+                remove_lookup(interface)
             end
+
+            self[:interfaces] = @check_interface.to_a
 
             return :success
         end
@@ -139,6 +141,7 @@ class Cisco::Switch::SnoopingIpSsh
             interface = entries[0].downcase
             logger.debug { "Interface Up: #{interface}" }
             @check_interface << interface.downcase
+            self[:interfaces] = @check_interface.to_a
             return :success
 
         elsif entries.include?('Down') || entries.include?('notconnect')
@@ -147,6 +150,7 @@ class Cisco::Switch::SnoopingIpSsh
             
             # Delete the lookup records
             remove_lookup(interface)
+            self[:interfaces] = @check_interface.to_a
             return :success
         end
 
