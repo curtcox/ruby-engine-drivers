@@ -51,6 +51,10 @@ Lint/UnusedBlockArgument:
 Style/ClassAndModuleChildren:
   EnforcedStyle: 'compact'
 
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - "**/**/*_spec.rb"
+
 Style/SymbolArray:
   EnforcedStyle: brackets
 
