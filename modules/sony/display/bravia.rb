@@ -35,7 +35,7 @@ class Sony::Display::Bravia
 
     # Power the display on or off
     #
-    # @param [Boolean] the desired power state
+    # @param state [Boolean] the desired power state
     def power(state, _ = nil)
         if is_affirmative?(state)
             request(:power, 1)
@@ -65,7 +65,7 @@ class Sony::Display::Bravia
 
     # switch to input on display
     #
-    # @param [Symbol, String] the desired power state. i.e. hdmi2
+    # @param input [Symbol, String] the desired power state. i.e. hdmi2
     def switch_to(input)
         type, index = input.to_s.scan(/[^0-9]+|\d+/)
         index ||= '1'
@@ -86,7 +86,7 @@ class Sony::Display::Bravia
 
     # Set the picture mute state
     #
-    # @param [Boolean] the desired picture mute state
+    # @param state [Boolean] the desired picture mute state
     def mute(state = true)
         val = is_affirmative?(state) ? 1 : 0
         request(:mute, val)
@@ -104,7 +104,7 @@ class Sony::Display::Bravia
 
     # Set the audio mute state
     #
-    # @param [Boolean] the desired mute state
+    # @param state [Boolean] the desired mute state
     def mute_audio(state = true)
         val = is_affirmative?(state) ? 1 : 0
         request(:audio_mute, val)
@@ -122,7 +122,7 @@ class Sony::Display::Bravia
 
     # Set the volume to the desired level
     #
-    # @param [Integer] the desired volume level
+    # @param level [Integer] the desired volume level
     def volume(level)
         request(:volume, level.to_i)
         volume?
