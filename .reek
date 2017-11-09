@@ -35,3 +35,12 @@ BooleanParameter:
 # Allow for a larger number of constants for protocol definitions.
 TooManyConstants:
   max_constants: 20
+
+# Suppress warning about parameter length within reason.
+LongParameterList:
+  max_params: 4
+  
+# Prevent from flagging multiple calls to utility methods
+# (e.g. is_affirmative?).
+RepeatedConditional:
+  enabled: false
