@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 module Aca; end
-class Aca::MacLookup < CouchbaseOrm::Base
-    design_document :inmac
+module Aca::Tracking; end
+class Aca::Tracking::MacLocation < CouchbaseOrm::Base
+    design_document :macloc
 
     before_create :set_id
 
@@ -28,6 +29,6 @@ class Aca::MacLookup < CouchbaseOrm::Base
 
 
     def set_id
-        self.id = "inmac-#{self.mac_address.downcase}"
+        self.id = "macloc-#{self.mac_address.downcase}"
     end
 end
