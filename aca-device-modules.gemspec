@@ -24,6 +24,5 @@ Gem::Specification.new do |s|
   s.add_dependency "rails"
   s.add_dependency "orchestrator"
 
-  # Annoyingly this breaks jruby support
-  # s.required_ruby_version = ">= 2.4.0"
+  s.required_ruby_version = ">= 2.3.0"
 end
