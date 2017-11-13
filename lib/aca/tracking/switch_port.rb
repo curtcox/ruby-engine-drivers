@@ -7,7 +7,6 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     design_document :swport
 
     # Connection details
-    attribute :connected,   type: Boolean
     attribute :mac_address, type: String  # MAC of the device currently connected to the switch
     attribute :device_ip,   type: String  # IP of the device connected to the switch
 
@@ -48,7 +47,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     # ================
 
     # A new device has connected to the switch port
-    def connected_to(mac_address, **switch_details)
+    def connected(mac_address, **switch_details)
         reserved = reserved?
 
         if not reserved
@@ -57,7 +56,6 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
             self.reserved_mac = nil
             self.reserved_by_id = nil
         end
-        self.connected = true
         self.mac_address = mac_address
         self.assign_attributes(switch_details)
         self.save!(with_cas: true)
@@ -83,7 +81,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     def update_reservation(time)
         return false unless self.reserved_mac
 
-        reserved = if self.connected
+        reserved = if connected?
             # If the reserved time has expired then the current connected
             # user is the new owner of the desk
             reserved?
@@ -101,12 +99,11 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     end
 
     def disconnected
-        return false unless self.connected
+        return false unless connected?
 
         # Configure pre-defined reservation on disconnect
         now = Time.now.to_i
         self.unplug_time = now if !reserved?
-        self.connected = false
         self.mac_address = nil
         self.device_ip = nil
         self.save!(with_cas: true)
@@ -120,6 +117,10 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
 
     def reserved?
         ((self.unplug_time || 0) + (self.reserve_time || 0)) >= Time.now.to_i
+    end
+
+    def connected?
+        !!self.mac_address
     end
 
 
