@@ -6,14 +6,18 @@ module Aca::Tracking; end
 class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     design_document :swport
 
-    attribute :connected,    type: Boolean
-    attribute :mac_address,  type: String  # MAC of the device currently connected to the switch
+    # Connection details
+    attribute :connected,   type: Boolean
+    attribute :mac_address, type: String  # MAC of the device currently connected to the switch
+    attribute :device_ip,   type: String  # IP of the device connected to the switch
+
+    # Reservation details
     attribute :unplug_time,  type: Integer # Unlug time for timeout
     attribute :reserve_time, type: Integer # Length of time for the reservation
     attribute :reserved_mac, type: String
     belongs_to :reserved_by, class_name: 'User'
 
-    attribute :device_ip,   type: String  # IP of the device connected to the switch
+    # Switch details
     attribute :switch_ip,   type: String  # IP of the network switch
     attribute :hostname,    type: String  # defined on switch
     attribute :switch_name, type: String  # defined in backoffice
@@ -44,49 +48,78 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     # ================
 
     # A new device has connected to the switch port
-    def connected(mac_address)
+    def connected_to(mac_address, **switch_details)
+        reserved = reserved?
+
+        if not reserved
+            self.unplug_time = 0
+            self.reserve_time = 0
+            self.reserved_mac = nil
+            self.reserved_by_id = nil
+        end
         self.connected = true
         self.mac_address = mac_address
-        self.save!
+        self.assign_attributes(switch_details)
+        self.save!(with_cas: true)
 
-        # Return true if desk is reserved
-        ((self.unplug_time || 0) + (self.reserve_time || 0)) > Time.now.to_i
+        reserved
+    rescue ::Libcouchbase::Error::KeyExists
+        self.reload
+        retry
     end
 
-    def reserve(time)
-        return unless self.reserved_mac
+    # Change the owner of the desk to this new user
+    def set_user(user, default_reserve_time = 5.minutes)
+        self.reserved_by = user
+        self.reserve_time = default_reserve_time.to_i
+        self.reserved_mac = self.mac_address
+        self.save!(with_cas: true)
+    rescue ::Libcouchbase::Error::KeyExists
+        self.reload
+        retry
+    end
 
-        now = Time.now.to_i
+    # Update the reservation (user would like to extend their desk booking)
+    def update_reservation(time)
+        return false unless self.reserved_mac
+
         reserved = if self.connected
-            ((self.unplug_time || 0) + (self.reserve_time || 0)) > now
+            # If the reserved time has expired then the current connected
+            # user is the new owner of the desk
+            reserved?
         else
+            # Otherwise we can only reserve a desk if the user had been set
             !!self.reserved_mac
         end
-
-        if reserved
-            self.reserve_time = time.to_i
-            self.save!
-        end
+        self.update_columns(reserve_time: time.to_i, with_cas: true) if reserved
 
         # Was the reservation request successful
         reserved
+    rescue ::Libcouchbase::Error::KeyExists
+        self.reload
+        retry
     end
 
-    def disconnected(reserve_time = 5.minutes)
+    def disconnected
         return false unless self.connected
-        self.connected = false
 
+        # Configure pre-defined reservation on disconnect
         now = Time.now.to_i
-        if ((self.unplug_time || 0) + (self.reserve_time || 0)) < now
-            self.unplug_time = now
-            self.reserve_time = reserve_time
-            self.reserved_mac = self.mac_address
-        end
+        self.unplug_time = now if !reserved?
+        self.connected = false
         self.mac_address = nil
-        self.save!
+        self.device_ip = nil
+        self.save!(with_cas: true)
 
         # Ask user if they would like to reserve the desk
-        self.reserve_time > 0 && now == self.unplug_time 
+        self.reserve_time > 0 && now == self.unplug_time
+    rescue ::Libcouchbase::Error::KeyExists
+        self.reload
+        retry
+    end
+
+    def reserved?
+        ((self.unplug_time || 0) + (self.reserve_time || 0)) >= Time.now.to_i
     end
 
 
