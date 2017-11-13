@@ -26,14 +26,14 @@ class Cisco::Switch::SnoopingIpSsh
 
     def on_load
         @check_interface = ::Set.new
+        on_update
 
         query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(remote_address)
         query.stream do |detail|
+            next unless detail.connected?
             self[detail.interface] = [detail.device_ip, detail.mac_address]
             self[detail.device_ip] = ::Aca::Tracking::SwitchPort.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
         end
-
-        on_update
     end
 
     def on_update
@@ -192,7 +192,7 @@ class Cisco::Switch::SnoopingIpSsh
                                 details = ::Aca::Tracking::SwitchPort.new
                             end
 
-                            details.connected_to(mac, {
+                            details.connected(mac, {
                                 device_ip: ip,
                                 switch_ip: remote_address,
                                 hostname: @hostname,
