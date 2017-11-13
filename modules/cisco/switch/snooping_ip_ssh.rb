@@ -1,11 +1,9 @@
 module Cisco; end
 module Cisco::Switch; end
 
-
 require 'set'
-require_relative '../../aca/mac_lookup.rb'
-::Aca::MacLookup.ensure_design_document!
-
+::Orchestrator::DependencyManager.load('Aca::Tracking::SwitchPort', :model, :force)
+::Aca::Tracking::SwitchPort.ensure_design_document!
 
 class Cisco::Switch::SnoopingIpSsh
     include ::Orchestrator::Constants
@@ -26,17 +24,16 @@ class Cisco::Switch::SnoopingIpSsh
 
     default_settings username: :cisco, password: :cisco
 
-
     def on_load
         @check_interface = ::Set.new
-
-        query = ::Aca::MacLookup.find_by_switch_ip(remote_address)
-        query.stream do |detail|
-            self[detail.interface] = [detail.device_ip, detail.mac_address]
-            self[detail.device_ip] = ::Aca::MacLookup.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
-        end
-
         on_update
+
+        query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(remote_address)
+        query.stream do |detail|
+            next unless detail.connected?
+            self[detail.interface] = [detail.device_ip, detail.mac_address]
+            self[detail.device_ip] = ::Aca::Tracking::SwitchPort.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
+        end
     end
 
     def on_update
@@ -118,11 +115,15 @@ class Cisco::Switch::SnoopingIpSsh
             if data =~ /Up:/
                 logger.debug { "Interface Up: #{interface}" }
                 @check_interface << interface
+
+                # Delay here is to give the PC some time to negotiate an IP address
                 schedule.in(3000) { query_snooping_bindings }
             elsif data =~ /Down:/
                 logger.debug { "Interface Down: #{interface}" }
-                @check_interface.delete(interface)
+                remove_lookup(interface)
             end
+
+            self[:interfaces] = @check_interface.to_a
 
             return :success
         end
@@ -141,6 +142,7 @@ class Cisco::Switch::SnoopingIpSsh
             interface = entries[0].downcase
             logger.debug { "Interface Up: #{interface}" }
             @check_interface << interface.downcase
+            self[:interfaces] = @check_interface.to_a
             return :success
 
         elsif entries.include?('Down') || entries.include?('notconnect')
@@ -149,6 +151,7 @@ class Cisco::Switch::SnoopingIpSsh
             
             # Delete the lookup records
             remove_lookup(interface)
+            self[:interfaces] = @check_interface.to_a
             return :success
         end
 
@@ -175,26 +178,28 @@ class Cisco::Switch::SnoopingIpSsh
                         if self[ip] != mac
                             logger.debug { "Recording lookup for #{ip} => #{mac}" }
                             self[ip] = mac
-                            ::Aca::MacLookup.bucket.set("ipmac-#{ip}", mac, expire_in: 1.week)
+                            ::Aca::Tracking::SwitchPort.bucket.set("ipmac-#{ip}", mac, expire_in: 1.year)
                         end
 
                         if self[interface] != [ip, mac]
-                            lookup = ::Aca::MacLookup.find_by_id("inmac-#{mac}")
-                            if lookup
+                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+                            if details
                                 # detect IP address change
-                                logger.debug { "Updating location of #{mac}" }
-                                remove_ip_to_mac_lookup(lookup.device_ip, mac) if lookup.device_ip != ip
+                                logger.debug { "Updating interface #{interface} with #{mac}" }
+                                remove_ip_to_mac_lookup(details.device_ip, mac) if details.device_ip != ip
                             else
-                                logger.debug { "Recording location of #{mac}" }
-                                lookup = ::Aca::MacLookup.new
+                                logger.debug { "Recording interface #{interface} details with #{mac}" }
+                                details = ::Aca::Tracking::SwitchPort.new
                             end
-                            lookup.mac_address = mac
-                            lookup.device_ip   = ip
-                            lookup.switch_ip   = remote_address
-                            lookup.hostname    = @hostname
-                            lookup.switch_name = @switch_name
-                            lookup.interface   = interface
-                            lookup.save!(expire_in: 1.week)
+
+                            details.connected(mac, {
+                                device_ip: ip,
+                                switch_ip: remote_address,
+                                hostname: @hostname,
+                                switch_name: @switch_name,
+                                interface: interface
+                            })
+
                             self[interface] = [ip, mac]
                         end
                     end
@@ -215,26 +220,23 @@ class Cisco::Switch::SnoopingIpSsh
         ip, mac = self[interface]
         return unless mac
 
+        # We are no longer interested in this interface
         @check_interface.delete(interface)
 
         # Delete the IP to MAC lookup
         remove_ip_to_mac_lookup(ip, mac)
 
-        # Make sure this MAC address hasn't been found somewhere else
-        model = ::Aca::MacLookup.find_by_id("inmac-#{mac}")
-        if model && model.switch_ip == remote_address && model.interface == interface
-            # CAS == Compare and Swap
-            # don't delete if the record has been updated
-            model.destroy(with_cas: true)
-            logger.debug { "Removing location of #{mac}" }
-        end
+        # Update the status of the switch port
+        model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+        model.disconnected if model
+
         self[interface] = nil
     end
 
     def remove_ip_to_mac_lookup(ip, mac)
         logger.debug { "Removing lookup for #{ip} => #{mac}" }
 
-        bucket = ::Aca::MacLookup.bucket
+        bucket = ::Aca::Tracking::SwitchPort.bucket
         key = "ipmac-#{ip}"
         resp = bucket.get(key, quiet: true, extended: true)
         if resp&.value == mac
