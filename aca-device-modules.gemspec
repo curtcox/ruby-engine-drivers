@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-$:.push File.expand_path('../lib', __FILE__)
+$LOAD_PATH.push File.expand_path('../lib', __FILE__)
 
 require 'aca-device-modules/version'
 
