@@ -1,9 +1,5 @@
 module Aca; end
 
-# We'll have Cisco::Switch::SnoopingIpSsh load this properly
-# This just ensures we the model is available
-require_relative './mac_lookup.rb'
-
 class Aca::LocateUser
     include ::Orchestrator::Constants
 
@@ -27,8 +23,8 @@ class Aca::LocateUser
         @looking_up[ip] = true
 
         logger.debug { "Looking up #{ip} for #{login}" }
-        bucket = ::Aca::MacLookup.bucket
-        mac = ::Aca::MacLookup.bucket.get("ipmac-#{ip}", quiet: true)
+        bucket = ::User.bucket
+        mac = ::User.bucket.get("ipmac-#{ip}", quiet: true)
         if mac && self[mac] != login
             logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
 
@@ -87,7 +83,7 @@ class Aca::LocateUser
         @looking_up[ip] = true
 
         # Find the mac address of the IP address logging out
-        mac = ::Aca::MacLookup.bucket.get("ipmac-#{ip}", quiet: true)
+        mac = ::User.bucket.get("ipmac-#{ip}", quiet: true)
         return unless mac
 
         # Remove the username details recorded for this MAC address
