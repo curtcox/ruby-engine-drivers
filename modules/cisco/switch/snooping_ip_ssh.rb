@@ -46,7 +46,8 @@ class Cisco::Switch::SnoopingIpSsh
     end
 
     def on_update
-        self[:name] = @switch_name = (setting(:switch_name) || remote_address)
+        self[:name] = @switch_name = setting(:switch_name)
+        self[:ip_address] = remote_address
         self[:building] = setting(:building)
         self[:level] = setting(:level)
     end
