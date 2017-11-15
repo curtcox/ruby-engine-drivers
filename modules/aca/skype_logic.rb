@@ -13,6 +13,7 @@ class Aca::SkypeLogic
         self[:hang_up] = 0
         self[:call_uri] = 0
         self[:open_dev_tools] = 0
+        self[:clear_local_storage] = 0
 
         @mic_mutes = setting(:mics_mutes)
     end
@@ -86,5 +87,9 @@ class Aca::SkypeLogic
 
     def open_dev_tools
         self[:open_dev_tools] += 1
+    end
+
+    def clear_local_storage
+        self[:clear_local_storage] += 1
     end
 end
