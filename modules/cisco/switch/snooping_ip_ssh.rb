@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+# encoding: ASCII-8BIT
+
 module Cisco; end
 module Cisco::Switch; end
 
@@ -22,10 +25,16 @@ class Cisco::Switch::SnoopingIpSsh
              wait_ready: ':'
     clear_queue_on_disconnect!
 
-    default_settings username: :cisco, password: :cisco
+    default_settings({
+        username: :cisco,
+        password: :cisco,
+        building: 'building_code'
+    })
 
     def on_load
         @check_interface = ::Set.new
+        self[:interfaces] = []
+
         on_update
 
         query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(remote_address)
@@ -37,7 +46,9 @@ class Cisco::Switch::SnoopingIpSsh
     end
 
     def on_update
-        @switch_name = setting(:switch_name)
+        self[:name] = @switch_name = (setting(:switch_name) || remote_address)
+        self[:building] = setting(:building)
+        self[:level] = setting(:level)
     end
 
     def connected

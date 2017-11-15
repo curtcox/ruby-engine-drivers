@@ -1,6 +1,7 @@
 module Aca; end
+module Aca::Tracking; end
 
-class Aca::LocateUser
+class Aca::Tracking::LocateUser
     include ::Orchestrator::Constants
 
     descriptive_name 'IP and Username to MAC lookup'

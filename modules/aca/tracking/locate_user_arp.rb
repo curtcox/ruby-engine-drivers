@@ -1,6 +1,7 @@
 module Aca; end
+module Aca::Tracking; end
 
-class Aca::LocateUserArp
+class Aca::Tracking::LocateUserArp
     include ::Orchestrator::Constants
 
 
