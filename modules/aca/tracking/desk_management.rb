@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 module Aca; end
 module Aca::Tracking; end
+
+require 'aca/tracking/switch_port'
 
 class Aca::Tracking::DeskManagement
     include ::Orchestrator::Constants
@@ -8,20 +12,36 @@ class Aca::Tracking::DeskManagement
     generic_name :DeskManagement
     implements :logic
 
+    default_settings({
+        'switch_ip' => { 'port_id' => 'desk_id' }
+    })
+
     def on_load
         on_update
 
         # Should only call once
-        desk_usage
+        get_usage
     end
 
     def on_update
-        # { "switch_name": { "port_id": "desk_id" } }
-        @interface_mappings = setting(:mappings) || {}
+        # { "switch_ip": { "port_id": "desk_id" } }
+        @switch_mappings = setting(:mappings) || {}
+        @desk_mappings = {}
+        @switch_mappings.each do |switch_ip, ports|
+            ports.each do |port, desk_id|
+                @desk_mappings[desk_id] = [switch_ip, port]
+            end
+        end
     end
 
-    def get_usage(building, level)
-        self["#{building}+#{level}"] || []
+    def desk_usage(building, level)
+        self["#{building}:#{level}"] || []
+    end
+
+    def desk_details(desk_id)
+        switch_ip, port = @desk_mappings[desk_id]
+        return nil unless switch_ip
+        Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
     end
 
     protected
@@ -30,10 +50,10 @@ class Aca::Tracking::DeskManagement
         system.all(:Snooping)
     end
 
-    def desk_usage
+    def get_usage
         # Get local vars in case they change while we are processing
         all_switches = switches.to_a
-        mappings = @interface_mappings
+        mappings = @switch_mappings
 
         # Perform operations on the thread pool
         @caching = thread.work {
@@ -47,7 +67,7 @@ class Aca::Tracking::DeskManagement
             # Cache the levels
             buildings.each do |building, levels|
                 levels.each do |level, desks|
-                    self["#{building}+#{level}"] = desks
+                    self["#{building}:#{level}"] = desks
                 end
             end
         }.finally {
@@ -56,9 +76,9 @@ class Aca::Tracking::DeskManagement
     end
 
     def apply_mappings(buildings, switch, mappings)
-        map = mappings[switch[:name]]
+        map = mappings[switch[:ip_address]]
         if map.nil?
-            logger.debug { "no mapping for switch #{switch[:name]}" }
+            logger.warn "no mappings for switch #{switch[:ip_address]}"
             return
         end
 
