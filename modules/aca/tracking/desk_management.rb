@@ -24,6 +24,9 @@ class Aca::Tracking::DeskManagement
     end
 
     def on_update
+        @desk_hold_time = setting(:desk_hold_time) || 5.minutes.to_i
+        @desk_reserve_time = setting(:desk_reserve_time) || 2.hours.to_i
+
         # { "switch_ip": { "port_id": "desk_id" } }
         @switch_mappings = setting(:mappings) || {}
         @desk_mappings = {}
@@ -34,6 +37,7 @@ class Aca::Tracking::DeskManagement
         end
     end
 
+    # these are helper functions for API usage
     def desk_usage(building, level)
         self["#{building}:#{level}"] || []
     end
@@ -43,6 +47,32 @@ class Aca::Tracking::DeskManagement
         return nil unless switch_ip
         Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
     end
+
+    # Grabs the current user from the websocket connection
+    # and if the user has a desk reserved, then they can reserve their desk
+    def reserve_desk(time = @desk_reserve_time)
+        user = current_user
+        raise 'User not found' unless user
+
+        desk_details = self[user.id] || {}
+        location = desk_details[:location]
+        return 'Desk not found. Reservation time limit exceeded.' unless location
+
+        switch_ip, port = @desk_mappings[location]
+        reservation = Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
+        raise "Mapping error. Desk #{location} can't be found on the switch #{switch_ip}-#{port}" unless reservation
+        return 'Desk not found. Reservation time limit exceeded.' unless location.reserved_by_id == user.id
+
+        reservation.update_reservation(time)
+    end
+
+    def cancel_reservation
+        reserve_desk(0)
+    end
+
+    #
+    # TODO:: Callback for new user / callback 
+    #
 
     protected
 
