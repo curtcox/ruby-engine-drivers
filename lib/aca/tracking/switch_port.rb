@@ -14,7 +14,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     attribute :unplug_time,  type: Integer # Unlug time for timeout
     attribute :reserve_time, type: Integer # Length of time for the reservation
     attribute :reserved_mac, type: String
-    belongs_to :reserved_by, class_name: 'User'
+    attribute :reserved_by,  type: String
 
     # Switch details
     attribute :switch_ip,   type: String  # IP of the network switch
@@ -29,7 +29,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     index_view :switch_ip
 
     # self.find_by_mac_address(mac) => nil or SwitchPort
-    index :mac_address, presence: false
+    index :mac_address,  presence: false
     index :reserved_mac, presence: false
 
     def self.locate(mac)
@@ -54,7 +54,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
             self.unplug_time = 0
             self.reserve_time = 0
             self.reserved_mac = nil
-            self.reserved_by_id = nil
+            self.reserved_by = nil
         end
         self.mac_address = mac_address
         self.assign_attributes(switch_details)
