@@ -183,7 +183,7 @@ class Cisco::Switch::SnoopingIpSsh
                 # Ensure the data is valid
                 mac = entries[0]
                 if mac =~ /^(?:[[:xdigit:]]{1,2}([-:]))(?:[[:xdigit:]]{1,2}\1){4}[[:xdigit:]]{1,2}$/
-                    mac.downcase!
+                    mac = format(mac)
                     ip = entries[1]
 
                     if ::IPAddress.valid? ip
@@ -258,5 +258,11 @@ class Cisco::Switch::SnoopingIpSsh
                 # CAS failed we can safely ignore this
             end
         end
+    end
+
+    protected
+
+    def format(mac)
+        mac.gsub(/(0x|[^0-9A-Fa-f])*/, "").downcase
     end
 end
