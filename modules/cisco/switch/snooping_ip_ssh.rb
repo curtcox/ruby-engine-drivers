@@ -28,7 +28,8 @@ class Cisco::Switch::SnoopingIpSsh
     default_settings({
         username: :cisco,
         password: :cisco,
-        building: 'building_code'
+        building: 'building_code',
+        reserve_time: 5.minutes.to_i
     })
 
     def on_load
@@ -38,10 +39,14 @@ class Cisco::Switch::SnoopingIpSsh
         on_update
 
         query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(remote_address)
-        query.stream do |detail|
-            next unless detail.connected?
-            self[detail.interface] = [detail.device_ip, detail.mac_address]
-            self[detail.device_ip] = ::Aca::Tracking::SwitchPort.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
+        query.each do |detail|
+            if detail.connected?
+                reserved = detail.reserved? || detail.mac_address == detail.reserved_mac
+                self[detail.interface] = [detail.device_ip, detail.mac_address, reserved, detail.clash?]
+                self[detail.device_ip] = ::Aca::Tracking::SwitchPort.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
+            elsif detail.reserved?
+                # TODO:: track reservation timeouts
+            end
         end
     end
 
@@ -50,6 +55,8 @@ class Cisco::Switch::SnoopingIpSsh
         self[:ip_address] = remote_address
         self[:building] = setting(:building)
         self[:level] = setting(:level)
+
+        @reserve_time = setting(:reserve_time) || 0
     end
 
     def connected
@@ -193,7 +200,8 @@ class Cisco::Switch::SnoopingIpSsh
                             ::Aca::Tracking::SwitchPort.bucket.set("ipmac-#{ip}", mac, expire_in: 1.year)
                         end
 
-                        if self[interface] != [ip, mac]
+                        iface = self[interface]
+                        if iface[0] != ip || iface[1] != mac
                             details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
                             if details
                                 # detect IP address change
@@ -204,7 +212,7 @@ class Cisco::Switch::SnoopingIpSsh
                                 details = ::Aca::Tracking::SwitchPort.new
                             end
 
-                            details.connected(mac, {
+                            reserved = details.connected(mac, @reserve_time, {
                                 device_ip: ip,
                                 switch_ip: remote_address,
                                 hostname: @hostname,
@@ -212,7 +220,20 @@ class Cisco::Switch::SnoopingIpSsh
                                 interface: interface
                             })
 
-                            self[interface] = [ip, mac]
+                            # ip, mac, reserved?, clash?
+                            self[interface] = [ip, mac, reserved, details.clash?]
+
+                        elsif not iface[RESERVED]
+                            # We don't know the user who is at this desk...
+                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+                            reserved = details.check_for_user(@reserve_time)
+                            self[interface] = [ip, mac, true, false] if reserved
+
+                        elsif iface[CLASH]
+                            # There was a reservation clash - is there still a clash?
+                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+                            reserved = details.check_for_user(@reserve_time)
+                            self[interface] = [ip, mac, reserved, false] if !details.clash?
                         end
                     end
                 end
@@ -222,6 +243,9 @@ class Cisco::Switch::SnoopingIpSsh
 
         :success
     end
+
+    RESERVED = 2
+    CLASH = 3
 
     def do_send(cmd, **options)
         logger.debug { "requesting #{cmd}" }
@@ -240,7 +264,11 @@ class Cisco::Switch::SnoopingIpSsh
 
         # Update the status of the switch port
         model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
-        model.disconnected if model
+        if model
+            notify = model.disconnected
+            # notify user about reserving their desk
+            self[:disconnected] = model if notify
+        end
 
         self[interface] = nil
     end

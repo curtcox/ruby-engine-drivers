@@ -3,6 +3,9 @@
 module Aca; end
 module Aca::Tracking; end
 
+# Tracks currently connected device
+# Tracks reservation and performs basic reservation management
+
 class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     design_document :swport
 
@@ -11,8 +14,8 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     attribute :device_ip,   type: String  # IP of the device connected to the switch
 
     # Reservation details
-    attribute :unplug_time,  type: Integer # Unlug time for timeout
-    attribute :reserve_time, type: Integer # Length of time for the reservation
+    attribute :unplug_time,  type: Integer, default: 0 # Unlug time for timeout
+    attribute :reserve_time, type: Integer, default: 0 # Length of time for the reservation
     attribute :reserved_mac, type: String
     attribute :reserved_by,  type: String
 
@@ -47,14 +50,29 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     # ================
 
     # A new device has connected to the switch port
-    def connected(mac_address, **switch_details)
+    def connected(mac_address, reserve_time, **switch_details)
         reserved = reserved?
 
-        if not reserved
+        if reserved
+            # TODO::
+            # Check the user isn't sitting somewhere else now
+            # we'll steal this desk from them if they are
+            # UserDevices.find_by_username
+            # Check for desks etc
+        else
             self.unplug_time = 0
-            self.reserve_time = 0
-            self.reserved_mac = nil
-            self.reserved_by = nil
+            username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
+
+            if username
+                reserved = true
+                self.reserve_time = reserve_time
+                self.reserved_mac = mac_address
+                self.reserved_by = username
+            else
+                self.reserve_time = 0
+                self.reserved_mac = nil
+                self.reserved_by = nil
+            end
         end
         self.mac_address = mac_address
         self.assign_attributes(switch_details)
@@ -67,11 +85,25 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     end
 
     # Change the owner of the desk to this new user
-    def set_user(user, default_reserve_time = 5.minutes)
-        self.reserved_by = user
-        self.reserve_time = default_reserve_time.to_i
+    def check_for_user(reserve_time)
+        return false if !connected?
+        if reserved?
+            # TODO::
+            # Check the user isn't sitting somewhere else now
+            # we'll steal this desk from them if they are
+            # UserDevices.find_by_username
+            # Check for desks etc
+            return false
+        end
+        username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
+        return false unless username
+
+        self.reserved_by = username
+        self.reserve_time = reserve_time
         self.reserved_mac = self.mac_address
+        self.unplug_time = 0
         self.save!(with_cas: true)
+        true
     rescue ::Libcouchbase::Error::KeyExists
         self.reload
         retry
@@ -116,11 +148,15 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     end
 
     def reserved?
-        ((self.unplug_time || 0) + (self.reserve_time || 0)) >= Time.now.to_i
+        (self.unplug_time + self.reserve_time) > Time.now.to_i
     end
 
     def connected?
         !!self.mac_address
+    end
+
+    def clash?
+        connected? ? (self.reserved_mac != self.mac_address && reserved?) : false
     end
 
 

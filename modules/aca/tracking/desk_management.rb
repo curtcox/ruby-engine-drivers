@@ -26,6 +26,7 @@ class Aca::Tracking::DeskManagement
     def on_update
         @desk_hold_time = setting(:desk_hold_time) || 5.minutes.to_i
         @desk_reserve_time = setting(:desk_reserve_time) || 2.hours.to_i
+        @user_identifier = setting(:user_identifier) || :login_name
 
         # { "switch_ip": { "port_id": "desk_id" } }
         @switch_mappings = setting(:mappings) || {}
@@ -54,14 +55,15 @@ class Aca::Tracking::DeskManagement
         user = current_user
         raise 'User not found' unless user
 
-        desk_details = self[user.id] || {}
+        username = user.__send__(@user_identifier)
+        desk_details = self[username] || {}
         location = desk_details[:location]
         return 'Desk not found. Reservation time limit exceeded.' unless location
 
         switch_ip, port = @desk_mappings[location]
         reservation = Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
         raise "Mapping error. Desk #{location} can't be found on the switch #{switch_ip}-#{port}" unless reservation
-        return 'Desk not found. Reservation time limit exceeded.' unless location.reserved_by_id == user.id
+        return 'Desk not found. Reservation time limit exceeded.' unless reservation.reserved_by == username
 
         reservation.update_reservation(time)
     end
