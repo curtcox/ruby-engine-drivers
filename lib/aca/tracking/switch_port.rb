@@ -159,6 +159,36 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         connected? ? (self.reserved_mac != self.mac_address && reserved?) : false
     end
 
+    class StaticDetails
+        attr_accessor :ip
+        attr_accessor :mac
+        attr_accessor :connected
+        attr_accessor :reserved
+        attr_accessor :clash
+
+        def to_json
+            {
+                ip: ip, mac: mac, connected: connected,
+                reserved: reserved, clash: clash
+            }.to_json
+        end
+    end
+
+    # pre-calculated lightweight details for this switch port
+    def details
+        d = StaticDetails.new
+        d.ip = self.device_ip
+        d.mac = self.mac_address || self.reserved_mac
+        d.connected = connected?
+        d.clash = clash?
+
+        # Reserved if there is a clash
+        # Reserved if connected and macs are the same
+        # Otherwise check if reserved in the traditonal sense
+        d.reserved = d.clash ? true : (d.connected ? self.reserved_mac == self.mac_address : reserved?)
+        d
+    end
+
 
     protected
 

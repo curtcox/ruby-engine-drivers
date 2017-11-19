@@ -34,20 +34,25 @@ class Cisco::Switch::SnoopingIpSsh
 
     def on_load
         @check_interface = ::Set.new
-        self[:interfaces] = []
+        @reserved_interface = ::Set.new
+        self[:interfaces] = [] # This will be updated via query
 
         on_update
 
+        # Load the current state of the switch from the database
         query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(remote_address)
         query.each do |detail|
-            if detail.connected?
-                reserved = detail.reserved? || detail.mac_address == detail.reserved_mac
-                self[detail.interface] = [detail.device_ip, detail.mac_address, reserved, detail.clash?]
+            details = detail.details
+            self[detail.interface] = details
+
+            if details.connected
                 self[detail.device_ip] = ::Aca::Tracking::SwitchPort.bucket.get("ipmac-#{detail.device_ip}", quiet: true)
-            elsif detail.reserved?
-                # TODO:: track reservation timeouts
+            elsif details.reserved
+                @reserved_interface << detail.interface
             end
         end
+
+        self[:reserved] = @reserved_interface.to_a
     end
 
     def on_update
@@ -63,7 +68,10 @@ class Cisco::Switch::SnoopingIpSsh
         @username = setting(:username) || 'cisco'
         do_send(@username, priority: 99)
 
-        schedule.every('1m') { query_connected_devices }
+        schedule.every('1m') do
+            query_connected_devices
+            check_reservations if @reserve_time > 0
+        end
     end
 
     def disconnected
@@ -186,10 +194,11 @@ class Cisco::Switch::SnoopingIpSsh
 
             # We only want entries that are currently active
             if @check_interface.include? interface
+                iface = self[interface]
 
                 # Ensure the data is valid
                 mac = entries[0]
-                if mac =~ /^(?:[[:xdigit:]]{1,2}([-:]))(?:[[:xdigit:]]{1,2}\1){4}[[:xdigit:]]{1,2}$/
+                if iface.connected && mac =~ /^(?:[[:xdigit:]]{1,2}([-:]))(?:[[:xdigit:]]{1,2}\1){4}[[:xdigit:]]{1,2}$/
                     mac = format(mac)
                     ip = entries[1]
 
@@ -200,8 +209,7 @@ class Cisco::Switch::SnoopingIpSsh
                             ::Aca::Tracking::SwitchPort.bucket.set("ipmac-#{ip}", mac, expire_in: 1.year)
                         end
 
-                        iface = self[interface]
-                        if iface[0] != ip || iface[1] != mac
+                        if iface.ip != ip || iface.mac != mac
                             details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
                             if details
                                 # detect IP address change
@@ -221,19 +229,19 @@ class Cisco::Switch::SnoopingIpSsh
                             })
 
                             # ip, mac, reserved?, clash?
-                            self[interface] = [ip, mac, reserved, details.clash?]
+                            self[interface] = details.details
 
-                        elsif not iface[RESERVED]
+                        elsif not iface.reserved
                             # We don't know the user who is at this desk...
                             details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
                             reserved = details.check_for_user(@reserve_time)
-                            self[interface] = [ip, mac, true, false] if reserved
+                            self[interface] = details.details if reserved
 
-                        elsif iface[CLASH]
+                        elsif iface.clash
                             # There was a reservation clash - is there still a clash?
                             details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
                             reserved = details.check_for_user(@reserve_time)
-                            self[interface] = [ip, mac, reserved, false] if !details.clash?
+                            self[interface] = details.details if !details.clash?
                         end
                     end
                 end
@@ -244,33 +252,32 @@ class Cisco::Switch::SnoopingIpSsh
         :success
     end
 
-    RESERVED = 2
-    CLASH = 3
-
     def do_send(cmd, **options)
         logger.debug { "requesting #{cmd}" }
         send("#{cmd}\n", options)
     end
 
     def remove_lookup(interface)
-        ip, mac = self[interface]
-        return unless mac
+        iface = self[interface]
+        return unless iface&.mac
 
         # We are no longer interested in this interface
         @check_interface.delete(interface)
 
         # Delete the IP to MAC lookup
-        remove_ip_to_mac_lookup(ip, mac)
+        remove_ip_to_mac_lookup(iface.ip, iface.mac)
 
         # Update the status of the switch port
         model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
         if model
             notify = model.disconnected
-            # notify user about reserving their desk
-            self[:disconnected] = model if notify
-        end
 
-        self[interface] = nil
+            # notify user about reserving their desk
+            if notify
+                self[:disconnected] = model.details
+                @reserved_interfaces << interface
+            end
+        end
     end
 
     def remove_ip_to_mac_lookup(ip, mac)
@@ -292,5 +299,24 @@ class Cisco::Switch::SnoopingIpSsh
 
     def format(mac)
         mac.gsub(/(0x|[^0-9A-Fa-f])*/, "").downcase
+    end
+
+    def check_reservations
+        remove = []
+
+        # Check if the interfaces are still reserved
+        @reserved_interfaces.each do |interface|
+            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+            if not details.reserved?
+                remove << interface
+                self[interface] = details.details
+            end
+        end
+
+        # Remove them from the reserved list if not
+        if remove.present?
+            @reserved_interfaces -= remove
+            self[:reserved] = @reserved_interfaces.to_a
+        end
     end
 end
