@@ -6,6 +6,11 @@ module Aca::Tracking; end
 # Tracks currently connected device
 # Tracks reservation and performs basic reservation management
 
+=begin
+-> if reserved is the reserved user sitting somewhere else
+-> TODO:: has the current user reserved somewhere else (cancel booking)
+=end
+
 class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     design_document :swport
 
@@ -173,8 +178,8 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
 
     class StaticDetails < Hash
         [
-            :ip, :mac, :connected, :reserved, :reserve_time
-            unplug_time:, :clash, :username, :desk_id
+            :ip, :mac, :connected, :reserved, :reserve_time, :unplug_time,
+            :reserved_by, :clash, :username, :desk_id
         ].each do |key|
             define_method key do
                 self[key]
@@ -203,6 +208,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
             # Allow a realtime count down on the users screen
             d.reserve_time = self.reserve_time
             d.unplug_time = self.unplug_time
+            d.reserved_by = self.reserved_by
         end
         d.username = self.username
         d.desk_id  = self.desk_id

@@ -105,6 +105,15 @@ class Aca::Tracking::DeskManagement
                     self[key] = desks[:inuse]
                     self["#{key}:#{clashes}"] = desks[:clash]
                     self["#{key}:#{reserved}"] = desks[:reserved]
+
+                    desks[:users].each do |user|
+                        self[user.username] = user
+                        self[user.reserved_by] = user if user.clash
+                    end
+
+                    desks[:reserved_users].each do |user|
+                        self[user.reserved_by] = user
+                    end
                 end
             end
         }.finally {
@@ -126,15 +135,24 @@ class Aca::Tracking::DeskManagement
 
         # Grab port information 
         interfaces = switch[:interfaces]
-        reserved = switch[:reserved]
+        reservations = switch[:reserved]
 
         # Build lookup structures
         b = buildings[building] ||= {}
         port_usage = b[level] ||= {
             inuse: [],
             clash: [],
-            reserved: []
+            reserved: [],
+            users: [],
+            reserved_users: []
         }
+
+        # Prevent needless hash lookups
+        inuse = port_usage[:inuse]
+        clash = port_usage[:clash]
+        reserved = port_usage[:reserved]
+        users = port_usage[:users]
+        reserved_users = port_usage[:reserved_users]
 
         # Map the ports to desk IDs
         interfaces.each do |port|
@@ -150,20 +168,23 @@ class Aca::Tracking::DeskManagement
                     end
                 end
 
-                port_usage[:inuse] << desk_id
-                port_usage[:clash] << desk_id if details.clash
+                inuse << desk_id
+                clash << desk_id if details.clash
 
                 # set the user details
-                self[details.username] = details if details.username
+                users << details if details.username
             else
                 logger.debug { "Unknown port #{port} - no desk mapping found" }
             end
         end
 
-        reserved.each do |port|
+        reservations.each do |port|
             desk_id = map[port]
             if desk_id
-                port_usage[:reserved] << desk_id
+                reserved << desk_id
+
+                # set the user details (reserved_by must exist to be here)
+                reserved_users << switch[port]
             else
                 logger.debug { "Unknown port #{port} - no desk mapping found" }
             end
