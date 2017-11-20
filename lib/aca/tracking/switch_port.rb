@@ -173,8 +173,8 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
 
     class StaticDetails < Hash
         [
-            :ip, :mac, :connected, :reserved,
-            :clash, :username, :desk_id
+            :ip, :mac, :connected, :reserved, :reserve_time
+            unplug_time:, :clash, :username, :desk_id
         ].each do |key|
             define_method key do
                 self[key]
@@ -197,7 +197,13 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         # Reserved if there is a clash
         # Reserved if connected and macs are the same
         # Otherwise check if reserved in the traditonal sense
-        d.reserved = d.clash ? true : (d.connected ? self.reserved_mac == self.mac_address : reserved?)
+        res = reserved?
+        d.reserved = d.clash ? true : (d.connected ? self.reserved_mac == self.mac_address : res)
+        if res
+            # Allow a realtime count down on the users screen
+            d.reserve_time = self.reserve_time
+            d.unplug_time = self.unplug_time
+        end
         d.username = self.username
         d.desk_id  = self.desk_id
         d
