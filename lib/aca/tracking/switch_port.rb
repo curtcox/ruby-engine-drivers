@@ -3,12 +3,11 @@
 module Aca; end
 module Aca::Tracking; end
 
-# Tracks currently connected device
-# Tracks reservation and performs basic reservation management
-
 =begin
--> if reserved is the reserved user sitting somewhere else
--> TODO:: has the current user reserved somewhere else (cancel booking)
+    Tracks currently connected device
+    Tracks reservation and performs basic reservation management
+      * if reserved is the reserved user sitting somewhere else (take over desk)
+      * has the current user reserved somewhere else (cancel other booking)
 =end
 
 class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
@@ -76,6 +75,10 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
                 self.reserve_time = reserve_time
                 self.reserved_mac = mac_address
                 self.reserved_by = username
+
+                # Check this user hasn't reserved elsewhere
+                other = self.class.find_by_mac_address(self.reserved_mac)
+                other.update_reservation(0) if other
             else
                 self.reserve_time = 0
                 self.reserved_mac = nil
@@ -127,16 +130,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
 
     # Update the reservation (user would like to extend their desk booking)
     def update_reservation(time)
-        return false unless self.reserved_mac
-
-        reserved = if connected?
-            # If the reserved time has expired then the current connected
-            # user is the new owner of the desk
-            reserved?
-        else
-            # Otherwise we can only reserve a desk if the user had been set
-            !!self.reserved_mac
-        end
+        reserved = reserved?
         self.update_columns(reserve_time: time.to_i, with_cas: true) if reserved
 
         # Was the reservation request successful
