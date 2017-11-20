@@ -10,8 +10,9 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     design_document :swport
 
     # Connection details
-    attribute :mac_address, type: String  # MAC of the device currently connected to the switch
-    attribute :device_ip,   type: String  # IP of the device connected to the switch
+    attribute :mac_address, type: String # MAC of the device currently connected to the switch
+    attribute :device_ip,   type: String # IP of the device connected to the switch
+    attribute :username,    type: String # Username of the currently connected user
 
     # Reservation details
     attribute :unplug_time,  type: Integer, default: 0 # Unlug time for timeout
@@ -60,9 +61,10 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
             reserved = false if other&.id != self.id
         end
 
+        username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
+
         if not reserved
             self.unplug_time = 0
-            username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
 
             if username
                 reserved = true
@@ -75,6 +77,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
                 self.reserved_by = nil
             end
         end
+        self.username = username
         self.mac_address = mac_address
         self.assign_attributes(switch_details)
         self.save!(with_cas: true)
@@ -88,14 +91,23 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     # Change the owner of the desk to this new user
     def check_for_user(reserve_time)
         return false if !connected?
-        if reserved? && self.mac_address != self.reserved_mac
-            # Check if the owner of this desk has moved somewhere else
-            other = self.class.find_by_mac_address(self.reserved_mac)
-            return false if other&.id == self.id
-        end
 
-        username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
+        # Check to see if the current user has been found
+        username = self.username || self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
         return false unless username
+
+        # Check if the owner of this desk has moved somewhere else
+        if reserved? && self.mac_address != self.reserved_mac
+            other = self.class.find_by_mac_address(self.reserved_mac)
+
+            if other&.id == self.id
+                if self.username.nil?
+                    self.username = username
+                    self.save!(with_cas: true)
+                end
+                return false
+            end
+        end
 
         self.reserved_by = username
         self.reserve_time = reserve_time
@@ -137,6 +149,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         self.unplug_time = now if !reserved?
         self.mac_address = nil
         self.device_ip = nil
+        self.username = nil
         self.save!(with_cas: true)
 
         # Ask user if they would like to reserve the desk
@@ -185,7 +198,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         # Reserved if connected and macs are the same
         # Otherwise check if reserved in the traditonal sense
         d.reserved = d.clash ? true : (d.connected ? self.reserved_mac == self.mac_address : reserved?)
-        d.username = self.reserved_by if d.reserved
+        d.username = self.username
         d.desk_id  = self.desk_id
         d
     end
