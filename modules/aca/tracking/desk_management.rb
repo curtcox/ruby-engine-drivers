@@ -99,7 +99,10 @@ class Aca::Tracking::DeskManagement
             # Cache the levels
             buildings.each do |building, levels|
                 levels.each do |level, desks|
-                    self["#{building}:#{level}"] = desks
+                    key = "#{building}:#{level}"
+                    self[key] = desks[:inuse]
+                    self["#{key}:#{clashes}"] = desks[:clash]
+                    self["#{key}:#{reserved}"] = desks[:reserved]
                 end
             end
         }.finally {
@@ -114,19 +117,42 @@ class Aca::Tracking::DeskManagement
             return
         end
 
-        # Grab switch information
-        interfaces = switch[:interfaces]
+        # Grab location information
         building = switch[:building]
         level = switch[:level]
 
+        # Grab port information 
+        interfaces = switch[:interfaces]
+        reserved = switch[:reserved]
+
         # Build lookup structures
         b = buildings[building] ||= {}
-        inuse = b[level] ||= []
+        port_usage = b[level] ||= {
+            inuse: [],
+            clash: [],
+            reserved: []
+        }
 
         # Map the ports to desk IDs
         interfaces.each do |port|
             desk_id = map[port]
-            inuse << desk_id if desk_id
+            if desk_id
+                port_usage[:inuse] << desk_id
+                port_usage[:clash] << desk_id if switch[port].clash
+            else
+                logger.debug { "Unknown port #{port} - no desk mapping found" }
+            end
         end
+
+        reserved.each do |port|
+            desk_id = map[port]
+            if desk_id
+                port_usage[:reserved] << desk_id
+            else
+                logger.debug { "Unknown port #{port} - no desk mapping found" }
+            end
+        end
+
+        nil
     end
 end
