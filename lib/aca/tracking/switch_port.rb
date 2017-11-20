@@ -18,6 +18,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     attribute :reserve_time, type: Integer, default: 0 # Length of time for the reservation
     attribute :reserved_mac, type: String
     attribute :reserved_by,  type: String
+    attribute :desk_id,      type: String
 
     # Switch details
     attribute :switch_ip,   type: String  # IP of the network switch
@@ -34,6 +35,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     # self.find_by_mac_address(mac) => nil or SwitchPort
     index :mac_address,  presence: false
     index :reserved_mac, presence: false
+    index :desk_id,      presence: false
 
     def self.locate(mac)
         port = ::Aca::Tracking::SwitchPort.find_by_mac_address(mac)
@@ -156,18 +158,18 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         connected? ? (self.reserved_mac != self.mac_address && reserved?) : false
     end
 
-    class StaticDetails
-        attr_accessor :ip
-        attr_accessor :mac
-        attr_accessor :connected
-        attr_accessor :reserved
-        attr_accessor :clash
+    class StaticDetails < Hash
+        [
+            :ip, :mac, :connected, :reserved,
+            :clash, :username, :desk_id
+        ].each do |key|
+            define_method key do
+                self[key]
+            end
 
-        def to_json
-            {
-                ip: ip, mac: mac, connected: connected,
-                reserved: reserved, clash: clash
-            }.to_json
+            define_method "#{key}=" do |val|
+                self[key] = val
+            end
         end
     end
 
@@ -183,6 +185,8 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         # Reserved if connected and macs are the same
         # Otherwise check if reserved in the traditonal sense
         d.reserved = d.clash ? true : (d.connected ? self.reserved_mac == self.mac_address : reserved?)
+        d.username = self.reserved_by if d.reserved
+        d.desk_id  = self.desk_id
         d
     end
 

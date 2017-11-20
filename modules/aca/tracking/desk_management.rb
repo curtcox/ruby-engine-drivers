@@ -46,7 +46,7 @@ class Aca::Tracking::DeskManagement
     def desk_details(desk_id)
         switch_ip, port = @desk_mappings[desk_id]
         return nil unless switch_ip
-        Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
+        ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
     end
 
     # Grabs the current user from the websocket connection
@@ -61,7 +61,7 @@ class Aca::Tracking::DeskManagement
         return 'Desk not found. Reservation time limit exceeded.' unless location
 
         switch_ip, port = @desk_mappings[location]
-        reservation = Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
+        reservation = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
         raise "Mapping error. Desk #{location} can't be found on the switch #{switch_ip}-#{port}" unless reservation
         return 'Desk not found. Reservation time limit exceeded.' unless reservation.reserved_by == username
 
@@ -96,7 +96,9 @@ class Aca::Tracking::DeskManagement
                 apply_mappings(buildings, switch, mappings)
             end
 
-            # Cache the levels
+            buildings
+        }.then { |buildings|
+            # Apply the settings on thread for performance reasons
             buildings.each do |building, levels|
                 levels.each do |level, desks|
                     key = "#{building}:#{level}"
@@ -111,9 +113,10 @@ class Aca::Tracking::DeskManagement
     end
 
     def apply_mappings(buildings, switch, mappings)
-        map = mappings[switch[:ip_address]]
+        switch_ip = switch[:ip_address]
+        map = mappings[switch_ip]
         if map.nil?
-            logger.warn "no mappings for switch #{switch[:ip_address]}"
+            logger.warn "no mappings for switch #{switch_ip}"
             return
         end
 
@@ -137,8 +140,21 @@ class Aca::Tracking::DeskManagement
         interfaces.each do |port|
             desk_id = map[port]
             if desk_id
+                details = switch[port]
+
+                # Configure desk id if not known
+                if details.desk_id != desk_id
+                    details.desk_id = desk_id
+                    ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
+                        doc.dict_upsert('desk_id', desk_id)
+                    end
+                end
+
                 port_usage[:inuse] << desk_id
-                port_usage[:clash] << desk_id if switch[port].clash
+                port_usage[:clash] << desk_id if details.clash
+
+                # set the user details
+                self[details.username] = details if details.username
             else
                 logger.debug { "Unknown port #{port} - no desk mapping found" }
             end
