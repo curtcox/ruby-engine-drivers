@@ -2,7 +2,7 @@
 
 module Foxtel; end
 
-class Foxtel::IQ3
+class Foxtel::Iq3
     include ::Orchestrator::Constants
 
 
