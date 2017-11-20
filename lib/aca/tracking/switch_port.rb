@@ -51,15 +51,14 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
 
     # A new device has connected to the switch port
     def connected(mac_address, reserve_time, **switch_details)
-        reserved = reserved?
-
+        reserved = reserved? && mac_address != self.reserved_mac
         if reserved
-            # TODO::
-            # Check the user isn't sitting somewhere else now
-            # we'll steal this desk from them if they are
-            # UserDevices.find_by_username
-            # Check for desks etc
-        else
+            # Check if the owner of this desk has moved somewhere else
+            other = self.class.find_by_mac_address(self.reserved_mac)
+            reserved = false if other&.id != self.id
+        end
+
+        if not reserved
             self.unplug_time = 0
             username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
 
@@ -87,14 +86,12 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     # Change the owner of the desk to this new user
     def check_for_user(reserve_time)
         return false if !connected?
-        if reserved?
-            # TODO::
-            # Check the user isn't sitting somewhere else now
-            # we'll steal this desk from them if they are
-            # UserDevices.find_by_username
-            # Check for desks etc
-            return false
+        if reserved? && self.mac_address != self.reserved_mac
+            # Check if the owner of this desk has moved somewhere else
+            other = self.class.find_by_mac_address(self.reserved_mac)
+            return false if other&.id == self.id
         end
+
         username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
         return false unless username
 

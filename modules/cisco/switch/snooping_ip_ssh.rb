@@ -252,6 +252,8 @@ class Cisco::Switch::SnoopingIpSsh
         :success
     end
 
+    protected
+
     def do_send(cmd, **options)
         logger.debug { "requesting #{cmd}" }
         send("#{cmd}\n", options)
@@ -294,8 +296,6 @@ class Cisco::Switch::SnoopingIpSsh
             end
         end
     end
-
-    protected
 
     def format(mac)
         mac.gsub(/(0x|[^0-9A-Fa-f])*/, "").downcase
