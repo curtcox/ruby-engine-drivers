@@ -81,6 +81,13 @@ class Aca::Tracking::UserDevices < CouchbaseOrm::Base
         self.updated_at = Time.now
     end
 
+    before_destroy :remove_macs
+    def remove_macs
+        self.macs.each do |mac|
+            self.class.bucket.delete("macuser-#{mac}")
+        end
+    end
+
     def self.format(mac)
         mac.gsub(/(0x|[^0-9A-Fa-f])*/, "").downcase
     end

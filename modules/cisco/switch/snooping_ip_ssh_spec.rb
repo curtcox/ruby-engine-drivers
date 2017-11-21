@@ -2,7 +2,7 @@ Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingIpSsh' do
     # Create some mock data
     start_id = "swport-192.168.0.1-gi2"
     mock = Aca::Tracking::SwitchPort.find_by_id(start_id) || Aca::Tracking::SwitchPort.new
-    mock.connected('c4:54:44:38:e1:58', 5.minutes.to_i, {
+    mock.connected('c4544438e158', 5.minutes.to_i, {
         device_ip: '192.168.1.16',
         switch_ip: '192.168.0.1',
         hostname: '',
@@ -28,7 +28,7 @@ Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingIpSsh' do
     mock = Aca::Tracking::SwitchPort.find(start_id)
     expect(mock.nil?).to eq false
     expect(status[:gi2]).to eq({
-        ip: "192.168.1.16", mac: "c4:54:44:38:e1:58", connected: true,
+        ip: "192.168.1.16", mac: "c4544438e158", connected: true,
         clash: false, reserved: false, username: nil, desk_id: nil
     })
 
