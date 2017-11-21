@@ -261,11 +261,12 @@ class Cisco::Switch::SnoopingIpSsh
         model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
         if model
             notify = model.disconnected
-            self[interface] = model.details
+            details = model.details
+            self[interface] = details
 
             # notify user about reserving their desk
             if notify
-                self[:disconnected] = model.details
+                self[:disconnected] = details
                 @reserved_interface << interface
             end
         else

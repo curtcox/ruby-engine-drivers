@@ -36,6 +36,12 @@ class Aca::Tracking::DeskManagement
                 @desk_mappings[desk_id] = [switch_ip, port]
             end
         end
+
+        # Bind to all the switches for disconnect notifications
+        @subscriptions ||= []
+        @subscriptions.each { |ref| unsubscribe(ref) }
+        @subscriptions.clear
+        subscribe_disconnect
     end
 
     # these are helper functions for API usage
@@ -73,14 +79,21 @@ class Aca::Tracking::DeskManagement
         reserve_desk(0)
     end
 
-    #
-    # TODO:: Callback for new user / callback 
-    #
-
     protected
 
     def switches
         system.all(:Snooping)
+    end
+
+    def subscribe_disconnect
+        (1..switches.length).each do |index|
+            @subscriptions << system.subscribe(:Snooping, index, :disconnected) do |notify|
+                details = notify.value
+                if details.reserved_by
+                    self[details.reserved_by] = details
+                end
+            end
+        end
     end
 
     def get_usage
