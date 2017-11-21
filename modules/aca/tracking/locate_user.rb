@@ -3,6 +3,7 @@
 module Aca; end
 module Aca::Tracking; end
 
+require 'aca/tracking/switch_port'
 ::Orchestrator::DependencyManager.load('Aca::Tracking::UserDevices', :model, :force)
 ::Aca::Tracking::UserDevices.ensure_design_document!
 
@@ -20,55 +21,59 @@ class Aca::Tracking::LocateUser
     def on_update
     end
 
-    def lookup(ip, login, domain = '.')
+    def lookup(ip, login, domain = nil)
         # prevents concurrent and repeat lookups for the one IP and user
-        return if @looking_up[ip] || self[ip] == login
-        @looking_up[ip] = true
+        return if self[ip] == login || @looking_up[ip]
+        begin
+            @looking_up[ip] = true
+            logger.debug { "Looking up #{ip} for #{domain}\\#{login}" }
 
-        logger.debug { "Looking up #{ip} for #{domain}\\#{login}" }
-        bucket = ::User.bucket
-        mac = ::User.bucket.get("ipmac-#{ip}", quiet: true)
-        if mac && self[mac] != login
-            logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
+            mac = Aca::Tracking::SwitchPort.find_by_device_ip(ip)&.mac_address
 
-            user = ::Aca::Tracking::UserDevices.for_user(login, domain)
-            user.add(mac)
+            if mac && self[mac] != login
+                logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
 
-            self[mac] = login
-            self[ip] = login
-        else
-            logger.debug {
-                if mac
-                    "MAC #{mac} known for #{ip} : #{login}"
-                else
-                    "unable to locate MAC for #{ip}"
-                end
-            }
+                user = ::Aca::Tracking::UserDevices.for_user(login, domain)
+                user.add(mac)
+
+                self[mac] = login
+                self[ip] = login
+            else
+                logger.debug {
+                    if mac
+                        "MAC #{mac} known for #{ip} : #{login}"
+                    else
+                        "unable to locate MAC for #{ip}"
+                    end
+                }
+            end
+        rescue => e
+            logger.print_error(e, "looking up #{ip}")
+        ensure
+            @looking_up.delete(ip)
         end
-    rescue => e
-        logger.print_error(e, "looking up #{ip}")
-    ensure
-        @looking_up.delete(ip)
     end
 
     # For use with shared desktop computers that anyone can log into
     # Optimally only these machines should trigger this web hook
-    def logout(ip, login, domain = '.')
+    def logout(ip, login, domain = nil)
         # Ensure only one operation per-IP is performed at a time
         return if @looking_up[ip]
-        @looking_up[ip] = true
+        begin
+            @looking_up[ip] = true
 
-        # Find the mac address of the IP address logging out
-        mac = ::User.bucket.get("ipmac-#{ip}", quiet: true)
-        return unless mac
+            # Find the mac address of the IP address logging out
+            mac = Aca::Tracking::SwitchPort.find_by_device_ip(ip)&.mac_address
+            return unless mac
 
-        # Remove the username details recorded for this MAC address
-        recorded_login = self[mac]
-        if mac && recorded_login
+            # Remove the username details recorded for this MAC address
+            recorded_login = self[mac]
             if recorded_login != login
-                logger.warn { "removing #{login} however #{recorded_login} was recorded against #{mac}" }
+                logger.warn { "removing #{mac} from recorded #{recorded_login} and reported #{login}" }
+                user = ::Aca::Tracking::UserDevices.for_user(recorded_login)
+                user.remove(mac)
             else
-                logger.debug { "removing #{login} from #{mac}" }
+                logger.debug { "removing #{mac} from #{login}" }
             end
 
             user = ::Aca::Tracking::UserDevices.for_user(login, domain)
@@ -76,8 +81,8 @@ class Aca::Tracking::LocateUser
 
             self[mac] = nil
             self[ip] = nil
+        ensure
+            @looking_up.delete(ip)
         end
-    ensure
-        @looking_up.delete(ip)
     end
 end

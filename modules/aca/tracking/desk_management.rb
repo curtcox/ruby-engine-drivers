@@ -40,13 +40,14 @@ class Aca::Tracking::DeskManagement
 
     # these are helper functions for API usage
     def desk_usage(building, level)
-        self["#{building}:#{level}"] || []
+        (self["#{building}:#{level}"] || []) +
+        (self["#{building}:#{level}:reserved"] || [])
     end
 
     def desk_details(desk_id)
         switch_ip, port = @desk_mappings[desk_id]
         return nil unless switch_ip
-        ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
+        ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.details
     end
 
     # Grabs the current user from the websocket connection
@@ -103,8 +104,8 @@ class Aca::Tracking::DeskManagement
                 levels.each do |level, desks|
                     key = "#{building}:#{level}"
                     self[key] = desks[:inuse]
-                    self["#{key}:#{clashes}"] = desks[:clash]
-                    self["#{key}:#{reserved}"] = desks[:reserved]
+                    self["#{key}:clashes"] = desks[:clash]
+                    self["#{key}:reserved"] = desks[:reserved]
 
                     desks[:users].each do |user|
                         self[user.username] = user

@@ -60,12 +60,12 @@ class Aca::Tracking::UserDevices < CouchbaseOrm::Base
         find_by_domain(domain.downcase)
     end
 
-    def self.for_user(username, domain = '.')
+    def self.for_user(username, domain = nil)
         macs = find_by_id("userdevices-#{username.downcase}")
         return macs if macs
         macs = self.new
         macs.username = username
-        macs.domain = domain.downcase
+        macs.domain = domain.downcase if domain
         macs
     end
 

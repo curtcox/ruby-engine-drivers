@@ -1,7 +1,22 @@
 # frozen_string_literal: true
 
 module Aca; end
-module Aca::Tracking; end
+module Aca::Tracking
+    class StaticDetails < ::Hash
+        [
+            :ip, :mac, :connected, :reserved, :reserve_time, :unplug_time,
+            :reserved_by, :clash, :username, :desk_id
+        ].each do |key|
+            define_method key do
+                self[key]
+            end
+
+            define_method "#{key}=" do |val|
+                self[key] = val
+            end
+        end
+    end
+end
 
 =begin
     Tracks currently connected device
@@ -40,7 +55,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     # self.find_by_mac_address(mac) => nil or SwitchPort
     index :mac_address,  presence: false
     index :reserved_mac, presence: false
-    index :desk_id,      presence: false
+    index :device_ip,    presence: false
 
     def self.locate(mac)
         port = ::Aca::Tracking::SwitchPort.find_by_mac_address(mac)
@@ -152,6 +167,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         self.save!(with_cas: true)
 
         # Ask user if they would like to reserve the desk
+        # Don't need to notify them unless reserved and they own the desk
         self.reserve_time > 0 && now == self.unplug_time
     rescue ::Libcouchbase::Error::KeyExists
         self.reload
@@ -170,24 +186,9 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         connected? ? (self.reserved_mac != self.mac_address && reserved?) : false
     end
 
-    class StaticDetails < Hash
-        [
-            :ip, :mac, :connected, :reserved, :reserve_time, :unplug_time,
-            :reserved_by, :clash, :username, :desk_id
-        ].each do |key|
-            define_method key do
-                self[key]
-            end
-
-            define_method "#{key}=" do |val|
-                self[key] = val
-            end
-        end
-    end
-
     # pre-calculated lightweight details for this switch port
     def details
-        d = StaticDetails.new
+        d = ::Aca::Tracking::StaticDetails.new
         d.ip = self.device_ip
         d.mac = self.mac_address || self.reserved_mac
         d.connected = connected?
