@@ -30,12 +30,12 @@ module Cisco::Spark::Xapi::Action
                   "Invalid action type. Must be one of #{ACTION_TYPE}."
         end
 
-        arg_str = args.map do |name, value|
+        args = args.map do |name, value|
             value = "\"#{value}\"" if value.is_a? String
             "#{name}: #{value}"
         end
 
-        [type, command, arg_str].flatten.join(' ') + "\n"
+        [type, command, args].flatten.join ' '
     end
 
     # Serialize an xCommand into transmittable command.

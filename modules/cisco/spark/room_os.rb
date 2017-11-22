@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'json'
+require 'securerandom'
+
 Dir[File.join(File.dirname(__FILE__), 'xapi', '*.rb')].each { |f| load f }
 
 module Cisco; end
@@ -42,6 +45,10 @@ class Cisco::Spark::RoomOs
 
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
+
+        # Async events only
+
+        :success
     end
 
     # Execute an xCommand on the device.
@@ -49,8 +56,66 @@ class Cisco::Spark::RoomOs
     # @param command [String] the command to execute
     # @param args [Hash] the command arguments
     def xcommand(command, args = {})
+        send_xcommand command, args
+    end
+
+    protected
+
+    # Perform the actual command execution - this allows device implementations
+    # to protect access to #xcommand and still refer the gruntwork here.
+    def send_xcommand(command, args = {})
         request = Xapi::Action.xcommand command, args
 
-        send request, name: command
+        do_send request, name: command do |response|
+            result = response.first.last
+
+            logger.debug response
+
+            if result['status'] == 'OK'
+                :success
+            else
+                reason = result.dig 'Reason', 'Value'
+                logger.error reason if reason
+                :abort
+            end
+        end
+    end
+
+    def do_send(command, **options)
+        request_id = SecureRandom.uuid
+
+        # FIXME: find a neater way of sharing id's with the test framework.
+        self[:__last_uuid] = request_id
+
+        send "#{command} | resultId=\"#{request_id}\"\n", **options do |rx|
+            begin
+                response = JSON.parse rx, object_class: CaseInsensitiveHash
+
+                if response['ResultId'] == request_id
+                    if block_given?
+                        yield response['CommandResponse']
+                    else
+                        :success
+                    end
+                else
+                    :ignore
+                end
+            rescue JSON::ParserError => error
+                logger.warn "Malformed device response: #{error}"
+                :fail
+            end
+        end
+    end
+end
+
+class CaseInsensitiveHash < ActiveSupport::HashWithIndifferentAccess
+    def [](key)
+        super convert_key(key)
+    end
+
+    protected
+
+    def convert_key(key)
+        key.respond_to?(:downcase) ? key.downcase : key
     end
 end

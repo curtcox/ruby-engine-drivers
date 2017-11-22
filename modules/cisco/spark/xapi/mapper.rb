@@ -59,7 +59,7 @@ module Cisco::Spark::Xapi::Mapper
                                   }
                                   .to_h
                                   .compact
-                    send Xapi::Action.xcommand('#{command_str}', args)
+                    send_xcommand '#{command_str}', args
                 end
             METHOD
 
