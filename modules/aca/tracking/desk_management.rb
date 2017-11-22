@@ -24,8 +24,8 @@ class Aca::Tracking::DeskManagement
     end
 
     def on_update
-        @desk_hold_time = setting(:desk_hold_time) || 5.minutes.to_i
-        @desk_reserve_time = setting(:desk_reserve_time) || 2.hours.to_i
+        self[:hold_time]    = setting(:desk_hold_time) || 5.minutes.to_i
+        self[:reserve_time] = @desk_reserve_time = setting(:desk_reserve_time) || 2.hours.to_i
         @user_identifier = setting(:user_identifier) || :login_name
 
         # { "switch_ip": { "port_id": "desk_id" } }
