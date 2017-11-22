@@ -38,7 +38,11 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     attribute :reserve_time, type: Integer, default: 0 # Length of time for the reservation
     attribute :reserved_mac, type: String
     attribute :reserved_by,  type: String
+
+    # Location details
+    attribute :level,        type: String
     attribute :desk_id,      type: String
+    attribute :building,     type: String
 
     # Switch details
     attribute :switch_ip,   type: String  # IP of the network switch

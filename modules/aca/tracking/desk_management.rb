@@ -176,9 +176,13 @@ class Aca::Tracking::DeskManagement
 
                 # Configure desk id if not known
                 if details.desk_id != desk_id
+                    details.level = desk_id
                     details.desk_id = desk_id
+                    details.building = desk_id
                     ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
-                        doc.dict_upsert('desk_id', desk_id)
+                        doc.dict_upsert(:level, level)
+                        doc.dict_upsert(:desk_id, desk_id)
+                        doc.dict_upsert(:building, building)
                     end
                 end
 
