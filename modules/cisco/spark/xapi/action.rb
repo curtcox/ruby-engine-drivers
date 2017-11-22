@@ -35,7 +35,7 @@ module Cisco::Spark::Xapi::Action
             "#{name}: #{value}"
         end
 
-        [type, command, arg_str].flatten.join ' '
+        [type, command, arg_str].flatten.join(' ') + "\n"
     end
 
     # Serialize an xCommand into transmittable command.

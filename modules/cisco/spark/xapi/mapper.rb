@@ -59,8 +59,7 @@ module Cisco::Spark::Xapi::Mapper
                                   }
                                   .to_h
                                   .compact
-                    do_send Xapi::Action.xcommand('#{command_str}', args)
-                    logger.debug { args }
+                    send Xapi::Action.xcommand('#{command_str}', args)
                 end
             METHOD
 

@@ -34,8 +34,8 @@ class Cisco::Spark::RoomOs
     def on_update; end
 
     def connected
-        do_send 'Echo off', wait: false, priority: 96
-        do_send 'xPreferences OutputMode JSON', wait: false
+        send "Echo off\n", wait: false, priority: 96
+        send "xPreferences OutputMode JSON\n", wait: false
     end
 
     def disconnected; end
@@ -49,17 +49,8 @@ class Cisco::Spark::RoomOs
     # @param command [String] the command to execute
     # @param args [Hash] the command arguments
     def xcommand(command, args = {})
-        do_send Xapi::Action.xcommand(command, args)
-    end
+        request = Xapi::Action.xcommand command, args
 
-    protected
-
-    # Execute and arbitary command on the device.
-    #
-    # @param command [String] the command to execute
-    # @param options [Hash] send options to be passed to the transport layer
-    def do_send(command, **options)
-        logger.debug { "-> #{command}" }
-        send "#{command}\n", **options
+        send request, name: command
     end
 end
