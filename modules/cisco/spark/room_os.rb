@@ -23,8 +23,8 @@ class Cisco::Spark::RoomOs
         (i.e. SX80, Spark Room Kit etc).
     DESC
 
-    tokenize delimiter: "\n}\n",
-             wait_ready: "OK\n" # *r Login successful\n\nOK\n
+    tokenize delimiter: /(?<=\n})|(?<=\n{})\n/,
+             wait_ready: "*r Login successful\n\nOK\n\n"
     clear_queue_on_disconnect!
 
     def on_load; end
