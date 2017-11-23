@@ -1,17 +1,33 @@
+require 'thread'
+
 Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
-    # Intercept calls to the request id generation so we can run tests.
+    # Patch in some tracking of request UUID's so we can form and validate
+    # device comms.
     @manager.instance.class_eval do
         generate_uuid = instance_method(:generate_request_uuid)
 
         define_method(:generate_request_uuid) do
             generate_uuid.bind(self).call.tap do |id|
-                instance_variable_set :@__last_uuid, id
+                @__request_ids ||= Queue.new
+                @__request_ids << id
             end
         end
     end
 
-    def last_uuid
-        @manager.instance.instance_variable_get :@__last_uuid
+    def request_ids
+        @manager.instance.instance_variable_get :@__request_ids
+    end
+
+    def id_peek
+        @last_id || id_pop
+    end
+
+    def id_pop
+        if @last_id
+            @last_id.tap { @last_id = nil }
+        else
+            request_ids.pop(true).tap { |id| @last_id = id }
+        end
     end
 
     transmit <<~BANNER
@@ -32,7 +48,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
 
     # Basic command
     exec(:xcommand, 'Standby Deactivate')
-        .should_send("xCommand Standby Deactivate | resultId=\"#{last_uuid}\"\n")
+        .should_send("xCommand Standby Deactivate | resultId=\"#{id_peek}\"\n")
         .responds(
             <<~JSON
                 {
@@ -41,14 +57,14 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                             "status":"OK"
                         }
                     },
-                    "ResultId": \"#{last_uuid}\"
+                    "ResultId": \"#{id_pop}\"
                 }
             JSON
         )
 
     # Command with arguments
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, Layout: :PIP)
-        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 Layout: PIP | resultId=\"#{last_uuid}\"\n")
+        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 Layout: PIP | resultId=\"#{id_peek}\"\n")
         .responds(
             <<~JSON
                 {
@@ -57,14 +73,14 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                             "status":"OK"
                         }
                     },
-                    "ResultId": \"#{last_uuid}\"
+                    "ResultId": \"#{id_pop}\"
                 }
             JSON
         )
 
     # Return device argument errors
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, SourceId: 1)
-        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 SourceId: 1 | resultId=\"#{last_uuid}\"\n")
+        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 SourceId: 1 | resultId=\"#{id_peek}\"\n")
         .responds(
             <<~JSON
                 {
@@ -76,18 +92,45 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                             }
                         }
                     },
-                    "ResultId": \"#{last_uuid}\"
+                    "ResultId": \"#{id_pop}\"
                 }
             JSON
         )
 
     # Basic configuration
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera)
-        .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{last_uuid}\"\n")
+        .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")
         .responds(
             <<~JSON
                 {
-                    "ResultId": \"#{last_uuid}\"
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+
+    # Multuple settings
+    exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Name: "Borris", Quality: :Motion)
+        .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+        .should_send("xConfiguration Video Input Connector 1 Name: \"Borris\" | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+        .should_send("xConfiguration Video Input Connector 1 Quality: Motion | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
                 }
             JSON
         )
