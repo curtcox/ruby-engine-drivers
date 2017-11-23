@@ -91,11 +91,16 @@ class Cisco::Spark::RoomOs
         end
     end
 
+    # Execute raw command on the device.
+    #
+    # Automatically appends a result tag and handles routing of response
+    # handling for async interactions. If a block is passed a pre-parsed
+    # response object will be yielded to it.
+    #
+    # @param command [String] the raw command to execute
+    # @yield [response] a pre-parsed response object for the command
     def do_send(command, **options)
-        request_id = SecureRandom.uuid
-
-        # FIXME: find a neater way of sharing id's with the test framework.
-        self[:__last_uuid] = request_id
+        request_id = generate_request_uuid
 
         send "#{command} | resultId=\"#{request_id}\"\n", **options do |rx|
             begin
@@ -115,6 +120,10 @@ class Cisco::Spark::RoomOs
                 :fail
             end
         end
+    end
+
+    def generate_request_uuid
+        SecureRandom.uuid
     end
 end
 
