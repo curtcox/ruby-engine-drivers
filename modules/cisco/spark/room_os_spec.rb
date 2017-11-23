@@ -80,4 +80,15 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
+
+    # Basic configuration
+    exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera)
+        .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{last_uuid}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{last_uuid}\"
+                }
+            JSON
+        )
 end

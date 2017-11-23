@@ -59,6 +59,14 @@ class Cisco::Spark::RoomOs
         send_xcommand command, args
     end
 
+    # Push a configuration settings to the device.
+    #
+    # @param path [String] the configuration path
+    # @param settings [Hash] the configuration values to apply
+    def xconfiguration(path, settings)
+        send_xconfiguration path, settings
+    end
+
     protected
 
     # Perform the actual command execution - this allows device implementations
@@ -91,6 +99,28 @@ class Cisco::Spark::RoomOs
         end
     end
 
+    def send_xconfiguration(path, settings = {})
+        setting, value = settings.shift
+
+        request = Xapi::Action.xconfiguration path, setting, value
+
+        apply = do_send request, name: "#{path} #{setting}" do |response|
+            result = response.dig 'CommandResponse', 'Configuration'
+
+            if result&.[] 'status' == 'Error'
+                reason = result.dig 'Reason', 'Value'
+                logger.error reason if reason
+                :abort
+            else
+                :sucess
+            end
+        end
+
+        # Values can only be applied one at a time - recurse and return the
+        # full promise chain.
+        apply.then send_xconfiguration(path, settings) unless settings.empty?
+    end
+
     # Execute raw command on the device.
     #
     # Automatically appends a result tag and handles routing of response
@@ -98,11 +128,16 @@ class Cisco::Spark::RoomOs
     # response object will be yielded to it.
     #
     # @param command [String] the raw command to execute
-    # @yield [response] a pre-parsed response object for the command
+    # @param options [Hash] options for the transport layer
+    # @yield [response]
+    #   a pre-parsed response object for the command, if used this block
+    #   should return the response result
     def do_send(command, **options)
         request_id = generate_request_uuid
 
-        send "#{command} | resultId=\"#{request_id}\"\n", **options do |rx|
+        request = "#{command} | resultId=\"#{request_id}\"\n"
+
+        send request, **options do |rx|
             begin
                 response = JSON.parse rx, object_class: CaseInsensitiveHash
 
