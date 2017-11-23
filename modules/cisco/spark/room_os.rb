@@ -67,15 +67,25 @@ class Cisco::Spark::RoomOs
         request = Xapi::Action.xcommand command, args
 
         do_send request, name: command do |response|
-            result = response.first.last
+            # The result keys are a little odd - they're a concatenation of the
+            # last two command elements and 'Result'.
+            # For example:
+            #   `xCommand Video Input SetMainVideoSource...`
+            # becomes:
+            #   `InputSetMainVideoSourceResult`
+            result_key = command.split(' ').last(2).join('') + 'Result'
+            result = response.dig 'CommandResponse', result_key
 
-            logger.debug response
-
-            if result['status'] == 'OK'
-                :success
+            if result
+                if result['status'] == 'OK'
+                    :success
+                else
+                    reason = result.dig 'Reason', 'Value'
+                    logger.error reason if reason
+                    :abort
+                end
             else
-                reason = result.dig 'Reason', 'Value'
-                logger.error reason if reason
+                logger.warn 'Unexpected response format'
                 :abort
             end
         end
@@ -93,7 +103,7 @@ class Cisco::Spark::RoomOs
 
                 if response['ResultId'] == request_id
                     if block_given?
-                        yield response['CommandResponse']
+                        yield response
                     else
                         :success
                     end

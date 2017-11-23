@@ -33,7 +33,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
 
     # Command with arguments
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, Layout: :PIP)
-        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 Layout: PIP | resultId=\"#{status[:__last_uuid]}\n")
+        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 Layout: PIP | resultId=\"#{status[:__last_uuid]}\"\n")
         .responds(
             <<~JSON
                 {
@@ -49,7 +49,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
 
     # Return device argument errors
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, SourceId: 1)
-        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 SourceId: 1 | resultId=\"#{status[:__last_uuid]}\n")
+        .should_send("xCommand Video Input SetMainVideoSource ConnectorId: 1 SourceId: 1 | resultId=\"#{status[:__last_uuid]}\"\n")
         .responds(
             <<~JSON
                 {
