@@ -21,15 +21,11 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     end
 
     def id_peek
-        @last_id || id_pop
+        @last_id || request_ids.pop(true).tap { |id| @last_id = id }
     end
 
     def id_pop
-        if @last_id
-            @last_id.tap { @last_id = nil }
-        else
-            request_ids.pop(true).tap { |id| @last_id = id }
-        end
+        @last_id.tap { @last_id = nil } || request_ids.pop(true)
     end
 
     transmit <<~BANNER
