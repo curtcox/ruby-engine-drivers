@@ -155,7 +155,7 @@ class Cisco::Spark::RoomOs
                     :ignore
                 end
             rescue JSON::ParserError => error
-                if rx == 'Command not recognized.'
+                if rx.strip == 'Command not recognized.'
                     logger.error { "Invalid command: `#{command}`" }
                     :abort
                 else
