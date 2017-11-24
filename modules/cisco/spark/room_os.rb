@@ -113,7 +113,7 @@ class Cisco::Spark::RoomOs
                     logger.error reason if reason
                     :abort
                 else
-                    :sucess
+                    :success
                 end
             end
         end
