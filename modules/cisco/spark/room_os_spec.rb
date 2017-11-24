@@ -28,6 +28,15 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
         @last_id.tap { @last_id = nil } || request_ids.pop(true)
     end
 
+    def section(message)
+        puts "\n\n#{'-' * 80}"
+        puts message
+        puts "\n"
+    end
+
+    # -------------------------------------------------------------------------
+    section 'Connection setup'
+
     transmit <<~BANNER
         Welcome to
         Cisco Codec Release Spark Room OS 2017-10-31 192c369
@@ -40,15 +49,22 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
 
     expect(status[:connected]).to be true
 
-    # Comms setup
     should_send "Echo off\n"
     should_send "xPreferences OutputMode JSON\n"
+
+
+    # -------------------------------------------------------------------------
+    section 'Protected base methods - ignore the access warnings'
 
     # Handle invalid device commands
     exec(:do_send, 'Not a real command')
         .should_send("Not a real command | resultId=\"#{id_pop}\"\n")
         .responds("Command not recognized.\n")
     expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
+
+
+    # -------------------------------------------------------------------------
+    section 'Commands'
 
     # Basic command
     exec(:xcommand, 'Standby Deactivate')
@@ -126,6 +142,10 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
             JSON
         )
     expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
+
+
+    # -------------------------------------------------------------------------
+    section 'Configuration'
 
     # Basic configuration
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera)
