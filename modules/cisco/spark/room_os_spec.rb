@@ -59,6 +59,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
+    expect(result).to be :success
 
     # Command with arguments
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, Layout: :PIP)
@@ -75,6 +76,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
+    expect(result).to be :success
 
     # Return device argument errors
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, SourceId: 1)
@@ -94,6 +96,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
+    expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
 
     # Basic configuration
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera)
@@ -105,6 +108,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
+    expect(result).to match_array [:success]
 
     # Multuple settings
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Name: "Borris", Quality: :Motion)
@@ -132,4 +136,5 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
+    expect(result).to match_array [:success, :success, :success]
 end
