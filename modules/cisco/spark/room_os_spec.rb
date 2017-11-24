@@ -44,6 +44,12 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     should_send "Echo off\n"
     should_send "xPreferences OutputMode JSON\n"
 
+    # Handle invalid device commands
+    exec(:do_send, 'Not a real command')
+        .should_send("Not a real command | resultId=\"#{id_pop}\"\n")
+        .responds("Command not recognized.\n")
+    expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
+
     # Basic command
     exec(:xcommand, 'Standby Deactivate')
         .should_send("xCommand Standby Deactivate | resultId=\"#{id_peek}\"\n")

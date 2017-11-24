@@ -26,7 +26,7 @@ class Cisco::Spark::RoomOs
         (i.e. SX80, Spark Room Kit etc).
     DESC
 
-    tokenize delimiter: /(?<=\n})|(?<=\n{})\n/,
+    tokenize delimiter: /(?<=\n})|(?<=\n{})|(?<=Command not recognized.)\n/,
              wait_ready: "*r Login successful\n\nOK\n\n"
     clear_queue_on_disconnect!
 
@@ -151,8 +151,13 @@ class Cisco::Spark::RoomOs
                     :ignore
                 end
             rescue JSON::ParserError => error
-                logger.warn "Malformed device response: #{error}"
-                :fail
+                if rx == 'Command not recognized.'
+                    logger.error { "Invalid command: `#{command}`" }
+                    :abort
+                else
+                    logger.warn { "Malformed device response: #{error}" }
+                    :fail
+                end
             end
         end
     end
