@@ -56,6 +56,23 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     # -------------------------------------------------------------------------
     section 'Protected base methods - ignore the access warnings'
 
+    # Append a request id and handle generic response parsing
+    exec(:do_send, 'xCommand Standby Deactivate')
+        .should_send("xCommand Standby Deactivate | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "CommandResponse":{
+                        "StandbyDeactivateResult":{
+                            "status":"OK"
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+    expect(result).to be :success
+
     # Handle invalid device commands
     exec(:do_send, 'Not a real command')
         .should_send("Not a real command | resultId=\"#{id_pop}\"\n")
