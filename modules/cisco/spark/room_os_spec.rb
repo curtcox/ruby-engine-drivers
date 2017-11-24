@@ -79,6 +79,18 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
         .responds("Command not recognized.\n")
     expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
 
+    # Device event subscription
+    exec(:subscribe, '/Status/Audio/Microphones/Mute')
+        .should_send("xFeedback register /Status/Audio/Microphones/Mute | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+    expect(result).to be :success
+
 
     # -------------------------------------------------------------------------
     section 'Commands'

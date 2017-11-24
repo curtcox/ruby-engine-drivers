@@ -56,4 +56,14 @@ module Cisco::Spark::Xapi::Action
     def xconfiguration(path, setting, value)
         create_action :xConfiguration, path, setting => value
     end
+
+    # Serialize a xFeedback subscription request.
+    #
+    # @param path [String, Array<String>] the feedback document path
+    # @return [String]
+    def xfeedback(path)
+        # Allow space or slash seperated paths
+        path = path.split(/[\s\/\\]/).reject(&:empty?) if path.is_a? String
+        create_action :xFeedback, "register /#{path.join '/'}"
+    end
 end

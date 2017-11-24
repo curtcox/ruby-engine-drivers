@@ -125,6 +125,16 @@ class Cisco::Spark::RoomOs
         thread.all settings.to_a.map(&apply_setting)
     end
 
+    # Subscribe to feedback from the device
+    def subscribe(path)
+        request = Xapi::Action.xfeedback path
+
+        do_send request do |response|
+            # Always returns empty JSON object, regardless of if xPath exists
+            :success
+        end
+    end
+
     # Execute raw command on the device.
     #
     # Automatically appends a result tag and handles routing of response
