@@ -104,6 +104,29 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
         )
     expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
 
+    # Return error from invalid / inaccessable xCommands
+    exec(:xcommand, 'Not A Real Command')
+        .should_send("xCommand Not A Real Command | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "CommandResponse":{
+                        "Result":{
+                            "status":"Error",
+                            "Reason":{
+                                "Value":"Unknown command"
+                            }
+                        },
+                        "XPath":{
+                            "Value":"/Not/A/Real/Command"
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+    expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
+
     # Basic configuration
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera)
         .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")

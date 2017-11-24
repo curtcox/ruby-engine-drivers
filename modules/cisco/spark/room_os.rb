@@ -75,14 +75,18 @@ class Cisco::Spark::RoomOs
         request = Xapi::Action.xcommand command, args
 
         do_send request, name: command do |response|
-            # The result keys are a little odd - they're a concatenation of the
-            # last two command elements and 'Result'.
+            # The result keys are a little odd: they're a concatenation of the
+            # last two command elements and 'Result', unless the command
+            # failed in which case it's just 'Result'.
             # For example:
-            #   `xCommand Video Input SetMainVideoSource...`
+            #   xCommand Video Input SetMainVideoSource ...
             # becomes:
-            #   `InputSetMainVideoSourceResult`
+            #   InputSetMainVideoSourceResult
             result_key = command.split(' ').last(2).join('') + 'Result'
-            result = response.dig 'CommandResponse', result_key
+            command_result = response.dig 'CommandResponse', result_key
+            failure_result = response.dig 'CommandResponse', 'Result'
+
+            result = command_result || failure_result
 
             if result
                 if result['status'] == 'OK'
