@@ -13,7 +13,9 @@ class Aca::Tracking::DeskManagement
     implements :logic
 
     default_settings({
-        'switch_ip' => { 'port_id' => 'desk_id' }
+        mappings: {
+            switch_ip: { 'port_id' => 'desk_id' }
+        }
     })
 
     def on_load
@@ -131,7 +133,7 @@ class Aca::Tracking::DeskManagement
                 end
             end
         }.finally {
-            schedule.in('5s') { desk_usage }
+            schedule.in('5s') { get_usage }
         }
     end
 
