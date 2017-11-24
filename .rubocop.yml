@@ -70,3 +70,6 @@ Style/Documentation:
 
 Style/NumericLiterals:
   Enabled: false
+
+Style/RegexpLiteral:
+  AllowInnerSlashes: true
