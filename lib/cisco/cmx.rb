@@ -47,13 +47,21 @@ class Cisco::Cmx
         locations = JSON.parse(resp.body, DECODE_OPTIONS)
         return nil if locations.length == 0
 
-        location = {
+        map = locations[0][:mapInfo][:mapHierarchyString].split('>')
+
+        {
             x: locations[0][:mapCoordinate][:x],
             y: locations[0][:mapCoordinate][:y],
-            x_max: locations[0][:floorDimension][:width],
-            y_max: locations[0][:floorDimension][:length],
+            x_max: locations[0][:mapInfo][:floorDimension][:width],
+            y_max: locations[0][:mapInfo][:floorDimension][:length],
             confidence: (locations[0][:confidenceFactor] / 2),
-            last_seen: locations[0][:changedOn] / 1000
+            last_seen: locations[0][:changedOn] / 1000,
+            user_active: locations[0][:currentlyTracked],
+            campus: map[0],
+            building: map[1],
+            level: map[2],
+            zone: map[3],
+            map_id: locations[0][:mapInfo][:floorRefId]
         }
     end
 end
