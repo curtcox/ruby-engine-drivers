@@ -6,6 +6,8 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     @manager.instance.class_eval do
         generate_uuid = instance_method(:generate_request_uuid)
 
+        attr_accessor :__request_ids
+
         define_method(:generate_request_uuid) do
             generate_uuid.bind(self).call.tap do |id|
                 @__request_ids ||= Queue.new
@@ -15,7 +17,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     end
 
     def request_ids
-        @manager.instance.instance_variable_get :@__request_ids
+        @manager.instance.__request_ids
     end
 
     def id_peek
