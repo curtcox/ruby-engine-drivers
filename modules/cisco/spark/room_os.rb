@@ -99,26 +99,26 @@ class Cisco::Spark::RoomOs
         end
     end
 
-    def send_xconfiguration(path, settings = {})
-        setting, value = settings.shift
+    def send_xconfiguration(path, settings)
+        # The device API only allows a single setting to be applied with each
+        # request.
+        apply_setting = lambda do |(setting, value)|
+            request = Xapi::Action.xconfiguration path, setting, value
 
-        request = Xapi::Action.xconfiguration path, setting, value
+            do_send request, name: "#{path} #{setting}" do |response|
+                result = response.dig 'CommandResponse', 'Configuration'
 
-        apply = do_send request, name: "#{path} #{setting}" do |response|
-            result = response.dig 'CommandResponse', 'Configuration'
-
-            if result&.[] 'status' == 'Error'
-                reason = result.dig 'Reason', 'Value'
-                logger.error reason if reason
-                :abort
-            else
-                :sucess
+                if result&.[] 'status' == 'Error'
+                    reason = result.dig 'Reason', 'Value'
+                    logger.error reason if reason
+                    :abort
+                else
+                    :sucess
+                end
             end
         end
 
-        # Values can only be applied one at a time - recurse and return the
-        # full promise chain.
-        apply.then send_xconfiguration(path, settings) unless settings.empty?
+        thread.all settings.to_a.map(&apply_setting)
     end
 
     # Execute raw command on the device.
