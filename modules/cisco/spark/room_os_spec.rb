@@ -54,7 +54,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
 
 
     # -------------------------------------------------------------------------
-    section 'Protected base methods - ignore the access warnings'
+    section 'Base comms (protected methods - ignore the access warnings)'
 
     # Append a request id and handle generic response parsing
     exec(:do_send, 'xCommand Standby Deactivate')
@@ -78,6 +78,30 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
         .should_send("Not a real command | resultId=\"#{id_pop}\"\n")
         .responds("Command not recognized.\n")
     expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
+
+    # Handle async response data
+    exec(:do_send, 'xCommand Standby Deactivate')
+        .should_send("xCommand Standby Deactivate | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "RandomAsyncData": "Foo"
+                }
+            JSON
+        )
+        .responds(
+            <<~JSON
+                {
+                    "CommandResponse":{
+                        "StandbyDeactivateResult":{
+                            "status":"OK"
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+    expect(result).to be :success
 
     # Device event subscription
     exec(:subscribe, '/Status/Audio/Microphones/Mute')

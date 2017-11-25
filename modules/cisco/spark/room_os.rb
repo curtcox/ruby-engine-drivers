@@ -43,12 +43,34 @@ class Cisco::Spark::RoomOs
 
     def disconnected; end
 
+    # Handle all incoming data from the device.
+    #
+    # In addition to acting an the normal Orchestrator callback, on_receive
+    # blocks also pipe through here for initial JSON decoding. See #do_send.
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
-        # Async events only
+        response = JSON.parse data, object_class: CaseInsensitiveHash
 
-        :success
+        if block_given?
+            # Let any pending command response handlers have first pass...
+            yield(response).tap do |command_result|
+                # Otherwise support interleaved async events
+                unprocessed = command_result == :ignore || command_result.nil?
+                handle_async response if unprocessed
+            end
+        else
+            handle_async response
+            :ignore
+        end
+    rescue JSON::ParserError => error
+        if data.strip == 'Command not recognized.'
+            logger.error { "Command not recognized: `#{command[:data]}`" }
+            :abort
+        else
+            logger.warn { "Malformed device response: #{error}" }
+            :fail
+        end
     end
 
     # Execute an xCommand on the device.
@@ -151,35 +173,34 @@ class Cisco::Spark::RoomOs
 
         request = "#{command} | resultId=\"#{request_id}\"\n"
 
-        send request, **options do |rx|
-            begin
-                response = JSON.parse rx, object_class: CaseInsensitiveHash
-
-                if response['ResultId'] == request_id
-                    if block_given?
-                        yield response
-                    else
-                        :success
-                    end
+        handle_response = lambda do |response|
+            if response['ResultId'] == request_id
+                if block_given?
+                    yield response
                 else
-                    :ignore
+                    :success
                 end
-            rescue JSON::ParserError => error
-                if rx.strip == 'Command not recognized.'
-                    logger.error { "Invalid command: `#{command}`" }
-                    :abort
-                else
-                    logger.warn { "Malformed device response: #{error}" }
-                    :fail
-                end
+            else
+                :ignore
             end
+        end
+
+        logger.debug { "-> #{request}" }
+
+        send request, **options do |response, defer, cmd|
+            received response, defer, cmd, &handle_response
         end
     end
 
     def generate_request_uuid
         SecureRandom.uuid
     end
+
+    def handle_async(response)
+        logger.debug "Handling async rx for #{response}"
+    end
 end
+
 
 class CaseInsensitiveHash < ActiveSupport::HashWithIndifferentAccess
     def [](key)
