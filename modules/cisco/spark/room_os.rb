@@ -41,7 +41,9 @@ class Cisco::Spark::RoomOs
         send "xPreferences OutputMode JSON\n", wait: false
     end
 
-    def disconnected; end
+    def disconnected
+        clear_subscriptions!
+    end
 
     # Handle all incoming data from the device.
     #
@@ -149,13 +151,73 @@ class Cisco::Spark::RoomOs
         end
     end
 
-    # Subscribe to feedback from the device
-    def subscribe(path)
-        request = Xapi::Action.xfeedback path
+    # Subscribe to feedback from the device.
+    #
+    # @param path [String, Array<String>] the xPath to subscribe to updates for
+    # @param update_handler [Proc] a callback to receive updates for the path
+    def subscribe(path, &update_handler)
+        logger.debug { "Subscribing to device feedback for #{path}" }
 
-        do_send request do |response|
-            # Always returns empty JSON object, regardless of if xPath exists
-            :success
+        request = Xapi::Action.xfeedback :register, path
+
+        # Build up a Trie based on the path components
+        @subscriptions ||= {}
+        path_components = xpath_split path
+        path_components.reduce(@subscriptions) do |node, component|
+            node[component] ||= {}
+        end
+
+        # And insert the handler at it's appropriate node
+        node = @subscriptions.dig(*path_components)
+        node[:_handlers] ||= []
+        node[:_handlers] << update_handler
+
+        # Always returns an empty JSON object, no special response to handle
+        do_send request
+    end
+
+    # Clear all subscribers from a path and deregister device feedback.
+    def unsubscribe(path)
+        logger.debug { "Unsubscribing feedback for #{path}" }
+
+        request = Xapi::Action.xfeedback :deregister, path
+
+        # Nuke the subtree from the subscription tracker
+        path_components = xpath_split path
+        if path_components.empty?
+            @subscriptions = {}
+        else
+            node = @subscriptions.dig(*path_components)
+            if node.nil?
+                logger.warn { "No subscriptions registered for #{path}" }
+            else
+                *parent_path, node_key = path_components
+                parent = if parent_path.empty?
+                             @subscriptions
+                         else
+                             @subscriptions.dig(*parent_path)
+                         end
+                parent.delete node_key
+            end
+        end
+
+        do_send request
+    end
+
+    # Clears any previously registered device feedback subscriptions
+    def clear_subscriptions!
+        unsubscribe '/'
+    end
+
+    # Split a space or slash seperated path into it's components.
+    def xpath_split(path)
+        if path.is_a? Array
+            path
+        else
+            path.split(/[\s\/\\]/)
+                .reject(&:empty?)
+                .map(&:downcase)
+                .map(&:to_sym)
         end
     end
 
@@ -200,6 +262,19 @@ class Cisco::Spark::RoomOs
 
     def handle_async(response)
         logger.debug "Handling async rx for #{response}"
+
+        # Traverse the response where there are any subscriptions registered
+        notify = lambda do |subscriptions, resp|
+            resp.each do |key, subtree|
+                subpath = key.downcase.to_sym
+                next unless subscriptions.key? subpath
+                handlers = subscriptions.dig subpath, :_handlers
+                [*handlers].each { |handler| handler.call subtree }
+                notify.call subscriptions[subpath], subtree
+            end
+        end
+
+        notify.call @subscriptions, response
     end
 end
 

@@ -16,6 +16,11 @@ module Cisco::Spark::Xapi::Action
         :xPreferences
     ]
 
+    FEEDBACK_ACTION ||= Set.new [
+        :register,
+        :deregister
+    ]
+
     module_function
 
     # Serialize an xAPI action into transmittable command.
@@ -59,11 +64,18 @@ module Cisco::Spark::Xapi::Action
 
     # Serialize a xFeedback subscription request.
     #
+    # @param action [:register, :deregister]
     # @param path [String, Array<String>] the feedback document path
     # @return [String]
-    def xfeedback(path)
+    def xfeedback(action, path)
+        unless FEEDBACK_ACTION.include? action
+            raise ArgumentError,
+                  "Invalid feedback action. Must be one of #{FEEDBACK_ACTION}."
+        end
+
         # Allow space or slash seperated paths
         path = path.split(/[\s\/\\]/).reject(&:empty?) if path.is_a? String
-        create_action :xFeedback, "register /#{path.join '/'}"
+
+        create_action :xFeedback, "#{action} /#{path.join '/'}"
     end
 end
