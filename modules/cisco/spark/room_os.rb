@@ -128,7 +128,7 @@ class Cisco::Spark::RoomOs
     def send_xconfiguration(path, settings)
         # The device API only allows a single setting to be applied with each
         # request.
-        apply_setting = lambda do |(setting, value)|
+        interactions = settings.to_a.map do |(setting, value)|
             request = Xapi::Action.xconfiguration path, setting, value
 
             do_send request, name: "#{path} #{setting}" do |response|
@@ -144,7 +144,9 @@ class Cisco::Spark::RoomOs
             end
         end
 
-        thread.all settings.to_a.map(&apply_setting)
+        thread.all(interactions).then do |results|
+            results.all? { |result| result == :success } ? :success : results
+        end
     end
 
     # Subscribe to feedback from the device

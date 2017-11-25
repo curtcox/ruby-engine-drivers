@@ -210,7 +210,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
-    expect(result).to match_array [:success]
+    expect(result).to be :success
 
     # Multuple settings
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Name: "Borris", Quality: :Motion)
@@ -238,5 +238,5 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
                 }
             JSON
         )
-    expect(result).to match_array [:success, :success, :success]
+    expect(result).to be :success
 end
