@@ -42,7 +42,7 @@ class Cisco::Spark::RoomOs
     end
 
     def disconnected
-        clear_subscriptions!
+        clear_subscriptions
     end
 
     # Handle all incoming data from the device.
@@ -59,10 +59,10 @@ class Cisco::Spark::RoomOs
             yield(response).tap do |command_result|
                 # Otherwise support interleaved async events
                 unprocessed = command_result == :ignore || command_result.nil?
-                handle_async response if unprocessed
+                @subscriptions&.notify response if unprocessed
             end
         else
-            handle_async response
+            @subscriptions&.notify response
             :ignore
         end
     rescue JSON::ParserError => error
@@ -158,67 +158,32 @@ class Cisco::Spark::RoomOs
     def subscribe(path, &update_handler)
         logger.debug { "Subscribing to device feedback for #{path}" }
 
-        request = Xapi::Action.xfeedback :register, path
+        @subscriptions ||= FeedbackTrie.new
 
-        # Build up a Trie based on the path components
-        @subscriptions ||= {}
-        path_components = xpath_split path
-        path_components.reduce(@subscriptions) do |node, component|
-            node[component] ||= {}
+        unless @subscriptions.contains? path
+            request = Xapi::Action.xfeedback :register, path
+            # Always returns an empty JSON object, no special response to handle
+            result = do_send request
         end
 
-        # And insert the handler at it's appropriate node
-        node = @subscriptions.dig(*path_components)
-        node[:_handlers] ||= []
-        node[:_handlers] << update_handler
+        @subscriptions.insert path, &update_handler
 
-        # Always returns an empty JSON object, no special response to handle
-        do_send request
+        result || ::Libuv::Q::ResolvedPromise.new(thread, :success)
     end
 
     # Clear all subscribers from a path and deregister device feedback.
     def unsubscribe(path)
         logger.debug { "Unsubscribing feedback for #{path}" }
 
+        @subscriptions&.remove path
+
         request = Xapi::Action.xfeedback :deregister, path
-
-        # Nuke the subtree from the subscription tracker
-        path_components = xpath_split path
-        if path_components.empty?
-            @subscriptions = {}
-        else
-            node = @subscriptions.dig(*path_components)
-            if node.nil?
-                logger.warn { "No subscriptions registered for #{path}" }
-            else
-                *parent_path, node_key = path_components
-                parent = if parent_path.empty?
-                             @subscriptions
-                         else
-                             @subscriptions.dig(*parent_path)
-                         end
-                parent.delete node_key
-            end
-        end
-
         do_send request
     end
 
     # Clears any previously registered device feedback subscriptions
-    def clear_subscriptions!
+    def clear_subscriptions
         unsubscribe '/'
-    end
-
-    # Split a space or slash seperated path into it's components.
-    def xpath_split(path)
-        if path.is_a? Array
-            path
-        else
-            path.split(/[\s\/\\]/)
-                .reject(&:empty?)
-                .map(&:downcase)
-                .map(&:to_sym)
-        end
     end
 
     # Execute raw command on the device.
@@ -260,22 +225,6 @@ class Cisco::Spark::RoomOs
         SecureRandom.uuid
     end
 
-    def handle_async(response)
-        logger.debug "Handling async rx for #{response}"
-
-        # Traverse the response where there are any subscriptions registered
-        notify = lambda do |subscriptions, resp|
-            resp.each do |key, subtree|
-                subpath = key.downcase.to_sym
-                next unless subscriptions.key? subpath
-                handlers = subscriptions.dig subpath, :_handlers
-                [*handlers].each { |handler| handler.call subtree }
-                notify.call subscriptions[subpath], subtree
-            end
-        end
-
-        notify.call @subscriptions, response
-    end
 end
 
 
@@ -288,5 +237,74 @@ class CaseInsensitiveHash < ActiveSupport::HashWithIndifferentAccess
 
     def convert_key(key)
         key.respond_to?(:downcase) ? key.downcase : key
+    end
+end
+
+
+class Cisco::Spark::RoomOs::FeedbackTrie < CaseInsensitiveHash
+    # Insert a response handler block to be notified of updates effecting the
+    # specified feedback path.
+    def insert(path, &handler)
+        node = tokenize(path).reduce(self) do |trie, token|
+            trie[token] ||= self.class.new
+        end
+
+        node << handler
+
+        self
+    end
+
+    # Nuke a subtree below the path
+    def remove(path)
+        path_components = tokenize path
+
+        if path_components.empty?
+            clear
+            @handlers&.clear
+        else
+            *parent_path, node_key = path_components
+            parent = parent_path.empty? ? self : dig(*parent_path)
+            parent&.delete node_key
+        end
+
+        self
+    end
+
+    def contains?(path)
+        !dig(*tokenize(path)).nil?
+    end
+
+    # Propogate a response throughout the trie
+    def notify(response)
+        response.each do |key, value|
+            node = self[key]
+            next unless node
+            node.dispatch value
+            node.notify value
+        end
+    end
+
+    protected
+
+    # Append a rx handler block to this node.
+    def <<(blk)
+        @handlers ||= []
+        @handlers << blk
+    end
+
+    # Dispatch to all handlers registered on this node.
+    def dispatch(value)
+        [*@handlers].each { |handler| handler.call value }
+    end
+
+    def tokenize(path)
+        if path.is_a? Array
+            path
+        else
+            path.split(/[\s\/\\]/)
+                .reject(&:empty?)
+                .map(&:downcase)
+                .map(&:to_sym)
+        end
     end
 end
