@@ -39,6 +39,8 @@ class Cisco::Spark::RoomOs
     def connected
         send "Echo off\n", wait: false, priority: 96
         send "xPreferences OutputMode JSON\n", wait: false
+
+        subscribe_to_configuration
     end
 
     def disconnected
@@ -183,6 +185,14 @@ class Cisco::Spark::RoomOs
         unsubscribe '/'
     end
 
+    def subscribe_to_configuration
+        subscribe '/Configuration' do |configuration|
+            self[:configuration] = configuration
+        end
+
+        send "xConfiguration *\n", wait: false
+    end
+
     # Execute raw command on the device.
     #
     # @param command [String] the raw command to execute
@@ -217,7 +227,6 @@ class Cisco::Spark::RoomOs
     def generate_request_uuid
         SecureRandom.uuid
     end
-
 end
 
 

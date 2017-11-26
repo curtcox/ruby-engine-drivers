@@ -52,6 +52,112 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     should_send "Echo off\n"
     should_send "xPreferences OutputMode JSON\n"
 
+    # -------------------------------------------------------------------------
+    section 'Initial state sync'
+
+    should_send "xFeedback register /Configuration | resultId=\"#{id_peek}\"\n"
+    responds(
+        <<~JSON
+            {
+                "ResultId": \"#{id_pop}\"
+            }
+        JSON
+    )
+
+    should_send "xConfiguration *\n"
+
+    responds(
+        <<~JSON
+            {
+              "Configuration":{
+                "Audio":{
+                  "DefaultVolume":{
+                    "valueSpaceRef":"/Valuespace/INT_0_100",
+                    "Value":"50"
+                  },
+                  "Input":{
+                    "Line":[
+                      {
+                        "id":"1",
+                        "VideoAssociation":{
+                          "MuteOnInactiveVideo":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                            "Value":"On"
+                          },
+                          "VideoInputSource":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_PresentationSources_2",
+                            "Value":"2"
+                          }
+                        }
+                      }
+                    ],
+                    "Microphone":[
+                      {
+                        "id":"1",
+                        "EchoControl":{
+                          "Dereverberation":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                            "Value":"Off"
+                          },
+                          "Mode":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                            "Value":"On"
+                          },
+                          "NoiseReduction":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                            "Value":"On"
+                          }
+                        },
+                        "Level":{
+                          "valueSpaceRef":"/Valuespace/INT_0_24",
+                          "Value":"14"
+                        },
+                        "Mode":{
+                          "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                          "Value":"On"
+                        }
+                      },
+                      {
+                        "id":"2",
+                        "EchoControl":{
+                          "Dereverberation":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                            "Value":"Off"
+                          },
+                          "Mode":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                            "Value":"On"
+                          },
+                          "NoiseReduction":{
+                            "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                            "Value":"On"
+                          }
+                        },
+                        "Level":{
+                          "valueSpaceRef":"/Valuespace/INT_0_24",
+                          "Value":"14"
+                        },
+                        "Mode":{
+                          "valueSpaceRef":"/Valuespace/TTPAR_OnOff",
+                          "Value":"On"
+                        }
+                      }
+                    ]
+                  },
+                  "Microphones":{
+                    "Mute":{
+                      "Enabled":{
+                        "valueSpaceRef":"/Valuespace/TTPAR_MuteEnabled",
+                        "Value":"True"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+        JSON
+    )
+    expect(status[:configuration].dig(:audio, :input, :microphone, 1, :mode, :value)).to eq "On"
 
     # -------------------------------------------------------------------------
     section 'Base comms (protected methods - ignore the access warnings)'
@@ -114,7 +220,6 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
             JSON
         )
     expect(result).to be :success
-
 
     # -------------------------------------------------------------------------
     section 'Commands'
