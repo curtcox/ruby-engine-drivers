@@ -229,7 +229,7 @@ class CaseInsensitiveHash < ActiveSupport::HashWithIndifferentAccess
     protected
 
     def convert_key(key)
-        key.respond_to?(:downcase) ? key.downcase : key
+        super(key.try(:downcase) || key)
     end
 end
 
@@ -294,10 +294,7 @@ class Cisco::Spark::RoomOs::FeedbackTrie < CaseInsensitiveHash
         if path.is_a? Array
             path
         else
-            path.split(/[\s\/\\]/)
-                .reject(&:empty?)
-                .map(&:downcase)
-                .map(&:to_sym)
+            path.split(/[\s\/\\]/).reject(&:empty?)
         end
     end
 end
