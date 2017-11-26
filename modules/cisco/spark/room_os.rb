@@ -269,7 +269,7 @@ class Cisco::Spark::RoomOs::FeedbackTrie < CaseInsensitiveHash
 
     # Propogate a response throughout the trie
     def notify(response)
-        response.each do |key, value|
+        response.try(:each) do |key, value|
             node = self[key]
             next unless node
             node.dispatch value
