@@ -48,7 +48,7 @@ class Cisco::Spark::RoomOs
     # Handle all incoming data from the device.
     #
     # In addition to acting an the normal Orchestrator callback, on_receive
-    # blocks also pipe through here for initial JSON decoding. See #do_send.
+    # procs also pipe through here for initial JSON decoding. See #do_send.
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
@@ -58,8 +58,8 @@ class Cisco::Spark::RoomOs
             # Let any pending command response handlers have first pass...
             yield(response).tap do |command_result|
                 # Otherwise support interleaved async events
-                unprocessed = command_result == :ignore || command_result.nil?
-                @subscriptions&.notify response if unprocessed
+                unhandled = command_result == :ignore || command_result.nil?
+                @subscriptions&.notify response if unhandled
             end
         else
             @subscriptions&.notify response
@@ -128,8 +128,7 @@ class Cisco::Spark::RoomOs
     end
 
     def send_xconfiguration(path, settings)
-        # The device API only allows a single setting to be applied with each
-        # request.
+        # The API only allows a single setting to be applied with each request.
         interactions = settings.to_a.map do |(setting, value)|
             request = Xapi::Action.xconfiguration path, setting, value
 
@@ -162,7 +161,7 @@ class Cisco::Spark::RoomOs
 
         unless @subscriptions.contains? path
             request = Xapi::Action.xfeedback :register, path
-            # Always returns an empty JSON object, no special response to handle
+            # Always returns an empty response, nothing special to handle
             result = do_send request
         end
 
@@ -171,7 +170,6 @@ class Cisco::Spark::RoomOs
         result || ::Libuv::Q::ResolvedPromise.new(thread, :success)
     end
 
-    # Clear all subscribers from a path and deregister device feedback.
     def unsubscribe(path)
         logger.debug { "Unsubscribing feedback for #{path}" }
 
@@ -181,16 +179,11 @@ class Cisco::Spark::RoomOs
         do_send request
     end
 
-    # Clears any previously registered device feedback subscriptions
     def clear_subscriptions
         unsubscribe '/'
     end
 
     # Execute raw command on the device.
-    #
-    # Automatically appends a result tag and handles routing of response
-    # handling for async interactions. If a block is passed a pre-parsed
-    # response object will be yielded to it.
     #
     # @param command [String] the raw command to execute
     # @param options [Hash] options for the transport layer
