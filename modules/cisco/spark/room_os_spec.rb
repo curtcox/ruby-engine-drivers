@@ -157,7 +157,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
             }
         JSON
     )
-    expect(status[:configuration].dig(:audio, :input, :microphone, 1, :mode, :value)).to eq "On"
+    expect(status[:configuration].dig(:audio, :input, :microphone, 1, :mode, :value)).to eq 'On'
 
     # -------------------------------------------------------------------------
     section 'Base comms (protected methods - ignore the access warnings)'
@@ -318,7 +318,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     expect(result).to be :success
 
     # Multuple settings return a unit :success when all ok
-    exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Name: "Borris", Quality: :Motion)
+    exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Name: 'Borris', Quality: :Motion)
         .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")
         .responds(
             <<~JSON
@@ -346,7 +346,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     expect(result).to be :success
 
     # Multuple settings with failure with return a promise that rejects
-    exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Foo: "Bar", Quality: :Motion)
+    exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Foo: 'Bar', Quality: :Motion)
         .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")
         .responds(
             <<~JSON
