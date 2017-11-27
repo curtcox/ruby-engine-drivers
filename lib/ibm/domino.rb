@@ -48,7 +48,6 @@ class IBM::Domino
 
     def get_bookings(room_id, starting, ending, days=nil)
         room = Orchestrator::ControlSystem.find(room_id)
-        Rails.logger.info "Getting bookings for #{room.name}"
         database = room.settings['database']
         starting, ending = convert_to_datetime(starting, ending)
         # Set count to max
@@ -62,19 +61,20 @@ class IBM::Domino
             query[:before] = to_ibm_date(ending)
         end
 
-	Rails.logger.info "Getting bookings for"
-	Rails.logger.info "/#{database}/api/calendar/events"
 
         # Get our bookings 
         response = domino_request('get', "/#{database}/api/calendar/events", nil, query).value
-        domino_bookings = JSON.parse(response.body)['events']
-
+        case response.status
+        when 204
+            domino_bookings = []
+        when 200
+            domino_bookings = JSON.parse(response.body)['events']
+        else
+            raise "Unexpected Response: #{response.status} \n #{response.body}"
+        end
         # Grab the attendee for each booking
         bookings = []
-	if response.status == 200 && response.body.nil?
-	    Rails.logger.info "Got empty response"
-	    domino_bookings = []
-	end
+    
         domino_bookings.each{ |booking|
             bookings.push(get_attendees(booking, database))
         }
