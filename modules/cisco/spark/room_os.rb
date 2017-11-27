@@ -149,10 +149,16 @@ class Cisco::Spark::RoomOs
         end
 
         thread.finally(interactions).then do |results|
-            if results.all? { |(_, resolved)| resolved == true }
+            resolved = results.map(&:last)
+            if resolved.all?
                 :success
             else
-                thread.defer.reject 'Could not apply all settings'
+                failures = settings.keys
+                                   .reject
+                                   .with_index { |_, index| resolved[index] }
+
+                thread.defer.reject 'Could not apply all settings. ' \
+                    "Failed on #{failures.join ', '}."
             end
         end
     end
