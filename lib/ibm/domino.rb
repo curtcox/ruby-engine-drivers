@@ -46,7 +46,10 @@ class IBM::Domino
 
 
 
-    def get_bookings(database, starting, ending, days=nil)
+    def get_bookings(room_id, starting, ending, days=nil)
+        room = Orchestrator::ControlSystem.find(room_id)
+        Rails.logger.info "Getting bookings for #{room.name}"
+        database = room.settings['database']
         starting, ending = convert_to_datetime(starting, ending)
         # Set count to max
         query = {
