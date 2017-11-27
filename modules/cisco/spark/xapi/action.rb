@@ -26,21 +26,21 @@ module Cisco::Spark::Xapi::Action
     # Serialize an xAPI action into transmittable command.
     #
     # @param type [ACTION_TYPE] the type of action to execute
-    # @param path [String, Array<String>] the action path
-    # @param args [Hash] an optional hash of keyword arguments for the action
+    # @param args [String, Array<String>] the action args
+    # @param kwargs [Hash] an optional hash of keyword arguments for the action
     # @return [String]
-    def create_action(type, path, args = {})
+    def create_action(type, *args, **kwargs)
         unless ACTION_TYPE.include? type
             raise ArgumentError,
                   "Invalid action type. Must be one of #{ACTION_TYPE}."
         end
 
-        args = args.map do |name, value|
+        kwargs = kwargs.map do |name, value|
             value = "\"#{value}\"" if value.is_a? String
             "#{name}: #{value}"
         end
 
-        [type, path, args].flatten.join ' '
+        [type, args, kwargs].flatten.join ' '
     end
 
     # Serialize an xCommand into transmittable command.
@@ -48,8 +48,8 @@ module Cisco::Spark::Xapi::Action
     # @param path [String, Array<String>] command path
     # @param args [Hash] an optional hash of keyword arguments
     # @return [String]
-    def xcommand(path, args = {})
-        create_action :xCommand, path, args
+    def xcommand(path, **args)
+        create_action :xCommand, tokenize(path), args
     end
 
     # Serialize an xConfiguration action into a transmittable command.
@@ -59,7 +59,7 @@ module Cisco::Spark::Xapi::Action
     # @param value the configuration value to apply
     # @return [String]
     def xconfiguration(path, setting, value)
-        create_action :xConfiguration, path, setting => value
+        create_action :xConfiguration, tokenize(path), setting => value
     end
 
     # Serialize a xFeedback subscription request.
@@ -73,9 +73,11 @@ module Cisco::Spark::Xapi::Action
                   "Invalid feedback action. Must be one of #{FEEDBACK_ACTION}."
         end
 
-        # Allow space or slash seperated paths
-        path = path.split(/[\s\/\\]/).reject(&:empty?) if path.is_a? String
+        create_action :xFeedback, action, "/#{tokenize(path).join '/'}"
+    end
 
-        create_action :xFeedback, "#{action} /#{path.join '/'}"
+    def tokenize(path)
+        # Allow space or slash seperated paths
+        path&.split(/[\s\/\\]/)&.reject(&:empty?) || path
     end
 end
