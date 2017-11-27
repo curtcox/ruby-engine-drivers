@@ -81,6 +81,7 @@ class Cisco::Spark::RoomOs
     #
     # @param command [String] the command to execute
     # @param args [Hash] the command arguments
+    # @return [::Libuv::Q::Promise] resolves when the command completes
     def xcommand(command, args = {})
         send_xcommand command, args
     end
@@ -89,8 +90,17 @@ class Cisco::Spark::RoomOs
     #
     # @param path [String] the configuration path
     # @param settings [Hash] the configuration values to apply
+    # @param [:Libuv::Q::Promise] resolves when the commands complete
     def xconfiguration(path, settings)
         send_xconfiguration path, settings
+    end
+
+    # Trigger a status update for the specified path.
+    #
+    # @param path [String] the status path
+    # @param [:Libuv::Q::Promise] resolves with the status response as a Hash
+    def xstatus(path)
+        send_xstatus path
     end
 
     protected
@@ -163,6 +173,38 @@ class Cisco::Spark::RoomOs
         end
     end
 
+    # Query the device's current status.
+    #
+    # @param path [String]
+    # @yield [response]
+    #   a pre-parsed response object for the command, if used this block
+    #   should return the response result
+    def send_xstatus(path)
+        request = Xapi::Action.xstatus path
+
+        defer = thread.defer
+
+        do_send request, name: "? #{path}" do |response|
+            path_components = Xapi::Action.tokenize path
+            status_response = response.dig 'Status', *path_components
+            error_result = response.dig 'CommandResponse', 'Status'
+
+            if status_response
+                yield status_response if block_given?
+                defer.resolve status_response
+                :success
+            else
+                reason = error_result&.dig 'Reason', 'Value'
+                xpath = error_result&.dig 'XPath', 'Value'
+                logger.error "#{reason} (#{xpath})" if reason
+                defer.reject
+                :abort
+            end
+        end
+
+        defer.promise
+    end
+
     # Subscribe to feedback from the device.
     #
     # @param path [String, Array<String>] the xPath to subscribe to updates for
@@ -211,6 +253,7 @@ class Cisco::Spark::RoomOs
     # @yield [response]
     #   a pre-parsed response object for the command, if used this block
     #   should return the response result
+    # @return [::Libuv::Q::Promise]
     def do_send(command, **options)
         request_id = generate_request_uuid
 

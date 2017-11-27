@@ -386,4 +386,80 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
         expect(last_result.resolved?).to be true
         expect { last_result.value }.to raise_error(CoroutineRejection)
     end
+
+
+    # -------------------------------------------------------------------------
+    section 'Status'
+
+    # Status query
+    exec(:xstatus, 'Audio')
+        .should_send("xStatus Audio | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "Status":{
+                        "Audio":{
+                            "Input":{
+                                "Connectors":{
+                                    "Microphone":[
+                                        {
+                                            "id":"1",
+                                            "ConnectionStatus":{
+                                                "Value":"Connected"
+                                            }
+                                        },
+                                        {
+                                            "id":"2",
+                                            "ConnectionStatus":{
+                                                "Value":"NotConnected"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "Microphones":{
+                                "Mute":{
+                                    "Value":"On"
+                                }
+                            },
+                            "Output":{
+                                "Connectors":{
+                                    "Line":[
+                                        {
+                                            "id":"1",
+                                            "DelayMs":{
+                                                "Value":"0"
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "Volume":{
+                                "Value":"50"
+                            }
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+
+    # Status results are provided in the return
+    exec(:xstatus, 'Time')
+        .should_send("xStatus Time | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "Status":{
+                        "Time":{
+                            "SystemTime":{
+                                "Value":"2017-11-27T15:14:25+1000"
+                            }
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+    expect(result.dig('SystemTime', 'Value')).to eq '2017-11-27T15:14:25+1000'
 end

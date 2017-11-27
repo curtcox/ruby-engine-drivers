@@ -62,6 +62,14 @@ module Cisco::Spark::Xapi::Action
         create_action :xConfiguration, tokenize(path), setting => value
     end
 
+    # Serialize an xStatus request into transmittable command.
+    #
+    # @param path [String, Array<String>] status path
+    # @return [String]
+    def xstatus(path)
+        create_action :xStatus, tokenize(path)
+    end
+
     # Serialize a xFeedback subscription request.
     #
     # @param action [:register, :deregister]
