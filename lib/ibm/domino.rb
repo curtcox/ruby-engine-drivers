@@ -30,6 +30,7 @@ class IBM::Domino
     end
 
     def get_free_rooms(starting, ending)
+        starting, ending = convert_to_datetime(starting, ending)        
         starting, ending = get_time_range(starting, ending, @timezone)
 
         req_params = {
@@ -45,6 +46,7 @@ class IBM::Domino
 
 
     def get_bookings(database, starting, ending, days=nil)
+        starting, ending = convert_to_datetime(starting, ending)
         # Set count to max
         query = {
             count: 100
@@ -70,6 +72,7 @@ class IBM::Domino
 
 
     def create_booking(starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+        starting, ending = convert_to_datetime(starting, ending)        
         event = {
             :summary => summary,
             :class => :public,
@@ -114,6 +117,7 @@ class IBM::Domino
 
 
     def edit_booking(id, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+        starting, ending = convert_to_datetime(starting, ending)       
         event = {
             :summary => summary,
             :class => :public,
@@ -188,6 +192,23 @@ class IBM::Domino
         time.strftime("%Y-%m-%dT%H:%M:%SZ")
     end
 
+    def convert_to_datetime(starting, ending)
+        if !(starting.class == Time)
+            if string_is_digits(starting)
+                starting = Time.at(starting)
+                ending = Time.at(ending)               
+            else
+                starting = Time.parse(starting)
+                ending = Time.parse(ending)                    
+            end
+        end
+        starting, ending
+    end
+
+
+    def string_is_digits(string)
+        string.scan(/\D/).empty?
+    end
 
     def to_utc_date(time)
         utctime = time.getutc
