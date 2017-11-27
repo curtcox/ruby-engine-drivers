@@ -174,7 +174,7 @@ class Cisco::Spark::RoomOs
 
         @subscriptions.insert path, &update_handler
 
-        result || ::Libuv::Q::ResolvedPromise.new(thread, :success)
+        result || thread.defer.resolve(:success)
     end
 
     def unsubscribe(path)
