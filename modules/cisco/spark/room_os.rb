@@ -61,10 +61,10 @@ class Cisco::Spark::RoomOs
             yield(response).tap do |command_result|
                 # Otherwise support interleaved async events
                 unhandled = [:ignore, nil].include? command_result
-                @subscriptions&.notify response if unhandled
+                subscriptions.notify response if unhandled
             end
         else
-            @subscriptions&.notify response
+            subscriptions.notify response
             :ignore
         end
     rescue JSON::ParserError => error
@@ -212,15 +212,13 @@ class Cisco::Spark::RoomOs
     def subscribe(path, &update_handler)
         logger.debug { "Subscribing to device feedback for #{path}" }
 
-        @subscriptions ||= FeedbackTrie.new
-
-        unless @subscriptions.contains? path
+        unless subscriptions.contains? path
             request = Xapi::Action.xfeedback :register, path
             # Always returns an empty response, nothing special to handle
             result = do_send request
         end
 
-        @subscriptions.insert path, &update_handler
+        subscriptions.insert path, &update_handler
 
         result || thread.defer.resolve(:success)
     end
@@ -228,7 +226,7 @@ class Cisco::Spark::RoomOs
     def unsubscribe(path)
         logger.debug { "Unsubscribing feedback for #{path}" }
 
-        @subscriptions&.remove path
+        subscriptions.remove path
 
         request = Xapi::Action.xfeedback :deregister, path
         do_send request
@@ -280,6 +278,10 @@ class Cisco::Spark::RoomOs
 
     def generate_request_uuid
         SecureRandom.uuid
+    end
+
+    def subscriptions
+        @subscriptions ||= FeedbackTrie.new
     end
 end
 
