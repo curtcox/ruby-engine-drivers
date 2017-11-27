@@ -92,7 +92,7 @@ class Cisco::Spark::RoomOs
     # @param settings [Hash] the configuration values to apply
     # @param [:Libuv::Q::Promise] resolves when the commands complete
     def xconfiguration(path, settings)
-        send_xconfiguration path, settings
+        send_xconfigurations path, settings
     end
 
     # Trigger a status update for the specified path.
@@ -139,23 +139,29 @@ class Cisco::Spark::RoomOs
         end
     end
 
-    def send_xconfiguration(path, settings)
+    # Apply a single configuration on the device.
+    def send_xconfiguration(path, setting, value)
+        request = Xapi::Action.xconfiguration path, setting, value
+
+        do_send request, name: "#{path} #{setting}" do |response|
+            result = response.dig 'CommandResponse', 'Configuration'
+
+            if result&.[]('status') == 'Error'
+                reason = result.dig 'Reason', 'Value'
+                xpath = result.dig 'XPath', 'Value'
+                logger.error "#{reason} (#{xpath})" if reason
+                :abort
+            else
+                :success
+            end
+        end
+    end
+
+    # Apply a set of configurations.
+    def send_xconfigurations(path, settings)
         # The API only allows a single setting to be applied with each request.
         interactions = settings.to_a.map do |(setting, value)|
-            request = Xapi::Action.xconfiguration path, setting, value
-
-            do_send request, name: "#{path} #{setting}" do |response|
-                result = response.dig 'CommandResponse', 'Configuration'
-
-                if result&.[]('status') == 'Error'
-                    reason = result.dig 'Reason', 'Value'
-                    xpath = result.dig 'XPath', 'Value'
-                    logger.error "#{reason} (#{xpath})" if reason
-                    :abort
-                else
-                    :success
-                end
-            end
+            send_xconfiguration(path, setting, value)
         end
 
         thread.finally(interactions).then do |results|
@@ -163,9 +169,9 @@ class Cisco::Spark::RoomOs
             if resolved.all?
                 :success
             else
-                failures = settings.keys
-                                   .reject
-                                   .with_index { |_, index| resolved[index] }
+                failures = resolved.zip(settings.keys)
+                                   .reject(&:first)
+                                   .map(&:last)
 
                 thread.defer.reject 'Could not apply all settings. ' \
                     "Failed on #{failures.join ', '}."
