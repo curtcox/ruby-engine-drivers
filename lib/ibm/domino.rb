@@ -201,7 +201,7 @@ class IBM::Domino
                 ending = ending.to_i
 
                 # If JavaScript epoch remove milliseconds
-                if starting.length == 13
+                if starting.to_s.length == 13
                     starting /= 1000
                     ending /= 1000
                 end
