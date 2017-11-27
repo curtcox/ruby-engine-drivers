@@ -60,7 +60,7 @@ class Cisco::Spark::RoomOs
             # Let any pending command response handlers have first pass...
             yield(response).tap do |command_result|
                 # Otherwise support interleaved async events
-                unhandled = command_result == :ignore || command_result.nil?
+                unhandled = [:ignore, nil].include? command_result
                 @subscriptions&.notify response if unhandled
             end
         else
