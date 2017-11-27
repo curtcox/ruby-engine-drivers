@@ -36,7 +36,8 @@ class IBM::Domino
         req_params = {
             :site => ENV["DOMINO_SITE"],
             :start => to_ibm_date(starting),
-            :end => to_ibm_date(ending)
+            :end => to_ibm_date(ending),
+            :capacity => 1
         }
 
         res = domino_request('get','/api/freebusy/freerooms', nil, req_params).value
@@ -58,12 +59,19 @@ class IBM::Domino
             query[:before] = to_ibm_date(ending)
         end
 
+	Rails.logger.info "Getting bookings for"
+	Rails.logger.info "/#{database}/api/calendar/events"
+
         # Get our bookings 
         response = domino_request('get', "/#{database}/api/calendar/events", nil, query).value
         domino_bookings = JSON.parse(response.body)['events']
 
         # Grab the attendee for each booking
         bookings = []
+	if response.status == 200 && response.body.nil?
+	    Rails.logger.info "Got empty response"
+	    domino_bookings = []
+	end
         domino_bookings.each{ |booking|
             bookings.push(get_attendees(booking, database))
         }
