@@ -318,7 +318,7 @@ class Cisco::Spark::RoomOs::FeedbackTrie < CaseInsensitiveHash
 
         if path_components.empty?
             clear
-            @handlers&.clear
+            handlers.clear
         else
             *parent_path, node_key = path_components
             parent = parent_path.empty? ? self : dig(*parent_path)
@@ -346,13 +346,12 @@ class Cisco::Spark::RoomOs::FeedbackTrie < CaseInsensitiveHash
 
     # Append a rx handler block to this node.
     def <<(blk)
-        @handlers ||= []
-        @handlers << blk
+        handlers << blk
     end
 
     # Dispatch to all handlers registered on this node.
     def dispatch(value)
-        [*@handlers].each { |handler| handler.call value }
+        handlers.each { |handler| handler.call value }
     end
 
     def tokenize(path)
@@ -361,5 +360,9 @@ class Cisco::Spark::RoomOs::FeedbackTrie < CaseInsensitiveHash
         else
             path.split(/[\s\/\\]/).reject(&:empty?)
         end
+    end
+
+    def handlers
+        @handlers ||= []
     end
 end
