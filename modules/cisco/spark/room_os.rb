@@ -148,8 +148,12 @@ class Cisco::Spark::RoomOs
             end
         end
 
-        thread.all(interactions).then do |results|
-            results.all? { |result| result == :success } ? :success : results
+        thread.finally(interactions).then do |results|
+            if results.all? { |(_, resolved)| resolved == true }
+                :success
+            else
+                thread.defer.reject 'Could not apply all settings'
+            end
         end
     end
 

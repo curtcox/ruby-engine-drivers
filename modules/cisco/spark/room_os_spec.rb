@@ -317,7 +317,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
         )
     expect(result).to be :success
 
-    # Multuple settings
+    # Multuple settings return a unit :success when all ok
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Name: "Borris", Quality: :Motion)
         .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")
         .responds(
@@ -344,4 +344,46 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
             JSON
         )
     expect(result).to be :success
+
+    # Multuple settings with failure with return a promise that rejects
+    exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Foo: "Bar", Quality: :Motion)
+        .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+        .should_send("xConfiguration Video Input Connector 1 Foo: \"Bar\" | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "CommandResponse":{
+                        "Configuration":{
+                            "status":"Error",
+                            "Reason":{
+                                "Value":"No match on address expression."
+                            },
+                            "XPath":{
+                                "Value":"Configuration/Video/Input/Connector[1]/Foo"
+                            }
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+        .should_send("xConfiguration Video Input Connector 1 Quality: Motion | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+    result.tap do |last_result|
+        expect(last_result.resolved?).to be true
+        expect { last_result.value }.to raise_error(CoroutineRejection)
+    end
 end
