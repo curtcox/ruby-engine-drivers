@@ -48,3 +48,7 @@ RepeatedConditional:
 # Allow for device model numbers to be used as module names.
 UncommunicativeModuleName:
   enabled: false
+
+# Support private, pure functions
+UtilityFunction:
+  public_methods_only: true
