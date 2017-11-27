@@ -137,9 +137,10 @@ class Cisco::Spark::RoomOs
             do_send request, name: "#{path} #{setting}" do |response|
                 result = response.dig 'CommandResponse', 'Configuration'
 
-                if result&.[] 'status' == 'Error'
+                if result&.[]('status') == 'Error'
                     reason = result.dig 'Reason', 'Value'
-                    logger.error reason if reason
+                    xpath = result.dig 'XPath', 'Value'
+                    logger.error "#{reason} (#{xpath})" if reason
                     :abort
                 else
                     :success
