@@ -195,6 +195,18 @@ class IBM::Domino
     def convert_to_datetime(starting, ending)
         if !(starting.class == Time)
             if string_is_digits(starting)
+
+                # Convert to an integer
+                starting = starting.to_i
+                ending = ending.to_i
+
+                # If JavaScript epoch remove milliseconds
+                if starting.length == 13
+                    starting /= 1000
+                    ending /= 1000
+                end
+
+                # Convert to datetimes
                 starting = Time.at(starting)
                 ending = Time.at(ending)               
             else
