@@ -84,7 +84,8 @@ class IBM::Domino
     end
 
 
-    def create_booking(current_user:, starting:, ending:, room_database:, room_email:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def create_booking(current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+        room = Orchestrator::ControlSystem.find(room_id)
         starting, ending = convert_to_datetime(starting, ending)        
         event = {
             :summary => summary,
@@ -138,11 +139,11 @@ class IBM::Domino
              "status":"accepted",
              "rsvp":false,
              "userType":"room",
-             "email": room_email
+             "email": room.email
         })
 
 
-        request = domino_request('post', "/#{room_database}/api/calendar/events", {events: [event]}).value
+        request = domino_request('post', "/#{database}/api/calendar/events", {events: [event]}).value
         request
     end
 
