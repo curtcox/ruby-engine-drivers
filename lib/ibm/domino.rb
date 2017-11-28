@@ -65,10 +65,12 @@ class IBM::Domino
         # Get our bookings 
         response = domino_request('get', "/#{database}/api/calendar/events", nil, query).value
         case response.status
-        when 204
-            domino_bookings = []
         when 200
-            domino_bookings = JSON.parse(response.body)['events']
+            if response.body.nil? || response.body == ""
+               domino_bookings = []
+            else
+               domino_bookings = JSON.parse(response.body)['events']
+            end
         else
             raise "Unexpected Response: #{response.status} \n #{response.body}"
         end
