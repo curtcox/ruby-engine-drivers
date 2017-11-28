@@ -68,12 +68,7 @@ module Cisco::TelePresence::SxCameraCommon
 
 
     def home
-        # command("Camera PositionReset CameraId:#{@index}", name: :preset).then do
-        # Preset1 is a better home as it will usually pointed to a default position wheras PositionReset may not be a userfull view
-        recall_position(1).then do
-            autofocus
-            do_poll
-        end
+        command("Camera Preset ActivateDefaultPosition", name: :preset)
     end
 
     def autofocus
@@ -246,8 +241,7 @@ module Cisco::TelePresence::SxCameraCommon
     def recall_position(number)
         number = in_range(number, 15, 1)
 
-        command('Camera PositionActivateFromPreset', params({
-            :CameraId => @index,
+        command('Camera Preset Activate Preset', params({
             :PresetId => number
         }), name: :preset).then do
             autofocus
