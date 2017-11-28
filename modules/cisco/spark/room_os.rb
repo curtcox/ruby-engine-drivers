@@ -48,11 +48,17 @@ class Cisco::Spark::RoomOs
 
         send "xPreferences OutputMode JSON\n", wait: false
 
+        register_control_system.then do
+            schedule.every('30s') { heartbeat timeout: 35 }
+        end
+
         subscribe_to_configuration
     end
 
     def disconnected
         clear_subscriptions
+
+        schedule.clear
     end
 
     # Handle all incoming data from the device.
@@ -60,7 +66,7 @@ class Cisco::Spark::RoomOs
     # In addition to acting an the normal Orchestrator callback, on_receive
     # procs also pipe through here for initial JSON decoding. See #do_send.
     def received(data, deferrable, command)
-        logger.debug { "<- #{data.inspect}" }
+        logger.debug { "<- #{data}" }
 
         response = JSON.parse data, object_class: CaseInsensitiveHash
 
@@ -101,7 +107,7 @@ class Cisco::Spark::RoomOs
     #
     # @param path [String] the configuration path
     # @param settings [Hash] the configuration values to apply
-    # @param [:Libuv::Q::Promise] resolves when the commands complete
+    # @param [::Libuv::Q::Promise] resolves when the commands complete
     def xconfiguration(path, settings)
         send_xconfigurations path, settings
     end
@@ -109,7 +115,7 @@ class Cisco::Spark::RoomOs
     # Trigger a status update for the specified path.
     #
     # @param path [String] the status path
-    # @param [:Libuv::Q::Promise] resolves with the status response as a Hash
+    # @param [::Libuv::Q::Promise] resolves with the status response as a Hash
     def xstatus(path)
         send_xstatus path
     end
@@ -299,6 +305,38 @@ class Cisco::Spark::RoomOs
 
     def subscriptions
         @subscriptions ||= FeedbackTrie.new
+    end
+
+    def register_control_system
+        info = "#{self.class.name}-#{version}"
+
+        send_xcommand 'Peripherals Connect',
+                      ID: peripheral_id,
+                      Name: 'ACAEngine',
+                      SoftwareInfo: info,
+                      Type: :ControlSystem
+    end
+
+    def heartbeat(timeout:)
+        send_xcommand 'Peripherals HeartBeat',
+                      ID: peripheral_id,
+                      Timeout: timeout
+    end
+
+    def edge_id
+        @edge_id ||= @__config__.settings.edge_id
+    end
+
+    def peripheral_id
+        "ACA-#{edge_id}"
+    end
+
+    def version
+        if system 'git --version'
+            Dir.chdir(__dir__) { `git rev-parse --short HEAD`.strip }
+        else
+            'Unknown'
+        end
     end
 end
 
