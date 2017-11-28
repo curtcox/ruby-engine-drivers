@@ -50,6 +50,8 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     expect(status[:connected]).to be true
 
     should_send "Echo off\n"
+    responds "\e[?1034h\r\nOK\r\n"
+
     should_send "xPreferences OutputMode JSON\n"
 
     # -------------------------------------------------------------------------
@@ -65,7 +67,6 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     )
 
     should_send "xConfiguration *\n"
-
     responds(
         <<~JSON
             {
@@ -182,7 +183,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     # Handle invalid device commands
     exec(:do_send, 'Not a real command')
         .should_send("Not a real command | resultId=\"#{id_pop}\"\n")
-        .responds("Command not recognized.\n")
+        .responds("Command not recognized.\r\n")
     expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
 
     # Handle async response data

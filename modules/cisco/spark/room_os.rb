@@ -26,8 +26,10 @@ class Cisco::Spark::RoomOs
         (i.e. SX80, Spark Room Kit etc).
     DESC
 
-    tokenize delimiter: /(?<=\n})|(?<=\n{})|(?<=Command not recognized.)\n/,
-             wait_ready: "*r Login successful\n\nOK\n\n"
+    tokenize \
+        delimiter: /(?<=\n})|(?<=\n{})|(?<=Command not recognized.)|(?<=OK)[\r\n]+/,
+        wait_ready: /\*r Login successful[\r\n]+/
+
     clear_queue_on_disconnect!
 
     def on_load; end
@@ -37,7 +39,10 @@ class Cisco::Spark::RoomOs
     def on_update; end
 
     def connected
-        send "Echo off\n", wait: false, priority: 96
+        send "Echo off\n", priority: 96 do |response|
+            :success if response.starts_with? "\e[?1034h"
+        end
+
         send "xPreferences OutputMode JSON\n", wait: false
 
         subscribe_to_configuration
@@ -68,7 +73,10 @@ class Cisco::Spark::RoomOs
             :ignore
         end
     rescue JSON::ParserError => error
-        if data.strip == 'Command not recognized.'
+        case data.strip
+        when 'OK'
+            :success
+        when 'Command not recognized.'
             logger.error { "Command not recognized: `#{command[:data]}`" }
             :abort
         else
