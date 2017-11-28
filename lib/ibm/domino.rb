@@ -97,28 +97,28 @@ class IBM::Domino
 
 
         event[:attendees] = Array(attendees).collect do |attendee|
-            {
+            out_attendee = {
                 role: "req-participant",
                 status: "needs-action",
                 rsvp: true,
-                displayName: attendee[:name],
                 email: attendee[:email]
             }
+            out_attendee[:displayName] = attendee[:name] if attendee[:name]
+            out_attendee
         end
 
         event[:organizer] = {
-            email: organizer[:email],
-            displayName: organizer[:name]
+            email: organizer[:email]
         }
 
-        # If there are attendees add the service account
+        event[:organizer][:displayName] = organizer[:name] if organizer[:name]
+
         event[:attendees].push({
              "role":"chair",
              "status":"accepted",
              "rsvp":false,
-             "displayName":"OTS Test1 Project SG/SG/R&R/PwC",
-             "email":"ots.test1.project.sg@sg.pwc.com"
-        }) if attendees    
+             "email": current_user.email
+        })
 
         request = domino_request('post', "/#{room}/api/calendar/events", {events: [event]}).value
         request
