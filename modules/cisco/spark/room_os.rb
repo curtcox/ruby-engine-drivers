@@ -52,7 +52,7 @@ class Cisco::Spark::RoomOs
     # In addition to acting an the normal Orchestrator callback, on_receive
     # procs also pipe through here for initial JSON decoding. See #do_send.
     def received(data, deferrable, command)
-        logger.debug { "<- #{data}" }
+        logger.debug { "<- #{data.inspect}" }
 
         response = JSON.parse data, object_class: CaseInsensitiveHash
 
