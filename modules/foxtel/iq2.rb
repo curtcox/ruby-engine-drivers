@@ -17,7 +17,7 @@ class Foxtel::Iq2
     end
 
     def on_update
-        self[:ir_driver] = @ir_driver = setting(:ir_driver)&.to_sym || whenal; []
+        self[:ir_driver] = @ir_driver = setting(:ir_driver)&.to_sym || :DigitalIO
         self[:ir_index] = @ir_index = setting(:ir_index) || 1
     end
 
