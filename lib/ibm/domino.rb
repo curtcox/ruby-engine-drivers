@@ -84,7 +84,7 @@ class IBM::Domino
     end
 
 
-    def create_booking(starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def create_booking(current_user:, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         starting, ending = convert_to_datetime(starting, ending)        
         event = {
             :summary => summary,
