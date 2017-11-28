@@ -84,7 +84,7 @@ class IBM::Domino
     end
 
 
-    def create_booking(current_user:, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def create_booking(current_user:, starting:, ending:, room_database:, room_email:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         starting, ending = convert_to_datetime(starting, ending)        
         event = {
             :summary => summary,
@@ -107,20 +107,41 @@ class IBM::Domino
             out_attendee
         end
 
-        event[:organizer] = {
-            email: organizer[:email]
-        }
+        # Set the current user as orgaqnizer and chair if no organizer passed in
+        if organizer
+            event[:organizer] = {
+                email: organizer[:email]
+            }
+            event[:organizer][:displayName] = organizer[:name] if organizer[:name]
 
-        event[:organizer][:displayName] = organizer[:name] if organizer[:name]
+            event[:attendees].push({
+                 "role":"chair",
+                 "status":"accepted",
+                 "rsvp":false,
+                 "email": organizer[:email]
+            })
+        else
+            event[:organizer] = {
+                email: current_user.email
+            }
+            event[:attendees].push({
+                 "role":"chair",
+                 "status":"accepted",
+                 "rsvp":false,
+                 "email": current_user.email
+            })
+        end
 
+        # Add the room as an attendee
         event[:attendees].push({
              "role":"chair",
              "status":"accepted",
              "rsvp":false,
-             "email": current_user.email
+             "email": room_email
         })
 
-        request = domino_request('post', "/#{room}/api/calendar/events", {events: [event]}).value
+
+        request = domino_request('post', "/#{room_database}/api/calendar/events", {events: [event]}).value
         request
     end
 
