@@ -121,7 +121,6 @@ class IBM::Domino
         }) if attendees    
 
         request = domino_request('post', "/#{room}/api/calendar/events", {events: [event]}).value
-        JSON.parse(request.body)['events'][0]
     end
 
     def delete_booking(room, id)
