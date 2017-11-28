@@ -30,12 +30,14 @@ class IBM::Domino
     end
 
     def get_free_rooms(starting, ending)
+        starting, ending = convert_to_datetime(starting, ending)        
         starting, ending = get_time_range(starting, ending, @timezone)
 
         req_params = {
             :site => ENV["DOMINO_SITE"],
             :start => to_ibm_date(starting),
-            :end => to_ibm_date(ending)
+            :end => to_ibm_date(ending),
+            :capacity => 1
         }
 
         res = domino_request('get','/api/freebusy/freerooms', nil, req_params).value
@@ -44,7 +46,10 @@ class IBM::Domino
 
 
 
-    def get_bookings(database, starting, ending, days=nil)
+    def get_bookings(room_id, starting, ending, days=nil)
+        room = Orchestrator::ControlSystem.find(room_id)
+        database = room.settings['database']
+        starting, ending = convert_to_datetime(starting, ending)
         # Set count to max
         query = {
             count: 100
@@ -56,12 +61,20 @@ class IBM::Domino
             query[:before] = to_ibm_date(ending)
         end
 
+
         # Get our bookings 
         response = domino_request('get', "/#{database}/api/calendar/events", nil, query).value
-        domino_bookings = JSON.parse(response.body)['events']
-
+        case response.status
+        when 204
+            domino_bookings = []
+        when 200
+            domino_bookings = JSON.parse(response.body)['events']
+        else
+            raise "Unexpected Response: #{response.status} \n #{response.body}"
+        end
         # Grab the attendee for each booking
         bookings = []
+    
         domino_bookings.each{ |booking|
             bookings.push(get_attendees(booking, database))
         }
@@ -70,6 +83,7 @@ class IBM::Domino
 
 
     def create_booking(starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+        starting, ending = convert_to_datetime(starting, ending)        
         event = {
             :summary => summary,
             :class => :public,
@@ -114,6 +128,7 @@ class IBM::Domino
 
 
     def edit_booking(id, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+        starting, ending = convert_to_datetime(starting, ending)       
         event = {
             :summary => summary,
             :class => :public,
@@ -188,6 +203,35 @@ class IBM::Domino
         time.strftime("%Y-%m-%dT%H:%M:%SZ")
     end
 
+    def convert_to_datetime(starting, ending)
+        if !(starting.class == Time)
+            if string_is_digits(starting)
+
+                # Convert to an integer
+                starting = starting.to_i
+                ending = ending.to_i
+
+                # If JavaScript epoch remove milliseconds
+                if starting.to_s.length == 13
+                    starting /= 1000
+                    ending /= 1000
+                end
+
+                # Convert to datetimes
+                starting = Time.at(starting)
+                ending = Time.at(ending)               
+            else
+                starting = Time.parse(starting)
+                ending = Time.parse(ending)                    
+            end
+        end
+        return starting, ending
+    end
+
+
+    def string_is_digits(string)
+        string.scan(/\D/).empty?
+    end
 
     def to_utc_date(time)
         utctime = time.getutc
