@@ -36,7 +36,10 @@ class Cisco::Spark::RoomOs
 
     def on_unload; end
 
-    def on_update; end
+    def on_update
+        # Force a reconnect and event resubscribe following module updates.
+        disconnect
+    end
 
     def connected
         send "Echo off\n", priority: 96 do |response|
