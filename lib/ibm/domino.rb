@@ -137,6 +137,7 @@ class IBM::Domino
              "role":"chair",
              "status":"accepted",
              "rsvp":false,
+             "userType":"room",
              "email": room_email
         })
 
