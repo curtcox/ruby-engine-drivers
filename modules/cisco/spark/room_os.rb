@@ -32,11 +32,16 @@ class Cisco::Spark::RoomOs
 
     clear_queue_on_disconnect!
 
-    def on_load; end
+    def on_load
+        on_update
+    end
 
     def on_unload; end
 
     def on_update
+        self[:peripheral_id] = setting(:peripheral_id) || "aca-#{edge_id}"
+        self[:version] = setting(:version) || "#{self.class.name}-#{version}"
+
         # Force a reconnect and event resubscribe following module updates.
         disconnect if self[:connected]
     end
@@ -308,27 +313,21 @@ class Cisco::Spark::RoomOs
     end
 
     def register_control_system
-        info = "#{self.class.name}-#{version}"
-
         send_xcommand 'Peripherals Connect',
-                      ID: peripheral_id,
+                      ID: self[:peripheral_id],
                       Name: 'ACAEngine',
-                      SoftwareInfo: info,
+                      SoftwareInfo: self[:version],
                       Type: :ControlSystem
     end
 
     def heartbeat(timeout:)
         send_xcommand 'Peripherals HeartBeat',
-                      ID: peripheral_id,
+                      ID: self[:peripheral_id],
                       Timeout: timeout
     end
 
     def edge_id
         @edge_id ||= @__config__.settings.edge_id
-    end
-
-    def peripheral_id
-        "ACA-#{edge_id}"
     end
 
     def version
