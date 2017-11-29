@@ -1,3 +1,5 @@
+# Reference: https://www.ibm.com/developerworks/lotus/library/ls-Domino_URL_cheat_sheet/
+
 require 'active_support/time'
 module IBM; end
 
@@ -23,7 +25,7 @@ class IBM::Domino
         request_method = request_method.to_sym
         data = data.to_json if !data.nil? && data.class != String
 
-        @headers.merge(headers) if headers  
+        @headers.merge(headers) if headers      
         
         if request_method == :post
 
@@ -54,41 +56,50 @@ class IBM::Domino
 
 
 
-    def get_bookings(room_id, starting, ending, days=nil)
+    def get_bookings(room_id, date=Time.now.tomorrow.midnight)
         room = Orchestrator::ControlSystem.find(room_id)
-        database = room.settings['database']
-        starting, ending = convert_to_datetime(starting, ending)
+        room_name = room.settings['name']
+
+        # The domino API takes a StartKey and UntilKey
+        # We will only ever need one days worth of bookings
+        # If startkey = 2017-11-29 and untilkey = 2017-11-30
+        # Then all bookings on the 30th (the day of the untilkey) are returned
+
+        # Make date a date object from epoch or parsed text
+        date = convert_to_simpledate(date)
+
+        starting = date.yesterday.strftime("%Y%m%d")
+        ending = date.strftime("%Y%m%d")
+
         # Set count to max
         query = {
-            count: 100
+            StartKey: starting,
+            UntilKey: ending,
+            KeyType: 'time',
+            ReadViewEntries: nil,
+            OutputFormat: 'JSON'
         }
-
-        # If we have a range use it
-        if starting
-            query[:since] = to_ibm_date(starting)
-            query[:before] = to_ibm_date(ending)
-        end
-
 
         # Get our bookings 
-        response = domino_request('get', "/#{database}/api/calendar/events", nil, query).value
-        case response.status
-        when 200
-            if response.body.nil? || response.body == ""
-               domino_bookings = []
-            else
-               domino_bookings = JSON.parse(response.body)['events']
+        request = domino_request('get', "/RRDB.nsf/93FDE1776546DEEB482581E7000B27FF", nil, query)
+        response = request.value
+
+        # Go through the returned bookings and add to output array
+        rooms_bookings = []
+        bookings = JSON.parse(response.body)['viewentry']
+        bookings.each{ |booking|
+            domino_room_name = booking['entrydata'][2]['text']['0'].split('/')[0]
+            if room_name == domino_room_name
+                new_booking = {
+                    start: Time.parse(booking['entrydata'][0]['datetime']['0']).to_i,
+                    end: Time.parse(booking['entrydata'][1]['datetime']['0']).to_i,
+                    summary: booking['entrydata'][5]['text']['0'],
+                    organizer: booking['entrydata'][3]['text']['0']
+                }
+                rooms_bookings.push(new_booking)
             end
-        else
-            raise "Unexpected Response: #{response.status} \n #{response.body}"
-        end
-        # Grab the attendee for each booking
-        bookings = []
-    
-        domino_bookings.each{ |booking|
-            bookings.push(get_attendees(booking, database))
         }
-        bookings
+        rooms_bookings
     end
 
 
@@ -234,6 +245,28 @@ class IBM::Domino
 
     def to_ibm_date(time)
         time.strftime("%Y-%m-%dT%H:%M:%SZ")
+    end
+
+    def convert_to_simpledate(date) 
+        if !(date.class == Time)
+            if string_is_digits(date)
+
+                # Convert to an integer
+                date = date.to_i
+
+                # If JavaScript epoch remove milliseconds
+                if starting.to_s.length == 13
+                    starting /= 1000
+                    ending /= 1000
+                end
+
+                # Convert to datetimes
+                date = Time.at(date)           
+            else
+                date = Time.parse(date)                
+            end
+        end
+        return date
     end
 
     def convert_to_datetime(starting, ending)
