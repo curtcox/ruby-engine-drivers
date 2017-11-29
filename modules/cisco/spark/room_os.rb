@@ -38,7 +38,7 @@ class Cisco::Spark::RoomOs
 
     def on_update
         # Force a reconnect and event resubscribe following module updates.
-        disconnect
+        disconnect if self[:connected]
     end
 
     def connected
