@@ -26,12 +26,15 @@ class IBM::Domino
         @headers.merge(headers) if headers  
         
         if request_method == :post
+
+            domino_api = UV::HttpEndpoint.new(ENV['DOMINO_CREATE_DOMAIN'], {inactivity_timeout: 25000})
             domino_path = "#{ENV['DOMINO_CREATE_DOMAIN']}#{endpoint}"
         else
+            domino_api = @domino_api
             domino_path = "#{ENV['DOMINO_DOMAIN']}#{endpoint}"
         end
 
-        response = @domino_api.__send__(request_method, path: domino_path, headers: @headers, body: data, query: query)
+        response = domino_api.__send__(request_method, path: domino_path, headers: @headers, body: data, query: query)
     end
 
     def get_free_rooms(starting, ending)
