@@ -24,8 +24,13 @@ class IBM::Domino
         data = data.to_json if !data.nil? && data.class != String
 
         @headers.merge(headers) if headers  
+        
+        if request_method == :post
+            domino_path = "#{ENV['DOMINO_CREATE_DOMAIN']}#{endpoint}"
+        else
+            domino_path = "#{ENV['DOMINO_DOMAIN']}#{endpoint}"
+        end
 
-        domino_path = "#{ENV['DOMINO_DOMAIN']}#{endpoint}"
         response = @domino_api.__send__(request_method, path: domino_path, headers: @headers, body: data, query: query)
     end
 
