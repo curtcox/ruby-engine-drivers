@@ -1,6 +1,10 @@
 require 'thread'
 
-Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
+Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs',
+                                  settings: {
+                                      peripheral_id: 'MOCKED_ID',
+                                      version: 'MOCKED_VERSION'
+                                  } do
     # Patch in some tracking of request UUID's so we can form and validate
     # device comms.
     @manager.instance.class_eval do
@@ -53,6 +57,23 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs' do
     responds "\e[?1034h\r\nOK\r\n"
 
     should_send "xPreferences OutputMode JSON\n"
+
+    # -------------------------------------------------------------------------
+    section 'System registration'
+
+    should_send "xCommand Peripherals Connect ID: \"MOCKED_ID\" Name: \"ACAEngine\" SoftwareInfo: \"MOCKED_VERSION\" Type: ControlSystem | resultId=\"#{id_peek}\"\n"
+    responds(
+        <<~JSON
+            {
+                "CommandResponse":{
+                    "PeripheralsConnectResult":{
+                        "status":"OK"
+                    }
+                },
+                "ResultId": \"#{id_pop}\"
+            }
+        JSON
+    )
 
     # -------------------------------------------------------------------------
     section 'Initial state sync'
