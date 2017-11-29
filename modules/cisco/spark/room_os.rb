@@ -27,7 +27,12 @@ class Cisco::Spark::RoomOs
     DESC
 
     tokenize \
-        delimiter: /(?<=\n})|(?<=\n{})|(?<=Command not recognized.)|(?<=OK)[\r\n]+/,
+        delimiter: Regexp.union([ # Zero-width groups (included in response)
+            '}',
+            '{}',
+            'Command not recognized.',
+            'OK'
+        ].map { |delim| /(?<=^#{delim})[\r\n]+/ }),
         wait_ready: /\*r Login successful[\r\n]+/
 
     clear_queue_on_disconnect!
