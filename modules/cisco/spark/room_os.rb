@@ -47,8 +47,11 @@ class Cisco::Spark::RoomOs
     def on_unload; end
 
     def on_update
-        self[:peripheral_id] = setting(:peripheral_id) || "aca-#{edge_id}"
-        self[:version] = setting(:version) || "#{self.class.name}-#{version}"
+        load_setting :peripheral_id,
+                     default: "aca-#{edge_id}"
+
+        load_setting :version,
+                     default: "#{self.class.name}-#{Util::Git.hash __dir__}"
 
         # Force a reconnect and event resubscribe following module updates.
         disconnect if self[:connected]
@@ -338,11 +341,8 @@ class Cisco::Spark::RoomOs
         @edge_id ||= @__config__.settings.edge_id
     end
 
-    def version
-        if system 'git --version'
-            Dir.chdir(__dir__) { `git rev-parse --short HEAD`.strip }
-        else
-            'Unknown'
-        end
+    # Load a setting from the module config into a status variable.
+    def load_setting(name, default:)
+        self[name] = setting(name) || default
     end
 end
