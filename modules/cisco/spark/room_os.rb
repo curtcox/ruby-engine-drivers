@@ -29,15 +29,8 @@ class Cisco::Spark::RoomOs
         (i.e. SX80, Spark Room Kit etc).
     DESC
 
-    tokenize \
-        delimiter: Regexp.union([ # Zero-width groups (included in response)
-            '}',
-            '{}',
-            'Command not recognized.',
-            'OK'
-        ].map { |delim| /(?<=^#{delim})[\r\n]+/ }),
-        wait_ready: /\*r Login successful[\r\n]+/
-
+    tokenize delimiter: Xapi::Tokens::COMMAND_RESPONSE,
+             wait_ready: Xapi::Tokens::LOGIN_COMPLETE
     clear_queue_on_disconnect!
 
     def on_load
