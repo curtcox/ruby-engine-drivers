@@ -33,6 +33,10 @@ class Cisco::Spark::RoomOs
              wait_ready: Xapi::Tokens::LOGIN_COMPLETE
     clear_queue_on_disconnect!
 
+
+    # ------------------------------
+    # Callbacks
+
     def on_load
         load_settings
     end
@@ -47,17 +51,13 @@ class Cisco::Spark::RoomOs
     end
 
     def connected
-        send "Echo off\n", priority: 96 do |response|
-            :success if response.starts_with? "\e[?1034h"
-        end
-
-        send "xPreferences OutputMode JSON\n", wait: false
+        init_connection
 
         register_control_system.then do
             schedule.every('30s') { heartbeat timeout: 35 }
         end
 
-        subscribe_to_configuration
+        sync_config
     end
 
     def disconnected
@@ -99,6 +99,10 @@ class Cisco::Spark::RoomOs
         end
     end
 
+
+    # ------------------------------
+    # Exec methods
+
     # Execute an xCommand on the device.
     #
     # @param command [String] the command to execute
@@ -125,7 +129,12 @@ class Cisco::Spark::RoomOs
         send_xstatus path
     end
 
+
     protected
+
+
+    # ------------------------------
+    # xAPI interactions
 
     # Perform the actual command execution - this allows device implementations
     # to protect access to #xcommand and still refer the gruntwork here.
@@ -233,6 +242,10 @@ class Cisco::Spark::RoomOs
         defer.promise
     end
 
+
+    # ------------------------------
+    # Event subscription
+
     # Subscribe to feedback from the device.
     #
     # @param path [String, Array<String>] the xPath to subscribe to updates for
@@ -264,12 +277,20 @@ class Cisco::Spark::RoomOs
         unsubscribe '/'
     end
 
-    def subscribe_to_configuration
-        subscribe '/Configuration' do |configuration|
-            self[:configuration] = configuration
+    def subscriptions
+        @subscriptions ||= Util::FeedbackTrie.new
+    end
+
+
+    # ------------------------------
+    # Base comms
+
+    def init_connection
+        send "Echo off\n", priority: 96 do |response|
+            :success if response.starts_with? "\e[?1034h"
         end
 
-        send "xConfiguration *\n", wait: false
+        send "xPreferences OutputMode JSON\n", wait: false
     end
 
     # Execute raw command on the device.
@@ -308,9 +329,33 @@ class Cisco::Spark::RoomOs
         SecureRandom.uuid
     end
 
-    def subscriptions
-        @subscriptions ||= Util::FeedbackTrie.new
+
+    # ------------------------------
+    # Module status
+
+    # Load a setting into a status variable of the same name.
+    def load_setting(name, default:, persist: false)
+        value = setting(name)
+        define_setting(name, default) if value.nil? && persist
+        self[name] = value || default
     end
+
+    def load_settings
+        load_setting :peripheral_id, default: SecureRandom.uuid, persist: true
+        load_setting :version, default: Util::Meta.version(self)
+    end
+
+    def sync_config
+        subscribe '/Configuration' do |configuration|
+            self[:configuration] = configuration
+        end
+
+        send "xConfiguration *\n", wait: false
+    end
+
+
+    # ------------------------------
+    # Connectivity management
 
     def register_control_system
         send_xcommand 'Peripherals Connect',
@@ -324,17 +369,5 @@ class Cisco::Spark::RoomOs
         send_xcommand 'Peripherals HeartBeat',
                       ID: self[:peripheral_id],
                       Timeout: timeout
-    end
-
-    # Load a setting into a status variable of the same name.
-    def load_setting(name, default:, persist: false)
-        value = setting(name)
-        define_setting(name, default) if value.nil? && persist
-        self[name] = value || default
-    end
-
-    def load_settings
-        load_setting :peripheral_id, default: SecureRandom.uuid, persist: true
-        load_setting :version, default: Util::Meta.version(self)
     end
 end
