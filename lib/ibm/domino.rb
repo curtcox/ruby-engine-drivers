@@ -296,6 +296,7 @@ class IBM::Domino
 
 
     def string_is_digits(string)
+        string = string.to_s
         string.scan(/\D/).empty?
     end
 
