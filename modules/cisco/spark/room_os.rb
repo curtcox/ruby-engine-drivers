@@ -3,15 +3,18 @@
 require 'json'
 require 'securerandom'
 
-Dir[File.join(File.dirname(__FILE__), 'xapi', '*.rb')].each { |f| load f }
-
 module Cisco; end
 module Cisco::Spark; end
+
+module Cisco::Spark::Xapi; end
+module Cisco::Spark::Util; end
+Dir[File.join(__dir__, '{xapi,util}', '*.rb')].each { |lib| load lib }
 
 class Cisco::Spark::RoomOs
     include ::Orchestrator::Constants
 
-    Xapi = Cisco::Spark::Xapi
+    Xapi = ::Cisco::Spark::Xapi
+    Util = ::Cisco::Spark::Util
 
     implements :ssh
     descriptive_name 'Cisco Spark Room Device'
@@ -78,7 +81,7 @@ class Cisco::Spark::RoomOs
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
-        response = JSON.parse data, object_class: CaseInsensitiveHash
+        response = JSON.parse data, object_class: Util::CaseInsensitiveHash
 
         if block_given?
             # Let any pending command response handlers have first pass...
@@ -314,7 +317,7 @@ class Cisco::Spark::RoomOs
     end
 
     def subscriptions
-        @subscriptions ||= FeedbackTrie.new
+        @subscriptions ||= Util::FeedbackTrie.new
     end
 
     def register_control_system
@@ -341,87 +344,5 @@ class Cisco::Spark::RoomOs
         else
             'Unknown'
         end
-    end
-end
-
-
-class CaseInsensitiveHash < ActiveSupport::HashWithIndifferentAccess
-    def [](key)
-        super convert_key(key)
-    end
-
-    protected
-
-    def convert_key(key)
-        super(key.try(:downcase) || key)
-    end
-end
-
-
-class Cisco::Spark::RoomOs::FeedbackTrie < CaseInsensitiveHash
-    # Insert a response handler block to be notified of updates effecting the
-    # specified feedback path.
-    def insert(path, &handler)
-        node = tokenize(path).reduce(self) do |trie, token|
-            trie[token] ||= self.class.new
-        end
-
-        node << handler
-
-        self
-    end
-
-    # Nuke a subtree below the path
-    def remove(path)
-        path_components = tokenize path
-
-        if path_components.empty?
-            clear
-            handlers.clear
-        else
-            *parent_path, node_key = path_components
-            parent = parent_path.empty? ? self : dig(*parent_path)
-            parent&.delete node_key
-        end
-
-        self
-    end
-
-    def contains?(path)
-        !dig(*tokenize(path)).nil?
-    end
-
-    # Propogate a response throughout the trie
-    def notify(response)
-        response.try(:each) do |key, value|
-            node = self[key]
-            next unless node
-            node.dispatch value
-            node.notify value
-        end
-    end
-
-    protected
-
-    # Append a rx handler block to this node.
-    def <<(blk)
-        handlers << blk
-    end
-
-    # Dispatch to all handlers registered on this node.
-    def dispatch(value)
-        handlers.each { |handler| handler.call value }
-    end
-
-    def tokenize(path)
-        if path.is_a? Array
-            path
-        else
-            path.split(/[\s\/\\]/).reject(&:empty?)
-        end
-    end
-
-    def handlers
-        @handlers ||= []
     end
 end
