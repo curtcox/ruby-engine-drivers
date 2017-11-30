@@ -34,17 +34,16 @@ class Cisco::Spark::RoomOs
     clear_queue_on_disconnect!
 
     def on_load
-        on_update
+        load_settings
     end
 
     def on_unload; end
 
     def on_update
-        load_setting :peripheral_id, default: SecureRandom.uuid, persist: true
-        load_setting :version, default: version
+        load_settings
 
         # Force a reconnect and event resubscribe following module updates.
-        disconnect if self[:connected]
+        disconnect
     end
 
     def connected
@@ -327,14 +326,15 @@ class Cisco::Spark::RoomOs
                       Timeout: timeout
     end
 
-    def version
-        "#{self.class.name}-#{Util::Git.hash __dir__}"
-    end
-
     # Load a setting into a status variable of the same name.
     def load_setting(name, default:, persist: false)
         value = setting(name)
         define_setting(name, default) if value.nil? && persist
         self[name] = value || default
+    end
+
+    def load_settings
+        load_setting :peripheral_id, default: SecureRandom.uuid, persist: true
+        load_setting :version, default: Util::Meta.version(self)
     end
 end
