@@ -49,7 +49,7 @@ module Cisco::Spark::Xapi::Action
     # @param args [Hash] an optional hash of keyword arguments
     # @return [String]
     def xcommand(path, **args)
-        create_action :xCommand, tokenize(path), args
+        create_action :xCommand, path, args
     end
 
     # Serialize an xConfiguration action into a transmittable command.
@@ -59,7 +59,7 @@ module Cisco::Spark::Xapi::Action
     # @param value the configuration value to apply
     # @return [String]
     def xconfiguration(path, setting, value)
-        create_action :xConfiguration, tokenize(path), setting => value
+        create_action :xConfiguration, path, setting => value
     end
 
     # Serialize an xStatus request into transmittable command.
@@ -67,7 +67,7 @@ module Cisco::Spark::Xapi::Action
     # @param path [String, Array<String>] status path
     # @return [String]
     def xstatus(path)
-        create_action :xStatus, tokenize(path)
+        create_action :xStatus, path
     end
 
     # Serialize a xFeedback subscription request.
@@ -81,11 +81,13 @@ module Cisco::Spark::Xapi::Action
                   "Invalid feedback action. Must be one of #{FEEDBACK_ACTION}."
         end
 
-        create_action :xFeedback, action, "/#{tokenize(path).join '/'}"
+        xpath = tokenize path if path.is_a? String
+
+        create_action :xFeedback, action, "/#{xpath.join '/'}"
     end
 
     def tokenize(path)
         # Allow space or slash seperated paths
-        path&.split(/[\s\/\\]/)&.reject(&:empty?) || path
+        path.split(/[\s\/\\]/).reject(&:empty?)
     end
 end
