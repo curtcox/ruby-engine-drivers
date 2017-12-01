@@ -20,15 +20,18 @@ class IBM::Domino
         @domino_api = UV::HttpEndpoint.new(@domain, {inactivity_timeout: 25000})
     end
 
-    def domino_request(request_method, endpoint, data = nil, query = {}, headers = {})
+    def domino_request(request_method, endpoint, data = nil, query = {}, headers = {}, full_path = nil)
         # Convert our request method to a symbol and our data to a JSON string
         request_method = request_method.to_sym
         data = data.to_json if !data.nil? && data.class != String
 
         @headers.merge(headers) if headers      
         
-        if request_method == :post
-
+        if full_path
+            uri = URI.parse(full_path)
+            domino_api = UV::HttpEndpoint.new("http://#{uri.host}", {inactivity_timeout: 25000})
+            domino_path = uri.to_s
+        elsif request_method == :post
             domino_api = UV::HttpEndpoint.new(ENV['DOMINO_CREATE_DOMAIN'], {inactivity_timeout: 25000})
             domino_path = "#{ENV['DOMINO_CREATE_DOMAIN']}#{endpoint}"
         else
@@ -162,7 +165,7 @@ class IBM::Domino
         })
 
 
-        request = domino_request('post', "/#{database}/api/calendar/events", {events: [event]}).value
+        request = domino_request('post', nil, {events: [event]}, nil, nil, database).value
         request
     end
 
