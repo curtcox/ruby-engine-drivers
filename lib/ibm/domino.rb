@@ -28,8 +28,8 @@ class IBM::Domino
         @headers.merge(headers) if headers      
         
         if full_path
-            uri = URI.parse(full_path)
-            domino_api = UV::HttpEndpoint.new("http://#{uri.host}", {inactivity_timeout: 25000})
+            uri = URI.parse(full_path + '/api/calendar/events')
+            domino_api = UV::HttpEndpoint.new("https://#{uri.host}", {inactivity_timeout: 25000})
             domino_path = uri.to_s
         elsif request_method == :post
             domino_api = UV::HttpEndpoint.new(ENV['DOMINO_CREATE_DOMAIN'], {inactivity_timeout: 25000})
