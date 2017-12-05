@@ -89,7 +89,7 @@ class IBM::Domino
 
         # Go through the returned bookings and add to output array
         rooms_bookings = []
-        bookings = JSON.parse(response.body)['viewentry']
+        bookings = JSON.parse(response.body)['viewentry'] || []
         bookings.each{ |booking|
             domino_room_name = booking['entrydata'][2]['text']['0'].split('/')[0]
             if room_name == domino_room_name
