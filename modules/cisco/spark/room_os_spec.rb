@@ -179,7 +179,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs',
             }
         JSON
     )
-    expect(status[:configuration].dig(:audio, :input, :microphone, 1, :mode, :value)).to eq 'On'
+    expect(status[:configuration].dig(:audio, :input, :microphone, 1, :mode)).to be true
 
     # -------------------------------------------------------------------------
     section 'Base comms (protected methods - ignore the access warnings)'
@@ -483,5 +483,5 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs',
                 }
             JSON
         )
-    expect(result.dig('SystemTime', 'Value')).to eq '2017-11-27T15:14:25+1000'
+    expect(result['SystemTime']).to eq '2017-11-27T15:14:25+1000'
 end

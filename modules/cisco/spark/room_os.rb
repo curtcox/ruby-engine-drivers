@@ -70,7 +70,7 @@ class Cisco::Spark::RoomOs
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
-        response = JSON.parse data, object_class: CaseInsensitiveHash
+        response = Response.parse data, into: CaseInsensitiveHash
 
         if block_given?
             # Let any pending command response handlers have first pass...
@@ -83,7 +83,7 @@ class Cisco::Spark::RoomOs
             subscriptions.notify response
             :ignore
         end
-    rescue JSON::ParserError => error
+    rescue Response::ParserError => error
         case data.strip
         when 'OK'
             :success
@@ -156,8 +156,7 @@ class Cisco::Spark::RoomOs
                 if result['status'] == 'OK'
                     :success
                 else
-                    reason = result.dig 'Reason', 'Value'
-                    logger.error reason if reason
+                    logger.error result['Reason']
                     :abort
                 end
             else
@@ -175,9 +174,7 @@ class Cisco::Spark::RoomOs
             result = response.dig 'CommandResponse', 'Configuration'
 
             if result&.[]('status') == 'Error'
-                reason = result.dig 'Reason', 'Value'
-                xpath = result.dig 'XPath', 'Value'
-                logger.error "#{reason} (#{xpath})" if reason
+                logger.error "#{result['Reason']} (#{result['XPath']})"
                 :abort
             else
                 :success
@@ -221,16 +218,14 @@ class Cisco::Spark::RoomOs
         do_send request, name: "? #{path}" do |response|
             path_components = Action.tokenize path
             status_response = response.dig 'Status', *path_components
-            error_result = response.dig 'CommandResponse', 'Status'
 
             if status_response
                 yield status_response if block_given?
                 defer.resolve status_response
                 :success
             else
-                reason = error_result&.dig 'Reason', 'Value'
-                xpath = error_result&.dig 'XPath', 'Value'
-                logger.error "#{reason} (#{xpath})" if reason
+                error = response.dig 'CommandResponse', 'Status'
+                logger.error "#{error['Reason']} (#{error['XPath']})"
                 defer.reject
                 :abort
             end
