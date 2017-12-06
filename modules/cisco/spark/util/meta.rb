@@ -2,6 +2,10 @@
 
 require_relative 'git'
 
+module Cisco; end
+module Cisco::Spark; end
+module Cisco::Spark::Util; end
+
 module Cisco::Spark::Util::Meta
     module_function
 

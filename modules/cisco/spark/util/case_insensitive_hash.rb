@@ -2,6 +2,10 @@
 
 require 'active_support/core_ext/hash/indifferent_access'
 
+module Cisco; end
+module Cisco::Spark; end
+module Cisco::Spark::Util; end
+
 class Cisco::Spark::Util::CaseInsensitiveHash < \
         ActiveSupport::HashWithIndifferentAccess
     def [](key)

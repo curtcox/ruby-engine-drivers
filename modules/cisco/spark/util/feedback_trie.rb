@@ -2,6 +2,10 @@
 
 require_relative 'case_insensitive_hash'
 
+module Cisco; end
+module Cisco::Spark; end
+module Cisco::Spark::Util; end
+
 class Cisco::Spark::Util::FeedbackTrie < Cisco::Spark::Util::CaseInsensitiveHash
     # Insert a response handler block to be notified of updates effecting the
     # specified feedback path.

@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+module Cisco; end
+module Cisco::Spark; end
+module Cisco::Spark::Util; end
+
 module Cisco::Spark::Util::Git
     module_function
 

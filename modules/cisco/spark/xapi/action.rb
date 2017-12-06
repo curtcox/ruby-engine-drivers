@@ -2,6 +2,10 @@
 
 require 'set'
 
+module Cisco; end
+module Cisco::Spark; end
+module Cisco::Spark::Xapi; end
+
 # Pure utility methods for building Cisco xAPI actions.
 module Cisco::Spark::Xapi::Action
     ACTION_TYPE ||= Set.new [
