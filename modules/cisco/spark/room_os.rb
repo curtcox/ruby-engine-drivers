@@ -3,18 +3,15 @@
 require 'json'
 require 'securerandom'
 
+Dir[File.join(__dir__, '{xapi,util}', '*.rb')].each { |lib| load lib }
+
 module Cisco; end
 module Cisco::Spark; end
 
-module Cisco::Spark::Xapi; end
-module Cisco::Spark::Util; end
-Dir[File.join(__dir__, '{xapi,util}', '*.rb')].each { |lib| load lib }
-
 class Cisco::Spark::RoomOs
     include ::Orchestrator::Constants
-
-    Xapi = ::Cisco::Spark::Xapi
-    Util = ::Cisco::Spark::Util
+    include ::Cisco::Spark::Xapi
+    include ::Cisco::Spark::Util
 
     implements :ssh
     descriptive_name 'Cisco Spark Room Device'
@@ -29,8 +26,8 @@ class Cisco::Spark::RoomOs
         (i.e. SX80, Spark Room Kit etc).
     DESC
 
-    tokenize delimiter: Xapi::Tokens::COMMAND_RESPONSE,
-             wait_ready: Xapi::Tokens::LOGIN_COMPLETE
+    tokenize delimiter: Tokens::COMMAND_RESPONSE,
+             wait_ready: Tokens::LOGIN_COMPLETE
     clear_queue_on_disconnect!
 
 
@@ -73,7 +70,7 @@ class Cisco::Spark::RoomOs
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
-        response = JSON.parse data, object_class: Util::CaseInsensitiveHash
+        response = JSON.parse data, object_class: CaseInsensitiveHash
 
         if block_given?
             # Let any pending command response handlers have first pass...
@@ -139,7 +136,7 @@ class Cisco::Spark::RoomOs
     # Perform the actual command execution - this allows device implementations
     # to protect access to #xcommand and still refer the gruntwork here.
     def send_xcommand(command, args = {})
-        request = Xapi::Action.xcommand command, args
+        request = Action.xcommand command, args
 
         do_send request, name: command do |response|
             # The result keys are a little odd: they're a concatenation of the
@@ -172,7 +169,7 @@ class Cisco::Spark::RoomOs
 
     # Apply a single configuration on the device.
     def send_xconfiguration(path, setting, value)
-        request = Xapi::Action.xconfiguration path, setting, value
+        request = Action.xconfiguration path, setting, value
 
         do_send request, name: "#{path} #{setting}" do |response|
             result = response.dig 'CommandResponse', 'Configuration'
@@ -217,12 +214,12 @@ class Cisco::Spark::RoomOs
     #   a pre-parsed response object for the command, if used this block
     #   should return the response result
     def send_xstatus(path)
-        request = Xapi::Action.xstatus path
+        request = Action.xstatus path
 
         defer = thread.defer
 
         do_send request, name: "? #{path}" do |response|
-            path_components = Xapi::Action.tokenize path
+            path_components = Action.tokenize path
             status_response = response.dig 'Status', *path_components
             error_result = response.dig 'CommandResponse', 'Status'
 
@@ -254,7 +251,7 @@ class Cisco::Spark::RoomOs
         logger.debug { "Subscribing to device feedback for #{path}" }
 
         unless subscriptions.contains? path
-            request = Xapi::Action.xfeedback :register, path
+            request = Action.xfeedback :register, path
             # Always returns an empty response, nothing special to handle
             result = do_send request
         end
@@ -269,7 +266,7 @@ class Cisco::Spark::RoomOs
 
         subscriptions.remove path
 
-        request = Xapi::Action.xfeedback :deregister, path
+        request = Action.xfeedback :deregister, path
         do_send request
     end
 
@@ -278,7 +275,7 @@ class Cisco::Spark::RoomOs
     end
 
     def subscriptions
-        @subscriptions ||= Util::FeedbackTrie.new
+        @subscriptions ||= FeedbackTrie.new
     end
 
 
@@ -342,7 +339,7 @@ class Cisco::Spark::RoomOs
 
     def load_settings
         load_setting :peripheral_id, default: SecureRandom.uuid, persist: true
-        load_setting :version, default: Util::Meta.version(self)
+        load_setting :version, default: Meta.version(self)
     end
 
     def sync_config

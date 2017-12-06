@@ -11,8 +11,8 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
         Device access requires an API user to be created on the endpoint.
     DESC
 
-    tokenize delimiter: Xapi::Tokens::COMMAND_RESPONSE,
-             wait_ready: Xapi::Tokens::LOGIN_COMPLETE
+    tokenize delimiter: Tokens::COMMAND_RESPONSE,
+             wait_ready: Tokens::LOGIN_COMPLETE
     clear_queue_on_disconnect!
 
     # Restrict access to the direct API methods to admins
