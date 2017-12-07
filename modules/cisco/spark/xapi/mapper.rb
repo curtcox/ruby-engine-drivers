@@ -45,9 +45,13 @@ module Cisco::Spark::Xapi::Mapper
 
             types = Hash[(req + opt).zip(mapping.values)]
             type_checks = types.map do |param, type|
-                if type.is_a? Class
+                case type
+                when Class
                     msg = "#{param} must be a #{type}"
                     cond = "#{param}.is_a?(#{type})"
+                when Range
+                    msg = "#{param} must be within #{type}"
+                    cond = "(#{type}).include?(#{param})"
                 else
                     msg = "#{param} must be one of #{type}"
                     cond = "#{type}.any? { |t| t.to_s.casecmp(#{param}) == 0 }"
