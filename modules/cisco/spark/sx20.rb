@@ -16,7 +16,7 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
     clear_queue_on_disconnect!
 
     # Restrict access to the direct API methods to admins
-    protect_method :xcommand, :xstatus, :xfeedback
+    protect_method :xcommand, :xconfigruation, :xstatus
 
 
     command 'Call Accept' => :accept,
