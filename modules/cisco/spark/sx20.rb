@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-load File.expand_path('./room_os.rb', File.dirname(__FILE__))
+load File.join(__dir__, 'room_os.rb')
 
 class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
     include ::Orchestrator::Security
@@ -15,29 +15,25 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
              wait_ready: Tokens::LOGIN_COMPLETE
     clear_queue_on_disconnect!
 
-    # Restrict access to the direct API methods to admins
     protect_method :xcommand, :xconfigruation, :xstatus
 
-
-    state '/Status/Standby/State' => :standby
-
+    command 'Audio Microphones Mute' => :mic_mute_on
+    command 'Audio Microphones Unmute' => :mic_mute_off
+    command 'Audio Microphones ToggleMute' => :mic_mute_toggle
     state '/Status/Audio/Microphones/Mute' => :mic_mute
 
-    command 'Call Accept' => :accept,
-            CallId_: Integer
+    command 'Audio Sound Play' => :play_sound,
+            Sound: [:Alert, :Bump, :Busy, :CallDisconnect, :CallInitiate, :CallWaiting,
+                    :Dial, :KeyInput, :KeyInputDelete, :KeyTone, :Nav, :NavBack,
+                    :Notification, :OK, :PresentationConnect, :Ringing, :SignIn,
+                    :SpecialInfo, :TelephoneCall, :VideoCall, :VolumeAdjust, :WakeUp],
+            Loop_: [:Off, :On]
+    command 'Audio Sound Stop' => :stop_sound
 
-    CAMERA_MOVE_DIRECTION = [
-        :Left,
-        :Right,
-        :Up,
-        :Down,
-        :ZoomIn,
-        :ZoomOut
-    ].freeze
-    command 'Call FarEndCameraControl Move' => :far_end_camera,
-            Value: CAMERA_MOVE_DIRECTION,
-            CallId_: Integer
+    command 'Standby Deactivate' => :wake_up
+    command 'Standby Activate' => :standby
+    command 'Standby ResetTimer' => :reset_standby_timer, Delay: (1..480)
+    state '/Status/Standby/State' => :standby
 
-    # configuration! 'Network/n/VLAN/Voice' => :set_voice_vlan,
-    #                Mode: [:Auto, :Manual, :Off]
+    command! 'SystemUnit Boot' => :reboot, Action_: [:Restart, :Shutdown]
 end
