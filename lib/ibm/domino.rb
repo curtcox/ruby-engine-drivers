@@ -188,7 +188,7 @@ class IBM::Domino
     end
 
 
-    def     (id, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def edit_booking(id, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         starting, ending = convert_to_datetime(starting, ending)       
         event = {
             :summary => summary,
