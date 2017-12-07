@@ -48,8 +48,8 @@ module Cisco::Spark::Xapi::Action
     # @param path [String, Array<String>] command path
     # @param args [Hash] an optional hash of keyword arguments
     # @return [String]
-    def xcommand(path, **args)
-        create_action :xCommand, path, args
+    def xcommand(path, args)
+        create_action :xCommand, path, **args
     end
 
     # Serialize an xConfiguration action into a transmittable command.

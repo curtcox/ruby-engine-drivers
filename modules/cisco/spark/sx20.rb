@@ -20,7 +20,7 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
 
 
     command 'Call Accept' => :accept,
-            _CallId: Integer
+            CallId_: Integer
 
     CAMERA_MOVE_DIRECTION = [
         :Left,
@@ -32,7 +32,7 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
     ].freeze
     command 'Call FarEndCameraControl Move' => :far_end_camera,
             Value: CAMERA_MOVE_DIRECTION,
-            _CallId: Integer
+            CallId_: Integer
 
     # configuration! 'Network/n/VLAN/Voice' => :set_voice_vlan,
     #                Mode: [:Auto, :Manual, :Off]
