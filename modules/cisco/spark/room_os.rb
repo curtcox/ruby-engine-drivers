@@ -58,7 +58,7 @@ class Cisco::Spark::RoomOs
     end
 
     def disconnected
-        clear_subscriptions
+        clear_device_subscriptions
 
         schedule.clear
     end
@@ -77,10 +77,10 @@ class Cisco::Spark::RoomOs
             yield(response).tap do |command_result|
                 # Otherwise support interleaved async events
                 unhandled = [:ignore, nil].include? command_result
-                subscriptions.notify response if unhandled
+                device_subscriptions.notify response if unhandled
             end
         else
-            subscriptions.notify response
+            device_subscriptions.notify response
             :ignore
         end
     rescue Response::ParserError => error
@@ -242,35 +242,35 @@ class Cisco::Spark::RoomOs
     #
     # @param path [String, Array<String>] the xPath to subscribe to updates for
     # @param update_handler [Proc] a callback to receive updates for the path
-    def subscribe(path, &update_handler)
+    def register_feedback(path, &update_handler)
         logger.debug { "Subscribing to device feedback for #{path}" }
 
-        unless subscriptions.contains? path
+        unless device_subscriptions.contains? path
             request = Action.xfeedback :register, path
             # Always returns an empty response, nothing special to handle
             result = do_send request
         end
 
-        subscriptions.insert path, &update_handler
+        device_subscriptions.insert path, &update_handler
 
         result || thread.defer.resolve(:success)
     end
 
-    def unsubscribe(path)
+    def unregister_feedback(path)
         logger.debug { "Unsubscribing feedback for #{path}" }
 
-        subscriptions.remove path
+        device_subscriptions.remove path
 
         request = Action.xfeedback :deregister, path
         do_send request
     end
 
-    def clear_subscriptions
-        unsubscribe '/'
+    def clear_device_subscriptions
+        unregister_feedback '/'
     end
 
-    def subscriptions
-        @subscriptions ||= FeedbackTrie.new
+    def device_subscriptions
+        @device_subscriptions ||= FeedbackTrie.new
     end
 
 
@@ -338,7 +338,7 @@ class Cisco::Spark::RoomOs
     end
 
     def sync_config
-        subscribe '/Configuration' do |configuration|
+        register_feedback '/Configuration' do |configuration|
             self[:configuration] = configuration
         end
 

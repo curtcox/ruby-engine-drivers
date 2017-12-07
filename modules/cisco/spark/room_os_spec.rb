@@ -232,7 +232,7 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs',
     expect(result).to be :success
 
     # Device event subscription
-    exec(:subscribe, '/Status/Audio/Microphones/Mute')
+    exec(:register_feedback, '/Status/Audio/Microphones/Mute')
         .should_send("xFeedback register /Status/Audio/Microphones/Mute | resultId=\"#{id_peek}\"\n")
         .responds(
             <<~JSON
