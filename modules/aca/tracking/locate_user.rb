@@ -21,36 +21,13 @@ class Aca::Tracking::LocateUser
     def on_update
     end
 
-    def lookup(ip, login, domain = nil)
-        # prevents concurrent and repeat lookups for the one IP and user
-        return if self[ip] == login || @looking_up[ip]
-        begin
-            @looking_up[ip] = true
-            logger.debug { "Looking up #{ip} for #{domain}\\#{login}" }
-
-            mac = Aca::Tracking::SwitchPort.find_by_device_ip(ip)&.mac_address
-
-            if mac && self[mac] != login
-                logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
-
-                user = ::Aca::Tracking::UserDevices.for_user(login, domain)
-                user.add(mac)
-
-                self[mac] = login
-                self[ip] = login
-            else
-                logger.debug {
-                    if mac
-                        "MAC #{mac} known for #{ip} : #{login}"
-                    else
-                        "unable to locate MAC for #{ip}"
-                    end
-                }
+    def lookup(ip, login = nil, domain = nil)
+        if ip.is_a? Array
+            ip.each do |ip, login, domain|
+                perform_lookup(ip, login, domain)
             end
-        rescue => e
-            logger.print_error(e, "looking up #{ip}")
-        ensure
-            @looking_up.delete(ip)
+        else
+            perform_lookup(ip, login, domain)
         end
     end
 
@@ -81,6 +58,41 @@ class Aca::Tracking::LocateUser
 
             self[mac] = nil
             self[ip] = nil
+        ensure
+            @looking_up.delete(ip)
+        end
+    end
+
+    protected
+
+    def perform_lookup(ip, login, domain)
+        # prevents concurrent and repeat lookups for the one IP and user
+        return if self[ip] == login || @looking_up[ip]
+        begin
+            @looking_up[ip] = true
+            logger.debug { "Looking up #{ip} for #{domain}\\#{login}" }
+
+            mac = Aca::Tracking::SwitchPort.find_by_device_ip(ip)&.mac_address
+
+            if mac && self[mac] != login
+                logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
+
+                user = ::Aca::Tracking::UserDevices.for_user(login, domain)
+                user.add(mac)
+
+                self[mac] = login
+                self[ip] = login
+            else
+                logger.debug {
+                    if mac
+                        "MAC #{mac} known for #{ip} : #{login}"
+                    else
+                        "unable to locate MAC for #{ip}"
+                    end
+                }
+            end
+        rescue => e
+            logger.print_error(e, "looking up #{ip}")
         ensure
             @looking_up.delete(ip)
         end
