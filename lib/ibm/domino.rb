@@ -57,7 +57,21 @@ class IBM::Domino
         domino_emails = JSON.parse(res.body)['rooms']
     end
 
+    def get_users_bookings(database,  date=Time.now.tomorrow.midnight)
+        # Make date a date object from epoch or parsed text
+        date = convert_to_simpledate(date)
 
+        starting = to_ibm_date(date.yesterday)
+        ending = to_ibm_date(date)
+
+        query = {
+            before: ending,
+            since: starting
+        }
+
+        request = domino_request('get', nil, nil, query, nil, database).value
+        request
+    end
 
     def get_bookings(room_id, date=Time.now.tomorrow.midnight)
         room = Orchestrator::ControlSystem.find(room_id)
@@ -174,7 +188,7 @@ class IBM::Domino
     end
 
 
-    def edit_booking(id, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def     (id, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         starting, ending = convert_to_datetime(starting, ending)       
         event = {
             :summary => summary,
