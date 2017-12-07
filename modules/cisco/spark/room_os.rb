@@ -337,11 +337,15 @@ class Cisco::Spark::RoomOs
         load_setting :version, default: Meta.version(self)
     end
 
-    def sync_config
-        register_feedback '/Configuration' do |configuration|
-            self[:configuration] = configuration
+    # Bind arbitary device state to a status variable.
+    def bind_state(path, status_key)
+        register_feedback path do |value|
+            self[status_key] = value
         end
+    end
 
+    def sync_config
+        bind_state '/Configuration', :configuration
         send "xConfiguration *\n", wait: false
     end
 

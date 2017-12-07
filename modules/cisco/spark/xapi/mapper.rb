@@ -77,11 +77,39 @@ module Cisco::Spark::Xapi::Mapper
         def command!(mapping)
             protect_method command(mapping)
         end
+
+        # Define a binding between device state and module status variables.
+        #
+        # Similar to command bindings, this provides a declarative mapping
+        # from a device xpath to an exposed state variable. Subscriptions will
+        # be automatically setup as part of connection initialisation.
+        #
+        # Example:
+        #   state '/Status/Standby/State' => :standby
+        #
+        # Will track the device standby state and push it to self[:standby]
+        #
+        # @param mapping [Hash] a set of xpath => status variable bindings
+        def state(mapping)
+            state_mappings.merge! mapping
+        end
+
+        def state_mappings
+            @mappings ||= {}
+        end
+    end
+
+    module ApiMapperHooks
+        def connected
+            super
+            self.class.state_mappings.each(&method(:bind_state))
+        end
     end
 
     module_function
 
-    def included(klass)
-        klass.extend ApiMapperMethods
+    def included(base)
+        base.extend ApiMapperMethods
+        base.prepend ApiMapperHooks
     end
 end

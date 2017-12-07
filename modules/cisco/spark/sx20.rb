@@ -19,6 +19,10 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
     protect_method :xcommand, :xconfigruation, :xstatus
 
 
+    state '/Status/Standby/State' => :standby
+
+    state '/Status/Audio/Microphones/Mute' => :mic_mute
+
     command 'Call Accept' => :accept,
             CallId_: Integer
 
