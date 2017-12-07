@@ -43,13 +43,13 @@ module Cisco::Spark::Xapi::Response
         end
     end
 
-    BOOLEAN = ->(val) { ['On', 'True'].include? val }
-    BOOL_OR = lambda do |term|
+    BOOLEAN ||= ->(val) { ['On', 'True'].include? val }
+    BOOL_OR ||= lambda do |term|
         sym = term.to_sym
         ->(val) { val == term ? sym : BOOLEAN[val] }
     end
 
-    PARSERS = {
+    PARSERS ||= {
         TTPAR_OnOff: BOOLEAN,
         TTPAR_OnOffAuto: BOOL_OR['Auto'],
         TTPAR_OnOffCurrent: BOOL_OR['Current'],

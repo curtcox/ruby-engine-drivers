@@ -6,13 +6,13 @@ module Cisco::Spark::Xapi; end
 
 # Regexp's for tokenizing the xAPI command and response structure.
 module Cisco::Spark::Xapi::Tokens
-    JSON = /(?<=^})|(?<=^{})[\r\n]+/
+    JSON_RESPONSE ||= /(?<=^})|(?<=^{})[\r\n]+/
 
-    INVALID_COMMAND = /(?<=^Command not recognized\.)[\r\n]+/
+    INVALID_COMMAND ||= /(?<=^Command not recognized\.)[\r\n]+/
 
-    SUCCESS = /(?<=^OK)[\r\n]+/
+    SUCCESS ||= /(?<=^OK)[\r\n]+/
 
-    COMMAND_RESPONSE = Regexp.union([JSON, INVALID_COMMAND, SUCCESS])
+    COMMAND_RESPONSE ||= Regexp.union([JSON_RESPONSE, INVALID_COMMAND, SUCCESS])
 
-    LOGIN_COMPLETE = /\*r Login successful[\r\n]+/
+    LOGIN_COMPLETE ||= /\*r Login successful[\r\n]+/
 end
