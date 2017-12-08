@@ -127,7 +127,7 @@ class Cisco::Switch::SnoopingCatalyst
         # 07-Aug-2014 17:44:47 %STP-W-PORTSTATUS: gi2: STP status Forwarding, aggregated (1)
         # 07-Aug-2014 17:45:24 %LINK-W-Down:  gi2, aggregated (2)
         if data =~ /%LINK/
-            interface = data.split(',')[0].split(/\s/)[-1].downcase
+            interface = normalise(data.split(',')[0].split(/\s/)[-1])
 
             if data =~ /Up:/
                 logger.debug { "Interface Up: #{interface}" }
@@ -185,7 +185,7 @@ class Cisco::Switch::SnoopingCatalyst
         # ------------------ --------------- ------------ ---------- ---- ----------
         # 38:c9:86:17:a2:07  192.168.1.15    166764       learned    1    gi3
         if @check_interface.present? && !entries.empty?
-            interface = entries[-1].downcase
+            interface = normalise(entries[-1])
 
             # We only want entries that are currently active
             if @check_interface.include? interface
@@ -289,5 +289,9 @@ class Cisco::Switch::SnoopingCatalyst
             @reserved_interface -= remove
             self[:reserved] = @reserved_interface.to_a
         end
+    end
+
+    def normalise(interface)
+        interface.downcase.gsub('tengigabitethernet', 'te').gsub('gigabitethernet', 'gi').gsub('fastethernet', 'fa')
     end
 end

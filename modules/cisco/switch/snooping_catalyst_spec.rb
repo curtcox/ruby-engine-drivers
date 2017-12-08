@@ -62,12 +62,13 @@ ISTATUS
 
     should_send "show ip dhcp snooping binding\n"
     transmit <<-SNOOPING
-Total number of binding: 2
+MacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface
+------------------  ---------------  ----------  -------------  ----  --------------------
+38:C9:86:17:A2:07   192.168.1.15     19868       dhcp-snooping   113   tenGigabitEthernet4/1/4
+C8:5B:76:08:F4:FA   10.151.128.150   16532       dhcp-snooping   113   GigabitEthernet3/0/43
+00:21:CC:D5:33:F4   10.151.130.1     16283       dhcp-snooping   113   GigabitEthernet3/0/43
+Total number of bindings: 3
 
-   MAC Address       IP Address    Lease (sec)     Type    VLAN Interface
------------------- --------------- ------------ ---------- ---- ----------
-38:c9:86:17:a2:07  192.168.1.15    159883       learned    1    Te4/1/4
-c4:54:44:38:e1:58  192.168.1.16    172522       learned    1    gi2
 SNOOPING
 
     # Database writes
