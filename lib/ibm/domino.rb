@@ -92,6 +92,9 @@ class IBM::Domino
             base_domain = db_uri.scheme + "://" + uri.host
             Rails.logger.info "Requesting to #{base_domain + event['href']}"
             full_event = get_attendees(base_domain + event['href'])
+            if full_event == false
+                full_event = event
+            end
             full_events.push(full_event)
         }
         full_events
@@ -266,6 +269,9 @@ class IBM::Domino
 
     def get_attendees(path)
         booking_request = domino_request('get',nil,nil,nil,nil,path).value
+        if ![200,201,204].include?(booking_response.status)
+            return false
+        end
         booking_response = JSON.parse(booking_request.body)['events'][0]
         if booking_response['attendees']
             attendees = booking_response['attendees'].dup 
