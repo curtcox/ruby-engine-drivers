@@ -277,6 +277,8 @@ class IBM::Domino
             }            
             booking_response['organizer'] = organizer
         end
+        bookings_response['start'] = Time.parse(bookings_response['start']['date']+'T'+bookings_response['start']['time']+'+0800').utc.to_i
+        bookings_response['end'] = Time.parse(bookings_response['end']['date']+'T'+bookings_response['end']['time']+'+0800').utc.to_i
         booking_response
     end
 
