@@ -88,7 +88,10 @@ class IBM::Domino
         end
         full_events = []
         events.each{|event|
-            full_event = get_attendees(database + '/api/calendar/events/' + event['id'])
+            db_uri = URI.parse(database)
+            base_domain = db_uri.scheme + "://" + uri.host
+            Rails.logger.info "Requesting to #{base_domain + event['href']}"
+            full_event = get_attendees(base_domain + event['href'])
             full_events.push(full_event)
         }
         full_events
@@ -151,8 +154,14 @@ class IBM::Domino
             :end => to_utc_date(ending)
         }
 
-        event[:description] = description if description
+        if description.nil?
+            description = ""
+        end
 
+        if room.support_url
+            description = description + "\nTo control this meeting room, click here: #{room.support_url}"
+            event[:description] = description
+        end
 
         event[:attendees] = Array(attendees).collect do |attendee|
             out_attendee = {
