@@ -94,6 +94,8 @@ class IBM::Domino
             full_event = get_attendees(base_domain + event['href'])
             if full_event == false
                 full_event = event
+                full_event['start'] = Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0800').utc.to_i
+                full_event['end'] = Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0800').utc.to_i
             end
             full_events.push(full_event)
         }
