@@ -89,7 +89,7 @@ class IBM::Domino
         full_events = []
         events.each{|event|
             db_uri = URI.parse(database)
-            base_domain = db_uri.scheme + "://" + uri.host
+            base_domain = db_uri.scheme + "://" + db_uri.host
             Rails.logger.info "Requesting to #{base_domain + event['href']}"
             full_event = get_attendees(base_domain + event['href'])
             if full_event == false
