@@ -81,7 +81,7 @@ class IBM::Domino
         end
         full_events = []
         events.each{|event|
-            full_event = get_attendees(database + '/' + event['id'])
+            full_event = get_attendees(database + '/api/calendar/events/' + event['id'])
             full_events.push(full_event)
         }
         full_events
