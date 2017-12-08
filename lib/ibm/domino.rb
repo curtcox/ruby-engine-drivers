@@ -68,8 +68,8 @@ class IBM::Domino
         # Make date a date object from epoch or parsed text
         date = convert_to_simpledate(date)
 
-        starting = to_ibm_date(date.yesterday)
-        ending = to_ibm_date(date)
+        starting = to_ibm_date(date)
+        ending = to_ibm_date(date.tomorrow)
 
         query = {
             before: ending,
