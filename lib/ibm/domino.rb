@@ -151,7 +151,15 @@ class IBM::Domino
             :end => to_utc_date(ending)
         }
 
-        event[:description] = description if description
+        if description.nil?
+            description = ""
+        end
+
+        if room.support_url
+            description = description + "\nTo control this meeting room, click here: #{room.support_url}"
+            event[:description] = description
+        end
+
 
 
         event[:attendees] = Array(attendees).collect do |attendee|
