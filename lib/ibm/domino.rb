@@ -226,8 +226,9 @@ class IBM::Domino
     end
 
 
-    def edit_booking(id, starting:, ending:, room:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
-        starting, ending = convert_to_datetime(starting, ending)       
+    def edit_booking(id, current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+        room = Orchestrator::ControlSystem.find(room_id)
+        starting, ending = convert_to_datetime(starting, ending)        
         event = {
             :summary => summary,
             :class => :public,
@@ -235,41 +236,49 @@ class IBM::Domino
             :end => to_utc_date(ending)
         }
 
-        query = {}
-
-        if description
-            event[:description] = description
-        else
-            query[:literally] = true
+        if description.nil?
+            description = ""
         end
 
+        if room.support_url
+            description = description + "\nTo control this meeting room, click here: #{room.support_url}"
+            event[:description] = description
+        end
 
         event[:attendees] = Array(attendees).collect do |attendee|
-            {
+            out_attendee = {
                 role: "req-participant",
                 status: "needs-action",
                 rsvp: true,
-                displayName: attendee[:name],
                 email: attendee[:email]
             }
+            out_attendee[:displayName] = attendee[:name] if attendee[:name]
+            out_attendee
         end
 
+        # Organizer will not change
         event[:organizer] = {
-            email: organizer[:email],
-            displayName: organizer[:name]
+            email: current_user.email
         }
-
-        # If there are attendees add the service account
         event[:attendees].push({
              "role":"chair",
              "status":"accepted",
              "rsvp":false,
-             "displayName":"OTS Test1 Project SG/SG/R&R/PwC",
-             "email":"ots.test1.project.sg@sg.pwc.com"
-        }) if attendees    
+             "email": current_user.email
+        })
 
-        request = domino_request('put', "/#{room}/api/calendar/events/#{id}", {events: [event]}, query).value
-        request.status
+        # Add the room as an attendee
+        event[:attendees].push({
+             "role":"chair",
+             "status":"accepted",
+             "rsvp":false,
+             "userType":"room",
+             "email": room.email
+        })
+
+
+        request = domino_request('put', nil, {events: [event]}, nil, nil, database + "/api/calendar/events/#{id}").value
+        request
     end
 
     def get_attendees(path)
