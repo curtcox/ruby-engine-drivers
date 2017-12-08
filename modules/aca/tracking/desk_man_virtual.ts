@@ -25,6 +25,9 @@ win.control.systems['sys-desk-tracking'] = {
         // Reserved desks that are not in use but otherwise reserved
         "building:level1:reserved": ["desk3", "desk8"],
 
+        // Number of free desks on the level
+        "building:level1:occupied_count": 6,
+
         // If connected==false, reserved_by==your/current user, user.reserve_time < global.reserve_time and user.reserve_time + unplug_time < time.now
         //   then prompt user to reserve or release desk.
         // If conflict=true then notify that your sitting at someone elses desk

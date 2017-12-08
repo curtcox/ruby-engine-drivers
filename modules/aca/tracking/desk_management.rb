@@ -8,6 +8,8 @@ require 'aca/tracking/switch_port'
 class Aca::Tracking::DeskManagement
     include ::Orchestrator::Constants
 
+
+
     descriptive_name 'ACA Desk Management'
     generic_name :DeskManagement
     implements :logic
@@ -118,16 +120,17 @@ class Aca::Tracking::DeskManagement
             buildings.each do |building, levels|
                 levels.each do |level, desks|
                     key = "#{building}:#{level}"
-                    self[key] = desks[:inuse]
-                    self["#{key}:clashes"] = desks[:clash]
-                    self["#{key}:reserved"] = desks[:reserved]
+                    self[key] = desks.inuse
+                    self["#{key}:clashes"] = desks.clash
+                    self["#{key}:reserved"] = desks.reserved
+                    self["#{key}:occupied_count"] = desks.inuse.length - desks.clash.length + desks.reserved.length
 
-                    desks[:users].each do |user|
+                    desks.users.each do |user|
                         self[user.username] = user
                         self[user.reserved_by] = user if user.clash
                     end
 
-                    desks[:reserved_users].each do |user|
+                    desks.reserved_users.each do |user|
                         self[user.reserved_by] = user
                     end
                 end
@@ -136,6 +139,8 @@ class Aca::Tracking::DeskManagement
             schedule.in('5s') { get_usage }
         }
     end
+
+    PortUsage = Struct.new(:inuse, :clash, :reserved, :users, :reserved_users)
 
     def apply_mappings(buildings, switch, mappings)
         switch_ip = switch[:ip_address]
@@ -155,20 +160,14 @@ class Aca::Tracking::DeskManagement
 
         # Build lookup structures
         b = buildings[building] ||= {}
-        port_usage = b[level] ||= {
-            inuse: [],
-            clash: [],
-            reserved: [],
-            users: [],
-            reserved_users: []
-        }
+        port_usage = b[level] ||= PortUsage.new([], [], [], [], [])
 
-        # Prevent needless hash lookups
-        inuse = port_usage[:inuse]
-        clash = port_usage[:clash]
-        reserved = port_usage[:reserved]
-        users = port_usage[:users]
-        reserved_users = port_usage[:reserved_users]
+        # Prevent needless lookups
+        inuse = port_usage.inuse
+        clash = port_usage.clash
+        reserved = port_usage.reserved
+        users = port_usage.users
+        reserved_users = port_usage.reserved_users
 
         # Map the ports to desk IDs
         interfaces.each do |port|
