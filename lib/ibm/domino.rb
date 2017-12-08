@@ -87,7 +87,7 @@ class IBM::Domino
             return nil
         end
         full_events = []
-        events.each{|event|
+        events.each{ |event|
             db_uri = URI.parse(database)
             base_domain = db_uri.scheme + "://" + db_uri.host
             Rails.logger.info "Requesting to #{base_domain + event['href']}"
@@ -97,8 +97,8 @@ class IBM::Domino
                 full_event['organizer'] = {email: 'N/A'}
                 full_event['description'] = ''
                 full_event['attendees'] = []
-                full_event['start'] = Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0800').utc.to_i
-                full_event['end'] = Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0800').utc.to_i
+                full_event['start'] = (Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0800').utc.to_i.to_s + "000").to_i
+                full_event['end'] = (Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0800').utc.to_i.to_s + "000").to_i
             end
             full_events.push(full_event)
         }
