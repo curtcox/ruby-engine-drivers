@@ -30,7 +30,7 @@ module Cisco::Spark::Xapi::Response
         case fragment
         when Hash
             value, valuespaceref = fragment.values_at(:value, :valuespaceref)
-            if value
+            if value&.is_a? String
                 valuespace = valuespaceref&.split('/')&.last&.to_sym
                 convert value, valuespace
             else
