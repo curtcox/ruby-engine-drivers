@@ -8,8 +8,6 @@ require 'aca/tracking/switch_port'
 class Aca::Tracking::DeskManagement
     include ::Orchestrator::Constants
 
-
-
     descriptive_name 'ACA Desk Management'
     generic_name :DeskManagement
     implements :logic
