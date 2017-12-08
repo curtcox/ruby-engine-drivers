@@ -25,10 +25,14 @@ class IBM::Domino
         request_method = request_method.to_sym
         data = data.to_json if !data.nil? && data.class != String
 
-        @headers.merge(headers) if headers      
+        @headers.merge(headers) if headers
         
         if full_path
-            uri = URI.parse(full_path + '/api/calendar/events')
+            if full_path.include?('/api/calendar/events')
+                uri = URI.parse(full_path)
+            else
+                uri = URI.parse(full_path + '/api/calendar/events')
+            end  
             domino_api = UV::HttpEndpoint.new("https://#{uri.host}", {inactivity_timeout: 25000})
             domino_path = uri.to_s
         elsif request_method == :post
