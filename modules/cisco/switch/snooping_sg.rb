@@ -8,12 +8,12 @@ require 'set'
 ::Orchestrator::DependencyManager.load('Aca::Tracking::SwitchPort', :model, :force)
 ::Aca::Tracking::SwitchPort.ensure_design_document!
 
-class Cisco::Switch::SnoopingIpSsh
+class Cisco::Switch::SnoopingSg
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
 
-    descriptive_name 'Cisco Switch IP Snooping over SSH'
+    descriptive_name 'Cisco SG Switch IP Snooping'
     generic_name :Snooping
 
     # Discovery Information

@@ -1,4 +1,4 @@
-Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingIpSsh' do
+Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingSg' do
     # Create some mock data
     start_id = "swport-192.168.0.1-gi2"
     mock = Aca::Tracking::SwitchPort.find_by_id(start_id) || Aca::Tracking::SwitchPort.new
