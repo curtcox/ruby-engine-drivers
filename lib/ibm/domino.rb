@@ -226,7 +226,7 @@ class IBM::Domino
     end
 
 
-    def edit_booking(id, current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def edit_booking(id:, current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         room = Orchestrator::ControlSystem.find(room_id)
         starting, ending = convert_to_datetime(starting, ending)        
         event = {
