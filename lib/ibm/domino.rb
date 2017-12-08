@@ -75,7 +75,7 @@ class IBM::Domino
 
         request = domino_request('get', nil, nil, query, nil, database).value
         if [200,201,204].include?(request.status) 
-           events = JSON.parse(booking_response.body)['events'] || []
+           events = JSON.parse(request.body)['events'] || []
         else
             return nil
         end
