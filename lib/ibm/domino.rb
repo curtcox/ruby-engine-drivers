@@ -48,7 +48,10 @@ class IBM::Domino
 
     def get_free_rooms(starting, ending)
         starting, ending = convert_to_datetime(starting, ending)        
-        starting, ending = get_time_range(starting, ending, @timezone)
+        # starting, ending = get_time_range(starting, ending, @timezone)
+
+        starting = starting.utc
+        ending = ending.utc
 
         req_params = {
             :site => ENV["DOMINO_SITE"],
