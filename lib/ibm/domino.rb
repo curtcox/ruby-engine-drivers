@@ -70,7 +70,17 @@ class IBM::Domino
         }
 
         request = domino_request('get', nil, nil, query, nil, database).value
-        request
+        if [200,201,204].include?(request.status) 
+           events = JSON.parse(booking_response.body)['events'] || []
+        else
+            return nil
+        end
+        full_events = []
+        events.each{|event|
+            full_event = get_attendees(database + '/' + event['id'])
+            full_events.push(full_event)
+        }
+        full_events
     end
 
     def get_bookings(room_id, date=Time.now.tomorrow.midnight)
@@ -234,9 +244,8 @@ class IBM::Domino
         request.status
     end
 
-    def get_attendees(booking, database)
-        path = "#{@domain}/#{database}/api/calendar/events/#{booking['id']}"
-        booking_request = @domino_api.get(path: path, headers: @headers).value
+    def get_attendees(path)
+        booking_request = domino_request('get',nil,nil,nil,nil,path).value
         booking_response = JSON.parse(booking_request.body)['events'][0]
         if booking_response['attendees']
             attendees = booking_response['attendees'].dup 
