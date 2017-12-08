@@ -97,8 +97,8 @@ class IBM::Domino
                 full_event['organizer'] = {email: 'N/A'}
                 full_event['description'] = ''
                 full_event['attendees'] = []
-                full_event['start'] = (Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0800').utc.to_i.to_s + "000").to_i
-                full_event['end'] = (Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0800').utc.to_i.to_s + "000").to_i
+                full_event['start'] = (Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0000').utc.to_i.to_s + "000").to_i
+                full_event['end'] = (Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0000').utc.to_i.to_s + "000").to_i
             end
             full_events.push(full_event)
         }
@@ -297,8 +297,8 @@ class IBM::Domino
             }            
             booking_response['organizer'] = organizer
         end
-        booking_response['start'] = (Time.parse(booking_response['start']['date']+'T'+booking_response['start']['time']+'+0800').utc.to_i.to_s + "000").to_i
-        booking_response['end'] = (Time.parse(booking_response['end']['date']+'T'+booking_response['end']['time']+'+0800').utc.to_i.to_s + "000").to_i
+        booking_response['start'] = (Time.parse(booking_response['start']['date']+'T'+booking_response['start']['time']+'+0000').utc.to_i.to_s + "000").to_i
+        booking_response['end'] = (Time.parse(booking_response['end']['date']+'T'+booking_response['end']['time']+'+0000').utc.to_i.to_s + "000").to_i
         booking_response
     end
 
