@@ -269,7 +269,7 @@ class IBM::Domino
 
     def get_attendees(path)
         booking_request = domino_request('get',nil,nil,nil,nil,path).value
-        if ![200,201,204].include?(booking_response.status)
+        if ![200,201,204].include?(booking_request.status)
             return false
         end
         booking_response = JSON.parse(booking_request.body)['events'][0]
