@@ -234,8 +234,8 @@ class IBM::Domino
         request
     end
 
-    def delete_booking(room, id)
-        request = domino_request('delete', "/#{room}/api/calendar/events/#{id}").value
+    def delete_booking(database, id)
+        request = domino_request('delete', nil, nil, nil, nil, "#{database}/api/calendar/events/#{id}").value
     end
 
 
