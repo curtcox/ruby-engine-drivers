@@ -43,6 +43,13 @@ class IBM::Domino
             domino_path = "#{ENV['DOMINO_DOMAIN']}#{endpoint}"
         end
 
+        Rails.logger.info "------------NEW DOMINO REQUEST--------------"
+        Rails.logger.info domino_path
+        Rails.logger.info query
+        Rails.logger.info data
+        Rails.logger.info @headers
+        Rails.logger.info "--------------------------------------------"
+
         response = domino_api.__send__(request_method, path: domino_path, headers: @headers, body: data, query: query)
     end
 
