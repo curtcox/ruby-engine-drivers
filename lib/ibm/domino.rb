@@ -233,7 +233,9 @@ class IBM::Domino
             :summary => summary,
             :class => :public,
             :start => to_utc_date(starting),
-            :end => to_utc_date(ending)
+            :end => to_utc_date(ending),
+            :href => "/#{database}/api/calendar/events/#{id}",
+            :id => id
         }
 
         if description.nil?
