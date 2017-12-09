@@ -239,7 +239,7 @@ class IBM::Domino
     end
 
 
-    def edit_booking(id:, current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def edit_booking(time_changed:, room_changed:, id:, current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         room = Orchestrator::ControlSystem.find(room_id)
         starting, ending = convert_to_datetime(starting, ending)        
         event = {
@@ -303,6 +303,11 @@ class IBM::Domino
         end
         booking_response = JSON.parse(booking_request.body)['events'][0]
         if booking_response['attendees']
+            booking_response['attendees'].each{|attendee|
+                if attendee.key?('userType') && attendee['userType'] == 'room'
+                    booking_response['room_email'] = attendee['email']
+                end
+            }
             attendees = booking_response['attendees'].dup 
             attendees.map!{ |attendee|
                 {
