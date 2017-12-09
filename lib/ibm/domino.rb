@@ -239,8 +239,8 @@ class IBM::Domino
     end
 
 
-    def edit_booking(time_changed:, room_changed:, id:, current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
-        room = Orchestrator::ControlSystem.find(room_id)
+    def edit_booking(time_changed:, room_changed:, id:, current_user:, starting:, ending:, database:, room_email:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+        room = Orchestrator::ControlSystem.find_by_email(room_email)
         starting, ending = convert_to_datetime(starting, ending)        
         event = {
             :summary => summary,
