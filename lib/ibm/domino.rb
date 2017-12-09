@@ -64,12 +64,18 @@ class IBM::Domino
         domino_emails = JSON.parse(res.body)['rooms']
     end
 
-    def get_users_bookings(database,  date=Time.now.tomorrow.midnight)
-        # Make date a date object from epoch or parsed text
-        date = convert_to_simpledate(date)
+    def get_users_bookings(database,  date=nil)
 
-        starting = to_ibm_date(date)
-        ending = to_ibm_date(date.tomorrow)
+        if !date.nil?
+            # Make date a date object from epoch or parsed text
+            date = convert_to_simpledate(date)
+
+            starting = to_ibm_date(date)
+            ending = to_ibm_date(date.tomorrow)
+        else
+            starting = to_ibm_date(Time.now.midnight)
+            ending = to_ibm_date((Time.now.midnight + 1.week))
+        end
 
         query = {
             before: ending,
