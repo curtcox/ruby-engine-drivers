@@ -150,13 +150,10 @@ class Cisco::Switch::SnoopingCatalyst
         entries = data.split(/\s+/)
 
         # show interfaces status
-        # gi1      1G-Copper    Full    1000  Enabled  Off  Up          Disabled On
-        # gi2      1G-Copper      --      --     --     --  Down           --     --
-        # OR
         # Port    Name               Status       Vlan       Duplex  Speed Type
         # Gi1/1                      notconnect   1            auto   auto No Gbic
         # Fa6/1                      connected    1          a-full  a-100 10/100BaseTX
-        if entries.include?('Up') || entries.include?('connected')
+        if entries.include?('connected')
             interface = entries[0].downcase
             return :success if @check_interface.include? interface
 
@@ -166,7 +163,7 @@ class Cisco::Switch::SnoopingCatalyst
             self[:interfaces] = @check_interface.to_a
             return :success
 
-        elsif entries.include?('Down') || entries.include?('notconnect')
+        elsif entries.include?('notconnect')
             interface = entries[0].downcase
             return :success unless @check_interface.include? interface
 
@@ -179,11 +176,10 @@ class Cisco::Switch::SnoopingCatalyst
 
         # We are looking for MAC to IP address mappings
         # =============================================
-        # Total number of binding: 1
-        #
-        #    MAC Address       IP Address    Lease (sec)     Type    VLAN Interface
-        # ------------------ --------------- ------------ ---------- ---- ----------
-        # 38:c9:86:17:a2:07  192.168.1.15    166764       learned    1    gi3
+        # MacAddress          IpAddress        Lease(sec)  Type           VLAN  Interface
+        # ------------------  ---------------  ----------  -------------  ----  --------------------
+        # 00:21:CC:D5:33:F4   10.151.130.1     16283       dhcp-snooping   113   GigabitEthernet3/0/43
+        # Total number of bindings: 3
         if @check_interface.present? && !entries.empty?
             interface = normalise(entries[-1])
 
@@ -292,6 +288,7 @@ class Cisco::Switch::SnoopingCatalyst
     end
 
     def normalise(interface)
+        # Port-channel == po
         interface.downcase.gsub('tengigabitethernet', 'te').gsub('gigabitethernet', 'gi').gsub('fastethernet', 'fa')
     end
 end

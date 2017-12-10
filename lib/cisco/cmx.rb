@@ -5,9 +5,10 @@ require 'uv-rays'
 
 module Cisco; end
 class Cisco::Cmx
-    def initialize(host, user, pass, use_ou = nil)
+    def initialize(host, user, pass, use_ou = nil, floor_mappings: nil)
         @host = UV::HttpEndpoint.new(host)
         @ldap = Array(use_ou)
+        @floor_mappings = floor_mappings
         @headers = {
             authorization: [user, pass]
         }
@@ -57,10 +58,10 @@ class Cisco::Cmx
             confidence: (locations[0][:confidenceFactor] / 2),
             last_seen: locations[0][:changedOn] / 1000,
             user_active: locations[0][:currentlyTracked],
-            campus: map[0],
-            building: map[1],
-            level: map[2],
-            zone: map[3],
+            campus: @floor_mappings[map[0]] || map[0],
+            building: @floor_mappings[map[1]] || map[1],
+            level: @floor_mappings[map[2]] || map[2],
+            zone: @floor_mappings[map[3]] || map[3],
             map_id: locations[0][:mapInfo][:floorRefId]
         }
     end
