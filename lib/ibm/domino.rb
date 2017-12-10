@@ -1,3 +1,4 @@
+require 'ibm/domino'
 # Reference: https://www.ibm.com/developerworks/lotus/library/ls-Domino_URL_cheat_sheet/
 
 require 'active_support/time'
