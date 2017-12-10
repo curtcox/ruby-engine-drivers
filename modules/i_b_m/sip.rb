@@ -12,10 +12,8 @@ end
 
 
 module IBM; end
-module IBM::Domino; end
 
-
-class IBM::Domino::Bookings
+class IBM::Sip
     include ::Orchestrator::Constants
 
     descriptive_name 'IBM Domino SIPs'
