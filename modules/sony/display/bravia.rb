@@ -18,17 +18,17 @@ class Sony::Display::Bravia
     # 24bytes with header however we'll ignore the footer
     tokenize indicator: "\x2A\x53", msg_length: 21
 
-    def on_load # :nodoc:
+    def on_load
         self[:volume_min] = 0
         self[:volume_max] = 100
     end
 
-    def connected # :nodoc:
+    def connected
         # Display disconnects after 30seconds of no comms
         schedule.every('20s') { poll }
     end
 
-    def disconnected # :nodoc:
+    def disconnected
         # Stop polling
         schedule.clear
     end
@@ -144,7 +144,7 @@ class Sony::Display::Bravia
         end
     end
 
-    def received(byte_str, resolve, command) # :nodoc:
+    def received(byte_str, resolve, command)
         logger.debug { "sent: #{byte_str}" }
 
         type = TYPES[byte_str[0]]
@@ -212,21 +212,21 @@ class Sony::Display::Bravia
         notify: "\x4E"
     }]
 
-    def request(command, parameter, **options) # :nodoc:
+    def request(command, parameter, **options)
         cmd = COMMANDS[command.to_sym]
         param = parameter.to_s.rjust(16, '0')
         options[:name] = cmd
         do_send(:control, cmd, param, options)
     end
 
-    def query(state, **options) # :nodoc:
+    def query(state, **options)
         cmd = COMMANDS[state.to_sym]
         param = '#' * 16
         options[:name] = :"#{state}_query"
         do_send(:enquiry, cmd, param, options)
     end
 
-    def do_send(type, command, parameter, **options) # :nodoc:
+    def do_send(type, command, parameter, **options)
         cmd_type = TYPES[type.to_sym]
         cmd = "\x2A\x53#{cmd_type}#{command}#{parameter}\n"
         send(cmd, options)
