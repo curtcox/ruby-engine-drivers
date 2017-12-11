@@ -106,6 +106,9 @@ class Ibm::Domino
             Rails.logger.info "Requesting to #{base_domain + event['href']}"
             full_event = get_attendees(base_domain + event['href'])
             if full_event == false
+                Rails.logger.info "##############################"
+                Rails.logger.info "FAILED TO GET DETAILED BOOKING"
+                Rails.logger.info "##############################"
                 full_event = event
                 full_event['organizer'] = {email: 'N/A'}
                 full_event['description'] = ''
@@ -310,9 +313,21 @@ class Ibm::Domino
             }
             attendees = booking_response['attendees'].dup 
             attendees.map!{ |attendee|
+                if attendee['status'] == 'accepted'
+                    accepted = true
+                else
+                    accepted = false
+                end
+                if attendee.key?('displayName')
+                    attendee_name = attendee['displayName']
+                else
+                    attendee_name = attendee['email']
+                end
+
                 {
                     name: attendee['displayName'],
-                    email: attendee['email']
+                    email: attendee['email'],
+                    state: attendee['status'].gsub(/-/,' ')
                 }
             }
             booking_response['attendees'] = attendees
@@ -322,7 +337,8 @@ class Ibm::Domino
             organizer = 
             {
                 name: organizer['displayName'],
-                email: organizer['email']
+                email: organizer['email'],
+                accepted: true
             }            
             booking_response['organizer'] = organizer
         end
