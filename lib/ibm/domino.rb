@@ -118,7 +118,7 @@ class Ibm::Domino
         full_events
     end
 
-    def get_bookings(room_id, date=Time.now.tomorrow.midnight)
+    def get_bookings(room_id, date=Time.now.midnight)
         room = Orchestrator::ControlSystem.find(room_id)
         room_name = room.settings['name']
 
