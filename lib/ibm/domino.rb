@@ -309,6 +309,8 @@ class Ibm::Domino
             booking_response['attendees'].each{|attendee|
                 if attendee.key?('userType') && attendee['userType'] == 'room'
                     booking_response['room_email'] = attendee['email']
+                else
+                    booking_response['room_email'] = nil
                 end
             }
             attendees = booking_response['attendees'].dup 
