@@ -71,7 +71,15 @@ class Ibm::Domino
         domino_emails = JSON.parse(res.body)['rooms']
     end
 
-    def get_users_bookings(database,  date=nil)
+    def get_users_bookings_created_today(database)
+        user_bookings = get_users_bookings(database, nil, 2)
+        user_bookings.select!{ |booking|
+            Time.now.midnight < booking['last-modified'] && Time.now.tomorrow.midnight > booking['last-modified']
+        }
+        user_bookings
+    end
+
+    def get_users_bookings(database,  date=nil, weeks=1)
 
         if !date.nil?
             # Make date a date object from epoch or parsed text
@@ -81,7 +89,7 @@ class Ibm::Domino
             ending = to_ibm_date(date.tomorrow)
         else
             starting = to_ibm_date(Time.now.midnight)
-            ending = to_ibm_date((Time.now.midnight + 1.week))
+            ending = to_ibm_date((Time.now.midnight + weeks.week))
         end
 
         query = {
