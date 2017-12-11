@@ -17,16 +17,17 @@ win.control.systems['sys-desk-tracking'] = {
         reserve_time: 7200, // 2 hours in seconds
 
         // Desks in use
-        "building:level1": ["desk1", "desk2", "desk4", "desk5", "desk6", "desk7"],
+        "level_id": ["desk1", "desk2", "desk4", "desk5", "desk6", "desk7"],
 
         // People sitting at reserved desks when they shouldn't be
-        "building:level1:clashes": ["desk2", "desk7"],
+        "level_id:clashes": ["desk2", "desk7"],
 
         // Reserved desks that are not in use but otherwise reserved
-        "building:level1:reserved": ["desk3", "desk8"],
+        "level_id:reserved": ["desk3", "desk8"],
 
         // Number of free desks on the level
-        "building:level1:occupied_count": 6,
+        "level_id:desk_count": 30,
+        "level_id:occupied_count": 6,
 
         // If connected==false, reserved_by==your/current user, user.reserve_time < global.reserve_time and user.reserve_time + unplug_time < time.now
         //   then prompt user to reserve or release desk.
