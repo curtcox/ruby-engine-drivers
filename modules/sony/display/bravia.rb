@@ -144,44 +144,26 @@ class Sony::Display::Bravia
         end
     end
 
-    def received(byte_str, resolve, command)
-        logger.debug { "sent: #{byte_str}" }
+    def received(data, resolve, command)
+        logger.debug { "sent: #{data}" }
 
-        type = TYPES[byte_str[0]]
-        cmd = byte_str[1..4]
-        param = byte_str[5..-1]
+        type, cmd, param = parse_response(data).values_at(:type, :cmd, :param)
 
         # Request failure
         return :abort if param[0] == 'F'
 
-        # If this is a response to a control request then it must have succeeded
-        return :success if
-            type == :answer &&
-            command && TYPES[command[:data][2]] == :control
-
-        # Data request response or notify
-        cmd_type = COMMANDS[cmd]
-        case cmd_type
-        when :power, :mute, :audio_mute, :pip
-            self[cmd_type] = param.to_i == 1
-        when :volume
-            self[:volume] = param.to_i
-        when :mac_address
-            self[:mac_address] = param.split('#')[0]
-        when :input
-            input_num = param[7..11]
-            index_num = param[12..-1].to_i
-            self[:input] = if index_num == 1
-                               INPUTS[input_num]
-                           else
-                               :"#{INPUTS[input_num]}#{index_num}"
-                           end
+        case type
+        when :answer
+            if command && TYPES[command[:data][2]] == :enquiry
+                update_status cmd, param
+            end
+            :success
+        when :notify
+            update_status cmd, param
+            :ignore
+        else
+            logger.debug 'Unhandled device response'
         end
-
-        # Ignore notify as we might be expecting a response and don't want to
-        # process
-        return :ignore if type == :notify
-        :success
     end
 
 
@@ -230,5 +212,33 @@ class Sony::Display::Bravia
         cmd_type = TYPES[type.to_sym]
         cmd = "\x2A\x53#{cmd_type}#{command}#{parameter}\n"
         send(cmd, options)
+    end
+
+    def parse_response(byte_str)
+        {
+            type: TYPES[byte_str[0]],
+            cmd: COMMANDS[byte_str[1..4]],
+            param: byte_str[5..-1]
+        }
+    end
+
+    # Update module state based on device feedback
+    def update_status(cmd, param)
+        case cmd
+        when :power, :mute, :audio_mute, :pip
+            self[cmd] = param.to_i == 1
+        when :volume
+            self[:volume] = param.to_i
+        when :mac_address
+            self[:mac_address] = param.split('#')[0]
+        when :input
+            input_num = param[7..11]
+            index_num = param[12..-1].to_i
+            self[:input] = if index_num == 1
+                               INPUTS[input_num]
+                           else
+                               :"#{INPUTS[input_num]}#{index_num}"
+                           end
+        end
     end
 end
