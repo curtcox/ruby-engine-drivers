@@ -50,8 +50,8 @@ class Aca::Tracking::DeskManagement
 
     # these are helper functions for API usage
     def desk_usage(building, level)
-        (self["#{building}:#{level}"] || []) +
-        (self["#{building}:#{level}:reserved"] || [])
+        (self[level] || []) +
+        (self["#{level}:reserved"] || [])
     end
 
     def desk_details(desk_id)
@@ -97,7 +97,7 @@ class Aca::Tracking::DeskManagement
         hardware.each do |switch|
             ip = switch[:ip_address]
             num = @switch_mappings[ip].length
-            lookup = "#{switch[:building]}:#{switch[:level]}:desk_count"
+            lookup = "#{switch[:level]}:desk_count"
             current = counts[lookup] || 0
             current += num
             counts[lookup] = current
@@ -125,32 +125,29 @@ class Aca::Tracking::DeskManagement
 
         # Perform operations on the thread pool
         @caching = thread.work {
-            buildings = {}
+            level_data = {}
 
             # Find the desks in use
             all_switches.each do |switch|
-                apply_mappings(buildings, switch, mappings)
+                apply_mappings(level_data, switch, mappings)
             end
 
-            buildings
-        }.then { |buildings|
+            level_data
+        }.then { |levels|
             # Apply the settings on thread for performance reasons
-            buildings.each do |building, levels|
-                levels.each do |level, desks|
-                    key = "#{building}:#{level}"
-                    self[key] = desks.inuse
-                    self["#{key}:clashes"] = desks.clash
-                    self["#{key}:reserved"] = desks.reserved
-                    self["#{key}:occupied_count"] = desks.inuse.length - desks.clash.length + desks.reserved.length
+            levels.each do |level, desks|
+                self[level] = desks.inuse
+                self["#{level}:clashes"] = desks.clash
+                self["#{level}:reserved"] = desks.reserved
+                self["#{level}:occupied_count"] = desks.inuse.length - desks.clash.length + desks.reserved.length
 
-                    desks.users.each do |user|
-                        self[user.username] = user
-                        self[user.reserved_by] = user if user.clash
-                    end
+                desks.users.each do |user|
+                    self[user.username] = user
+                    self[user.reserved_by] = user if user.clash
+                end
 
-                    desks.reserved_users.each do |user|
-                        self[user.reserved_by] = user
-                    end
+                desks.reserved_users.each do |user|
+                    self[user.reserved_by] = user
                 end
             end
         }.finally {
@@ -160,7 +157,7 @@ class Aca::Tracking::DeskManagement
 
     PortUsage = Struct.new(:inuse, :clash, :reserved, :users, :reserved_users)
 
-    def apply_mappings(buildings, switch, mappings)
+    def apply_mappings(level_data, switch, mappings)
         switch_ip = switch[:ip_address]
         map = mappings[switch_ip]
         if map.nil?
@@ -168,17 +165,14 @@ class Aca::Tracking::DeskManagement
             return
         end
 
-        # Grab location information
-        building = switch[:building]
-        level = switch[:level]
-
         # Grab port information 
         interfaces = switch[:interfaces]
         reservations = switch[:reserved]
 
         # Build lookup structures
-        b = buildings[building] ||= {}
-        port_usage = b[level] ||= PortUsage.new([], [], [], [], [])
+        building = switch[:building]
+        level = switch[:level]
+        port_usage = level_data[level] ||= PortUsage.new([], [], [], [], [])
 
         # Prevent needless lookups
         inuse = port_usage.inuse
@@ -195,9 +189,9 @@ class Aca::Tracking::DeskManagement
 
                 # Configure desk id if not known
                 if details.desk_id != desk_id
-                    details.level = desk_id
+                    details.level = level
                     details.desk_id = desk_id
-                    details.building = desk_id
+                    details.building = building
                     ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
                         doc.dict_upsert(:level, level)
                         doc.dict_upsert(:desk_id, desk_id)
