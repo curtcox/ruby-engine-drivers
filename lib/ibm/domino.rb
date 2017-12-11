@@ -325,7 +325,7 @@ class Ibm::Domino
                 end
 
                 {
-                    name: attendee['displayName'],
+                    name: attendee_name,
                     email: attendee['email'],
                     state: attendee['status'].gsub(/-/,' ')
                 }
