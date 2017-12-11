@@ -1,3 +1,4 @@
+version: "2"
 engines:
   duplication:
     enabled: false
@@ -10,6 +11,25 @@ engines:
     enabled: true
   reek:
     enabled: true
+checks:
+  argument-count:
+    config:
+      threshold: 4
+  complex-logic:
+    config:
+      threshold: 4
+  file-lines:
+    config:
+      threshold: 300
+  method-complexity:
+    config:
+      threshold: 5
+  method-count:
+    config:
+      threshold: 40
+  method-lines:
+    config:
+      threshold: 30
 ratings:
   paths:
   - "**.rb"
