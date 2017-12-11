@@ -26,7 +26,7 @@ class Cisco::Cmx
         if user && !@ldap.empty?
             resp = nil
             @ldap.each do |ou|
-                query[:username] = "CN=#{user},#{ou}"
+                query[:username] = "CN=#{user}#{ou}"
                 resp = perform(query)
                 break if resp
             end
