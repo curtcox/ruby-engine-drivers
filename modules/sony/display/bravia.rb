@@ -1,4 +1,5 @@
-# frozen_string_literal: true, encoding: ASCII-8BIT
+# frozen_string_literal: true
+# encoding: ASCII-8BIT
 
 module Sony; end
 module Sony::Display; end
@@ -17,31 +18,31 @@ class Sony::Display::Bravia
     # 24bytes with header however we'll ignore the footer
     tokenize indicator: "\x2A\x53", msg_length: 21
 
-    def on_load # :nodoc:
+    def on_load
         self[:volume_min] = 0
         self[:volume_max] = 100
     end
 
-    def connected # :nodoc:
+    def connected
         # Display disconnects after 30seconds of no comms
         schedule.every('20s') { poll }
     end
 
-    def disconnected # :nodoc:
+    def disconnected
         # Stop polling
         schedule.clear
     end
-    
+
     # Power the display on or off
     #
-    # @param [Boolean] the desired power state
+    # @param state [Boolean] the desired power state
     def power(state, _ = nil)
         if is_affirmative?(state)
             request(:power, 1)
-            logger.debug "-- sony display requested to power on"
+            logger.debug '-- sony display requested to power on'
         else
             request(:power, 0)
-            logger.debug "-- sony display requested to power off"
+            logger.debug '-- sony display requested to power off'
         end
 
         # Request status update
@@ -55,23 +56,22 @@ class Sony::Display::Bravia
         query(:power, options)
     end
 
-    INPUTS = {
-        tv:     "00000",
-        hdmi:   "10000",
-        mirror: "50000",
-        vga:    "60000"
-    }
-    INPUTS.merge!(INPUTS.invert)
+    INPUTS = ->(hash) { hash.merge!(hash.invert).freeze } [{
+        tv:     '00000',
+        hdmi:   '10000',
+        mirror: '50000',
+        vga:    '60000'
+    }]
 
     # switch to input on display
     #
-    # @param [Symbol, String] the desired power state. i.e. hdmi2
+    # @param input [Symbol, String] the desired power state. i.e. hdmi2
     def switch_to(input)
-        type, index = input.to_s.scan /[^0-9]+|\d+/
+        type, index = input.to_s.scan(/[^0-9]+|\d+/)
         index ||= '1'
 
         inp = type.to_sym
-        raise ArgumentError, "unknown input #{input}" unless INPUTS.has_key? inp
+        raise ArgumentError, "unknown input #{input}" unless INPUTS.key? inp
 
         request(:input, "#{INPUTS[inp]}#{index.rjust(4, '0')}")
         logger.debug { "requesting to switch to: #{input}" }
@@ -86,7 +86,7 @@ class Sony::Display::Bravia
 
     # Set the picture mute state
     #
-    # @param [Boolean] the desired picture mute state
+    # @param state [Boolean] the desired picture mute state
     def mute(state = true)
         val = is_affirmative?(state) ? 1 : 0
         request(:mute, val)
@@ -104,7 +104,7 @@ class Sony::Display::Bravia
 
     # Set the audio mute state
     #
-    # @param [Boolean] the desired mute state
+    # @param state [Boolean] the desired mute state
     def mute_audio(state = true)
         val = is_affirmative?(state) ? 1 : 0
         request(:audio_mute, val)
@@ -122,7 +122,7 @@ class Sony::Display::Bravia
 
     # Set the volume to the desired level
     #
-    # @param [Integer] the desired volume level
+    # @param level [Integer] the desired volume level
     def volume(level)
         request(:volume, level.to_i)
         volume?
@@ -144,48 +144,33 @@ class Sony::Display::Bravia
         end
     end
 
-    def received(byte_str, resolve, command) # :nodoc:
-        logger.debug { "sent: #{byte_str}" }
+    def received(data, resolve, command)
+        logger.debug { "sent: #{data}" }
 
-        type = TYPES[byte_str[0]]
-        cmd = byte_str[1..4]
-        param = byte_str[5..-1]
+        type, cmd, param = parse_response(data).values_at(:type, :cmd, :param)
 
         # Request failure
         return :abort if param[0] == 'F'
 
-        # If this is a response to a control request then it must have succeeded
-        return :success if type == :answer && command && TYPES[command[:data][2]] == :control
-
-        # Data request response or notify
-        cmd_type = COMMANDS[cmd]
-        case cmd_type
-        when :power, :mute, :audio_mute, :pip
-            self[cmd_type] = param.to_i == 1
-        when :volume
-            self[:volume] = param.to_i
-        when :mac_address
-            self[:mac_address] = param.split('#')[0]
-        when :input
-            input_num = param[7..11]
-            index_num = param[12..-1].to_i
-            if index_num == 1
-                self[:input] = INPUTS[input_num]
-            else
-                self[:input] = :"#{INPUTS[input_num]}#{index_num}"
+        case type
+        when :answer
+            if command && TYPES[command[:data][2]] == :enquiry
+                update_status cmd, param
             end
+            :success
+        when :notify
+            update_status cmd, param
+            :ignore
+        else
+            logger.debug 'Unhandled device response'
         end
-
-        # Ignore notify as we might be expecting a response and don't want to process 
-        return :ignore if type == :notify
-        :success
     end
 
 
     protected
 
 
-    COMMANDS = {
+    COMMANDS = ->(hash) { hash.merge!(hash.invert).freeze } [{
         ir_code: 'IRCC',
         power: 'POWR',
         volume: 'VOLU',
@@ -200,31 +185,60 @@ class Sony::Display::Bravia
         position_pip: 'TPPP',
         broadcast_address: 'BADR',
         mac_address: 'MADR'
-    }
-    COMMANDS.merge!(COMMANDS.invert)
+    }]
 
-    TYPES = {
+    TYPES = ->(hash) { hash.merge!(hash.invert).freeze } [{
         control: "\x43",
         enquiry: "\x45",
         answer: "\x41",
         notify: "\x4E"
-    }
-    TYPES.merge! TYPES.invert
+    }]
 
-    def request(command, parameter = nil, **options) # :nodoc:
-        cmd = command.to_sym
+    def request(command, parameter, **options)
+        cmd = COMMANDS[command.to_sym]
+        param = parameter.to_s.rjust(16, '0')
         options[:name] = cmd
-        do_send(:control, COMMANDS[cmd], parameter, options)
+        do_send(:control, cmd, param, options)
     end
 
-    def query(state, **options) # :nodoc:
+    def query(state, **options)
+        cmd = COMMANDS[state.to_sym]
+        param = '#' * 16
         options[:name] = :"#{state}_query"
-        do_send(:enquiry, COMMANDS[state.to_sym], nil, options)
+        do_send(:enquiry, cmd, param, options)
     end
 
-    def do_send(type, command, parameter = nil, **options) # :nodoc:
-        param = parameter.nil? ? '################' : parameter.to_s.rjust(16, '0')
-        cmd = "\x2A\x53#{TYPES[type]}#{command}#{param}\n"
+    def do_send(type, command, parameter, **options)
+        cmd_type = TYPES[type.to_sym]
+        cmd = "\x2A\x53#{cmd_type}#{command}#{parameter}\n"
         send(cmd, options)
+    end
+
+    def parse_response(byte_str)
+        {
+            type: TYPES[byte_str[0]],
+            cmd: COMMANDS[byte_str[1..4]],
+            param: byte_str[5..-1]
+        }
+    end
+
+    # Update module state based on device feedback
+    def update_status(cmd, param)
+        case cmd
+        when :power, :mute, :audio_mute, :pip
+            self[cmd] = param.to_i == 1
+        when :volume
+            self[:volume] = param.to_i
+        when :mac_address
+            self[:mac_address] = param.split('#')[0]
+        when :input
+            input_num = param[7..11]
+            index_num = param[12..-1].to_i
+            self[:input] = if index_num == 1
+                               INPUTS[input_num]
+                           else
+                               :"#{INPUTS[input_num]}#{index_num}"
+                           end
+        end
     end
 end

@@ -44,3 +44,7 @@ LongParameterList:
 # (e.g. is_affirmative?).
 RepeatedConditional:
   enabled: false
+
+# Support private, pure functions
+UtilityFunction:
+  public_methods_only: true
