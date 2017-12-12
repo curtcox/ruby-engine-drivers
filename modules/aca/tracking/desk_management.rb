@@ -92,19 +92,24 @@ class Aca::Tracking::DeskManagement
     def subscribe_disconnect
         hardware = switches
 
-        # Grab real port count for each level
-        counts = {}
+        # Build the list of desk ids for each level
+        desk_ids = {}
         hardware.each do |switch|
             ip = switch[:ip_address]
-            num = @switch_mappings[ip].length
-            lookup = "#{switch[:level]}:desk_count"
-            current = counts[lookup] || 0
-            current += num
-            counts[lookup] = current
+            mappings = @switch_mappings[ip]
+            next unless mappings
+
+            level = switch[:level]
+            ids = desk_ids[level] || []
+            ids += mappings.values
+            desk_ids[level] = ids
         end
 
-        # Apply the count
-        counts.each { |key, value| self[key] = value }
+        # Apply the level details
+        desk_ids.each { |level, desks|
+            self["#{level}:desk_ids"] = desks
+            self["#{level}:desk_count"] = desks.length
+        }
 
         # Watch for users unplugging laptops
         sys = system
