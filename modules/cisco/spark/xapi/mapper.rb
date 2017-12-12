@@ -38,7 +38,7 @@ module Cisco::Spark::Xapi::Mapper
             opt_, req = params.partition { |name| name.ends_with? '_' }
             opt = opt_.map { |name| name.chomp '_' }
 
-            param_str = (req + opt.map { |name| "#{name} = nil" }).join ', '
+            param_str = (req + opt.map { |name| "#{name}: nil" }).join ', '
 
             # TODO: add support for index commands
             command_str = command_path.split(' ').join(' ')
