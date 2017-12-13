@@ -31,6 +31,8 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
 
+    state '/Status/Audio/Volume' => :volume
+
     command 'Call Disconnect' => :disconnect, CallId_: Integer
     command 'Dial' => :dial,
             Number:  String,
