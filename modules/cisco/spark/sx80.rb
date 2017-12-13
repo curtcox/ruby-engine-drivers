@@ -19,7 +19,6 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
 
     status 'Audio Microphones Mute' => :mic_mute
     status 'Audio Volume' => :volume
-    status 'Cameras Camera' => :camera
     status 'Cameras PresenterTrack' => :presenter_track
     status 'Cameras SpeakerTrack' => :speaker_track
     status 'Conference DoNotDisturb' => :do_not_disturb
