@@ -15,6 +15,10 @@ module Aca::Tracking
                 self[key] = val
             end
         end
+
+        def reserved?
+            (self[:unplug_time] + self[:reserve_time]) > Time.now.to_i
+        end
     end
 end
 
