@@ -278,10 +278,7 @@ class Cisco::Spark::RoomOs
     # Base comms
 
     def init_connection
-        send "Echo off\n", priority: 96 do |response|
-            :success if response.starts_with? "\e[?1034h"
-        end
-
+        send "Echo off\n", priority: 96, wait: false
         send "xPreferences OutputMode JSON\n", wait: false
     end
 
