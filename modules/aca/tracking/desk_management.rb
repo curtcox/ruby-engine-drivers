@@ -273,6 +273,8 @@ class Aca::Tracking::DeskManagement
             end
 
             nil
+        }.catch { |error|
+            logger.print_error error, 'getting desk usage'
         }.finally {
             schedule.in('5s') { get_usage }
         }
@@ -317,9 +319,7 @@ class Aca::Tracking::DeskManagement
 
                 # Configure desk id if not known
                 if details.desk_id != desk_id
-                    details.level = level
                     details.desk_id = desk_id
-                    details.building = building
                     ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
                         doc.dict_upsert(:level, level)
                         doc.dict_upsert(:desk_id, desk_id)
