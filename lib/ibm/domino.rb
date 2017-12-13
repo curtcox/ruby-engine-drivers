@@ -72,11 +72,15 @@ class Ibm::Domino
     end
 
     def get_users_bookings_created_today(database)
-        user_bookings = get_users_bookings(database, nil, 2)
+        user_bookings = get_users_bookings(database, nil, 1)
         user_bookings.select!{ |booking|
-            Time.now.midnight < booking['last-modified'] && Time.now.tomorrow.midnight > booking['last-modified']
+            booking['last-modified'] && Time.now.midnight < booking['last-modified'] && Time.now.tomorrow.midnight > booking['last-modified']
         }
         user_bookings
+        
+        rescue => e
+            STDERR.puts "#{e.message}\n#{e.backtrace.join("\n")}"
+        raise e
     end
 
     def get_users_bookings(database,  date=nil, weeks=1)
