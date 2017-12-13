@@ -23,10 +23,11 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
     state '/Status/Audio/Microphones/Mute' => :mic_mute
 
     command 'Audio Sound Play' => :play_sound,
-            Sound: [:Alert, :Bump, :Busy, :CallDisconnect, :CallInitiate, :CallWaiting,
-                    :Dial, :KeyInput, :KeyInputDelete, :KeyTone, :Nav, :NavBack,
-                    :Notification, :OK, :PresentationConnect, :Ringing, :SignIn,
-                    :SpecialInfo, :TelephoneCall, :VideoCall, :VolumeAdjust, :WakeUp],
+            Sound: [:Alert, :Bump, :Busy, :CallDisconnect, :CallInitiate,
+                    :CallWaiting, :Dial, :KeyInput, :KeyInputDelete, :KeyTone,
+                    :Nav, :NavBack, :Notification, :OK, :PresentationConnect,
+                    :Ringing, :SignIn, :SpecialInfo, :TelephoneCall,
+                    :VideoCall, :VolumeAdjust, :WakeUp],
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
 
