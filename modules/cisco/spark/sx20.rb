@@ -3,19 +3,12 @@
 load File.join(__dir__, 'room_os.rb')
 
 class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
-    include ::Orchestrator::Security
     include ::Cisco::Spark::Xapi::Mapper
 
     descriptive_name 'Cisco Spark SX20'
     description <<~DESC
         Device access requires an API user to be created on the endpoint.
     DESC
-
-    tokenize delimiter: Tokens::COMMAND_RESPONSE,
-             wait_ready: Tokens::LOGIN_COMPLETE
-    clear_queue_on_disconnect!
-
-    protect_method :xcommand, :xconfigruation, :xstatus
 
     status 'Audio Microphones Mute' => :mic_mute
     status 'Audio Volume' => :volume

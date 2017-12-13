@@ -10,6 +10,7 @@ module Cisco::Spark; end
 
 class Cisco::Spark::RoomOs
     include ::Orchestrator::Constants
+    include ::Orchestrator::Security
     include ::Cisco::Spark::Xapi
     include ::Cisco::Spark::Util
 
@@ -124,6 +125,17 @@ class Cisco::Spark::RoomOs
     # @param [::Libuv::Q::Promise] resolves with the status response as a Hash
     def xstatus(path)
         send_xstatus path
+    end
+
+    def self.extended(child)
+        child.class_eval do
+            protect_method :xcommand, :xconfigruation, :xstatus
+
+            # Workaround for issues in Orchestrator where these are not applied
+            tokenize delimiter: Tokens::COMMAND_RESPONSE,
+                     wait_ready: Tokens::LOGIN_COMPLETE
+            clear_queue_on_disconnect!
+        end
     end
 
 
