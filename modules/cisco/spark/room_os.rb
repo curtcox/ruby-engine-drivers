@@ -217,7 +217,7 @@ class Cisco::Spark::RoomOs
             path_components = Action.tokenize path
             status_response = response.dig 'Status', *path_components
 
-            if status_response
+            if !status_response.nil?
                 yield status_response if block_given?
                 defer.resolve status_response
                 :success
