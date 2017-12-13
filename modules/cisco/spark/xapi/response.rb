@@ -43,7 +43,7 @@ module Cisco::Spark::Xapi::Response
         end
     end
 
-    BOOLEAN ||= ->(val) { ['On', 'True'].include? val }
+    BOOLEAN ||= ->(val) { is_affirmative? val }
     BOOL_OR ||= lambda do |term|
         sym = term.to_sym
         ->(val) { val == term ? sym : BOOLEAN[val] }
@@ -69,12 +69,24 @@ module Cisco::Spark::Xapi::Response
             begin
                 Integer(value)
             rescue ArgumentError
-                if value =~ /\A[[:alpha:]]+\z/
+                if is_affirmative? value
+                    true
+                elsif is_negatory? value
+                    false
+                elsif value =~ /\A[[:alpha:]]+\z/
                     value.to_sym
                 else
                     value
                 end
             end
         end
+    end
+
+    def is_affirmative?(value)
+        ::Orchestrator::Constants::On_vars.include? value
+    end
+
+    def is_negatory?(value)
+        ::Orchestrator::Constants::Off_vars.include? value
     end
 end
