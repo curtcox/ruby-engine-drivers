@@ -25,9 +25,13 @@ win.control.systems['sys-desk-tracking'] = {
         // Reserved desks that are not in use but otherwise reserved
         "level_id:reserved": ["desk3", "desk8"],
 
+        // Desks that the user can click to manually check in
+        "level_id:manual_checkin": ["desk4"],
+
         // Number of free desks on the level
         "level_id:desk_count": 30,
         "level_id:occupied_count": 6,
+        "level_id:free_count": 24,
 
         // If connected==false, reserved_by==your/current user, user.reserve_time < global.reserve_time and user.reserve_time + unplug_time < time.now
         //   then prompt user to reserve or release desk.
