@@ -116,16 +116,32 @@ class Aca::Tracking::DeskManagement
         reserve_desk(0)
     end
 
-    def manual_checkin(level_id, desk_id)
+    # Assumes this will be performed by a user
+    def manual_checkin(desk_id, level_id = nil)
+        raise "desk #{desk_id} does not support manual check-in" unless @manual_desks.include?(desk_id)
+        raise "desk #{desk_id} already in use" unless @manual_usage[desk_id].nil?
+
+        # Grab user details if they are available
+        username = nil
         user = current_user
-        raise 'User not found' unless user
-        return false unless @manual_usage[desk_id].nil? && @manual_desks.include?(desk_id)
+        if user
+            # Cancel any other desk that has been reserved
+            cancel_reservation
+            username = user.__send__(@user_identifier)
+        end
 
-        cancel_reservation
+        # Find the level if this was unknown
+        if level_id.nil?
+            @manual_checkin.each do |level, desks|
+                if desks.include? desk_id
+                    level_id = level
+                    break
+                end
+            end
+        end
 
-        username = @manual_usage[desk_id] = user.__send__(@user_identifier)
         tracker = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{level_id}-#{desk_id}") || ::Aca::Tracking::SwitchPort.new
-        tracker.reserved_by = tracker.username = username
+        tracker.reserved_by = tracker.username = username if username
 
         # Reserve for the remainder of the day
         Time.zone = @timezone
@@ -135,16 +151,31 @@ class Aca::Tracking::DeskManagement
         # To set the ID correctly
         tracker.level = tracker.switch_ip = level_id
         tracker.desk_id = tracker.interface = desk_id
-
         tracker.save!
+
+        # Update the details to indicate that this is a manual desk
         details = tracker.details
         details[:level] = level_id
         details[:manual_desk] = true
         details[:clash] = false
 
-        @manual_usage[desk_id] = username
-        @manual_users << username
-        self[username] = details
+        # Configure the desk to look occupied on the map
+        if username
+            @manual_usage[desk_id] = username
+            @manual_users << username
+            self[username] = details
+        else
+            # If we don't know the user we just want the desk to look busy
+            @manual_usage[desk_id] = desk_id
+            self[desk_id] = details
+        end
+    end
+
+    # For use with other sensor systems
+    def force_checkout(desk_id)
+        username = @manual_usage[desk_id]
+        return unless username
+        manual_checkout(self[username])
     end
 
     protected
@@ -152,7 +183,7 @@ class Aca::Tracking::DeskManagement
     def manual_checkout(details)
         level = details[:level]
         desk_id = details[:desk_id]
-        username = details[:username]
+        username = details[:username] || desk_id
         
         tracker = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{level}-#{desk_id}")
         tracker&.destroy
