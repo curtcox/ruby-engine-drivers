@@ -243,6 +243,71 @@ Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs',
         )
     expect(result).to be :success
 
+    # Bind module status to device state
+    exec(:bind_feedback, '/Status/Audio/Volume', :volume)
+        .should_send("xFeedback register /Status/Audio/Volume | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+        .responds(
+            <<~JSON
+                {
+                    "Status":{
+                        "Audio":{
+                            "Volume":{
+                                "Value":"50"
+                            }
+                        }
+                    }
+                }
+            JSON
+        )
+    expect(status[:volume]).to be 50
+
+    # Bind xStatus to module state
+    exec(:bind_status, 'Standby State', :standby_state)
+        .should_send("xFeedback register /Status/Standby/State | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+        .should_send("xStatus Standby State | resultId=\"#{id_peek}\"\n")
+        .responds(
+            <<~JSON
+                {
+                    "Status":{
+                        "Standby":{
+                            "State":{
+                                "Value":"HalfWake"
+                            }
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+        .responds(
+            <<~JSON
+                {
+                    "Status":{
+                        "Standby":{
+                            "State":{
+                                "Value":"Standby"
+                            }
+                        }
+                    }
+                }
+            JSON
+        )
+    expect(status[:standby_state]).to be :Standby
+
     # -------------------------------------------------------------------------
     section 'Commands'
 
