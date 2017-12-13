@@ -62,19 +62,19 @@ module Cisco::Spark::Xapi::Response
     # @param valuespace [Symbol] the Cisco value space reference
     # @return the value as an appropriate core datatype
     def convert(value, valuespace)
-        if valuespace
-            parser = PARSERS[valuespace]
-            if parser
-                parser.call(value)
-            else
-                begin
-                    Integer(value)
-                rescue ArgumentError
+        parser = PARSERS[valuespace]
+        if parser
+            parser.call(value)
+        else
+            begin
+                Integer(value)
+            rescue ArgumentError
+                if value =~ /\A[[:alpha:]]+\z/
                     value.to_sym
+                else
+                    value
                 end
             end
-        else
-            value
         end
     end
 end
