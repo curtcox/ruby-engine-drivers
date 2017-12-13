@@ -17,10 +17,21 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
 
     protect_method :xcommand, :xconfigruation, :xstatus
 
+    status 'Audio Microphones Mute' => :mic_mute
+    status 'Audio Volume' => :volume
+    status 'RoomAnalytics PeoplePresence' => :presence_detected
+    status 'Conference DoNotDisturb' => :do_not_disturb
+    status 'Conference Presentation Mode' => :presentation
+    status 'Peripherals ConnectedDevice' => :peripherals
+    status 'SystemUnit State NumberOfActiveCalls' => :active_calls
+    status 'Video SelfView Mode' => :selfview
+    status 'Video Input' => :video_input
+    status 'Video Output' => :video_output
+    status 'Standby State' => :standby
+
     command 'Audio Microphones Mute' => :mic_mute_on
     command 'Audio Microphones Unmute' => :mic_mute_off
     command 'Audio Microphones ToggleMute' => :mic_mute_toggle
-    state '/Status/Audio/Microphones/Mute' => :mic_mute
 
     command 'Audio Sound Play' => :play_sound,
             Sound: [:Alert, :Bump, :Busy, :CallDisconnect, :CallInitiate,
@@ -31,10 +42,29 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
 
+    command 'Call Disconnect' => :hangup, CallId_: Integer
+    command 'Dial' => :dial,
+            Number:  String,
+            Protocol_: [:H320, :H323, :Sip, :Spark],
+            CallRate_: (64..6000),
+            CallType_: [:Audio, :Video]
+
+    command 'Camera PositionReset' => :camera_position_reset,
+            CameraId: (1..2),
+            Axis_: [:All, :Focus, :PanTilt, :Zoom]
+    command 'Camera Ramp' => :camera_move,
+            CameraId: (1..2),
+            Pan_: [:Left, :Right, :Stop],
+            PanSpeed_: (1..15),
+            Tilt_: [:Down, :Up, :Stop],
+            TiltSpeed_: (1..15),
+            Zoom_: [:In, :Out, :Stop],
+            ZoomSpeed_: (1..15),
+            Focus_: [:Far, :Near, :Stop]
+
     command 'Standby Deactivate' => :wake_up
     command 'Standby Activate' => :standby
     command 'Standby ResetTimer' => :reset_standby_timer, Delay: (1..480)
-    state '/Status/Standby/State' => :standby
 
     command! 'SystemUnit Boot' => :reboot, Action_: [:Restart, :Shutdown]
 end
