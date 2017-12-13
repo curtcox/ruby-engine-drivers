@@ -42,7 +42,7 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
 
-    command 'Call Disconnect' => :disconnect, CallId_: Integer
+    command 'Call Disconnect' => :hangup, CallId_: Integer
     command 'Dial' => :dial,
             Number:  String,
             Protocol_: [:H320, :H323, :Sip, :Spark],
