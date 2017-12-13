@@ -17,17 +17,17 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
 
     protect_method :xcommand, :xconfigruation, :xstatus
 
-    state '/Status/Audio/Microphones/Mute' => :mic_mute
-    state '/Status/Audio/Volume' => :volume
-    state '/Status/Cameras/Camera' => :camera
-    state '/Status/Cameras/PresenterTrack' => :presenter_track
-    state '/Status/Cameras/SpeakerTrack' => :speaker_track
-    state '/Status/Conference/DoNotDisturb' => :do_not_disturb
-    state '/Status/Conference/Presentation/Mode' => :presentation
-    state '/Status/Peripherals/ConnectedDevice' => :peripherals
-    state '/Status/Video/Input' => :video_input
-    state '/Status/Video/Output' => :video_output
-    state '/Status/Standby/State' => :standby
+    status 'Audio Microphones Mute' => :mic_mute
+    status 'Audio Volume' => :volume
+    status 'Cameras Camera' => :camera
+    status 'Cameras PresenterTrack' => :presenter_track
+    status 'Cameras SpeakerTrack' => :speaker_track
+    status 'Conference DoNotDisturb' => :do_not_disturb
+    status 'Conference Presentation Mode' => :presentation
+    status 'Peripherals ConnectedDevice' => :peripherals
+    status 'Video Input' => :video_input
+    status 'Video Output' => :video_output
+    status 'Standby State' => :standby
 
     command 'Audio Microphones Mute' => :mic_mute_on
     command 'Audio Microphones Unmute' => :mic_mute_off
