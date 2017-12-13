@@ -21,9 +21,12 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
     status 'Audio Volume' => :volume
     status 'Cameras PresenterTrack' => :presenter_track
     status 'Cameras SpeakerTrack' => :speaker_track
+    status 'RoomAnalytics PeoplePresence' => :presence_detected
     status 'Conference DoNotDisturb' => :do_not_disturb
     status 'Conference Presentation Mode' => :presentation
     status 'Peripherals ConnectedDevice' => :peripherals
+    status 'SystemUnit State NumberOfActiveCalls' => :active_calls
+    status 'Video SelfView Mode' => :selfview
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
     status 'Standby State' => :standby
