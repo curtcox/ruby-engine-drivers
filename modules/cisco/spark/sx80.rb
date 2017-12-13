@@ -17,10 +17,21 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
 
     protect_method :xcommand, :xconfigruation, :xstatus
 
+    state '/Status/Audio/Microphones/Mute' => :mic_mute
+    state '/Status/Audio/Volume' => :volume
+    state '/Status/Cameras/Camera' => :camera
+    state '/Status/Cameras/PresenterTrack' => :presenter_track
+    state '/Status/Cameras/SpeakerTrack' => :speaker_track
+    state '/Status/Conference/DoNotDisturb' => :do_not_disturb
+    state '/Status/Conference/Presentation/Mode' => :presentation
+    state '/Status/Peripherals/ConnectedDevice' => :peripherals
+    state '/Status/Video/Input' => :video_input
+    state '/Status/Video/Output' => :video_output
+    state '/Status/Standby/State' => :standby
+
     command 'Audio Microphones Mute' => :mic_mute_on
     command 'Audio Microphones Unmute' => :mic_mute_off
     command 'Audio Microphones ToggleMute' => :mic_mute_toggle
-    state '/Status/Audio/Microphones/Mute' => :mic_mute
 
     command 'Audio Sound Play' => :play_sound,
             Sound: [:Alert, :Bump, :Busy, :CallDisconnect, :CallInitiate,
@@ -30,8 +41,6 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
                     :VideoCall, :VolumeAdjust, :WakeUp],
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
-
-    state '/Status/Audio/Volume' => :volume
 
     command 'Call Disconnect' => :disconnect, CallId_: Integer
     command 'Dial' => :dial,
@@ -59,35 +68,21 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
     command! 'Cameras AutoFocus Diagnostics Stop' => \
              :autofocus_diagnostics_stop,
              CameraId_: (1..7)
-    state '/Status/Cameras/Camera' => :camera
 
     command! 'Cameras PresenterTrack ClearPosition' => :presenter_track_clear
     command! 'Cameras PresenterTrack StorePosition' => :presenter_track_store
     command! 'Cameras PresenterTrack Set' => :presenter_track,
              Mode: [:Off, :Follow, :Diagnostic, :Background, :Setup,
                     :Persistant]
-    state '/Status/Cameras/PresenterTrack' => :presenter_track
 
     command! 'Cameras SpeakerTrack Diagnostics Start' => \
              :speaker_track_diagnostics_start
     command! 'Cameras SpeakerTrack Diagnostics Stop' => \
              :speaker_track_diagnostics_stop
-    state '/Status/Cameras/SpeakerTrack' => :speaker_track
-
-    state '/Status/Conference/DoNotDisturb' => :do_not_disturb
-
-    state '/Status/Conference/Presentation/Mode' => :presentation
-
-    state '/Status/Peripherals/ConnectedDevice' => :peripherals
-
-    state '/Status/Video/Input' => :video_input
-
-    state '/Status/Video/Output' => :video_output
 
     command 'Standby Deactivate' => :wake_up
     command 'Standby Activate' => :standby
     command 'Standby ResetTimer' => :reset_standby_timer, Delay: (1..480)
-    state '/Status/Standby/State' => :standby
 
     command! 'SystemUnit Boot' => :reboot, Action_: [:Restart, :Shutdown]
 end
