@@ -346,7 +346,7 @@ class Cisco::Spark::RoomOs
 
     # Bind device status to a module status variable.
     def bind_status(path, status_key)
-        bind_feedback "/Status/#{Action.tokenize(path).join('/')}", status_key
+        bind_feedback "/Status/#{path.tr ' ', '/'}", status_key
         send_xstatus path
     end
 
