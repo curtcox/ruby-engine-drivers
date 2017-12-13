@@ -207,15 +207,13 @@ class Cisco::Spark::RoomOs
     # Query the device's current status.
     #
     # @param path [String]
-    # @yield [response]
-    #   a pre-parsed response object for the command, if used this block
-    #   should return the response result
+    # @yield [response] a pre-parsed response object for the status query
     def send_xstatus(path)
         request = Action.xstatus path
 
         defer = thread.defer
 
-        do_send request, name: "? #{path}" do |response|
+        do_send request do |response|
             path_components = Action.tokenize path
             status_response = response.dig 'Status', *path_components
 
@@ -344,7 +342,9 @@ class Cisco::Spark::RoomOs
     # Bind device status to a module status variable.
     def bind_status(path, status_key)
         bind_feedback "/Status/#{path.tr ' ', '/'}", status_key
-        send_xstatus path
+        send_xstatus path do |value|
+            self[status_key] = value
+        end
     end
 
     def sync_config
