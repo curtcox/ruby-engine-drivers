@@ -35,7 +35,7 @@ module Cisco::Spark::Xapi::Action
                   "Invalid action type. Must be one of #{ACTION_TYPE}."
         end
 
-        kwargs = kwargs.map do |name, value|
+        kwargs = kwargs.compact.map do |name, value|
             value = "\"#{value}\"" if value.is_a? String
             "#{name}: #{value}"
         end

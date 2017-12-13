@@ -66,7 +66,6 @@ module Cisco::Spark::Xapi::Mapper
                     args = binding.local_variables
                                   .map { |p| [p.to_s.camelize.to_sym, binding.local_variable_get(p)] }
                                   .to_h
-                                  .compact
                     send_xcommand '#{command_str}', args
                 end
             METHOD
