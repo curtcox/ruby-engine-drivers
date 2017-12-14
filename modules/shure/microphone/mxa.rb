@@ -124,7 +124,7 @@ class Shure::Microphone::Mxa
     end
 
     def disco(enable = true)
-        @disco = enabled
+        @disco = enable
     end
 
 
