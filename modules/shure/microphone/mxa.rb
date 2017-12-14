@@ -26,14 +26,21 @@ class Shure::Microphone::Mxw
             logger.debug '-- Polling Mics'
             do_poll
         end
+
+        query_firmware
     end
 
     def disconnected
         schedule.clear
     end
 
-    def device_id
+
+    def query_device_id
         do_send 'GET DEVICE_ID'
+    end
+
+    def query_firmware
+        'GET FW_VER'
     end
 
 
@@ -78,6 +85,8 @@ class Shure::Microphone::Mxw
             self[:preset] = resp[2].to_i
         when :DEVICE_ID
             self[:device_id] = resp[2]
+        when :FIRMWARE
+            self[:firmware] = resp[2]
         end
 
         :success
