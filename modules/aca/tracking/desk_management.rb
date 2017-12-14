@@ -101,6 +101,8 @@ class Aca::Tracking::DeskManagement
 
         username = user.__send__(@user_identifier)
         desk_details = self[username]
+
+        return unless desk_details
         return manual_checkout(desk_details) if desk_details[:manual_desk]
 
         location = desk_details[:location]
