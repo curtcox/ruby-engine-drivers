@@ -83,7 +83,7 @@ class Ibm::Domino
         raise e
     end
 
-    def get_users_bookings(database,  date=nil, weeks=1)
+    def get_users_bookings(database,  date=nil, weeks=1, simple=nil)
 
         if !date.nil?
             # Make date a date object from epoch or parsed text
@@ -113,6 +113,13 @@ class Ibm::Domino
         end
         full_events = []
         events.each{ |event|
+            if simple
+                full_events.push({
+                    start: (Time.parse(event['start']['date']+'T'+event['start']['time']+'+0000').utc.to_i.to_s + "000").to_i
+                    end: (Time.parse(event['end']['date']+'T'+event['end']['time']+'+0000').utc.to_i.to_s + "000").to_i
+                })
+                next
+            end
             db_uri = URI.parse(database)
             base_domain = db_uri.scheme + "://" + db_uri.host
             Rails.logger.info "Requesting to #{base_domain + event['href']}"
