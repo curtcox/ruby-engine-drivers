@@ -81,10 +81,21 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
     command! 'Cameras SpeakerTrack Diagnostics Stop' => \
              :speaker_track_diagnostics_stop
 
-    command 'Standby Deactivate' => :wake_up
+    command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby
     command 'Standby ResetTimer' => :reset_standby_timer, Delay: (1..480)
+    def power(state = false)
+        if is_affirmative? state
+            powerup
+        elsif is_negatory? state
+            standby
+        elsif state.to_s =~ /wake/i
+            half_wake
+        else
+            logger.error "Invalid power state: #{state}"
+        end
+    end
 
     command! 'SystemUnit Boot' => :reboot, Action_: [:Restart, :Shutdown]
 end
