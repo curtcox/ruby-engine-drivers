@@ -40,8 +40,8 @@ module Cisco::Spark::UiExtensions
     command 'UserInterface Message TextInput Clear' => :msg_text_clear
     command 'UserInterface Message TextInput Display' => :msg_text,
             Text: String,
+            FeedbackId: String,
             Title_: String,
-            FeedbackId_: String,
             Duration_: (0..3600),
             InputType_: [:SingleLine, :Numeric, :Password, :PIN],
             KeyboardState_: [:Open, :Closed],
