@@ -85,8 +85,8 @@ class Shure::Microphone::Mxa
     end
 
     def led(on = true)
-        state = on ? 'ON' : 'OFF'
-        do_send "SET DEV_LED_IN_STATE #{state}", name: :led_state
+        led_state_muted on
+        led_state_unmuted on
     end
 
     def query_led_colour_muted
@@ -142,7 +142,6 @@ class Shure::Microphone::Mxa
         when :PRESET then self[:preset] = value.to_i
         when :DEVICE_ID then self[:device_id] = value
         when :FIRMWARE then self[:firmware] = value
-        when :DEV_LED_IN_STATE then self[:led_enabled] = value == 'ON'
         when :DEV_LED_STATE_MUTED then self[:led_muted] = value == 'ON'
         when :DEV_LED_STATE_UNMUTED then self[:led_unmuted] = value == 'ON'
         when :LED_COLOR_MUTED
