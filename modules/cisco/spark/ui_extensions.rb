@@ -34,7 +34,7 @@ module Cisco::Spark::UiExtensions
                 Title: title,
                 FeedbackId: feedback_id,
                 Duration: duration
-            }.merge(Hash[('Option.1'..'Option.5').zip options])
+            }.merge(Hash[('Option.1'..'Option.5').map(&:to_sym).zip options])
     end
 
     command 'UserInterface Message TextInput Clear' => :msg_text_clear
