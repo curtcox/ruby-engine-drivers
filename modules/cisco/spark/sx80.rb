@@ -81,6 +81,16 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
     command! 'Cameras SpeakerTrack Diagnostics Stop' => \
              :speaker_track_diagnostics_stop
 
+    # The 'integrator' account can't active/deactive SpeakerTrack, but we can
+    # cut off access via a configuration setting.
+    def speaker_track(state = On)
+        if is_affirmative? state
+            send_xconfiguration 'Cameras SpeakerTrack', :Mode, :Auto
+        else
+            send_xconfiguration 'Cameras SpeakerTrack', :Mode, :Off
+        end
+    end
+
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby
