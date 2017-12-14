@@ -149,8 +149,10 @@ class Shure::Microphone::Mxa
             self[:led_colour_muted] = value.downcase.to_sym
         when :LED_COLOR_UNMUTED
             self[:led_colour_unmuted] = value.downcase.to_sym
-        when :AUTOMIX_GET_OUT_EXT_SIGNAL_SIG
-            if @disco && value == 'ON'
+        end
+
+        if @disco
+            if data =~ /AUTOMIX_GATE_OUT_EXT_SIG ON/
                 led_colour_unmuted [:RED, :GREEN, :BLUE, :PINK, :PURPLE,
                                     :YELLOW, :ORANGE, :WHITE].sample
             end
