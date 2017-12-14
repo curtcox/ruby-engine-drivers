@@ -65,10 +65,10 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
 
     command! 'Cameras AutoFocus Diagnostics Start' => \
              :autofocus_diagnostics_start,
-             CameraId_: (1..7)
+             CameraId: (1..7)
     command! 'Cameras AutoFocus Diagnostics Stop' => \
              :autofocus_diagnostics_stop,
-             CameraId_: (1..7)
+             CameraId: (1..7)
 
     command! 'Cameras PresenterTrack ClearPosition' => :presenter_track_clear
     command! 'Cameras PresenterTrack StorePosition' => :presenter_track_store
