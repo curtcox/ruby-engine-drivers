@@ -26,16 +26,16 @@ module Cisco::Spark::UiExtensions
             Duration_: (0..3600)
 
     command 'UserInterface Message Prompt Clear' => :msg_prompt_clear
-    command 'UserInterface Message Prompt Display' => :msg_prompt,
-            Text: String,
-            Title_: String,
-            FeedbackId_: String,
-            Duration_: (0..3600),
-            'Option.1' => String,
-            'Option.2' => String,
-            'Option.3' => String,
-            'Option.4' => String,
-            'Option.5' => String
+    def msg_prompt(text, options, title: nil, feedback_id: nil, duration: nil)
+        send_xcommand \
+            'UserInterface Message Prompt Display',
+            {
+                Text: text,
+                Title: title,
+                FeedbackId: feedback_id,
+                Duration: duration
+            }.merge(Hash[('Option.1'..'Option.5').zip options])
+    end
 
     command 'UserInterface Message TextInput Clear' => :msg_text_clear
     command 'UserInterface Message TextInput Display' => :msg_text,
