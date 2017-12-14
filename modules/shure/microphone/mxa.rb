@@ -163,7 +163,7 @@ class Shure::Microphone::Mxa
 
 
     def do_poll
-        get_device_id
+        query_device_id
     end
 
 
