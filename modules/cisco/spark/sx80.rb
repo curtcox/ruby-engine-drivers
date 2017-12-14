@@ -82,6 +82,7 @@ class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
              :speaker_track_diagnostics_stop
 
     command 'Standby Deactivate' => :wake_up
+    command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby
     command 'Standby ResetTimer' => :reset_standby_timer, Delay: (1..480)
 

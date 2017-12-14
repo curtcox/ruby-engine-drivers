@@ -62,6 +62,7 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
             Focus_: [:Far, :Near, :Stop]
 
     command 'Standby Deactivate' => :wake_up
+    command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby
     command 'Standby ResetTimer' => :reset_standby_timer, Delay: (1..480)
 
