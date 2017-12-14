@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Shure; end
 module Shure::Microphone; end
 
@@ -7,25 +9,21 @@ class Shure::Microphone::Mxw
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
-
-    # Discovery Information
     tcp_port 2202
     descriptive_name 'Shure Ceiling Array Microphone'
     generic_name :CeilingMic
 
     tokenize indicator: '< ', delimiter: ' >'
 
-
     def on_load
         on_update
     end
 
-    def on_update
-    end
+    def on_update; end
 
     def connected
         schedule.every('60s') do
-            logger.debug "-- Polling Mics"
+            logger.debug '-- Polling Mics'
             do_poll
         end
     end
@@ -34,9 +32,10 @@ class Shure::Microphone::Mxw
         schedule.clear
     end
 
-    def get_device_id
+    def device_id
         do_send 'GET DEVICE_ID'
     end
+
 
     # Mute commands
     def query_mute
@@ -52,6 +51,7 @@ class Shure::Microphone::Mxw
         mute false
     end
 
+
     # Preset commands
     def query_preset
         do_send 'GET PRESET'
@@ -61,11 +61,11 @@ class Shure::Microphone::Mxw
         do_send "SET PRESET #{number}", name: :preset
     end
 
+
     # flash the LED for 30 seconds
     def flash
         do_send 'SET FLASH ON'
     end
-
 
     def received(data, resolve, command)
         logger.debug { "-- received: #{data}" }
@@ -80,7 +80,7 @@ class Shure::Microphone::Mxw
             self[:device_id] = resp[2]
         end
 
-        return :success
+        :success
     end
 
 
