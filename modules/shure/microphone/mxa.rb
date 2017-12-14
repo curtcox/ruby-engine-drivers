@@ -63,7 +63,7 @@ class Shure::Microphone::Mxw
 
     # flash the LED for 30 seconds
     def flash
-        'SET FLASH ON'
+        do_send 'SET FLASH ON'
     end
 
 
