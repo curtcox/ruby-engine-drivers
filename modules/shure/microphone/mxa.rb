@@ -94,7 +94,7 @@ class Shure::Microphone::Mxa
     end
 
     def led_colour_muted(colour)
-        do_send "SET LED_COLOR_MUTED #{colour.upcase}"
+        do_send "SET LED_COLOR_MUTED #{colour}"
     end
 
     def query_led_colour_unmuted
@@ -102,7 +102,7 @@ class Shure::Microphone::Mxa
     end
 
     def led_colour_unmuted(colour)
-        do_send "SET LED_COLOR_UNMUTED #{colour.upcase}"
+        do_send "SET LED_COLOR_UNMUTED #{colour}"
     end
 
     def query_led_state_unmuted
