@@ -72,7 +72,7 @@ class Ibm::Domino
     end
 
     def get_users_bookings_created_today(database)
-        user_bookings = get_users_bookings(database, nil, 1)
+        user_bookings = get_users_bookings(database, nil, nil, 1)
         user_bookings.select!{ |booking|
             booking['last-modified'] && Time.now.midnight < booking['last-modified'] && Time.now.tomorrow.midnight > booking['last-modified']
         }
@@ -83,7 +83,7 @@ class Ibm::Domino
         raise e
     end
 
-    def get_users_bookings(database,  date=nil, weeks=1, simple=nil)
+    def get_users_bookings(database,  date=nil, simple=nil, weeks=1)
 
         if !date.nil?
             # Make date a date object from epoch or parsed text
