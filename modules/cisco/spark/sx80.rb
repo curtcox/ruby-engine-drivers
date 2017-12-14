@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 load File.join(__dir__, 'room_os.rb')
+load File.join(__dir__, 'ui_extensions.rb')
 
 class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
     include ::Cisco::Spark::Xapi::Mapper
+    include ::Cisco::Spark::UiExtensions
 
     descriptive_name 'Cisco Spark SX80'
     description <<~DESC
