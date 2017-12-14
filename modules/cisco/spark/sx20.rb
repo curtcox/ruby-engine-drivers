@@ -12,6 +12,10 @@ class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
         Device access requires an API user to be created on the endpoint.
     DESC
 
+    tokenize delimiter: Tokens::COMMAND_RESPONSE,
+             wait_ready: Tokens::LOGIN_COMPLETE
+    clear_queue_on_disconnect!
+
     status 'Audio Microphones Mute' => :mic_mute
     status 'Audio Volume' => :volume
     status 'RoomAnalytics PeoplePresence' => :presence_detected

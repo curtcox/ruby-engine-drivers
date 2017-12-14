@@ -130,11 +130,6 @@ class Cisco::Spark::RoomOs
     def self.extended(child)
         child.class_eval do
             protect_method :xcommand, :xconfigruation, :xstatus
-
-            # Workaround for issues in Orchestrator where these are not applied
-            tokenize delimiter: Tokens::COMMAND_RESPONSE,
-                     wait_ready: Tokens::LOGIN_COMPLETE
-            clear_queue_on_disconnect!
         end
     end
 
