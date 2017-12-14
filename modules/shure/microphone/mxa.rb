@@ -10,12 +10,12 @@ class Shure::Microphone::Mxw
 
     # Discovery Information
     tcp_port 2202
-    descriptive_name 'Shure Microflex Microphone'
+    descriptive_name 'Shure Ceiling Array Microphone'
     generic_name :CeilingMic
 
     tokenize indicator: '< ', delimiter: ' >'
 
-    
+
     def on_load
         on_update
     end
@@ -34,11 +34,9 @@ class Shure::Microphone::Mxw
         schedule.clear
     end
 
-
     def get_device_id
         do_send 'GET DEVICE_ID'
     end
-
 
     # Mute commands
     def query_mute
