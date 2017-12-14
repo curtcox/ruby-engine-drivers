@@ -28,7 +28,9 @@ class Aca::Tracking::DeskManagement
         on_update
 
         # Load any manual check-in data
-        @manual_checkin.each do |level|
+        @manual_checkin.each do |level, _|
+            logger.debug { "Loading manual desk check-in details for level #{level}" }
+
             query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(level)
             query.each do |detail|
                 details = detail.details
