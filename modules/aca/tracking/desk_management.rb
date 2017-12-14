@@ -128,8 +128,8 @@ class Aca::Tracking::DeskManagement
         user = current_user
         if user
             # Cancel any other desk that has been reserved
-            cancel_reservation
             username = user.__send__(@user_identifier)
+            cancel_reservation if username.present?
         end
 
         # Find the level if this was unknown
