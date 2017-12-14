@@ -26,7 +26,7 @@ win.control.systems['sys-desk-tracking'] = {
         "level_id:reserved": ["desk3", "desk8"],
 
         // Desks that the user can click to manually check in
-        "level_id:manual_checkin": ["desk4"],
+        "level_id:manual_checkin": ["desk9"],
 
         // Number of free desks on the level
         "level_id:desk_count": 30,
@@ -47,6 +47,14 @@ win.control.systems['sys-desk-tracking'] = {
             "conflict": false,        // Only true if the reservation is valid and the desk isn't owned by you
             "reserve_time": 300,      // should only ever be set to either hold_time or reserve_time
             "unplug_time": 1511307676 // unix epoch in seconds
+        },
+
+        // Accepts a desk from the "level_id:manual_checkin" array and checks the user in
+        $manual_checkin: (desk_id: string, level_id?: string) => {
+            self["level_id"] = self["level_id"].concat([desk_id]);
+            self["level_id:clashes"] = self["level_id:clashes"].concat([desk_id]);
+            self["level_id:occupied_count"] += 1;
+            self["level_id:free_count"] -= 1;
         },
 
         // Will reserve the desk that is indicated above (batch updated - up to 1min latency)
