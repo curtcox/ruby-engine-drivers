@@ -78,19 +78,82 @@ class Shure::Microphone::Mxw
         do_send 'SET FLASH ON'
     end
 
+
+    # LED Setup
+    def query_led_state
+        do_send 'GET DEV_LED_IN_STATE'
+    end
+
+    def led(on = true)
+        state = on ? 'ON' : 'OFF'
+        do_send "SET DEV_LED_IN_STATE #{state}", name: :led_state
+    end
+
+    def query_led_colour_muted
+        do_send 'GET LED_COLOR_MUTED'
+    end
+
+    def led_colour_muted(colour)
+        do_send "SET LED_COLOR_MUTED #{colour.upcase}"
+    end
+
+    def query_led_colour_unmuted
+        do_send 'GET LED_COLOR_UNMUTED'
+    end
+
+    def led_colour_unmuted(colour)
+        do_send "SET LED_COLOR_UNMUTED #{colour.upcase}"
+    end
+
+    def query_led_state_unmuted
+        do_send 'GET LED_STATE_UNMUTED'
+    end
+
+    def led_state_unmuted(on = true)
+        state = on ? 'ON' : 'OFF'
+        do_send "SET LED_STATE_UNMUTED #{state}"
+    end
+
+    def query_led_state_muted
+        do_send 'GET LED_STATE_MUTED'
+    end
+
+    def led_state_muted(on = true)
+        state = on ? 'ON' : 'OFF'
+        do_send "SET LED_STATE_MUTED #{state}"
+    end
+
+    def disco(enable = true)
+        @disco = enabled
+    end
+
+
     def received(data, resolve, command)
         logger.debug { "-- received: #{data}" }
 
         resp = data.split(' ')
-        case resp[1].to_sym
-        when :DEVICE_AUDIO_MUTE
-            self[:muted] = resp[2] == 'ON'
-        when :PRESET
-            self[:preset] = resp[2].to_i
-        when :DEVICE_ID
-            self[:device_id] = resp[2]
-        when :FIRMWARE
-            self[:firmware] = resp[2]
+        param = resp[1].to_sym
+        value = resp[2]
+
+        return :abort if param == :ERR
+
+        case param
+        when :DEVICE_AUDIO_MUTE then self[:muted] = value == 'ON'
+        when :PRESET then self[:preset] = value.to_i
+        when :DEVICE_ID then self[:device_id] = value
+        when :FIRMWARE then self[:firmware] = value
+        when :DEV_LED_IN_STATE then self[:led_enabled] = value == 'ON'
+        when :DEV_LED_STATE_MUTED then self[:led_muted] = value == 'ON'
+        when :DEV_LED_STATE_UNMUTED then self[:led_unmuted] = value == 'ON'
+        when :LED_COLOR_MUTED
+            self[:led_colour_muted] = value.downcase.to_sym
+        when :LED_COLOR_UNMUTED
+            self[:led_colour_unmuted] = value.downcase.to_sym
+        when :AUTOMIX_GET_OUT_EXT_SIGNAL_SIG
+            if @disco && value == 'ON'
+                led_colour_unmuted [:RED, :GREEN, :BLUE, :PINK, :PURPLE,
+                                    :YELLOW, :ORANGE, :WHITE].sample
+            end
         end
 
         :success
