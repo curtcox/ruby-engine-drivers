@@ -27,7 +27,7 @@ class Shure::Microphone::Mxw
             do_poll
         end
 
-        query_firmware
+        query_all
     end
 
     def disconnected
@@ -35,12 +35,16 @@ class Shure::Microphone::Mxw
     end
 
 
+    def query_all
+        do_send 'GET 0 ALL'
+    end
+
     def query_device_id
         do_send 'GET DEVICE_ID'
     end
 
     def query_firmware
-        'GET FW_VER'
+        do_send 'GET FW_VER'
     end
 
 
