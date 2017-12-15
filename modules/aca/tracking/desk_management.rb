@@ -3,7 +3,7 @@
 module Aca; end
 module Aca::Tracking; end
 
-# Manual desk tracking 
+# Manual desk tracking will use this DB structure for persistance 
 require 'aca/tracking/switch_port'
 require 'set'
 
@@ -76,12 +76,17 @@ class Aca::Tracking::DeskManagement
         subscribe_disconnect
     end
 
-    # these are helper functions for API usage
-    def desk_usage(building, level)
+    # Grab the list of desk ids in use on a floor
+    #
+    # @param level [String] the level id of the floor
+    def desk_usage(level)
         (self[level] || []) +
         (self["#{level}:reserved"] || [])
     end
 
+    # Grab the ownership details of the desk
+    #
+    # @param desk_id [String] the unique id that represents a desk
     def desk_details(desk_id)
         switch_ip, port = @desk_mappings[desk_id]
         if switch_ip
@@ -94,33 +99,51 @@ class Aca::Tracking::DeskManagement
     end
 
     # Grabs the current user from the websocket connection
-    # and if the user has a desk reserved, then they can reserve their desk
+    # If the user has a desk reserved, then they can reserve their desk
+    #
+    # @param time [Integer] the reserve time in seconds from the unplug time
+    # @return [false] if reservation successful
+    # @return [true] if reservation failed - timeout had elapsed
+    # @return [nil] if manual check-out successful
+    # @return [Integer] if there was an error
+    #   1: if the username is unknown
+    #   2: if there is no reservation to update
+    #   3: if the desk ID is unknown for this IP port
+    #   4: if reserved by someone else
     def reserve_desk(time = @desk_reserve_time)
         user = current_user
         raise 'User not found' unless user
 
         username = user.__send__(@user_identifier)
+        if username.nil?
+            logger.warn "no username defined for #{user.name} (#{user.id})"
+            return 1 # no user
+        end
         desk_details = self[username]
-
-        return unless desk_details
+        return 2 unless desk_details # no reservation to update
         return manual_checkout(desk_details) if desk_details[:manual_desk]
 
-        location = desk_details[:location]
-        return 'Desk not found. Reservation time limit exceeded.' unless location
+        location = desk_details[:desk_id]
+        return 3 unless location # desk ID unknown for this IP port
 
         switch_ip, port = @desk_mappings[location]
         reservation = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
         raise "Mapping error. Desk #{location} can't be found on the switch #{switch_ip}-#{port}" unless reservation
-        return 'Desk not found. Reservation time limit exceeded.' unless reservation.reserved_by == username
+        return 4 unless reservation.reserved_by == username # reserved by someone else
 
-        reservation.update_reservation(time)
+        # falsy values == success and truthy values == failure
+        !reservation.update_reservation(time)
     end
 
+    # Adjusts the reservation time to 0 - effectively freeing the desk
     def cancel_reservation
         reserve_desk(0)
     end
 
-    # Assumes this will be performed by a user
+    # For desks that use sensors or require users to manually reserve
+    #
+    # @param desk_id [String] the unique id that represents a desk
+    # @param level_id [String] the level id of the floor - saves processing if you have it handy
     def manual_checkin(desk_id, level_id = nil)
         raise "desk #{desk_id} does not support manual check-in" unless @manual_desks.include?(desk_id)
         raise "desk #{desk_id} already in use" unless @manual_usage[desk_id].nil?
@@ -175,7 +198,9 @@ class Aca::Tracking::DeskManagement
         end
     end
 
-    # For use with other sensor systems
+    # For use with sensor systems
+    #
+    # @param desk_id [String] the unique id that represents a desk
     def force_checkout(desk_id)
         username = @manual_usage[desk_id]
         return unless username
@@ -197,6 +222,8 @@ class Aca::Tracking::DeskManagement
         self[username] = nil
     end
 
+    # If people reserve a desk then they may forget to checkout
+    #   This cleans up manual reservations when their timeout is expired
     def cleanup_manual_checkins
         remove = []
 
@@ -210,10 +237,12 @@ class Aca::Tracking::DeskManagement
         end
     end
 
+    # Helper to return all the physical switches in a building
     def switches
         system.all(:Snooping)
     end
 
+    # Builds data structures from settings and watches switches for unplug events
     def subscribe_disconnect
         hardware = switches
 
@@ -260,6 +289,7 @@ class Aca::Tracking::DeskManagement
         end
     end
 
+    # Schedules periodic desk usage statistics gathering
     def get_usage
         # Get local vars in case they change while we are processing
         all_switches = switches.to_a
@@ -320,6 +350,7 @@ class Aca::Tracking::DeskManagement
 
     PortUsage = Struct.new(:inuse, :clash, :reserved, :users, :reserved_users, :manual)
 
+    # Performs the desk usage statistics gathering
     def apply_mappings(level_data, switch, mappings)
         switch_ip = switch[:ip_address]
         map = mappings[switch_ip]
