@@ -325,10 +325,12 @@ class Ibm::Domino
     def get_attendees(path)
         booking_request = domino_request('get',nil,nil,nil,nil,path).value
         if ![200,201,204].include?(booking_request.status)
+            Rails.logger.info "Didn't get a 20X response from meeting detail requst."
             return false
         end
         booking_response = JSON.parse(booking_request.body)['events'][0]
         if booking_response['attendees']
+            Rails.logger.info "Booking has attendees"
             booking_response['attendees'].each{|attendee|
                 if attendee.key?('userType') && attendee['userType'] == 'room'
                     booking_response['room_email'] = attendee['email']
@@ -347,6 +349,9 @@ class Ibm::Domino
                     attendee_name = attendee['displayName']
                 else
                     attendee_name = attendee['email']
+                end
+                if attendee.key?('userType') && attendee['userType'] == 'room'
+                    next
                 end
 
                 {
