@@ -2,10 +2,12 @@
 
 load File.join(__dir__, 'room_os.rb')
 load File.join(__dir__, 'ui_extensions.rb')
+load File.join(__dir__, 'external_source.rb')
 
 class Cisco::Spark::Sx80 < Cisco::Spark::RoomOs
     include ::Cisco::Spark::Xapi::Mapper
     include ::Cisco::Spark::UiExtensions
+    include ::Cisco::Spark::ExternalSource
 
     descriptive_name 'Cisco Spark SX80'
     description <<~DESC
