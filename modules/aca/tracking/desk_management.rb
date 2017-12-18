@@ -47,6 +47,12 @@ class Aca::Tracking::DeskManagement
             end
         end
 
+        # Manual checkout times don't need to be checked very often
+        cleanup_manual_checkins
+        schedule.every('10m') do
+            cleanup_manual_checkins
+        end
+
         # Should only call once
         get_usage
     end
@@ -181,7 +187,6 @@ class Aca::Tracking::DeskManagement
         tracker.level = tracker.switch_ip = level_id
         tracker.desk_id = tracker.interface = desk_id
         tracker.reserved_mac = tracker.mac_address = desk_id
-        tracker.connected = true
         tracker.save!
 
         # Update the details to indicate that this is a manual desk
@@ -345,11 +350,6 @@ class Aca::Tracking::DeskManagement
         }.finally {
             schedule.in('5s') { get_usage }
         }
-
-        cleanup_manual_checkins
-        schedule.every('10m') do
-            cleanup_manual_checkins
-        end
     end
 
     PortUsage = Struct.new(:inuse, :clash, :reserved, :users, :reserved_users, :manual)
@@ -384,6 +384,7 @@ class Aca::Tracking::DeskManagement
             desk_id = map[port]
             if desk_id
                 details = switch[port]
+                next unless details
 
                 # Configure desk id if not known
                 if details.desk_id != desk_id
