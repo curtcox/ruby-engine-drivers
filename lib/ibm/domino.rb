@@ -372,7 +372,10 @@ class Ibm::Domino
             }            
             booking_response['organizer'] = organizer
         end
-        if booking_response['start'].key?('tzid') && booking_response['start']['tzid'] == "Singapore Standard Time"
+        if !booking_response['start'].key?('time')
+            booking_response['start'] = (Time.parse(booking_response['start']['date']+'T00:00:00+0800').utc.to_i.to_s + "000").to_i
+            booking_response['end'] = (Time.parse(booking_response['end']['date']+'T00:00:00+0800').utc.to_i.to_s + "000").to_i
+        elsif booking_response['start'].key?('tzid') && booking_response['start']['tzid'] == "Singapore Standard Time"
             booking_response['start'] = (Time.parse(booking_response['start']['date']+'T'+booking_response['start']['time']+'+0800').utc.to_i.to_s + "000").to_i
             booking_response['end'] = (Time.parse(booking_response['end']['date']+'T'+booking_response['end']['time']+'+0800').utc.to_i.to_s + "000").to_i
         else
