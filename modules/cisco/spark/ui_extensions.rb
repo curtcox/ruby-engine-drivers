@@ -27,6 +27,8 @@ module Cisco::Spark::UiExtensions
 
     command 'UserInterface Message Prompt Clear' => :msg_prompt_clear
     def msg_prompt(text, options, title: nil, feedback_id: nil, duration: nil)
+        # TODO: return a promise, then prepend a async traffic monitor so it
+        # can be resolved with the response, or rejected after the timeout.
         send_xcommand \
             'UserInterface Message Prompt Display',
             {
