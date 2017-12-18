@@ -129,7 +129,7 @@ class Ibm::Domino
                 Rails.logger.info "FAILED TO GET DETAILED BOOKING"
                 Rails.logger.info "##############################"
                 full_event = event
-                full_event['organizer'] = {email: 'N/A'}
+                full_event['organizer'] = {}
                 full_event['description'] = ''
                 full_event['attendees'] = []
                 full_event['start'] = (Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0000').utc.to_i.to_s + "000").to_i
