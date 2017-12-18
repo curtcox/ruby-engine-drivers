@@ -40,7 +40,7 @@ class Aca::Tracking::DeskManagement
 
                 username = details.username
                 self[username] = details
-                @manual_usage[desk_id] = username
+                @manual_usage[detail.desk_id] = username
                 @manual_users << username
             end
         end
