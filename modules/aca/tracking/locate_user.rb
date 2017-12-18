@@ -21,12 +21,8 @@ class Aca::Tracking::LocateUser
     def on_update
     end
 
-    def lookup(ip, login = nil, domain = nil)
-        if ip.is_a? Array
-            ip.each do |ip, login, domain|
-                perform_lookup(ip, login, domain)
-            end
-        else
+    def lookup(*ips)
+        ips.each do |ip, login, domain|
             perform_lookup(ip, login, domain)
         end
     end
