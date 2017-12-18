@@ -147,9 +147,9 @@ class Ibm::Domino
         }
         full_events
         
-        rescue => e
-            STDERR.puts "#{e.message}\n#{e.backtrace.join("\n")}"
-        raise e
+    rescue => e
+            STDERR.puts "\n\n#{e.message}\n#{e.backtrace.join("\n")}\n\n"
+        raise "\n\n#{e.message}\n#{e.backtrace.join("\n")}\n\n"
     end
 
     def get_bookings(room_id, date=Time.now.midnight)
