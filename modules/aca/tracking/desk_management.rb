@@ -307,13 +307,13 @@ class Aca::Tracking::DeskManagement
         @caching = thread.work {
             level_data = {}
 
+            # Ensure all the manual only levels are included
+            manual_levels.each { |level| level_data[level] ||= PortUsage.new([], [], [], [], []) }
+
             # Find the desks in use
             all_switches.each do |switch|
                 apply_mappings(level_data, switch, mappings)
             end
-
-            # Ensure all the manual only levels are included
-            manual_levels.each { |level| level_data[level] ||= PortUsage.new([], [], [], [], []) }
 
             level_data
         }.then { |levels|
