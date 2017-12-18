@@ -359,7 +359,7 @@ class Ibm::Domino
                     email: attendee['email'],
                     state: attendee['status'].gsub(/-/,' ')
                 }
-            }.compact
+            }.compact!
             booking_response['attendees'] = attendees
         end
         if booking_response['organizer']
