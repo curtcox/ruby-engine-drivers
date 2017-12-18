@@ -9,10 +9,10 @@ module Cisco::Spark::ExternalSource
     module Hooks
         def connected
             super
-            register_feedback '/Event/UserInterface/Presentation/ExternalSource' do |action|
-                logger.debug action
-                # TODO update module status with active source so our modules
-                # can subscribe
+            register_feedback \
+                '/Event/UserInterface/Presentation/ExternalSource' do |action|
+                source = action.dig 'Selected', 'SourceIdentifier'
+                self[:external_source] = source unless source.nil?
             end
         end
     end
