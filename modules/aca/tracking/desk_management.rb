@@ -178,6 +178,8 @@ class Aca::Tracking::DeskManagement
         # To set the ID correctly
         tracker.level = tracker.switch_ip = level_id
         tracker.desk_id = tracker.interface = desk_id
+        tracker.reserved_mac = tracker.mac_address = desk_id
+        tracker.connected = true
         tracker.save!
 
         # Update the details to indicate that this is a manual desk
