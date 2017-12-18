@@ -24,9 +24,9 @@ module Cisco::Spark::ExternalSource
     # TODO: protect methods (via ::Orchestrator::Security) that manipulate
     # sources. Currently mapper does not support this from within a module.
     command 'UserInterface Presentation ExternalSource Add' => :add_source,
+            SourceIdentifier: String,
             ConnectorId: (1..7),
             Name: String,
-            SourceIdentifier: String,
             Type: [:pc, :camera, :desktop, :document_camera, :mediaplayer,
                    :other, :whiteboard]
 
@@ -39,8 +39,8 @@ module Cisco::Spark::ExternalSource
             SourceIdentifier: String
 
     command 'UserInterface Presentation ExternalSource State Set' => :source_state,
-            State: [:Error, :Hidden, :NotReady, :Ready],
             SourceIdentifier: String,
+            State: [:Error, :Hidden, :NotReady, :Ready],
             ErrorReason_: String
 
     command 'UserInterface Presentation ExternalSource List' => :list_sources
