@@ -132,7 +132,7 @@ class Ibm::Domino
                 full_event['organizer'] = {}
                 full_event['description'] = ''
                 full_event['attendees'] = []
-                if !full_event['start'].key('time')
+                if !full_event['start'].key?('time')
                     full_event['start'] = (Time.parse(full_event['start']['date']+'T00:00:00+0000').utc.to_i.to_s + "000").to_i
                     full_event['end'] = (Time.parse(full_event['end']['date']+'T00:00:00+0000').utc.to_i.to_s + "000").to_i
                 elsif booking_response['start'].key?('tzid') && booking_response['start']['tzid'] == "Singapore Standard Time"
