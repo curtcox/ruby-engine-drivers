@@ -209,8 +209,8 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         d.reserved = d.clash ? true : (d.connected ? self.reserved_mac == self.mac_address : res)
         if res
             # Allow a realtime count down on the users screen
-            d.reserve_time = self.reserve_time
-            d.unplug_time = self.unplug_time
+            d.reserve_time = self.reserve_time || 0
+            d.unplug_time = self.unplug_time || 0
             d.reserved_by = self.reserved_by
         end
         d.username = self.username
