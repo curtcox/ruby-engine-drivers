@@ -54,7 +54,7 @@ module Cisco::Spark::Xapi::Mapper
                     cond = "(#{type}).include?(#{param})"
                 else
                     msg = "#{param} must be one of #{type}"
-                    cond = "#{type}.any? { |t| t.to_s.casecmp(#{param}) == 0 }"
+                    cond = "#{type}.any? { |t| t.to_s.casecmp(#{param}.to_s) == 0 }"
                 end
                 "raise ArgumentError, '#{msg}' unless #{param}.nil? || #{cond}"
             end
