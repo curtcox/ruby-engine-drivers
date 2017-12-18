@@ -340,7 +340,7 @@ class Aca::Tracking::DeskManagement
             # Apply the summaries now manual desk counts are accurate
             levels.each do |level, desks|
                 self[level] = desks.inuse + desks.manual
-                self["#{level}:clashes"] = desks.clash + desks.manual # manual checkin desks look like clashes on the map
+                self["#{level}:clashes"] = desks.clash
                 self["#{level}:reserved"] = desks.reserved
                 o = self["#{level}:occupied_count"] = desks.inuse.length - desks.clash.length + desks.reserved.length + desks.manual.length
                 self["#{level}:free_count"] = self["#{level}:desk_count"] - o
