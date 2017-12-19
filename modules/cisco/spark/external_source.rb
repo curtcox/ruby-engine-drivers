@@ -12,7 +12,10 @@ module Cisco::Spark::ExternalSource
             register_feedback \
                 '/Event/UserInterface/Presentation/ExternalSource' do |action|
                 source = action.dig 'Selected', 'SourceIdentifier'
-                self[:external_source] = source unless source.nil?
+                unless source.nil?
+                    self[:external_source] = source
+                    signal_status(:external_source)
+                end
             end
         end
     end
