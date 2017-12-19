@@ -24,6 +24,11 @@ module Cisco::Spark::ExternalSource
         base.prepend Hooks
     end
 
+    def source_audio(state)
+        mode = is_affirmative?(state) ? :On : :Off
+        send_xconfiguration 'Audio Input HDMI 3', :Mode, mode
+    end
+
     # TODO: protect methods (via ::Orchestrator::Security) that manipulate
     # sources. Currently mapper does not support this from within a module.
     command 'UserInterface Presentation ExternalSource Add' => :add_source,
