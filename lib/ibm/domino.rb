@@ -135,7 +135,7 @@ class Ibm::Domino
                 if !full_event['start'].key?('time')
                     full_event['start'] = (Time.parse(full_event['start']['date']+'T00:00:00+0000').utc.to_i.to_s + "000").to_i
                     full_event['end'] = (Time.parse(full_event['end']['date']+'T00:00:00+0000').utc.to_i.to_s + "000").to_i
-                elsif full_event['start'].key?('tzid') && full_event['start']['tzid'] == "Singapore Standard Time"
+                elsif full_event['start'].key?('tzid') && ["Singapore Standard Time", "GMT+8 Standard Time"].include?(full_event['start']['tzid'])
                     full_event['start'] = (Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0800').utc.to_i.to_s + "000").to_i
                     full_event['end'] = (Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0800').utc.to_i.to_s + "000").to_i
                 else
