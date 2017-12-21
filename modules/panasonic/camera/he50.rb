@@ -53,7 +53,7 @@ class Panasonic::Camera::He50
     end
 
     def connected
-        schedule.every('60s', method(:do_poll))
+        schedule.every('60s') { do_poll }
         do_poll
     end
 
