@@ -331,6 +331,8 @@ class Lg::Lcd::ModelLs5
             logger.debug { "No Signal Auto Off changed!" }
         when :auto_off
             logger.debug { "Auto Off changed!" }
+        when :local_button_lock
+            logger.debug { "Local Button Lock changed!" }
         else
             return :ignore
         end
