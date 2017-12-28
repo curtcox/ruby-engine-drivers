@@ -229,7 +229,7 @@ class Lg::Lcd::ModelLs5
     def local_button_lock(enable = true)
         #0=off,  1=lock all except Power buttons, 2=lock all buttons. Default to 2 as power off from local button results in network offline
         val = is_affirmative?(enable) ? 2 : 0
-        do_send(Command[:local_button_lock], val, :f, name: :local_button_lock)
+        do_send(Command[:local_button_lock], val, :t, name: :local_button_lock)
     end
     
     def no_signal_off(enable = false)
