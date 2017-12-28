@@ -184,7 +184,7 @@ class Ibm::Domino
         rooms_bookings = []
         bookings = JSON.parse(response.body)['viewentry'] || []
         bookings.each{ |booking|
-            domino_room_name = booking['entrydata'][2]['text']['0'].split('/')[0]
+            domino_room_name = booking['entrydata'][2]['text']['0']
             if room_name == domino_room_name
                 new_booking = {
                     start: Time.parse(booking['entrydata'][0]['datetime']['0']).to_i,
