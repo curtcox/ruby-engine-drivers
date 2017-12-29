@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.3
 
 Metrics/AbcSize:
   Max: 30
@@ -8,7 +8,7 @@ Metrics/PerceivedComplexity:
   Max: 10
 
 Metrics/CyclomaticComplexity:
-  Max: 8
+  Max: 15
 
 Metrics/BlockNesting:
   Max: 4
@@ -33,14 +33,27 @@ Metrics/ParameterLists:
 Layout/IndentationWidth:
   Width: 4
 
-Style/ClassAndModuleChildren:
-  EnforcedStyle: 'compact'
+Layout/EmptyLines:
+  Enabled: false
+
+Layout/EmptyLineBetweenDefs:
+  NumberOfEmptyLines: [1, 2]
+
+Layout/IndentHash:
+  EnforcedStyle: consistent
 
 Lint/UnusedMethodArgument:
   Enabled: false
 
 Lint/UnusedBlockArgument:
   Enabled: false
+
+Style/ClassAndModuleChildren:
+  EnforcedStyle: 'compact'
+
+Style/FrozenStringLiteralComment:
+  Exclude:
+    - "**/**/*_spec.rb"
 
 Style/SymbolArray:
   EnforcedStyle: brackets
@@ -55,5 +68,5 @@ Style/Encoding:
 Style/Documentation:
   Enabled: false
 
-Layout/IndentHash:
-  EnforcedStyle: consistent
+Style/NumericLiterals:
+  Enabled: false
