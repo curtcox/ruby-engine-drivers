@@ -55,6 +55,7 @@ class Lg::Lcd::ModelLs5
         wake_on_lan(true)
         no_signal_off(false)
         auto_off(false)
+        local_button_lock(true)
         do_poll
     end
 
@@ -79,7 +80,8 @@ class Lg::Lcd::ModelLs5
         wol: 'w',
         no_signal_off: 'g',
         auto_off: 'n',
-        dpm: 'j'
+        dpm: 'j',
+        local_button_lock: 'o'
     }
     Lookup = Command.invert
 
@@ -223,6 +225,12 @@ class Lg::Lcd::ModelLs5
         # The action DPM takes needs to be configured using a remote
         # The action should be set to: screen off always
     end
+
+    def local_button_lock(enable = true)
+        #0=off,  1=lock all except Power buttons, 2=lock all buttons. Default to 2 as power off from local button results in network offline
+        val = is_affirmative?(enable) ? 2 : 0
+        do_send(Command[:local_button_lock], val, :t, name: :local_button_lock)
+    end
     
     def no_signal_off(enable = false)
         val = is_affirmative?(enable) ? 1 : 0
@@ -323,6 +331,8 @@ class Lg::Lcd::ModelLs5
             logger.debug { "No Signal Auto Off changed!" }
         when :auto_off
             logger.debug { "Auto Off changed!" }
+        when :local_button_lock
+            logger.debug { "Local Button Lock changed!" }
         else
             return :ignore
         end
