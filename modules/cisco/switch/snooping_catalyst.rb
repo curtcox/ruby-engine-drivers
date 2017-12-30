@@ -25,8 +25,15 @@ class Cisco::Switch::SnoopingCatalyst
     clear_queue_on_disconnect!
 
     default_settings({
-        username: :cisco,
-        password: :cisco,
+        ssh: {
+            username: :cisco,
+            password: :cisco,
+            auth_methods: [
+                :none,
+                :publickey,
+                :password
+            ]
+        },
         building: 'building_code',
         reserve_time: 5.minutes.to_i
     })

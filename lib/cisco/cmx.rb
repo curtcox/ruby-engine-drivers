@@ -5,10 +5,11 @@ require 'uv-rays'
 
 module Cisco; end
 class Cisco::Cmx
-    def initialize(host, user, pass, use_ou = nil, floor_mappings: nil)
+    def initialize(host, user, pass, use_ou = nil, floor_mappings: nil, ssid: nil)
         @host = UV::HttpEndpoint.new(host)
         @ldap = Array(use_ou)
         @floor_mappings = floor_mappings
+        @ssid = Array(ssid) if ssid
         @headers = {
             authorization: [user, pass]
         }
@@ -46,6 +47,7 @@ class Cisco::Cmx
         raise "request failed #{resp.status}\n#{resp.body}" unless (200...300).include?(resp.status)
 
         locations = JSON.parse(resp.body, DECODE_OPTIONS)
+        locations.select! { |loc| @ssid.include?(loc[:ssId]) } if @ssid
         return nil if locations.length == 0
 
         map = locations[0][:mapInfo][:mapHierarchyString].split('>')
