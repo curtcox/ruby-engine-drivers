@@ -50,7 +50,7 @@ class Sony::Projector::SerialControl
         end
 
         # Request status update
-        power? priority: 99
+        power? priority: 50
     end
 
     def power?(**options, &block)
@@ -278,7 +278,7 @@ class Sony::Projector::SerialControl
         param.unshift(0) if param.length < 2
 
         # Build the request
-        cmd = cmd + type + data
+        cmd = cmd + type + param
         cmd << checksum(cmd)
         cmd << 0x9A
         cmd.unshift(0xA9)
