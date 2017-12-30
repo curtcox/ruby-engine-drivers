@@ -1,5 +1,5 @@
-# frozen_string_literal: true
 # encoding: ASCII-8BIT
+# frozen_string_literal: true
 
 module Sony; end
 module Sony::Projector; end
@@ -43,10 +43,10 @@ class Sony::Projector::SerialControl
             # Need to send twice in case of deep sleep
             do_send(:set, :power_on, name: :power, wait: false)
             do_send(:set, :power_on, name: :power, delay: 3000, wait: false)
-            logger.debug "requested to power on"
+            logger.debug 'requested to power on'
         else
             do_send(:set, :power_off, name: :power, delay: 3000, wait: false)
-            logger.debug "requested to power off"
+            logger.debug 'requested to power off'
         end
 
         # Request status update
@@ -94,14 +94,14 @@ class Sony::Projector::SerialControl
     # Mute Audio and Video
     #
     def mute(val = true)
-        logger.debug "-- sony projector, requested to mute"
+        logger.debug 'requested to mute'
 
         actual = is_affirmative?(val) ? [0x00, 0x01] : [0x00, 0x00]
         do_send(:set, :mute, actual, delay_on_receive: 500)
     end
 
     def unmute
-        logger.debug "-- sony projector, requested to unmute"
+        logger.debug 'requested to unmute'
         mute(false)
     end
 

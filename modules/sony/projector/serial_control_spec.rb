@@ -1,4 +1,5 @@
 # encoding: ASCII-8BIT
+# frozen_string_literal: true
 
 Orchestrator::Testing.mock_device 'Sony::Projector::SerialControl' do
     exec(:power, false)
