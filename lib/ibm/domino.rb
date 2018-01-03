@@ -152,9 +152,17 @@ class Ibm::Domino
         raise "\n\n#{e.message}\n#{e.backtrace.join("\n")}\n\n"
     end
 
-    def get_bookings(room_id, date=Time.now.midnight)
-        room = Orchestrator::ControlSystem.find(room_id)
-        room_name = room.settings['name']
+    def get_bookings(room_ids, date=Time.now.midnight)
+        if !(room_ids.class == Array)
+            room_ids = [room_ids]
+        end
+        room_names = room_ids.map{|id| Orchestrator::ControlSystem.find(id).settings['name']}
+        room_mapping = {}
+        room_ids.each{|id|
+            room_mapping[Orchestrator::ControlSystem.find(id).settings['name']] = id
+        }
+        # room = Orchestrator::ControlSystem.find(room_id)
+        # room_name = room.settings['name']
 
         # The domino API takes a StartKey and UntilKey
         # We will only ever need one days worth of bookings
@@ -181,18 +189,23 @@ class Ibm::Domino
         response = request.value
 
         # Go through the returned bookings and add to output array
-        rooms_bookings = []
+        rooms_bookings = {}
         bookings = JSON.parse(response.body)['viewentry'] || []
         bookings.each{ |booking|
+
+            # Get the room name
             domino_room_name = booking['entrydata'][2]['text']['0']
-            if room_name == domino_room_name
+
+            # Check if room is in our list
+            if room_names.include?(domino_room_name)
+                rooms_bookings[room_mapping[domino_room_name]] ||= []
                 new_booking = {
                     start: Time.parse(booking['entrydata'][0]['datetime']['0']).to_i,
                     end: Time.parse(booking['entrydata'][1]['datetime']['0']).to_i,
                     summary: booking['entrydata'][5]['text']['0'],
                     organizer: booking['entrydata'][3]['text']['0']
                 }
-                rooms_bookings.push(new_booking)
+                rooms_bookings[room_mapping[domino_room_name]].push(new_booking)
             end
         }
         rooms_bookings
