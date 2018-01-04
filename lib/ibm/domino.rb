@@ -104,7 +104,7 @@ class Ibm::Domino
         request = domino_request('get', nil, nil, query, nil, database).value
         if [200,201,204].include?(request.status) 
             if request.body != ''
-                events = add_event_utc(JSON.parse(request.body)['events'])
+                events = add_event_utc(JSON.parse(request.body))
             else
                 events = []
             end
