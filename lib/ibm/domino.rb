@@ -104,7 +104,7 @@ class Ibm::Domino
         request = domino_request('get', nil, nil, query, nil, database).value
         if [200,201,204].include?(request.status) 
             if request.body != ''
-                events = JSON.parse(request.body)['events']
+                events = add_event_utc(JSON.parse(request.body)['events'])
             else
                 events = []
             end
@@ -125,23 +125,10 @@ class Ibm::Domino
             Rails.logger.info "Requesting to #{base_domain + event['href']}"
             full_event = get_attendees(base_domain + event['href'])
             if full_event == false
-                Rails.logger.info "##############################"
-                Rails.logger.info "FAILED TO GET DETAILED BOOKING"
-                Rails.logger.info "##############################"
                 full_event = event
                 full_event['organizer'] = {}
                 full_event['description'] = ''
                 full_event['attendees'] = []
-                if !full_event['start'].key?('time')
-                    full_event['start'] = (Time.parse(full_event['start']['date']+'T00:00:00+0000').utc.to_i.to_s + "000").to_i
-                    full_event['end'] = (Time.parse(full_event['end']['date']+'T00:00:00+0000').utc.to_i.to_s + "000").to_i
-                elsif full_event['start'].key?('tzid') && ["Singapore Standard Time", "GMT+8 Standard Time"].include?(full_event['start']['tzid'])
-                    full_event['start'] = (Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0800').utc.to_i.to_s + "000").to_i
-                    full_event['end'] = (Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0800').utc.to_i.to_s + "000").to_i
-                else
-                    full_event['start'] = (Time.parse(full_event['start']['date']+'T'+full_event['start']['time']+'+0000').utc.to_i.to_s + "000").to_i
-                    full_event['end'] = (Time.parse(full_event['end']['date']+'T'+full_event['end']['time']+'+0000').utc.to_i.to_s + "000").to_i
-                end
             end
             full_events.push(full_event)
         }
@@ -349,7 +336,9 @@ class Ibm::Domino
             Rails.logger.info "Didn't get a 20X response from meeting detail requst."
             return false
         end
-        booking_response = JSON.parse(booking_request.body)['events'][0]
+
+        booking_response = add_event_utc(JSON.parse(booking_request.body))[0]
+
         if booking_response['attendees']
             Rails.logger.info "Booking has attendees"
             booking_response['attendees'].each{|attendee|
@@ -383,6 +372,7 @@ class Ibm::Domino
             }.compact!
             booking_response['attendees'] = attendees
         end
+
         if booking_response['organizer']
             organizer = booking_response['organizer'].dup 
             organizer = 
@@ -393,20 +383,47 @@ class Ibm::Domino
             }            
             booking_response['organizer'] = organizer
         end
-        if !booking_response['start'].key?('time')
-            booking_response['start'] = (Time.parse(booking_response['start']['date']+'T00:00:00+0800').utc.to_i.to_s + "000").to_i
-            booking_response['end'] = (Time.parse(booking_response['end']['date']+'T00:00:00+0800').utc.to_i.to_s + "000").to_i
-        elsif booking_response['start'].key?('tzid') && booking_response['start']['tzid'] == "Singapore Standard Time"
-            booking_response['start'] = (Time.parse(booking_response['start']['date']+'T'+booking_response['start']['time']+'+0800').utc.to_i.to_s + "000").to_i
-            booking_response['end'] = (Time.parse(booking_response['end']['date']+'T'+booking_response['end']['time']+'+0800').utc.to_i.to_s + "000").to_i
-        else
-            booking_response['start'] = (Time.parse(booking_response['start']['date']+'T'+booking_response['start']['time']+'+0000').utc.to_i.to_s + "000").to_i
-            booking_response['end'] = (Time.parse(booking_response['end']['date']+'T'+booking_response['end']['time']+'+0000').utc.to_i.to_s + "000").to_i
-        end
+
         booking_response['start_readable'] = Time.at(booking_response['start'].to_i / 1000).to_s
         booking_response['end_readable'] = Time.at(booking_response['end'].to_i / 1000).to_s
         
         booking_response
+    end
+
+    def add_event_utc(response)
+
+        events = response['events']
+        response.key?('timezones') ? timezones = response['timezones'] : timezones = nil
+
+        events.each{ |event|
+            # If the event has no time, set time to "00:00:00"
+            if !event['start'].key?('time')
+                start_time = "00:00:00"
+                end_time = "00:00:00"
+            else
+                start_time = event['start']['time']
+                end_time = event['end']['time']
+            end
+
+            # If the event start has a tzid field, use the timezones hash
+            if event['start'].key?('tzid')
+                offset = timezones.find{|t| t['tzid'] == event['start']['tzid']}['standard']['offsetFrom']
+
+            # If the event has a utc field set to true, use utc
+            elsif event['start'].key?('utc') && event['start']['utc']
+                offset = "+0000"
+            end
+
+            start_timestring = "#{event['start']['date']}T#{start_time}#{offset}"
+            start_utc = (Time.parse(start_timestring).utc.to_i.to_s + "000").to_i
+
+            end_timestring = "#{event['end']['date']}T#{end_time}#{offset}"
+            end_utc = (Time.parse(end_timestring).utc.to_i.to_s + "000").to_i
+
+            event['start'] = start_utc
+            event['end'] = end_utc
+        }
+        events    
     end
 
     def to_ibm_date(time)
