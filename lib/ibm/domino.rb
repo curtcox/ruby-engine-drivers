@@ -177,6 +177,9 @@ class Ibm::Domino
 
         # Go through the returned bookings and add to output array
         rooms_bookings = {}
+        room_ids.each{|id|
+            rooms_bookings[id] = []
+        }
         bookings = JSON.parse(response.body)['viewentry'] || []
         bookings.each{ |booking|
 
@@ -185,7 +188,6 @@ class Ibm::Domino
 
             # Check if room is in our list
             if room_names.include?(domino_room_name)
-                rooms_bookings[room_mapping[domino_room_name]] ||= []
                 new_booking = {
                     start: Time.parse(booking['entrydata'][0]['datetime']['0']).to_i,
                     end: Time.parse(booking['entrydata'][1]['datetime']['0']).to_i,
