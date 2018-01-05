@@ -164,6 +164,7 @@ class Ibm::Domino
 
         # Set count to max
         query = {
+            Count: '500',
             StartKey: starting,
             UntilKey: ending,
             KeyType: 'time',
