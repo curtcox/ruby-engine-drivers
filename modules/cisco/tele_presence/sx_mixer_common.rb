@@ -41,13 +41,23 @@ module Cisco::TelePresence::SxMixerCommon
             self[:faderOutput] = vol
         end
     end
+
+    def faders(ids:, level:, **_)
+       fader(nil, level)
+    end
     
     def mute(_, state)
         value = is_affirmative?(state) ? 'Mute' : 'Unmute'
-        command("Audio Volume #{value}"), name: :mute).then do
+        command("Audio Volume #{value}", name: :mute).then do
             self[:faderOutput_mute] = value
         end
     end
+
+    def mutes(ids:, muted:, **_)
+        mute(muted)
+    end
+
+
     # ---------------
     # STATUS REQUESTS
     # ---------------
