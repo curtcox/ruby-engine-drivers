@@ -54,8 +54,8 @@ class Ibm::Domino
     end
 
     def get_free_rooms(starting, ending)
-        starting, ending = convert_to_datetime(starting, ending)        
-        # starting, ending = get_time_range(starting, ending, @timezone)
+        starting = convert_to_simpledate(starting)
+        ending = convert_to_simpledate(ending)        
 
         starting = starting.utc
         ending = ending.utc
@@ -140,9 +140,7 @@ class Ibm::Domino
     end
 
     def get_bookings(room_ids, date=Time.now.midnight)
-        if !(room_ids.class == Array)
-            room_ids = [room_ids]
-        end
+        room_ids = Array(room_ids)
         room_names = room_ids.map{|id| Orchestrator::ControlSystem.find(id).settings['name']}
         room_mapping = {}
         room_ids.each{|id|
@@ -204,7 +202,8 @@ class Ibm::Domino
 
     def create_booking(current_user:, starting:, ending:, database:, room_id:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         room = Orchestrator::ControlSystem.find(room_id)
-        starting, ending = convert_to_datetime(starting, ending)        
+        starting = convert_to_simpledate(starting)
+        ending = convert_to_simpledate(ending)        
         event = {
             :summary => summary,
             :class => :public,
@@ -278,7 +277,8 @@ class Ibm::Domino
 
     def edit_booking(time_changed:, room_changed:, id:, current_user:, starting:, ending:, database:, room_email:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         room = Orchestrator::ControlSystem.find_by_email(room_email)
-        starting, ending = convert_to_datetime(starting, ending)        
+        starting = convert_to_simpledate(starting)        
+        ending = convert_to_simpledate(ending)        
         event = {
             :summary => summary,
             :class => :public,
@@ -429,10 +429,12 @@ class Ibm::Domino
         events    
     end
 
+    # Take a time object and convert to a string in the format IBM uses
     def to_ibm_date(time)
         time.strftime("%Y-%m-%dT%H:%M:%SZ")
     end
 
+    # Takes a date of any kind (epoch, string, time object) and returns a time object
     def convert_to_simpledate(date) 
         if !(date.class == Time)
             if string_is_digits(date)
@@ -455,37 +457,13 @@ class Ibm::Domino
         return date
     end
 
-    def convert_to_datetime(starting, ending)
-        if !(starting.class == Time)
-            if string_is_digits(starting)
-
-                # Convert to an integer
-                starting = starting.to_i
-                ending = ending.to_i
-
-                # If JavaScript epoch remove milliseconds
-                if starting.to_s.length == 13
-                    starting /= 1000
-                    ending /= 1000
-                end
-
-                # Convert to datetimes
-                starting = Time.at(starting)
-                ending = Time.at(ending)               
-            else
-                starting = Time.parse(starting)
-                ending = Time.parse(ending)                    
-            end
-        end
-        return starting, ending
-    end
-
-
+    # Returns true if a string is all digits (used to check for an epoch)
     def string_is_digits(string)
         string = string.to_s
         string.scan(/\D/).empty?
     end
 
+    # Take a time object and return a hash in the format LN uses
     def to_utc_date(time)
         utctime = time.getutc
         {
@@ -493,15 +471,6 @@ class Ibm::Domino
             time: utctime.strftime("%H:%M:%S"),
             utc: true
         }
-    end
-
-    def get_time_range(starting, ending, timezone)
-        return [starting, ending] if starting.is_a?(Time)
-
-        Time.zone = timezone
-        start = starting.nil? ? Time.zone.today.to_time : Time.zone.parse(starting)
-        fin = ending.nil? ? Time.zone.tomorrow.to_time : Time.zone.parse(ending)
-        [start, fin]
     end
 
 end
