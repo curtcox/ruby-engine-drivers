@@ -341,7 +341,8 @@ class Ibm::Domino
         end
 
         booking_response = add_event_utc(JSON.parse(booking_request.body))[0]
-
+        room = get_system(booking)
+        support_url = room.support_url
         if booking_response['attendees']
             Rails.logger.info "Booking has attendees"
             booking_response['attendees'].each{|attendee|
@@ -389,8 +390,24 @@ class Ibm::Domino
 
         booking_response['start_readable'] = Time.at(booking_response['start'].to_i / 1000).to_s
         booking_response['end_readable'] = Time.at(booking_response['end'].to_i / 1000).to_s
-        
+        booking_response.support_url = support_url if support_url
         booking_response
+    end
+
+    def get_system(booking)
+        @@elastic ||= Elastic.new(Orchestrator::ControlSystem)
+
+        # Deal with a date range query
+        params[:q] = "\"#{booking['location']}\""
+        params[:limit] = 500
+
+
+        # Find the room with the email ID passed in
+        filters = {}
+        query = @@elastic.query(params, filters)
+        matching_rooms = @@elastic.search(query)[:results]
+        return matching_rooms[0]
+
     end
 
     def add_event_utc(response)
