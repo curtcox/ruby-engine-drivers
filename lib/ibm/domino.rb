@@ -88,7 +88,6 @@ class Ibm::Domino
         if !date.nil?
             # Make date a date object from epoch or parsed text
             date = convert_to_simpledate(date)
-
             starting = to_ibm_date(date)
             ending = to_ibm_date(date.tomorrow)
         else
@@ -122,7 +121,6 @@ class Ibm::Domino
             end
             db_uri = URI.parse(database)
             base_domain = db_uri.scheme + "://" + db_uri.host
-            Rails.logger.info "Requesting to #{base_domain + event['href']}"
             full_event = get_attendees(base_domain + event['href'])
             if full_event == false
                 full_event = event
@@ -146,8 +144,6 @@ class Ibm::Domino
         room_ids.each{|id|
             room_mapping[Orchestrator::ControlSystem.find(id).settings['name']] = id
         }
-        # room = Orchestrator::ControlSystem.find(room_id)
-        # room_name = room.settings['name']
 
         # The domino API takes a StartKey and UntilKey
         # We will only ever need one days worth of bookings
@@ -350,7 +346,6 @@ class Ibm::Domino
         end
 
         if booking_response['attendees']
-            Rails.logger.info "Booking has attendees"
             booking_response['attendees'].each{|attendee|
                 if attendee.key?('userType') && attendee['userType'] == 'room'
                     booking_response['room_email'] = attendee['email']
