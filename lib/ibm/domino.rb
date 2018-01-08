@@ -341,7 +341,7 @@ class Ibm::Domino
         end
 
         booking_response = add_event_utc(JSON.parse(booking_request.body))[0]
-        room = get_system(booking)
+        room = get_system(booking_response)
         support_url = room.support_url
         if booking_response['attendees']
             Rails.logger.info "Booking has attendees"
