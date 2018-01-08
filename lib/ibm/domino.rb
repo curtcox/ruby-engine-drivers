@@ -467,9 +467,8 @@ class Ibm::Domino
                 date = date.to_i
 
                 # If JavaScript epoch remove milliseconds
-                if starting.to_s.length == 13
-                    starting /= 1000
-                    ending /= 1000
+                if date.to_s.length == 13
+                    date /= 1000
                 end
 
                 # Convert to datetimes
