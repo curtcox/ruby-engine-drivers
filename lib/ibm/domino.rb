@@ -398,13 +398,14 @@ class Ibm::Domino
         @@elastic ||= Elastic.new(Orchestrator::ControlSystem)
 
         # Deal with a date range query
-        params[:q] = "\"#{booking['location']}\""
-        params[:limit] = 500
+        elastic_params = {}
+        elastic_params[:q] = "\"#{booking['location']}\""
+        elastic_params[:limit] = 500
 
 
         # Find the room with the email ID passed in
         filters = {}
-        query = @@elastic.query(params, filters)
+        query = @@elastic.query(elastic_params, filters)
         matching_rooms = @@elastic.search(query)[:results]
         return matching_rooms[0]
 
