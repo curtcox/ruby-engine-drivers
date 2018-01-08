@@ -398,7 +398,7 @@ class Ibm::Domino
         @@elastic ||= Elastic.new(Orchestrator::ControlSystem)
 
         # Deal with a date range query
-        elastic_params = {}
+        elastic_params = ActionController::Parameters.new({})
         elastic_params[:q] = "\"#{booking['location']}\""
         elastic_params[:limit] = 500
 
