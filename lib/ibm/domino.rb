@@ -137,7 +137,7 @@ class Ibm::Domino
         raise "\n\n#{e.message}\n#{e.backtrace.join("\n")}\n\n"
     end
 
-    def get_bookings(room_ids, date=Time.now.midnight)
+    def get_bookings(room_ids, date=Time.now.midnight, ending=nil)
         room_ids = Array(room_ids)
         room_names = room_ids.map{|id| Orchestrator::ControlSystem.find(id).settings['name']}
         room_mapping = {}
@@ -152,9 +152,14 @@ class Ibm::Domino
 
         # Make date a date object from epoch or parsed text
         date = convert_to_simpledate(date)
-
         starting = date.yesterday.strftime("%Y%m%d")
-        ending = date.strftime("%Y%m%d")
+
+        if ending
+            ending = convert_to_simpledate(ending).strftime("%Y%m%d")
+        else
+            ending = date.strftime("%Y%m%d")
+        end
+
 
         # Set count to max
         query = {
