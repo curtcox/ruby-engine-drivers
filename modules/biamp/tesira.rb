@@ -105,7 +105,7 @@ class Biamp::Tesira
         if inouts.is_a? Hash
             inouts.each_key do |input|
                 outputs = inouts[input]
-                outs = outputs.is_a?(Array) ? outputs : [outputs]
+                outs = Array(outputs)
 
                 outs.each do |output|
                     do_send build(id, :set, mixer_type, input, output, value)
@@ -127,8 +127,9 @@ class Biamp::Tesira
     FADERS.merge!(FADERS.invert)
     def fader(fader_id, level, index = 1, type = :fader)
         # value range: -100 ~ 12
-        faders = fader_id.is_a?(Array) ? fader_id : [fader_id]
-        fader_type = FADERS[type.to_sym]
+        faders = Array(fader_id)
+        type = type.to_sym
+        fader_type = FADERS[type] || type
 
         faders.each do |fad|
             do_send build(fader_id, :set, fader_type, index, level), type: :fader
@@ -147,9 +148,10 @@ class Biamp::Tesira
     MUTES.merge!(MUTES.invert)
     def mute(fader_id, val = true, index = 1, type = :fader)
         value = is_affirmative?(val)
-        mute_type = MUTES[type.to_sym]
+        type = type.to_sym
+        mute_type = MUTES[type] || type
 
-        faders = fader_id.is_a?(Array) ? fader_id : [fader_id]
+        faders = Array(fader_id)
         faders.each do |fad|
             do_send build(fader_id, :set, mute_type, index, value), type: :mute
         end
@@ -164,7 +166,7 @@ class Biamp::Tesira
     end
 
     def query_fader(fader_id, index = 1, type = :fader)
-        fad = fader_id.is_a?(Array) ? fader_id[0] : fader_id
+        fad = Array(fader_id)[0]
         fad_type = FADERS[type.to_sym]
 
         do_send build(fader_id, :get, fad_type, index), type: :fader
@@ -175,7 +177,7 @@ class Biamp::Tesira
     end
 
     def query_mute(fader_id, index = 1, type = :fader)
-        fad = fader_id.is_a?(Array) ? fader_id[0] : fader_id
+        fad = Array(fader_id)[0]
         mute_type = MUTES[type.to_sym]
         
         do_send build(fader_id, :get, fad_type, index), type: :mute
@@ -226,10 +228,12 @@ class Biamp::Tesira
             # Lets set the variable
             case command[:type]
             when :fader
-                type = FADERS[request[2].to_sym]
+                fad = request[2].to_sym
+                type = FADERS[fad] || fad
                 self["#{type}#{request[0]}_#{request[3]}"] = value
             when :mute
-                type = MUTES[request[2].to_sym]
+                fad = request[2].to_sym
+                type = MUTES[fad] || fad
                 self["#{type}#{request[0]}_#{request[3]}_mute"] = value
             end
         end
