@@ -100,14 +100,12 @@ class Biamp::Tesira
     # Who thought having 3 different types was a good idea? FFS
     def mixer(id, inouts, mute = false, type = :matrix)
         value = is_affirmative?(mute)
-        mixer_type = MIXERS[type.to_sym]
+        type = type.to_sym
+        mixer_type = MIXERS[type] || type
 
         if inouts.is_a? Hash
-            inouts.each_key do |input|
-                outputs = inouts[input]
-                outs = Array(outputs)
-
-                outs.each do |output|
+            inouts.each do |input, out|
+                Array(out).each do |output|
                     do_send build(id, :set, mixer_type, input, output, value)
                 end
             end
@@ -127,12 +125,14 @@ class Biamp::Tesira
     FADERS.merge!(FADERS.invert)
     def fader(fader_id, level, index = 1, type = :fader)
         # value range: -100 ~ 12
-        faders = Array(fader_id)
         type = type.to_sym
         fader_type = FADERS[type] || type
 
-        faders.each do |fad|
-            do_send build(fader_id, :set, fader_type, index, level), type: :fader
+        indicies = Array(index)
+        Array(fader_id).each do |fad|
+            indicies.each do |i|
+                do_send build(fad, :set, fader_type, i, level), type: :fader
+            end
         end
     end
     # Named params version
@@ -151,9 +151,11 @@ class Biamp::Tesira
         type = type.to_sym
         mute_type = MUTES[type] || type
 
-        faders = Array(fader_id)
-        faders.each do |fad|
-            do_send build(fader_id, :set, mute_type, index, value), type: :mute
+        indicies = Array(index)
+        Array(fader_id).each do |fad|
+            indicies.each do |i|
+                do_send build(fad, :set, mute_type, i, value), type: :mute
+            end
         end
     end
     # Named params version
@@ -166,10 +168,10 @@ class Biamp::Tesira
     end
 
     def query_fader(fader_id, index = 1, type = :fader)
-        fad = Array(fader_id)[0]
-        fad_type = FADERS[type.to_sym]
+        type = type.to_sym
+        fad_type = FADERS[type] || type
 
-        do_send build(fader_id, :get, fad_type, index), type: :fader
+        do_send build(Array(fader_id)[0], :get, fad_type, Array(index)[0]), type: :fader
     end
     # Named params version
     def query_faders(ids:, index: 1, type: :fader, **_)
@@ -177,10 +179,10 @@ class Biamp::Tesira
     end
 
     def query_mute(fader_id, index = 1, type = :fader)
-        fad = Array(fader_id)[0]
-        mute_type = MUTES[type.to_sym]
+        type = type.to_sym
+        mute_type = MUTES[type] || type
         
-        do_send build(fader_id, :get, fad_type, index), type: :mute
+        do_send build(Array(fader_id)[0], :get, mute_type, Array(index)[0]), type: :mute
     end
     # Named params version
     def query_mutes(ids:, index: 1, type: :fader, **_)
