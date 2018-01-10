@@ -178,8 +178,9 @@ class Aca::Tracking::DeskManagement
 
         # Reserve for the remainder of the day
         Time.zone = @timezone
-        now = tracker.unplug_time = Time.now.to_i
-        tracker.reserve_time = Time.zone.now.tomorrow.midnight.to_i - now
+        time = Time.zone.now
+        now = tracker.unplug_time = time.to_i
+        tracker.reserve_time = time.tomorrow.midnight.to_i - now
 
         # To set the ID correctly
         tracker.level = tracker.switch_ip = level_id
@@ -242,6 +243,8 @@ class Aca::Tracking::DeskManagement
         remove.each do |details|
             manual_checkout(details)
         end
+
+        logger.debug { "cleaned up manual check-ins, removed #{remove.length}" }
     end
 
     # Helper to return all the physical switches in a building
