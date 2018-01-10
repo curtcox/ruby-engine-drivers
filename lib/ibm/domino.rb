@@ -114,8 +114,8 @@ class Ibm::Domino
         events.each{ |event|
             if simple
                 full_events.push({
-                    start: (Time.parse(event['start']['date']+'T'+event['start']['time']+'+0000').utc.to_i.to_s + "000").to_i,
-                    end: (Time.parse(event['end']['date']+'T'+event['end']['time']+'+0000').utc.to_i.to_s + "000").to_i
+                    start: event['start'],
+                    end: event['start']
                 })
                 next
             end
