@@ -28,7 +28,7 @@ class Ibm::Domino
         @headers.merge(headers) if headers
         
         if full_path
-            if full_path.include?('/api/calendar/events')
+            if full_path.include?('/api/calendar/')
                 uri = URI.parse(full_path)
             else
                 uri = URI.parse(full_path + '/api/calendar/events')
@@ -100,28 +100,56 @@ class Ibm::Domino
             since: starting
         }
 
+        events = []
+        # First request is to the user's database
         request = domino_request('get', nil, nil, query, nil, database).value
         if [200,201,204].include?(request.status) 
             if request.body != ''
                 events = add_event_utc(JSON.parse(request.body))
-            else
-                events = []
             end
         else
             return nil
         end
+
+        query = {
+            since: starting
+        }
+
+        invite_db = database + '/api/calendar/invitations'
+        request = domino_request('get', nil, nil, query, nil, invite_db).value
+        if [200,201,204].include?(request.status) 
+            if request.body != ''
+                events += JSON.parse(request.body)['events']
+            end
+        else
+            return nil
+        end
+
         full_events = []
         events.each{ |event|
-            if simple
-                full_events.push({
-                    start: event['start'],
-                    end: event['start']
-                })
-                next
-            end
             db_uri = URI.parse(database)
             base_domain = db_uri.scheme + "://" + db_uri.host
+
+            if simple
+                # If we're dealing with an invite we must try and resolve the href
+                if !event.key?('start')
+                    invite = get_attendees(base_domain + event['href'])
+                    if invite
+                        full_events.push({
+                            start: invite['start'],
+                            end: invite['end']
+                        })
+                    end
+                else
+                    full_events.push({
+                        start: event['start'],
+                        end: event['end']
+                    })
+                end
+                next
+            end
             full_event = get_attendees(base_domain + event['href'])
+            
             if full_event == false
                 full_event = event
                 full_event['organizer'] = {}
