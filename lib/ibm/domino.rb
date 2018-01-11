@@ -119,7 +119,8 @@ class Ibm::Domino
         request = domino_request('get', nil, nil, query, nil, invite_db).value
         if [200,201,204].include?(request.status) 
             if request.body != ''
-                events += JSON.parse(request.body)['events']
+                invites = JSON.parse(request.body)['events']
+                events += invites if !invites.nil?
             end
         else
             return nil
