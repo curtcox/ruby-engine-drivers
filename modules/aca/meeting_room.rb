@@ -277,12 +277,17 @@ class Aca::MeetingRoom < Aca::Joiner
                 check = ids.collect(&:to_s)
                 rms = Set.new(check)
                 rms << system.id.to_s
+
+                found = false
                 @join_modes.each_value do |jm|
                     if jm[:rooms] == rms
                         perform_action(mod: :System, func: :switch_mode, args: [jm[:mode], true])
+                        found = true
                         break
                     end
                 end
+
+                unjoin if !found
             end
         end
 
