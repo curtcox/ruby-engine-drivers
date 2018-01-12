@@ -248,10 +248,10 @@ class Ibm::Domino
             description = ""
         end
 
-        #if room.support_url
-        #    description = description + "\nTo control this meeting room, click here: #{room.support_url}"
-        #    event[:description] = description
-        #end
+        # if room.support_url
+           # description = description + "\nTo control this meeting room, click here: #{room.support_url}"
+        event[:description] = description
+        # end
 
         event[:attendees] = Array(attendees).collect do |attendee|
             out_attendee = {
