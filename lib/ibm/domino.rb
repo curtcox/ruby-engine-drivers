@@ -222,8 +222,7 @@ class Ibm::Domino
             # Check if room is in our list
             if room_names.include?(domino_room_name)
                 new_booking = {
-                    start: Time.parse(booking['entrydata'][0]['datetime']['0']).to_i,
-                    end: Time.parse(booking['entrydata'][1]['datetime']['0']).to_i,
+                    end: Time.parse(booking['entrydata'][1]['datetime']['0']).to_i * 1000,
                     summary: booking['entrydata'][5]['text']['0'],
                     organizer: booking['entrydata'][3]['text']['0']
                 }
