@@ -74,7 +74,11 @@ class Ibm::Domino
     def get_users_bookings_created_today(database)
         user_bookings = get_users_bookings(database, nil, nil, 1)
         user_bookings.select!{ |booking|
-            booking['last-modified'] && Time.now.midnight < booking['last-modified'] && Time.now.tomorrow.midnight > booking['last-modified']
+            if booking.key?('last-modified')
+                booking['last-modified'] && Time.now.midnight < booking['last-modified'] && Time.now.tomorrow.midnight > booking['last-modified']
+            else
+                false
+            end
         }
         user_bookings
         
