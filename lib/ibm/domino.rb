@@ -389,8 +389,10 @@ class Ibm::Domino
         room = get_system(booking_response)
         
         if room
+            room_id = room.id
             support_url = room.support_url
         else
+            room_id = nil
             support_url = nil
         end
 
@@ -441,6 +443,7 @@ class Ibm::Domino
         booking_response['start_readable'] = Time.at(booking_response['start'].to_i / 1000).to_s
         booking_response['end_readable'] = Time.at(booking_response['end'].to_i / 1000).to_s
         booking_response['support_url'] = support_url if support_url
+        booking_response['room_id'] = room_id if room_id
         booking_response
     end
 
