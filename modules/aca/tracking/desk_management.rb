@@ -49,7 +49,7 @@ class Aca::Tracking::DeskManagement
 
         # Manual checkout times don't need to be checked very often
         cleanup_manual_checkins
-        schedule.every('10m') do
+        schedule.every('2m') do
             cleanup_manual_checkins
         end
 
@@ -60,6 +60,7 @@ class Aca::Tracking::DeskManagement
     def on_update
         self[:hold_time]    = setting(:desk_hold_time) || 5.minutes.to_i
         self[:reserve_time] = @desk_reserve_time = setting(:desk_reserve_time) || 2.hours.to_i
+        self[:manual_reserve_time] = @manual_reserve_time = setting(:manual_reserve_time) || 2.hours.to_i
         @user_identifier = setting(:user_identifier) || :login_name
         @timezone = setting(:timezone) || 'UTC'
 
@@ -182,7 +183,12 @@ class Aca::Tracking::DeskManagement
         Time.zone = @timezone
         time = Time.zone.now
         now = tracker.unplug_time = time.to_i
-        tracker.reserve_time = time.tomorrow.midnight.to_i - now
+
+        if @manual_reserve_time
+            tracker.reserve_time = time.to_i + @manual_reserve_time.to_i
+        else
+            tracker.reserve_time = time.tomorrow.midnight.to_i - now
+        end
 
         # To set the ID correctly
         tracker.level = tracker.switch_ip = level_id
@@ -219,7 +225,7 @@ class Aca::Tracking::DeskManagement
 
     protected
 
-    def manual_checkout(details)
+    def manual_checkout(details, user_initiated = true)
         level = details[:level]
         desk_id = details[:desk_id]
         username = details[:username] || desk_id
@@ -229,7 +235,10 @@ class Aca::Tracking::DeskManagement
 
         @manual_usage.delete(desk_id)
         @manual_users.delete(username)
-        self[username] = nil
+        self[username] = details.merge({
+            connected: false,
+            user_initiated: user_initiated
+        })
     end
 
     # If people reserve a desk then they may forget to checkout
@@ -243,7 +252,7 @@ class Aca::Tracking::DeskManagement
         end
 
         remove.each do |details|
-            manual_checkout(details)
+            manual_checkout(details, false)
         end
 
         logger.debug { "cleaned up manual check-ins, removed #{remove.length}" }
