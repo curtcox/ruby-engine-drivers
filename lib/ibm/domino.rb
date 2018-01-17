@@ -161,7 +161,7 @@ class Ibm::Domino
                 full_event['description'] = ''
                 full_event['attendees'] = []
             end
-            full_events.push(full_event)
+            full_events.push(full_event) if !full_event['declined']
         }
         full_events
         
@@ -443,12 +443,28 @@ class Ibm::Domino
             booking_response['organizer'] = organizer
         end
 
+        declined = !(is_accepted(booking_response))
+
         booking_response['start_readable'] = Time.at(booking_response['start'].to_i / 1000).to_s
         booking_response['end_readable'] = Time.at(booking_response['end'].to_i / 1000).to_s
         booking_response['support_url'] = support_url if support_url
         booking_response['room_id'] = room_id if room_id
+        booking_response['declined'] = true if declined
         booking_response
     end
+
+    def is_accepted(event)
+        accepted = true
+        event['attendees'].each{|attendee|
+            if attendee.key?('userType') && attendee['userType'] == 'room'
+                if attendee.key?('status') && attendee['status'] == 'declined'
+                    accepted = false
+                end
+            end
+        }
+        return accepted
+    end
+
 
     def get_system(booking)
         @@elastic ||= Elastic.new(Orchestrator::ControlSystem)
