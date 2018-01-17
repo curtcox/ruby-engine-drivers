@@ -400,6 +400,8 @@ class Ibm::Domino
         end
 
         if booking_response['attendees']
+
+            declined = !(is_accepted(booking_response))
             booking_response['attendees'].each{|attendee|
                 if attendee.key?('userType') && attendee['userType'] == 'room'
                     booking_response['room_email'] = attendee['email']
@@ -442,8 +444,6 @@ class Ibm::Domino
             }            
             booking_response['organizer'] = organizer
         end
-
-        declined = !(is_accepted(booking_response))
 
         booking_response['start_readable'] = Time.at(booking_response['start'].to_i / 1000).to_s
         booking_response['end_readable'] = Time.at(booking_response['end'].to_i / 1000).to_s
