@@ -161,7 +161,7 @@ class Ibm::Domino
                 full_event['description'] = ''
                 full_event['attendees'] = []
             end
-            full_events.push(full_event) if !full_event['declined']
+            full_events.push(full_event)
         }
         full_events
         
