@@ -170,8 +170,11 @@ class Ibm::Domino
         raise "\n\n#{e.message}\n#{e.backtrace.join("\n")}\n\n"
     end
 
-    def get_booking(path)
-        booking_request = domino_request('get',nil,nil,nil,nil,path).value
+    def get_booking(path, database)
+        db_uri = URI.parse(database)
+        base_domain = db_uri.scheme + "://" + db_uri.host
+        event_path = base_domain + path
+        booking_request = domino_request('get',nil,nil,nil,nil,event_path).value
         if ![200,201,204].include?(booking_request.status)
             Rails.logger.info "Didn't get a 20X response from meeting detail requst."
             return false
