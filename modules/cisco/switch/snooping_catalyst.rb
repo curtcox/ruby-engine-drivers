@@ -204,6 +204,7 @@ class Cisco::Switch::SnoopingCatalyst
                         if iface.ip != ip || iface.mac != mac
                             logger.debug { "New connection on #{interface} with #{ip}: #{mac}" }
 
+                            # NOTE:: Same as username found
                             details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
                             reserved = details.connected(mac, @reserve_time, {
                                 device_ip: ip,
@@ -215,6 +216,25 @@ class Cisco::Switch::SnoopingCatalyst
 
                             # ip, mac, reserved?, clash?
                             self[interface] = details.details
+
+                        elsif iface.username.nil?
+                            username = self.class.bucket.get("macuser-#{mac_address}", quiet: true)
+                            if username
+                                logger.debug { "Found #{username} at #{ip}: #{mac}" }
+
+                                # NOTE:: Same as new connection
+                                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                                reserved = details.connected(mac, @reserve_time, {
+                                    device_ip: ip,
+                                    switch_ip: remote_address,
+                                    hostname: @hostname,
+                                    switch_name: @switch_name,
+                                    interface: interface
+                                })
+
+                                # ip, mac, reserved?, clash?
+                                self[interface] = details.details
+                            end
 
                         elsif not iface.reserved
                             # We don't know the user who is at this desk...
