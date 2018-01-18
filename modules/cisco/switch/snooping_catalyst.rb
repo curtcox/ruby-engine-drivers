@@ -218,7 +218,7 @@ class Cisco::Switch::SnoopingCatalyst
                             self[interface] = details.details
 
                         elsif iface.username.nil?
-                            username = self.class.bucket.get("macuser-#{mac_address}", quiet: true)
+                            username = ::Aca::Tracking::SwitchPort.bucket.get("macuser-#{mac_address}", quiet: true)
                             if username
                                 logger.debug { "Found #{username} at #{ip}: #{mac}" }
 
