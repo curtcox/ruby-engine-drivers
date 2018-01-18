@@ -199,6 +199,7 @@ class Aca::Tracking::DeskManagement
         # Update the details to indicate that this is a manual desk
         details = tracker.details
         details[:level] = level_id
+        details[:connected] = true
         details[:manual_desk] = true
         details[:clash] = false
 
