@@ -90,7 +90,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
             reserved = false if other&.id != self.id
         end
 
-        username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
+        username = self.class.bucket.get("macuser-#{mac_address}", quiet: true)
 
         if not reserved
             self.unplug_time = 0
