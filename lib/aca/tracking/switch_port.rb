@@ -38,7 +38,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     attribute :mac_address,  type: String # MAC of the device currently connected to the switch
     attribute :device_ip,    type: String # IP of the device connected to the switch
     attribute :username,     type: String # Username of the currently connected user
-    attribute :connected_at, type: Integer
+    attribute :connected_at, type: Integer, default: lambda { Time.now }
 
     # Reservation details
     attribute :unplug_time,  type: Integer, default: 0 # Unlug time for timeout
@@ -111,10 +111,10 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
                 self.reserved_by = nil
             end
         end
-        self.connected_at = Time.now.to_i
         self.username = username
         self.mac_address = mac_address
         self.assign_attributes(switch_details)
+        self.connected_at = Time.now.to_i
         self.save!(with_cas: true)
 
         reserved
