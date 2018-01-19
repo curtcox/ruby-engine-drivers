@@ -91,12 +91,12 @@ class Ibm::Domino
 
         if !date.nil?
             # Make date a date object from epoch or parsed text
-            date = convert_to_simpledate(date)
+            date = convert_to_simpledate(date).utc
             starting = to_ibm_date(date)
             ending = to_ibm_date(date.tomorrow)
         else
-            starting = to_ibm_date(Time.now.midnight)
-            ending = to_ibm_date((Time.now.midnight + weeks.week))
+            starting = to_ibm_date(Time.now.midnight.utc)
+            ending = to_ibm_date((Time.now.midnight.utc + weeks.week))
         end
 
         query = {
