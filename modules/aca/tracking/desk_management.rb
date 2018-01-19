@@ -182,7 +182,7 @@ class Aca::Tracking::DeskManagement
         # Reserve for the remainder of the day
         Time.zone = @timezone
         time = Time.zone.now
-        now = tracker.unplug_time = time.to_i
+        now = tracker.connected_at = tracker.unplug_time = time.to_i
 
         if @manual_reserve_time
             tracker.reserve_time = time.to_i + @manual_reserve_time.to_i

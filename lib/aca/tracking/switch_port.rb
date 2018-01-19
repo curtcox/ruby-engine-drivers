@@ -5,7 +5,7 @@ module Aca::Tracking
     class StaticDetails < ::Hash
         [
             :ip, :mac, :connected, :reserved, :reserve_time, :unplug_time,
-            :reserved_by, :clash, :username, :desk_id
+            :reserved_by, :clash, :username, :desk_id, :connected_at
         ].each do |key|
             define_method key do
                 self[key]
@@ -35,9 +35,10 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     design_document :swport
 
     # Connection details
-    attribute :mac_address, type: String # MAC of the device currently connected to the switch
-    attribute :device_ip,   type: String # IP of the device connected to the switch
-    attribute :username,    type: String # Username of the currently connected user
+    attribute :mac_address,  type: String # MAC of the device currently connected to the switch
+    attribute :device_ip,    type: String # IP of the device connected to the switch
+    attribute :username,     type: String # Username of the currently connected user
+    attribute :connected_at, type: Integer
 
     # Reservation details
     attribute :unplug_time,  type: Integer, default: 0 # Unlug time for timeout
@@ -110,6 +111,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
                 self.reserved_by = nil
             end
         end
+        self.connected_at = Time.now.to_i
         self.username = username
         self.mac_address = mac_address
         self.assign_attributes(switch_details)
@@ -201,6 +203,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         d = ::Aca::Tracking::StaticDetails.new
         d.ip = self.device_ip
         d.mac = self.mac_address || self.reserved_mac
+        d.connected_at = self.connected_at
         d.connected = connected?
         d.clash = clash?
 
