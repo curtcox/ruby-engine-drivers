@@ -489,7 +489,9 @@ class Ibm::Domino
         response.key?('timezones') ? timezones = response['timezones'] : timezones = nil
 
         events.reject!{|event|
-            event['summary'][0..10] == "Invitation:"
+            if event.key?('summary')
+                event['summary'][0..10] == "Invitation:"
+            end
         }
         events.each{ |event|
             # If the event has no time, set time to "00:00:00"
