@@ -139,7 +139,9 @@ class Aca::Tracking::DeskManagement
         return 4 unless reservation.reserved_by == username # reserved by someone else
 
         # falsy values == success and truthy values == failure
-        !reservation.update_reservation(time)
+        reserved = reservation.update_reservation(time)
+        self[username] = reservation.details
+        !reserved
     end
 
     # Adjusts the reservation time to 0 - effectively freeing the desk
