@@ -200,6 +200,7 @@ class Aca::Tracking::DeskManagement
         tracker.level = tracker.switch_ip = level_id
         tracker.desk_id = tracker.interface = desk_id
         tracker.reserved_mac = tracker.mac_address = desk_id
+        tracker.device_ip = username # Used for API lookup
         tracker.save!
 
         # Update the details to indicate that this is a manual desk
