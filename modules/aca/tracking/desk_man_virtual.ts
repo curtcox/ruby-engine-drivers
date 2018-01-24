@@ -49,6 +49,18 @@ win.control.systems['sys-desk-tracking'] = {
             "unplug_time": 1511307676 // unix epoch in seconds
         },
 
+        /*
+
+            reserved == false (if connected == false && unplug_time + reserve_time > time.now)
+
+            If the reserve_time == 0 then the user released the desk (both manual and auto desks)
+                   reserve_time > 0  then the reservation timed out
+             
+            released_at == user initiated checkout time (this field may not be set)
+            unplug_time + reserve_time == reservation timeout time
+
+        */
+
         // Accepts a desk from the "level_id:manual_checkin" array and checks the user in
         $manual_checkin: (desk_id: string, level_id?: string) => {
             self["level_id"] = self["level_id"].concat([desk_id]);

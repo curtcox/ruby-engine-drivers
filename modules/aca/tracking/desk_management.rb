@@ -143,7 +143,9 @@ class Aca::Tracking::DeskManagement
 
         # falsy values == success and truthy values == failure
         reserved = reservation.update_reservation(time.to_i)
-        self[username] = reservation.details
+        details = reservation.details
+        details[:released_at] = Time.now.to_i
+        self[username] = details
         system.all(:Snooping).update_reservations if reserved
         !reserved
     end
@@ -240,10 +242,11 @@ class Aca::Tracking::DeskManagement
 
         @manual_usage.delete(desk_id)
         @manual_users.delete(username)
-        self[username] = details.merge({
-            connected: false,
-            user_initiated: user_initiated
-        })
+        details = details.dup
+        details[:connected] = false
+        details[:reserve_time] = 0 if user_initiated
+        details[:released_at] = Time.now.to_i
+        self[username] = details
     end
 
     # If people reserve a desk then they may forget to checkout
