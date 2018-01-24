@@ -142,6 +142,7 @@ class Aca::Tracking::DeskManagement
         # falsy values == success and truthy values == failure
         reserved = reservation.update_reservation(time.to_i)
         self[username] = reservation.details
+        system.all(:Snooping).update_reservations if reserved
         !reserved
     end
 
