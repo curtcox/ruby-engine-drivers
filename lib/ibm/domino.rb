@@ -498,12 +498,18 @@ class Ibm::Domino
             if !event['start'].key?('time')
                 start_time = "00:00:00"
                 end_time = "00:00:00"
+                start_date = event['start']['date']
+                end_date = event['end']['date']
             elsif !event.key?('end')
                 start_time = event['start']['time']
                 end_time = event['start']['time']
+                start_date = event['start']['date']
+                end_date = event['start']['date']
             else
                 start_time = event['start']['time']
                 end_time = event['end']['time']
+                start_date = event['start']['date']
+                end_date = event['end']['date']
             end
 
             # If the event start has a tzid field, use the timezones hash
@@ -515,10 +521,10 @@ class Ibm::Domino
                 offset = "+0000"
             end
 
-            start_timestring = "#{event['start']['date']}T#{start_time}#{offset}"
+            start_timestring = "#{start_date}T#{start_time}#{offset}"
             start_utc = (Time.parse(start_timestring).utc.to_i.to_s + "000").to_i
 
-            end_timestring = "#{event['end']['date']}T#{end_time}#{offset}"
+            end_timestring = "#{end_date}T#{end_time}#{offset}"
             end_utc = (Time.parse(end_timestring).utc.to_i.to_s + "000").to_i
 
             event['start'] = start_utc
