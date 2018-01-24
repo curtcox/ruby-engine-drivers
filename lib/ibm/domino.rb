@@ -498,7 +498,7 @@ class Ibm::Domino
             if !event['start'].key?('time')
                 start_time = "00:00:00"
                 end_time = "00:00:00"
-            elsif !event['end'].key?('time')
+            elsif !event.key?('end')
                 start_time = event['start']['time']
                 end_time = event['start']['time']
             else
