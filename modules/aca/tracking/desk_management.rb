@@ -119,7 +119,8 @@ class Aca::Tracking::DeskManagement
     #   2: if there is no reservation to update
     #   3: if the desk ID is unknown for this IP port
     #   4: if reserved by someone else
-    def reserve_desk(time = @desk_reserve_time)
+    def reserve_desk(time = nil)
+        time ||= @desk_reserve_time
         user = current_user
         raise 'User not found' unless user
 
@@ -141,7 +142,7 @@ class Aca::Tracking::DeskManagement
         return 4 unless reservation.reserved_by == username # reserved by someone else
 
         # falsy values == success and truthy values == failure
-        reserved = reservation.update_reservation(time)
+        reserved = reservation.update_reservation(time.to_i)
         self[username] = reservation.details
         !reserved
     end
