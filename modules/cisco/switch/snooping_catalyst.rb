@@ -104,6 +104,10 @@ class Cisco::Switch::SnoopingCatalyst
         schedule.in(3000) { query_snooping_bindings }
     end
 
+    def update_reservations
+        check_reservations
+    end
+
 
     protected
 
@@ -301,10 +305,8 @@ class Cisco::Switch::SnoopingCatalyst
         # Check if the interfaces are still reserved
         @reserved_interface.each do |interface|
             details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
-            if not details.reserved?
-                remove << interface
-                self[interface] = details.details
-            end
+            remove << interface unless details.reserved?
+            self[interface] = details.details
         end
 
         # Remove them from the reserved list if not
