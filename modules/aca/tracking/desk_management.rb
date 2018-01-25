@@ -134,8 +134,8 @@ class Aca::Tracking::DeskManagement
             level = desk_details[:level]
             desk_id = desk_details[:desk_id]
 
-            reserved_by = @manual_usage[desk_id]
-            return 4 unless reserved_by == username
+            #reserved_by = @manual_usage[desk_id]
+            #return 4 unless reserved_by == username
 
             reservation = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{level}-#{desk_id}")
             raise "Mapping error. Reservation for #{desk_id} can't be found in the database" unless reservation
@@ -170,6 +170,10 @@ class Aca::Tracking::DeskManagement
             system.all(:Snooping).update_reservations if reserved
             !reserved
         end
+    end
+
+    def get_manual_usage
+        @manual_usage
     end
 
     # Adjusts the reservation time to 0 - effectively freeing the desk
