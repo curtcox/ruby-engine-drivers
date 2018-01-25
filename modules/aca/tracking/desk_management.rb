@@ -190,10 +190,10 @@ class Aca::Tracking::DeskManagement
         time = Time.zone.now
         now = tracker.connected_at = tracker.unplug_time = time.to_i
 
-        if @manual_reserve_time
-            tracker.reserve_time = time.to_i + @manual_reserve_time.to_i
-        else
+        if @manual_reserve_time == 0
             tracker.reserve_time = time.tomorrow.midnight.to_i - now
+        else
+            tracker.reserve_time = @manual_reserve_time.to_i
         end
 
         # To set the ID correctly
