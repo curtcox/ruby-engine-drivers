@@ -451,6 +451,8 @@ class Ibm::Domino
         booking_response['room_id'] = room_id if room_id
         booking_response['declined'] = true if declined
         booking_response['location'] = "unassigned" if declined
+        booking_response['room_email'] = nil if declined
+        booking_response['room_id'] = nil if declined
         booking_response
     end
 
