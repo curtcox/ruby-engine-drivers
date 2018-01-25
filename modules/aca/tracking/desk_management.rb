@@ -120,7 +120,6 @@ class Aca::Tracking::DeskManagement
     #   3: if the desk ID is unknown for this IP port
     #   4: if reserved by someone else
     def reserve_desk(time = nil)
-        time ||= @desk_reserve_time
         user = current_user
         raise 'User not found' unless user
 
@@ -131,23 +130,48 @@ class Aca::Tracking::DeskManagement
         end
         desk_details = self[username]
         return 2 unless desk_details # no reservation to update
-        return manual_checkout(desk_details) if desk_details[:manual_desk]
 
-        location = desk_details[:desk_id]
-        return 3 unless location # desk ID unknown for this IP port
+        if desk_details[:manual_desk]
+            return 2 unless desk_details[:connected]
+            level = details[:level]
+            desk_id = details[:desk_id]
 
-        switch_ip, port = @desk_mappings[location]
-        reservation = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
-        raise "Mapping error. Desk #{location} can't be found on the switch #{switch_ip}-#{port}" unless reservation
-        return 4 unless reservation.reserved_by == username # reserved by someone else
+            reserved_by = @manual_usage[desk_id]
+            return 4 unless reserved_by == username
 
-        # falsy values == success and truthy values == failure
-        reserved = reservation.update_reservation(time.to_i)
-        details = reservation.details
-        details[:released_at] = Time.now.to_i
-        self[username] = details
-        system.all(:Snooping).update_reservations if reserved
-        !reserved
+            reservation = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{level}-#{desk_id}")
+            raise "Mapping error. Reservation for #{desk_id} can't be found in the database" unless reservation
+
+            time ||= @manual_reserve_time
+            time = time.to_i
+            if time == 0
+                manual_checkout(details)
+                false
+            else
+                reserved = reservation.update_reservation(time)
+                details = details.dup
+                details[:reserve_time] = time
+                self[username] = details
+                !reserved
+            end
+        else
+            time ||= @desk_reserve_time
+            location = desk_details[:desk_id]
+            return 3 unless location # desk ID unknown for this IP port
+
+            switch_ip, port = @desk_mappings[location]
+            reservation = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")
+            raise "Mapping error. Desk #{location} can't be found on the switch #{switch_ip}-#{port}" unless reservation
+            return 4 unless reservation.reserved_by == username # reserved by someone else
+
+            # falsy values == success and truthy values == failure
+            reserved = reservation.update_reservation(time.to_i)
+            details = reservation.details
+            details[:released_at] = Time.now.to_i if time == 0
+            self[username] = details
+            system.all(:Snooping).update_reservations if reserved
+            !reserved
+        end
     end
 
     # Adjusts the reservation time to 0 - effectively freeing the desk
