@@ -133,8 +133,8 @@ class Aca::Tracking::DeskManagement
 
         if desk_details[:manual_desk]
             return 2 unless desk_details[:connected]
-            level = details[:level]
-            desk_id = details[:desk_id]
+            level = desk_details[:level]
+            desk_id = desk_details[:desk_id]
 
             reserved_by = @manual_usage[desk_id]
             return 4 unless reserved_by == username
@@ -145,13 +145,13 @@ class Aca::Tracking::DeskManagement
             time ||= @manual_reserve_time
             time = time.to_i
             if time == 0
-                manual_checkout(details)
+                manual_checkout(desk_details)
                 false
             else
                 reserved = reservation.update_reservation(time)
-                details = details.dup
-                details[:reserve_time] = time
-                self[username] = details
+                desk_details = desk_details.dup
+                desk_details[:reserve_time] = time
+                self[username] = desk_details
                 !reserved
             end
         else
