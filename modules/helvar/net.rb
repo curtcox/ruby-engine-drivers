@@ -159,7 +159,7 @@ class Helvar::Net
         logger.debug { "Helvar sent #{data}" }
 
         # remove connectors from multi-part responses
-        data.gsub!('$', '')
+        data.delete!('$')
 
         indicator = data[0]
         case indicator
