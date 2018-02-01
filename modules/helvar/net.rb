@@ -15,7 +15,7 @@ class Helvar::Net
     generic_name :Lighting
 
     # Communication settings
-    tokenize delimiter: "#"
+    tokenize delimiter: '#'
     default_settings version: 2
 
     def on_load
@@ -31,7 +31,7 @@ class Helvar::Net
 
     def connected
         schedule.every('40s') do
-            logger.debug "-- Polling Helvar"
+            logger.debug '-- Polling Helvar'
             query_software_version
         end
     end
@@ -163,14 +163,14 @@ class Helvar::Net
 
         indicator = data[0]
         case indicator
-        when "?", ">"
-            data, value = data.split("=")
+        when '?', '>'
+            data, value = data.split('=')
             params = {}
-            data.split(",").each do |param|
-                parts = param.split(":")
+            data.split(',').each do |param|
+                parts = param.split(':')
                 if parts.length > 1
                     params[Params[parts[0]]] = parts[1]
-                elsif parts[0][0] == "@"
+                elsif parts[0][0] == '@'
                     params[:addr] == parts[0][1..-1]
                 else
                     logger.debug { "unknown param type #{param}" }
@@ -196,8 +196,8 @@ class Helvar::Net
             else
                 logger.debug { "unknown response value\n#{cmd} = #{value}" }
             end
-        when "!"
-            error = Errors[data.split("=")[1]]
+        when '!'
+            error = Errors[data.split('=')[1]]
             self[:last_error] = "error #{error} for #{data}"
             logger.warn self[:last_error]
             return :abort
