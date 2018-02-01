@@ -205,7 +205,7 @@ class Helvar::Net
             logger.info "unknown request #{data}"
         end
 
-        return :success
+        :success
     end
 
 
