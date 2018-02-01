@@ -22,8 +22,7 @@ class Helvar::Net
         on_update
     end
 
-    def on_unload
-    end
+    def on_unload; end
 
     def on_update
         @version = setting(:version)
