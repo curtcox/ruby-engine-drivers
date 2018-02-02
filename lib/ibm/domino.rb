@@ -182,7 +182,7 @@ class Ibm::Domino
         return JSON.parse(booking_request.body)['events'][0]
     end
 
-    def get_bookings(room_ids, date=Time.now.midnight, ending=nil)
+    def get_bookings(room_ids, date=Time.now.midnight, ending=nil, full_data=false)
         room_ids = Array(room_ids)
         room_names = room_ids.map{|id| Orchestrator::ControlSystem.find(id).settings['name']}
         room_mapping = {}
@@ -233,12 +233,27 @@ class Ibm::Domino
 
             # Check if room is in our list
             if room_names.include?(domino_room_name)
+                organizer = booking['entrydata'][3]['text']['0']
                 new_booking = {
                     start: Time.parse(booking['entrydata'][0]['datetime']['0']).to_i * 1000,
                     end: Time.parse(booking['entrydata'][1]['datetime']['0']).to_i * 1000,
                     summary: booking['entrydata'][5]['text']['0'],
-                    organizer: booking['entrydata'][3]['text']['0']
+                    organizer: organizer
                 }
+                if full_data
+                    new_booking[:booking_id] = booking['entrydata'][9]['text']['0']
+                    uat_server = UV::HttpEndpoint.new(ENV['ALL_USERS_DOMAIN'])
+                    all_users = uat_server.get(path: ENV['ALL_USERS_PATH']).value
+                    all_users = JSON.parse(all_users.body)['staff']
+                    staff_db = nil
+                    all_users.each{|u|
+                        if u['StaffLNMail'] == organizer
+                            staff_db = "https://#{u['ServerName']}/#{u['MailboxPath']}.nsf"
+                            break
+                        end
+                    }
+                    new_booking[:database] = staff_db
+                end
                 rooms_bookings[room_mapping[domino_room_name]].push(new_booking)
             end
         }
