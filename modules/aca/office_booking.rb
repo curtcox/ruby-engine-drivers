@@ -639,8 +639,8 @@ class Aca::OfficeBooking
 
             # start_time = Time.parse(booking['start']['dateTime']).utc.iso8601[0..18] + 'Z'
             # end_time = Time.parse(booking['end']['dateTime']).utc.iso8601[0..18] + 'Z'
-            start_time = ActiveSupport::TimeZone.new('UTC').parse(booking['start']['dateTime']).iso8601[0..18]
-            end_time = ActiveSupport::TimeZone.new('UTC').parse(booking['end']['dateTime']).iso8601[0..18]
+            start_time = ActiveSupport::TimeZone.new('UTC').parse(booking['start']['dateTime']).iso8601
+            end_time = ActiveSupport::TimeZone.new('UTC').parse(booking['end']['dateTime']).iso8601
 
             if office_organiser_location == 'attendees'
                 # Grab the first attendee
