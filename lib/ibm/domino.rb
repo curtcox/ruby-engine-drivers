@@ -241,7 +241,7 @@ class Ibm::Domino
                     organizer: organizer
                 }
                 if full_data
-                    new_booking[:booking_id] = booking['entrydata'][9]['text']['0']
+                    booking_id = booking['entrydata'][9]['text']['0']
                     uat_server = UV::HttpEndpoint.new(ENV['ALL_USERS_DOMAIN'])
                     all_users = uat_server.get(path: ENV['ALL_USERS_PATH']).value
                     all_users = JSON.parse(all_users.body)['staff']
@@ -252,7 +252,10 @@ class Ibm::Domino
                             break
                         end
                     }
+                    staff_db_uri = URI.parse(staff_db)
+                    path = "#{staff_db_uri.path}/api/calendar/events#{booking_id}"
                     new_booking[:database] = staff_db
+                    new_booking[:path] = path
                 end
                 rooms_bookings[room_mapping[domino_room_name]].push(new_booking)
             end
