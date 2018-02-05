@@ -350,7 +350,7 @@ class Ibm::Domino
             :class => :public,
             :start => to_utc_date(starting),
             :end => to_utc_date(ending),
-            :href => "/#{database}/api/calendar/events/#{id}",
+            # :href => "/#{database}/api/calendar/events/#{id}",
             :id => id
         }
 
