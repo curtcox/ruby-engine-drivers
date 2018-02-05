@@ -341,7 +341,7 @@ class Ibm::Domino
     end
 
 
-    def edit_booking(time_changed:, room_changed:, id:, current_user:, starting:, ending:, database:, room_email:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
+    def edit_booking(id:, current_user: nil, starting:, ending:, database:, room_email:, summary:, description: nil, organizer:, attendees: [], timezone: @timezone, **opts)
         room = Orchestrator::ControlSystem.find_by_email(room_email)
         starting = convert_to_simpledate(starting)        
         ending = convert_to_simpledate(ending)        
@@ -374,16 +374,28 @@ class Ibm::Domino
             out_attendee
         end
 
-        # Organizer will not change
-        event[:organizer] = {
-            email: current_user.email
-        }
-        event[:attendees].push({
-             "role":"chair",
-             "status":"accepted",
-             "rsvp":false,
-             "email": current_user.email
-        })
+        if current_user.nil?
+             event[:organizer] = {
+                email: organizer
+            }
+            event[:attendees].push({
+                 "role":"chair",
+                 "status":"accepted",
+                 "rsvp":false,
+                 "email": organizer
+            })
+        else
+            # Organizer will not change
+            event[:organizer] = {
+                email: current_user.email
+            }
+            event[:attendees].push({
+                 "role":"chair",
+                 "status":"accepted",
+                 "rsvp":false,
+                 "email": current_user.email
+            })
+        end
 
         # Add the room as an attendee
         event[:attendees].push({
