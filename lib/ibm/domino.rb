@@ -253,7 +253,7 @@ class Ibm::Domino
                         end
                     }
                     staff_db_uri = URI.parse(staff_db)
-                    path = "#{staff_db_uri.path}/api/calendar/events#{booking_id}"
+                    path = "#{staff_db_uri.path}/api/calendar/events/#{booking_id}"
                     new_booking[:database] = staff_db
                     new_booking[:path] = path
                 end
