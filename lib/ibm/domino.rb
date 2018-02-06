@@ -9,10 +9,12 @@ class Ibm::Domino
             password:,
             auth_hash:,
             domain:,
-            timezone:
+            timezone:,
+            logger: logger
         )
         @domain = domain
         @timeone = timezone
+        @logger = logger
         @headers = {
             'Authorization' => "Basic #{auth_hash}",
             'Content-Type' => 'application/json'
@@ -43,12 +45,12 @@ class Ibm::Domino
             domino_path = "#{ENV['DOMINO_DOMAIN']}#{endpoint}"
         end
 
-        Rails.logger.info "------------NEW DOMINO REQUEST--------------"
-        Rails.logger.info domino_path
-        Rails.logger.info query
-        Rails.logger.info data
-        Rails.logger.info @headers
-        Rails.logger.info "--------------------------------------------"
+        logger.info "------------NEW DOMINO REQUEST--------------"
+        logger.info domino_path
+        logger.info query
+        logger.info data
+        logger.info @headers
+        logger.info "--------------------------------------------"
 
         response = domino_api.__send__(request_method, path: domino_path, headers: @headers, body: data, query: query)
     end
@@ -176,7 +178,7 @@ class Ibm::Domino
         event_path = base_domain + path
         booking_request = domino_request('get',nil,nil,nil,nil,event_path).value
         if ![200,201,204].include?(booking_request.status)
-            Rails.logger.info "Didn't get a 20X response from meeting detail requst."
+            logger.info "Didn't get a 20X response from meeting detail requst."
             return false
         end
         return JSON.parse(booking_request.body)['events'][0]
@@ -232,6 +234,9 @@ class Ibm::Domino
             rooms_bookings[id] = []
         }
         bookings = JSON.parse(response.body)['viewentry'] || []
+        @logger.info "Checking room names:"
+        @logger.info room_names
+        start_timer = Time.now
         bookings.each{ |booking|
 
             # Get the room name
@@ -263,6 +268,8 @@ class Ibm::Domino
                 rooms_bookings[room_mapping[domino_room_name]].push(new_booking)
             end
         }
+        end_timer = Time.now
+        @logger.info "Total time #{end_timer - start_timer}"
         rooms_bookings
     end
 
@@ -417,7 +424,7 @@ class Ibm::Domino
     def get_attendees(path)
         booking_request = domino_request('get',nil,nil,nil,nil,path).value
         if ![200,201,204].include?(booking_request.status)
-            Rails.logger.info "Didn't get a 20X response from meeting detail requst."
+            logger.info "Didn't get a 20X response from meeting detail requst."
             return false
         end
 
