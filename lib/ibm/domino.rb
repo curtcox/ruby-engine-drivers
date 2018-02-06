@@ -10,7 +10,7 @@ class Ibm::Domino
             auth_hash:,
             domain:,
             timezone:,
-            logger: logger
+            logger: Rails.logger
         )
         @domain = domain
         @timeone = timezone
@@ -45,12 +45,12 @@ class Ibm::Domino
             domino_path = "#{ENV['DOMINO_DOMAIN']}#{endpoint}"
         end
 
-        logger.info "------------NEW DOMINO REQUEST--------------"
-        logger.info domino_path
-        logger.info query
-        logger.info data
-        logger.info @headers
-        logger.info "--------------------------------------------"
+        @logger.info "------------NEW DOMINO REQUEST--------------"
+        @logger.info domino_path
+        @logger.info query
+        @logger.info data
+        @logger.info @headers
+        @logger.info "--------------------------------------------"
 
         response = domino_api.__send__(request_method, path: domino_path, headers: @headers, body: data, query: query)
     end
@@ -178,7 +178,7 @@ class Ibm::Domino
         event_path = base_domain + path
         booking_request = domino_request('get',nil,nil,nil,nil,event_path).value
         if ![200,201,204].include?(booking_request.status)
-            logger.info "Didn't get a 20X response from meeting detail requst."
+            @logger.info "Didn't get a 20X response from meeting detail requst."
             return false
         end
         return JSON.parse(booking_request.body)['events'][0]
@@ -424,7 +424,7 @@ class Ibm::Domino
     def get_attendees(path)
         booking_request = domino_request('get',nil,nil,nil,nil,path).value
         if ![200,201,204].include?(booking_request.status)
-            logger.info "Didn't get a 20X response from meeting detail requst."
+            @logger.info "Didn't get a 20X response from meeting detail requst."
             return false
         end
 
