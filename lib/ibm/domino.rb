@@ -1,6 +1,7 @@
 # Reference: https://www.ibm.com/developerworks/lotus/library/ls-Domino_URL_cheat_sheet/
 
 require 'active_support/time'
+require 'logger'
 module Ibm; end
 
 class Ibm::Domino
@@ -10,7 +11,7 @@ class Ibm::Domino
             auth_hash:,
             domain:,
             timezone:,
-            logger: Rails.logger
+            logger: Logger.new(STDOUT)
         )
         @domain = domain
         @timeone = timezone
