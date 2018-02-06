@@ -20,7 +20,7 @@ class Ibm::Domino
             'Authorization' => "Basic #{auth_hash}",
             'Content-Type' => 'application/json'
         }
-        @domino_api = UV::HttpEndpoint.new(@domain, {inactivity_timeout: 25000})
+        @domino_api = UV::HttpEndpoint.new(@domain, {inactivity_timeout: 25000, keepalive: false})
     end
 
     def domino_request(request_method, endpoint, data = nil, query = {}, headers = {}, full_path = nil)
@@ -418,7 +418,7 @@ class Ibm::Domino
         })
 
 
-        request = domino_request('put', nil, {events: [event]}, nil, nil, database + "/api/calendar/events/#{id}").value
+        request = domino_request('put', nil, {events: [event]}, {workflow: true}, nil, database + "/api/calendar/events/#{id}").value
         request
     end
 
