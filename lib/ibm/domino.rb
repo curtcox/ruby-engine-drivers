@@ -220,6 +220,12 @@ class Ibm::Domino
         request = domino_request('get', "/RRDB.nsf/93FDE1776546DEEB482581E7000B27FF", nil, query)
         response = request.value
 
+        if full_data
+            uat_server = UV::HttpEndpoint.new(ENV['ALL_USERS_DOMAIN'])
+            all_users = uat_server.get(path: ENV['ALL_USERS_PATH']).value
+            all_users = JSON.parse(all_users.body)['staff']
+        end
+
         # Go through the returned bookings and add to output array
         rooms_bookings = {}
         room_ids.each{|id|
@@ -242,9 +248,6 @@ class Ibm::Domino
                 }
                 if full_data
                     booking_id = booking['entrydata'][9]['text']['0']
-                    uat_server = UV::HttpEndpoint.new(ENV['ALL_USERS_DOMAIN'])
-                    all_users = uat_server.get(path: ENV['ALL_USERS_PATH']).value
-                    all_users = JSON.parse(all_users.body)['staff']
                     staff_db = nil
                     all_users.each{|u|
                         if u['StaffLNMail'] == organizer
