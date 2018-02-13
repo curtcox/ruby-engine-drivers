@@ -89,8 +89,8 @@ class Microsoft::Office
 
     def get_bookings_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
         # Allow passing in epoch, time string or ruby Time class
-        start_param = ensure_ruby_date(start_param).iso8601
-        end_param = ensure_ruby_date(end_param).iso8601
+        start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
+        end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
 
         # Array of all bookings within our period
         recurring_bookings = get_recurring_bookings_by_user(user_id, start_param, end_param)
@@ -112,8 +112,8 @@ class Microsoft::Office
 
     def get_recurring_bookings_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
         # Allow passing in epoch, time string or ruby Time class
-        start_param = ensure_ruby_date(start_param).iso8601
-        end_param = ensure_ruby_date(end_param).iso8601
+        start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
+        end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
 
         recurring_endpoint = "/v1.0/users/#{user_id}/calendarView"
 
