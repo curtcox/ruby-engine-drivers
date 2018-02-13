@@ -44,8 +44,8 @@ class Microsoft::Office
 
         # Set our unchanging headers
         headers['Authorization'] = "Bearer #{graph_token}"
-        headers['Content-Type'] = ENV['GRAPH_CONTENT_TYPE']
-        headers['Prefer'] = ENV['GRAPH_PREFER']
+        headers['Content-Type'] = ENV['GRAPH_CONTENT_TYPE'] || "application/json"
+        headers['Prefer'] = ENV['GRAPH_PREFER'] || 'outlook.timezone="Australia/Sydney"'
 
         graph_path = "#{@graph_domain}#{endpoint}"
 
