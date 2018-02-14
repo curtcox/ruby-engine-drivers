@@ -68,28 +68,78 @@ class Microsoft::Office
     def get_users(q: nil, limit: nil)
         filter_param = "startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}')" if q
         query_params = {
-            count: true,
-            filter: filter_param,
-            limit: limit
-        }.compact!
+            '$filter': filter_param,
+            '$top': limit
+        }.compact
         endpoint = "/v1.0/users"
-        user_response = JSON.parse(graph_request('get', endpoint, nil, query_params).value.body)['value']
+        JSON.parse(graph_request('get', endpoint, nil, query_params).value.body)['value']
     end
 
     def get_user(user_id:)
         endpoint = "/v1.0/users/#{user_id}"
-        user_response = JSON.parse(graph_request('get', endpoint).value.body)['value']
+        JSON.parse(graph_request('get', endpoint).value.body)
     end
 
-    def get_rooms
+    def get_rooms(q: nil, limit: nil)
+        filter_param = "startswith(name,'#{q}') or startswith(address,'#{q}')" if q
+        query_params = {
+            '$filter': filter_param,
+            '$top': limit
+        }.compact
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
-        room_response = JSON.parse(graph_request('get', endpoint).value.body)['value']
+        room_response = JSON.parse(graph_request('get', endpoint, nil, query_params).value.body)['value']
     end
 
     def get_room(room_id:)
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
         room_response = JSON.parse(graph_request('get', endpoint).value.body)['value']
         room_response.select! { |room| room['email'] == room_id }
+    end
+
+    def get_available_rooms(room_ids:, start_param:, end_param:, attendees:[])
+        endpoint = "/beta/users/#{@service_account_email}/findMeetingTimes"   
+        start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
+        end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
+
+        # Add the attendees
+        attendees.map!{|a|
+            { 
+                type: 'required',
+                emailAddress: {
+                    address: a[:email],
+                    name: a[:name]
+            }   }
+        }
+
+        locations = {
+            isRequired: true,
+            locations: room_ids.map{ |email| 
+                { locationEmailAddress: email }
+            },
+            suggestLocation: true
+        }
+
+        time_constraint = {
+            timeslots: [{
+                start: {
+                    DateTime: start_param,
+                    TimeZone: 'UTC'
+                },
+                end: {
+                    DateTime: end_param,
+                    TimeZone: 'UTC'
+                }
+            }]
+        }
+
+        post_data = {
+            attendees: attendees,
+            locations: locations,
+            timeConstraint: time_constraint
+        }.to_json
+
+
+        JSON.parse(graph_request('post', endpoint, post_data).value.body)
     end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week))
