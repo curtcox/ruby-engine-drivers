@@ -68,7 +68,7 @@ class Microsoft::Office
     def get_users(q: nil, limit: nil)
         filter_param = "startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}')" if q
         query_params = {
-            count: true
+            count: true,
             filter: filter_param,
             limit: limit
         }.compact!
