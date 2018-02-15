@@ -33,7 +33,13 @@ class Microsoft::Office
     end 
 
     def graph_token
-       @graph_token ||= @graph_client.password.get_token(
+       @graph_token ||= @graph_client.client_credentials.get_token({
+            :scope => @app_scope
+        }).token
+    end
+
+    def password_graph_token
+        @graph_token ||= @graph_client.password.get_token(
         @service_account_email,
         @service_account_password,
         {
@@ -41,14 +47,18 @@ class Microsoft::Office
         }).token
     end
 
-    def graph_request(request_method, endpoint, data = nil, query = {}, headers = {})
+    def graph_request(request_method, endpoint, data = nil, query = {}, headers = {}, password=false)
 
         # Convert our request method to a symbol and our data to a JSON string
         request_method = request_method.to_sym
         data = data.to_json if !data.nil? && data.class != String
 
         # Set our unchanging headers
-        headers['Authorization'] = "Bearer #{graph_token}"
+        if password
+            headers['Authorization'] = "Bearer #{password_graph_token}"
+        else
+            headers['Authorization'] = "Bearer #{graph_token}"
+        end
         headers['Content-Type'] = ENV['GRAPH_CONTENT_TYPE'] || "application/json"
         headers['Prefer'] = ENV['GRAPH_PREFER'] || 'outlook.timezone="Australia/Sydney"'
 
@@ -156,7 +166,7 @@ class Microsoft::Office
 
         }.to_json
 
-        JSON.parse(graph_request('post', endpoint, post_data).value.body)
+        JSON.parse(graph_request('post', endpoint, post_data, nil, nil, true).value.body)
     end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week))
