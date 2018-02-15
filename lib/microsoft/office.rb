@@ -14,6 +14,7 @@ class Microsoft::Office
             app_scope:,
             graph_domain:,
             service_account_email:,
+            service_account_password:,
             logger: Rails.logger
         )
         @client_id = client_id
@@ -23,6 +24,7 @@ class Microsoft::Office
         @app_scope = app_scope
         @graph_domain = graph_domain
         @service_account_email = service_account_email
+        @service_account_password = service_account_password
         @graph_client ||= OAuth2::Client.new(
             @client_id,
             @client_secret,
@@ -31,7 +33,10 @@ class Microsoft::Office
     end 
 
     def graph_token
-       @graph_token ||= @graph_client.client_credentials.get_token({
+       @graph_token ||= @graph_client.password.get_token(
+        @service_account_email,
+        @service_account_password,
+        {
             :scope => @app_scope
         }).token
     end
@@ -97,9 +102,9 @@ class Microsoft::Office
     end
 
     def get_available_rooms(room_ids:, start_param:, end_param:, attendees:[])
-        endpoint = "/beta/users/#{@service_account_email}/findMeetingTimes"   
-        start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
-        end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
+        endpoint = "/v1.0/users/#{@service_account_email}/findMeetingTimes"   
+        start_param = ensure_ruby_date((start_param || Time.now)).utc.iso8601.split("+")[0]
+        end_param = ensure_ruby_date((end_param || (Time.now + 1.hour))).utc.iso8601.split("+")[0]
 
         # Add the attendees
         attendees.map!{|a|
@@ -111,15 +116,19 @@ class Microsoft::Office
             }   }
         }
 
-        locations = {
+        location_constraint = {
             isRequired: true,
             locations: room_ids.map{ |email| 
-                { locationEmailAddress: email }
+                {
+                    locationEmailAddress: email, 
+                    resolveAvailability: false
+                }
             },
-            suggestLocation: true
+            suggestLocation: false
         }
 
         time_constraint = {
+            activityDomain: 'unrestricted',
             timeslots: [{
                 start: {
                     DateTime: start_param,
@@ -134,12 +143,16 @@ class Microsoft::Office
 
         post_data = {
             attendees: attendees,
-            locations: locations,
-            timeConstraint: time_constraint
+            locationConstraint: location_constraint,
+            timeConstraint: time_constraint,
+            maxCandidates: 1000,
+            returnSuggestionReasons: true
         }.to_json
 
-
-        JSON.parse(graph_request('post', endpoint, post_data).value.body)
+        response = graph_request('post', endpoint, post_data).value.body
+        # JSON.parse(response)['meetingTimeSuggestions'][0]['locations'].map{ |room|
+        #     room['locationEmailAddress'] if room['locationEmailAddress'] != ""
+        # }.compact
     end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week))
