@@ -102,9 +102,13 @@ class Microsoft::Office
     end
 
     def get_available_rooms(room_ids:, start_param:, end_param:, attendees:[])
-        endpoint = "/v1.0/users/#{@service_account_email}/findMeetingTimes"   
-        start_param = ensure_ruby_date((start_param || Time.now)).utc.iso8601.split("+")[0]
-        end_param = ensure_ruby_date((end_param || (Time.now + 1.hour))).utc.iso8601.split("+")[0]
+        endpoint = "/v1.0/users/#{@service_account_email}/findMeetingTimes" 
+        now = Time.now
+        start_ruby_param = ensure_ruby_date((start_param || now))
+        end_ruby_param = ensure_ruby_date((end_param || (now + 1.hour)))
+        duration_string = "PT#{end_ruby_param.to_i-start_ruby_param.to_i}S"
+        start_param = start_ruby_param.utc.iso8601.split("+")[0]
+        end_param = (end_ruby_param + 30.minutes).utc.iso8601.split("+")[0]
 
         # Add the attendees
         attendees.map!{|a|
@@ -121,7 +125,7 @@ class Microsoft::Office
             locations: room_ids.map{ |email| 
                 {
                     locationEmailAddress: email, 
-                    resolveAvailability: false
+                    resolveAvailability: true
                 }
             },
             suggestLocation: false
@@ -146,13 +150,13 @@ class Microsoft::Office
             locationConstraint: location_constraint,
             timeConstraint: time_constraint,
             maxCandidates: 1000,
-            returnSuggestionReasons: true
+            returnSuggestionReasons: true,
+            meetingDuration: duration_string
+
+
         }.to_json
 
-        response = graph_request('post', endpoint, post_data).value.body
-        # JSON.parse(response)['meetingTimeSuggestions'][0]['locations'].map{ |room|
-        #     room['locationEmailAddress'] if room['locationEmailAddress'] != ""
-        # }.compact
+        JSON.parse(graph_request('post', endpoint, post_data).value.body)
     end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week))
