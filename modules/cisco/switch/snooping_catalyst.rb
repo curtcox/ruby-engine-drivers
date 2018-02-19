@@ -127,7 +127,7 @@ class Cisco::Switch::SnoopingCatalyst
         # Detect more data available
         # ==> --More-- 
         if data =~ /More/
-            send(' ', priority: 99)
+            send(' ', priority: 99, retries: 0)
             return :success
         end
 
