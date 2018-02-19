@@ -305,6 +305,8 @@ class Aca::Tracking::DeskManagement
         # Build the list of desk ids for each level
         desk_ids = {}
         hardware.each do |switch|
+            next if switch.nil?
+
             ip = switch[:ip_address]
             mappings = @switch_mappings[ip]
             next unless mappings
