@@ -70,7 +70,9 @@ class Microsoft::Office
 
         log_graph_request(request_method, data, query, headers, graph_path)
 
-        graph_api = UV::HttpEndpoint.new(@graph_domain, {inactivity_timeout: 25000})
+        proxy = URI.parse(@internet_proxy)
+
+        graph_api = UV::HttpEndpoint.new(@graph_domain, {inactivity_timeout: 25000, proxy: { host: proxy.host, port: proxy.port }})
         response = graph_api.__send__(request_method, path: graph_path, headers: headers, body: data, query: query)
     end
 
