@@ -15,6 +15,7 @@ class Microsoft::Office
             graph_domain:,
             service_account_email:,
             service_account_password:,
+            internet_proxy:nil,
             logger: Rails.logger
         )
         @client_id = client_id
@@ -25,10 +26,13 @@ class Microsoft::Office
         @graph_domain = graph_domain
         @service_account_email = service_account_email
         @service_account_password = service_account_password
+        @internet_proxy = internet_proxy
+        oauth_options = { site: @app_site,  token_url: @app_token_url }
+        oauth_options[:connection_opts] = { proxy: @internet_proxy } if @internet_proxy
         @graph_client ||= OAuth2::Client.new(
             @client_id,
             @client_secret,
-            {:site => @app_site, :token_url => @app_token_url}
+            oauth_options
         )
     end 
 
