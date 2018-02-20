@@ -241,7 +241,7 @@ class Aca::MeetingRoom < Aca::Joiner
     end
 
     def preview(source)
-        if self[:has_preview]
+        if self[:has_preview] && self[:has_preview].is_a?(Integer)
             disp_source = self[:sources][source.to_sym]
             preview_input = disp_source[:preview] || disp_source[:input]
 
@@ -277,12 +277,17 @@ class Aca::MeetingRoom < Aca::Joiner
                 check = ids.collect(&:to_s)
                 rms = Set.new(check)
                 rms << system.id.to_s
+
+                found = false
                 @join_modes.each_value do |jm|
                     if jm[:rooms] == rms
                         perform_action(mod: :System, func: :switch_mode, args: [jm[:mode], true])
+                        found = true
                         break
                     end
                 end
+
+                unjoin if !found
             end
         end
 
@@ -543,9 +548,10 @@ class Aca::MeetingRoom < Aca::Joiner
                 sys[:Switcher].switch(mode[:routes]) if mode[:routes]
                 sys[:Lighting].trigger(@light_group, mode[:light_preset]) if mode[:light_preset]
                 sys[:VideoWall].preset(mode[:videowall_preset]) if mode[:videowall_preset]
-                # Route currently selected source to any added preview screens
-                preview(self[self[:tab]][0]) if self[:has_preview] && self[:tab]
 
+                # Route currently selected source to any added preview screens
+                self[:tab] = self[:inputs][0] if self[:tab] && !self[self[:tab]]
+                preview(self[self[:tab]][0]) if self[:has_preview] && self[:tab] && self[self[:tab]]
 
                 if mode[:execute]
                     mode[:execute].each do |cmd|
