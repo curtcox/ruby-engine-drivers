@@ -3,7 +3,7 @@
 module Aca; end
 module Aca::Tracking; end
 
-# Manual desk tracking will use this DB structure for persistance 
+# Manual desk tracking will use this DB structure for persistance
 require 'aca/tracking/switch_port'
 require 'set'
 
@@ -28,7 +28,7 @@ class Aca::Tracking::DeskManagement
         on_update
 
         # Load any manual check-in data
-        @manual_checkin.each do |level, _|
+        @manual_checkin.each_key do |level|
             logger.debug { "Loading manual desk check-in details for level #{level}" }
 
             query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(level)
@@ -87,8 +87,7 @@ class Aca::Tracking::DeskManagement
     #
     # @param level [String] the level id of the floor
     def desk_usage(level)
-        (self[level] || []) +
-        (self["#{level}:reserved"] || [])
+        (self[level] || []) + (self["#{level}:reserved"] || [])
     end
 
     # Grab the ownership details of the desk
@@ -134,8 +133,8 @@ class Aca::Tracking::DeskManagement
             level = desk_details[:level]
             desk_id = desk_details[:desk_id]
 
-            #reserved_by = @manual_usage[desk_id]
-            #return 4 unless reserved_by == username
+            # reserved_by = @manual_usage[desk_id]
+            # return 4 unless reserved_by == username
 
             reservation = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{level}-#{desk_id}")
             raise "Mapping error. Reservation for #{desk_id} can't be found in the database" unless reservation
@@ -263,7 +262,7 @@ class Aca::Tracking::DeskManagement
         level = details[:level]
         desk_id = details[:desk_id]
         username = details[:username] || desk_id
-        
+
         tracker = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{level}-#{desk_id}")
         tracker&.destroy
 
@@ -281,7 +280,7 @@ class Aca::Tracking::DeskManagement
     def cleanup_manual_checkins
         remove = []
 
-        @manual_usage.each do |desk_id, username|
+        @manual_usage.each_value do |username|
             details = self[username]
             remove << details unless details.reserved?
         end
@@ -330,19 +329,17 @@ class Aca::Tracking::DeskManagement
         end
 
         # Apply the level details
-        desk_ids.each { |level, desks|
+        desk_ids.each do |level, desks|
             self["#{level}:desk_ids"] = desks
             self["#{level}:desk_count"] = desks.length
-        }
+        end
 
         # Watch for users unplugging laptops
         sys = system
         (1..hardware.length).each do |index|
             @subscriptions << sys.subscribe(:Snooping, index, :disconnected) do |notify|
                 details = notify.value
-                if details.reserved_by
-                    self[details.reserved_by] = details
-                end
+                self[details.reserved_by] = details if details.reserved_by
             end
         end
     end
@@ -416,7 +413,7 @@ class Aca::Tracking::DeskManagement
             return
         end
 
-        # Grab port information 
+        # Grab port information
         interfaces = switch[:interfaces]
         reservations = switch[:reserved]
 
