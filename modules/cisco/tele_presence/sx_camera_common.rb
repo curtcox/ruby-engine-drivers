@@ -13,14 +13,14 @@ module Cisco::TelePresence::SxCameraCommon
         self[:joy_right] = 3
         self[:joy_center] = 0
 
-        self[:pan_max] = 65535    # Right
-        self[:pan_min] = -65535   # Left
+        self[:pan_max] = 10000    # Right
+        self[:pan_min] = -10000   # Left
         self[:pan_center] = 0
-        self[:tilt_max] = 65535   # UP
-        self[:tilt_min] = -65535  # Down
+        self[:tilt_max] = 2500   # UP
+        self[:tilt_min] = -2500  # Down
         self[:tilt_center] = 0
 
-        self[:zoom_max] = 17284 # 65535
+        self[:zoom_max] = 8500 # 65535
         self[:zoom_min] = 0
 
         super
