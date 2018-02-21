@@ -350,8 +350,8 @@ class Aca::ExchangeBooking
 
     def create_meeting(options)
         # Check that the required params exist
-        required_fields = ["start", "end"]
-        check = required_fields - options.keys
+        required_fields = [:start, :end]
+        check = required_fields - options.keys.collect(&:to_sym)
         if check != []
             # There are missing required fields
             logger.info "Required fields missing: #{check}"
@@ -614,10 +614,14 @@ class Aca::ExchangeBooking
                 ending = Time.parse(ending).in_time_zone(@timezone).iso8601[0..18]
             end
 
+            logger.debug { item.inspect }
+
+            subject = item[:subject]
+
             {
                 :Start => start,
                 :End => ending,
-                :Subject => item[:subject][:text],
+                :Subject => subject ? subject[:text] : "Private",
                 :owner => item[:organizer][:elems][0][:mailbox][:elems][0][:name][:text],
                 :setup => 0,
                 :breakdown => 0
