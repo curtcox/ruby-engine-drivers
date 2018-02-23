@@ -492,8 +492,11 @@ class Aca::MeetingRoom < Aca::Joiner
             mode_outs = mode[:outputs] || {}
             difference = mode_outs.keys - default_outs.keys
 
-            self[:outputs] = ActiveSupport::HashWithIndifferentAccess.new.deep_merge(mode_outs.merge(default_outs))
-            @original_outputs = self[:outputs].deep_dup
+            if mode[:outputs_clobber] 
+              self[:outputs] = ActiveSupport::HashWithIndifferentAccess.new.deep_merge(mode_outs)
+            else
+               self[:outputs] = ActiveSupport::HashWithIndifferentAccess.new.deep_merge(mode_outs.merge(default_outs))
+            end
 
             if respond_to? :switch_mode_custom
                 begin
