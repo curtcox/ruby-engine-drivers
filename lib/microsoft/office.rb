@@ -1,6 +1,14 @@
 require 'active_support/time'
 require 'logger'
-module Microsoft; end
+module Microsoft
+    class Error < StandardError
+        class ResourceNotFound < Error; end
+        class InvalidAuthenticationToken < Error; end
+        class BadRequest < Error; end
+        class ErrorInvalidIdMalformed < Error; end
+        class ErrorAccessDenied < Error; end
+    end
+end
 
 class Microsoft::Office
     TIMEZONE_MAPPING = {
@@ -51,8 +59,9 @@ class Microsoft::Office
         }).token
     end
 
-    def graph_request(request_method, endpoint, data = nil, query = {}, headers = {}, password=false)
-
+    def graph_request(request_method, endpoint, data = nil, query = {}, headers = nil, password=false)
+        headers = Hash(headers)
+        query = Hash(query)
         # Convert our request method to a symbol and our data to a JSON string
         request_method = request_method.to_sym
         data = data.to_json if !data.nil? && data.class != String
@@ -68,22 +77,50 @@ class Microsoft::Office
 
         graph_path = "#{@graph_domain}#{endpoint}"
 
-        log_graph_request(request_method, data, query, headers, graph_path)
+        log_graph_request(request_method, data, query, headers, graph_path, password)
 
-        proxy = URI.parse(@internet_proxy)
 
-        graph_api = UV::HttpEndpoint.new(@graph_domain, {inactivity_timeout: 25000, proxy: { host: proxy.host, port: proxy.port }})
+        graph_api_options = {inactivity_timeout: 25000}
+        if @internet_proxy
+            proxy = URI.parse(@internet_proxy)
+            graph_api_options[:proxy] = { host: proxy.host, port: proxy.port }
+        end
+
+        graph_api = UV::HttpEndpoint.new(@graph_domain, graph_api_options)
         response = graph_api.__send__(request_method, path: graph_path, headers: headers, body: data, query: query)
     end
 
-    def log_graph_request(request_method, data, query, headers, graph_path)
+    def log_graph_request(request_method, data, query, headers, graph_path, password)
         STDERR.puts "--------------NEW GRAPH REQUEST------------"
         STDERR.puts "#{request_method} to #{graph_path}"
+        STDERR.puts "Data:"
         STDERR.puts data if data
+        STDERR.puts "Query:"
         STDERR.puts query if query
-        STDERR.puts headers
+        STDERR.puts "Headers:"
+        STDERR.puts headers if headers
+        STDERR.puts "Password auth is: #{password}"
         STDERR.puts '--------------------------------------------'
         STDERR.flush
+    end
+
+    def check_response(response)
+        case response.status
+        when 200, 201, 204
+            return
+        when 400
+            if response['error']['code'] == 'ErrorInvalidIdMalformed'
+                raise Microsoft::Error::ErrorInvalidIdMalformed.new(response.body)
+            else
+                raise Microsoft::Error::BadRequest.new(response.body)
+            end
+        when 401
+            raise Microsoft::Error::InvalidAuthenticationToken.new(response.body)
+        when 403
+            raise Microsoft::Error::ErrorAccessDenied.new(response.body)
+        when 404
+            raise Microsoft::Error::ResourceNotFound.new(response.body)
+        end
     end
 
     def get_users(q: nil, limit: nil)
@@ -93,12 +130,16 @@ class Microsoft::Office
             '$top': limit
         }.compact
         endpoint = "/v1.0/users"
-        JSON.parse(graph_request('get', endpoint, nil, query_params).value.body)['value']
+        request = graph_request('get', endpoint, nil, query_params).value
+        check_response(request)
+        JSON.parse(request.body)['value']
     end
 
     def get_user(user_id:)
         endpoint = "/v1.0/users/#{user_id}"
-        JSON.parse(graph_request('get', endpoint).value.body)
+        request = graph_request('get', endpoint).value
+        check_response(request)
+        JSON.parse(request.body)
     end
 
     def get_rooms(q: nil, limit: nil)
@@ -108,12 +149,16 @@ class Microsoft::Office
             '$top': limit
         }.compact
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
-        room_response = JSON.parse(graph_request('get', endpoint, nil, query_params).value.body)['value']
+        request = graph_request('get', endpoint, nil, query_params).value
+        check_response(request)
+        room_response = JSON.parse(request.body)['value']
     end
 
     def get_room(room_id:)
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
-        room_response = JSON.parse(graph_request('get', endpoint).value.body)['value']
+        request = graph_request('get', endpoint).value
+        check_response(request)
+        room_response = JSON.parse(request.body)['value']
         room_response.select! { |room| room['email'] == room_id }
     end
 
@@ -172,7 +217,17 @@ class Microsoft::Office
 
         }.to_json
 
-        JSON.parse(graph_request('post', endpoint, post_data, nil, nil, true).value.body)
+        request = graph_request('post', endpoint, post_data, nil, nil, true).value
+        check_response(request)
+        JSON.parse(request.body)
+    end
+
+    def delete_booking(room_id:, booking_id:)
+        room = Orchestrator::ControlSystem.find(room_id)
+        endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
+        request = graph_request('delete', endpoint, nil, nil, nil, true).value
+        check_response(request)
+        response = JSON.parse(request.body)
     end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week))
@@ -193,9 +248,14 @@ class Microsoft::Office
             query_hash['$filter'.to_sym] = "(Start/DateTime le '#{start_param}' and End/DateTime ge '#{start_param}') or (Start/DateTime ge '#{start_param}' and Start/DateTime le '#{end_param}')"
         end
 
-        bookings_response = graph_request('get', endpoint, nil, query_hash).value
+        bookings_response = graph_request('get', endpoint, nil, query_hash, nil, true).value
+        check_response(bookings_response)
         bookings = JSON.parse(bookings_response.body)['value']
-        bookings.concat recurring_bookings
+        if bookings.nil?
+            return recurring_bookings
+        else
+            bookings.concat recurring_bookings
+        end
     end
 
     def get_recurring_bookings_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
@@ -214,7 +274,8 @@ class Microsoft::Office
             query_hash['endDateTime'] = end_param
         end
 
-        recurring_response = graph_request('get', recurring_endpoint, nil, query_hash).value
+        recurring_response = graph_request('get', recurring_endpoint, nil, query_hash, nil, true).value
+        check_response(recurring_response)
         recurring_bookings = JSON.parse(recurring_response.body)['value']
     end
 
@@ -292,13 +353,20 @@ class Microsoft::Office
             attendees: attendees
         }.to_json
 
-        response = JSON.parse(graph_request('post', endpoint, event).value.body)['value']
+        request = graph_request('post', endpoint, event, nil, nil, true).value
+
+        check_response(request)
+
+        response = JSON.parse(request.body)['value']
     end
 
     def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, timezone:'Sydney')
         # We will always need a room and endpoint passed in
         room = Orchestrator::ControlSystem.find(room_id)
         endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
+        STDERR.puts "ENDPOINT IS"
+        STDERR.puts endpoint
+        STDERR.flush
         event = {}
         event[:subject] = subject if subject
 
@@ -325,8 +393,11 @@ class Microsoft::Office
             }   }
         } if attendees
 
-        response = JSON.parse(graph_request('patch', endpoint, event).to_json.value.body)['value']
+        request = graph_request('patch', endpoint, event.to_json, nil, nil, true).value
+        check_response(request)
+        response = JSON.parse(request.body)['value']
     end
+
 
     # Takes a date of any kind (epoch, string, time object) and returns a time object
     def ensure_ruby_date(date) 
