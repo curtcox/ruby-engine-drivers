@@ -59,19 +59,20 @@ class Microsoft::Office
         }).token
     end
 
-    def graph_request(request_method, endpoint, data = nil, query = {}, headers = nil, password=false)
+    def graph_request(request_method:, endpoint:, data:nil, query:{}, headers:nil, password:false)
         headers = Hash(headers)
         query = Hash(query)
         # Convert our request method to a symbol and our data to a JSON string
         request_method = request_method.to_sym
         data = data.to_json if !data.nil? && data.class != String
 
-        # Set our unchanging headers
         if password
             headers['Authorization'] = "Bearer #{password_graph_token}"
         else
             headers['Authorization'] = "Bearer #{graph_token}"
         end
+
+        # Set our unchanging headers
         headers['Content-Type'] = ENV['GRAPH_CONTENT_TYPE'] || "application/json"
         headers['Prefer'] = ENV['GRAPH_PREFER'] || 'outlook.timezone="Australia/Sydney"'
 
@@ -130,7 +131,7 @@ class Microsoft::Office
             '$top': limit
         }.compact
         endpoint = "/v1.0/users"
-        request = graph_request('get', endpoint, nil, query_params).value
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params).value
         check_response(request)
         JSON.parse(request.body)['value']
     end
@@ -149,14 +150,14 @@ class Microsoft::Office
             '$top': limit
         }.compact
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
-        request = graph_request('get', endpoint, nil, query_params).value
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params).value
         check_response(request)
         room_response = JSON.parse(request.body)['value']
     end
 
     def get_room(room_id:)
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
-        request = graph_request('get', endpoint).value
+        request = graph_request(request_method: 'get', endpoint: endpoint).value
         check_response(request)
         room_response = JSON.parse(request.body)['value']
         room_response.select! { |room| room['email'] == room_id }
@@ -217,7 +218,7 @@ class Microsoft::Office
 
         }.to_json
 
-        request = graph_request('post', endpoint, post_data, nil, nil, true).value
+        request = graph_request(request_method: 'post', endpoint: endpoint, data: post_data, password: true).value
         check_response(request)
         JSON.parse(request.body)
     end
@@ -225,7 +226,7 @@ class Microsoft::Office
     def delete_booking(room_id:, booking_id:)
         room = Orchestrator::ControlSystem.find(room_id)
         endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
-        request = graph_request('delete', endpoint, nil, nil, nil, true).value
+        request = graph_request(request_method: 'delete', endpoint: endpoint, password: true).value
         check_response(request)
         response = JSON.parse(request.body)
     end
@@ -248,7 +249,7 @@ class Microsoft::Office
             query_hash['$filter'.to_sym] = "(Start/DateTime le '#{start_param}' and End/DateTime ge '#{start_param}') or (Start/DateTime ge '#{start_param}' and Start/DateTime le '#{end_param}')"
         end
 
-        bookings_response = graph_request('get', endpoint, nil, query_hash, nil, true).value
+        bookings_response = graph_request(request_method: 'get', endpoint: endpoint, query: query_hash, password: true).value
         check_response(bookings_response)
         bookings = JSON.parse(bookings_response.body)['value']
         if bookings.nil?
@@ -274,7 +275,7 @@ class Microsoft::Office
             query_hash['endDateTime'] = end_param
         end
 
-        recurring_response = graph_request('get', recurring_endpoint, nil, query_hash, nil, true).value
+        recurring_response = graph_request(request_method: 'get', endpoint: recurring_endpoint, query: query_hash, password: true).value
         check_response(recurring_response)
         recurring_bookings = JSON.parse(recurring_response.body)['value']
     end
@@ -353,7 +354,7 @@ class Microsoft::Office
             attendees: attendees
         }.to_json
 
-        request = graph_request('post', endpoint, event, nil, nil, true).value
+        request = graph_request(request_method: 'post', endpoint: endpoint, data: event, password: true).value
 
         check_response(request)
 
@@ -393,7 +394,7 @@ class Microsoft::Office
             }   }
         } if attendees
 
-        request = graph_request('patch', endpoint, event.to_json, nil, nil, true).value
+        request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: true).value
         check_response(request)
         response = JSON.parse(request.body)['value']
     end
