@@ -55,7 +55,7 @@ class Polycom::RealPresence::GroupSeriesCamera
 
         schedule.every('50s') do
             logger.debug 'Maintaining connection..'
-            position?
+            maintain_connection
         end
     end
 
@@ -63,11 +63,16 @@ class Polycom::RealPresence::GroupSeriesCamera
         schedule.clear
     end
 
-    protect_method :notify, :nonotify, :update_position, :send_cmd
+    protect_method :notify, :nonotify, :update_position, :send_cmd, :maintain_connection
 
     def send_cmd(data)
         logger.debug { "sending: #{data}" }
         send "#{data}\r"
+    end
+
+    def maintain_connection
+        # Queries the AMX beacon state.
+        send "amxdd get\r", name: :connection_maintenance, priority: 0
     end
 
     # Lists the notification types that are currently being
