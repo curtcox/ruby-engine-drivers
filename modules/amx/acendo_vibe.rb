@@ -5,6 +5,8 @@ require 'shellwords'
 
 module Amx; end
 
+# Documentation: https://aca.im/driver_docs/AMX/AMX+Acendo+Vibe.pdf
+
 class Amx::AcendoVibe
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
