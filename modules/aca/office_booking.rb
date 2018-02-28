@@ -325,7 +325,7 @@ class Aca::OfficeBooking
     def fetch_bookings(*args)
 
         # Make the request
-        response = @client.get_bookings_by_room(room_id: @office_room, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)
+        response = @client.get_bookings_by_user(room_id: @office_room, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)
 
 
 
