@@ -59,7 +59,7 @@ class Amx::AcendoVibe
 
     CMDS.each do |name, cmd|
         define_method "#{name}?" do |**options|
-            get cmd **options
+            get(cmd, **options)
         end
     end
 
@@ -184,6 +184,18 @@ class Amx::AcendoVibe
                 self[:source] = data[2].to_sym
             when 'vol_change'
                 self[:volume] = data[2].to_i
+            when 'usb_conn'
+                self[:usb_connected] = true
+            when 'usb_dis'
+                self[:usb_connected] = false
+            when 'hdmi_conn'
+                self[:hdmi_connected] = true
+            when 'hdmi_dis'
+                self[:hdmi_connected] = false
+            when 'vacancy_det'
+                self[:presence_detected] = false
+            when 'occupancy_det'
+                self[:presence_detected] = true
             end
             return :ignore
         end
@@ -206,17 +218,21 @@ class Amx::AcendoVibe
         path = data[1].split('/')
         arg = data[-1]
 
-        case path[0]
+        # ignore echos
+        return unless data.length > 2
+
+logger.debug "DATA: #{data.inspect}"
+        case path[1]
         when 'audmic'
             self[:mic_mute] = arg == 'muted'
         when 'audio'
-            case path[1]
+            case path[2]
             when 'autoswitch'
                 self[:auto_switch] = arg == 'on'
             when 'defvolume'
                 self[:default_volume] = arg.to_i
             when 'gain'
-                if path[2] == 'level'
+                if path[3] == 'level'
                     self[:gain] = arg.to_i
                 else
                     self[:gain_mode] = arg
@@ -231,7 +247,7 @@ class Amx::AcendoVibe
         when 'battery'
             self[:battery] = arg
         when 'bluetooth'
-            if path[1] == 'connstate'
+            if path[2] == 'connstate'
                 self[:bluetooth] = arg
             else
                 self[:bluetooth_enabled] = arg == 'on'
@@ -239,9 +255,9 @@ class Amx::AcendoVibe
         when 'camera'
             self[:camera] = arg
         when 'system'
-            self[path[1]] = arg
+            self[path[2]] = arg
         when 'usbup'
-            self[:usb_status] = arg
+            self[:usb_status] = (arg == 'connected')
         end
 
         :success
