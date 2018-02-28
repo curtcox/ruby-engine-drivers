@@ -608,7 +608,7 @@ class Aca::OfficeBooking
     end
 
     def todays_bookings(response, office_organiser_location)
-
+        results = []
         response.each{|booking| 
 
             # start_time = Time.parse(booking['start']['dateTime']).utc.iso8601[0..18] + 'Z'
