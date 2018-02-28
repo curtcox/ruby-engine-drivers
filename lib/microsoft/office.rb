@@ -24,6 +24,7 @@ class Microsoft::Office
             service_account_email:,
             service_account_password:,
             internet_proxy:nil,
+            delegated:false,
             logger: Rails.logger
         )
         @client_id = client_id
@@ -35,6 +36,7 @@ class Microsoft::Office
         @service_account_email = service_account_email
         @service_account_password = service_account_password
         @internet_proxy = internet_proxy
+        @delegated = delegated
         oauth_options = { site: @app_site,  token_url: @app_token_url }
         oauth_options[:connection_opts] = { proxy: @internet_proxy } if @internet_proxy
         @graph_client ||= OAuth2::Client.new(
@@ -89,6 +91,13 @@ class Microsoft::Office
 
         graph_api = UV::HttpEndpoint.new(@graph_domain, graph_api_options)
         response = graph_api.__send__(request_method, path: graph_path, headers: headers, body: data, query: query)
+
+        start_timing = Time.now.to_i
+        response_value = response.value
+        end_timing = Time.now.to_i
+        STDERR.puts "Graph request took #{end_timing - start_timing} seconds"
+        STDERR.flush
+        return response_value
     end
 
     def log_graph_request(request_method, data, query, headers, graph_path, password)
@@ -131,14 +140,14 @@ class Microsoft::Office
             '$top': limit
         }.compact
         endpoint = "/v1.0/users"
-        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params).value
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
         JSON.parse(request.body)['value']
     end
 
     def get_user(user_id:)
         endpoint = "/v1.0/users/#{user_id}"
-        request = graph_request('get', endpoint).value
+        request = graph_request('get', endpoint)
         check_response(request)
         JSON.parse(request.body)
     end
@@ -150,14 +159,14 @@ class Microsoft::Office
             '$top': limit
         }.compact
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
-        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params).value
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
         room_response = JSON.parse(request.body)['value']
     end
 
     def get_room(room_id:)
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
-        request = graph_request(request_method: 'get', endpoint: endpoint).value
+        request = graph_request(request_method: 'get', endpoint: endpoint, password: true)
         check_response(request)
         room_response = JSON.parse(request.body)['value']
         room_response.select! { |room| room['email'] == room_id }
@@ -218,7 +227,7 @@ class Microsoft::Office
 
         }.to_json
 
-        request = graph_request(request_method: 'post', endpoint: endpoint, data: post_data, password: true).value
+        request = graph_request(request_method: 'post', endpoint: endpoint, data: post_data, password: @delegated)
         check_response(request)
         JSON.parse(request.body)
     end
@@ -226,7 +235,7 @@ class Microsoft::Office
     def delete_booking(room_id:, booking_id:)
         room = Orchestrator::ControlSystem.find(room_id)
         endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
-        request = graph_request(request_method: 'delete', endpoint: endpoint, password: true).value
+        request = graph_request(request_method: 'delete', endpoint: endpoint, password: @delegated)
         check_response(request)
         response = JSON.parse(request.body)
     end
@@ -249,7 +258,7 @@ class Microsoft::Office
             query_hash['$filter'.to_sym] = "(Start/DateTime le '#{start_param}' and End/DateTime ge '#{start_param}') or (Start/DateTime ge '#{start_param}' and Start/DateTime le '#{end_param}')"
         end
 
-        bookings_response = graph_request(request_method: 'get', endpoint: endpoint, query: query_hash, password: true).value
+        bookings_response = graph_request(request_method: 'get', endpoint: endpoint, query: query_hash, password: @delegated)
         check_response(bookings_response)
         bookings = JSON.parse(bookings_response.body)['value']
         if bookings.nil?
@@ -275,7 +284,7 @@ class Microsoft::Office
             query_hash['endDateTime'] = end_param
         end
 
-        recurring_response = graph_request(request_method: 'get', endpoint: recurring_endpoint, query: query_hash, password: true).value
+        recurring_response = graph_request(request_method: 'get', endpoint: recurring_endpoint, query: query_hash, password: @delegated)
         check_response(recurring_response)
         recurring_bookings = JSON.parse(recurring_response.body)['value']
     end
@@ -354,7 +363,7 @@ class Microsoft::Office
             attendees: attendees
         }.to_json
 
-        request = graph_request(request_method: 'post', endpoint: endpoint, data: event, password: true).value
+        request = graph_request(request_method: 'post', endpoint: endpoint, data: event, password: @delegated)
 
         check_response(request)
 
@@ -394,7 +403,7 @@ class Microsoft::Office
             }   }
         } if attendees
 
-        request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: true).value
+        request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: @delegated)
         check_response(request)
         response = JSON.parse(request.body)['value']
     end
