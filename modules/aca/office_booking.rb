@@ -150,7 +150,7 @@ class Aca::OfficeBooking
         # Do we want to use exchange web services to manage bookings
         if CAN_OFFICE
             logger.debug "Setting OFFICE"
-            @office_organiser_location = setting(:office_organiser_location)
+            @office_organiser_location = setting(:office_organiser_location) 
             @office_client_id = setting(:office_client_id)
             @office_secret = setting(:office_secret)
             @office_scope = setting(:office_scope)
@@ -611,15 +611,13 @@ class Aca::OfficeBooking
         results = []
         response.each{|booking| 
 
-            # start_time = Time.parse(booking['start']['dateTime']).utc.iso8601[0..18] + 'Z'
-            # end_time = Time.parse(booking['end']['dateTime']).utc.iso8601[0..18] + 'Z'
-            start_time = ActiveSupport::TimeZone.new('UTC').parse(booking['start']['dateTime']).iso8601[0..18]
-            end_time = ActiveSupport::TimeZone.new('UTC').parse(booking['end']['dateTime']).iso8601[0..18]
+            start_time = ActiveSupport::TimeZone.new('UTC').parse(booking['start']['dateTime']).iso8601
+            end_time = ActiveSupport::TimeZone.new('UTC').parse(booking['end']['dateTime']).iso8601
 
             if office_organiser_location == 'attendees'
                 # Grab the first attendee
                 organizer = booking['attendees'][0]['emailAddress']['name']
-            elsif office_organiser_location == 'organizer'
+            else
                 # Grab the organiser
                 organizer = booking['organizer']['emailAddress']['name']
             end
@@ -629,13 +627,8 @@ class Aca::OfficeBooking
                 :End => end_time,
                 :Subject => booking['subject'],
                 :owner => organizer
-                # :setup => 0,
-                # :breakdown => 0
             })
         }
-
-        logger.info "Got #{results.length} results!"
-        logger.info results.to_json
 
         results
     end
