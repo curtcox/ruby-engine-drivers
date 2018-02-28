@@ -329,8 +329,8 @@ class Microsoft::Office
         # Add the current user as an attendee
         attendees.push({
             emailAddress: {
-                address: current_user.email,
-                name: current_user.name
+                address: current_user[:email],
+                name: current_user[:name]
             }
         })
 
@@ -367,7 +367,7 @@ class Microsoft::Office
 
         check_response(request)
 
-        response = JSON.parse(request.body)['value']
+        response = JSON.parse(request.body)
     end
 
     def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, timezone:'Sydney')

@@ -165,6 +165,19 @@ class Aca::OfficeBooking
             # NOTE:: Using UPN we might be able to remove the LDAP requirement
             @office_connect_type = (setting(:office_connect_type) || :SMTP).to_sym
             @timezone = setting(:room_timezone)
+
+            @client = ::Microsoft::Office.new({
+                client_id: @office_client_id || ENV['OFFICE_CLIENT_ID'],
+                client_secret: @office_secret || ENV["OFFICE_CLIENT_SECRET"],
+                app_site: @office_site || ENV["OFFICE_SITE"] || "https://login.microsoftonline.com",
+                app_token_url: @office_token_url || ENV["OFFICE_TOKEN_URL"],
+                app_scope: @office_scope || ENV['OFFICE_SCOPE'] || "https://graph.microsoft.com/.default",
+                graph_domain: ENV['GRAPH_DOMAIN'] || "https://graph.microsoft.com",
+                service_account_email: @office_user_password || ENV['OFFICE_ACCOUNT_EMAIL'],
+                service_account_password: @office_user_password || ENV['OFFICE_ACCOUNT_PASSWORD'],
+                internet_proxy: @internet_proxy || ENV['INTERNET_PROXY'],
+                delegated: @office_delegated || false
+            })
         else
             logger.warn "oauth2 gem not available" if setting(:office_creds)
         end
@@ -329,19 +342,7 @@ class Aca::OfficeBooking
         # @office_options = setting(:office_options)
         # @office_room = (setting(:office_room) || system.email)
         # client = OAuth2::Client.new(@office_client_id, @office_secret, {site: @office_site, token_url: @office_token_url})
-        client = ::Microsoft::Office.new({
-            client_id: @office_client_id || ENV['OFFICE_CLIENT_ID'],
-            client_secret: @office_secret || ENV["OFFICE_CLIENT_SECRET"],
-            app_site: @office_site || ENV["OFFICE_SITE"] || "https://login.microsoftonline.com",
-            app_token_url: @office_token_url || ENV["OFFICE_TOKEN_URL"],
-            app_scope: @office_scope || ENV['OFFICE_SCOPE'] || "https://graph.microsoft.com/.default",
-            graph_domain: ENV['GRAPH_DOMAIN'] || "https://graph.microsoft.com",
-            service_account_email: @office_user_password || ENV['OFFICE_ACCOUNT_EMAIL'],
-            service_account_password: @office_user_password || ENV['OFFICE_ACCOUNT_PASSWORD'],
-            internet_proxy: @internet_proxy || ENV['INTERNET_PROXY'],
-            delegated: @office_delegated || false
 
-        })
 
         # begin
         #     access_token = client.client_credentials.get_token({
@@ -370,7 +371,7 @@ class Aca::OfficeBooking
         # }
 
         # Make the request
-        response = client.get_bookings_by_room(@office_room, Time.now.midnight, Time.now.tomorrow.midnight)
+        response = @client.get_bookings_by_room(@office_room, Time.now.midnight, Time.now.tomorrow.midnight)
 
 
 
@@ -453,8 +454,8 @@ class Aca::OfficeBooking
         req_params[:room_email] = @ews_room
         req_params[:organizer] = options[:user_email]
         req_params[:subject] = options[:title]
-        req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.iso8601.chop
-        req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.iso8601.chop
+        req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.to_i
+        req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.to_i
 
        
         # TODO:: Catch error for booking failure
@@ -571,42 +572,43 @@ class Aca::OfficeBooking
         logger.debug "Creating booking:"
         logger.debug booking_data
 
-        client = OAuth2::Client.new(@office_client_id, @office_secret, {site: @office_site, token_url: @office_token_url})
+        # client = OAuth2::Client.new(@office_client_id, @office_secret, {site: @office_site, token_url: @office_token_url})
 
-        begin
-            access_token = client.client_credentials.get_token({
-                :scope => @office_scope
-                # :client_secret => ENV["OFFICE_APP_CLIENT_SECRET"],
-                # :client_id => ENV["OFFICE_APP_CLIENT_ID"]
-            }).token
-        rescue Exception => e
-            logger.debug e.message
-            logger.debug e.backtrace.inspect
-            raise e
-        end
+        # begin
+        #     access_token = client.client_credentials.get_token({
+        #         :scope => @office_scope
+        #         # :client_secret => ENV["OFFICE_APP_CLIENT_SECRET"],
+        #         # :client_id => ENV["OFFICE_APP_CLIENT_ID"]
+        #     }).token
+        # rescue Exception => e
+        #     logger.debug e.message
+        #     logger.debug e.backtrace.inspect
+        #     raise e
+        # end
 
 
-        # Set out domain, endpoint and content type
-        domain = 'https://graph.microsoft.com'
-        host = 'graph.microsoft.com'
-        endpoint = "/v1.0/users/#{@office_room}/events"
-        content_type = 'application/json;odata.metadata=minimal;odata.streaming=true'
+        # # Set out domain, endpoint and content type
+        # domain = 'https://graph.microsoft.com'
+        # host = 'graph.microsoft.com'
+        # endpoint = "/v1.0/users/#{@office_room}/events"
+        # content_type = 'application/json;odata.metadata=minimal;odata.streaming=true'
 
-        # Create the request URI and config
-        office_api = UV::HttpEndpoint.new(domain, tls_options: {host_name: host})
-        headers = {
-            'Authorization' => "Bearer #{access_token}",
-            'Content-Type' => content_type
-        }
+        # # Create the request URI and config
+        # office_api = UV::HttpEndpoint.new(domain, tls_options: {host_name: host})
+        # headers = {
+        #     'Authorization' => "Bearer #{access_token}",
+        #     'Content-Type' => content_type
+        # }
 
         # Make the request
-        response = office_api.post(path: "#{domain}#{endpoint}", body: booking_data, headers: headers).value
 
+        # response = office_api.post(path: "#{domain}#{endpoint}", body: booking_data, headers: headers).value
+        response = @client.create_booking(room_id: system.id, start_param: start_time, end_param: end_time, subject: subject, current_user: {email: organizer, name: "User"})
         logger.debug response.body
         logger.debug response.to_json
-        logger.debug JSON.parse(response.body)['id']
+        logger.debug response['id']
 
-        id = JSON.parse(response.body)['id']
+        id = response['id']
 
         # Return the booking IDs
         id
