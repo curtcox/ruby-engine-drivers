@@ -324,54 +324,8 @@ class Aca::OfficeBooking
     # ======================================
     def fetch_bookings(*args)
 
-        # @office_client_id = ENV["OFFICE_APP_CLIENT_ID"]
-        # @office_secret = ENV["OFFICE_APP_CLIENT_SECRET"]
-        # @office_scope = ENV['OFFICE_APP_SCOPE']
-        # @office_options = {
-        #     site: ENV["OFFICE_APP_SITE"],
-        #     token_url: ENV["OFFICE_APP_TOKEN_URL"]
-        # }
-        # @office_room = 'testroom@internationaltowers.com'
-
-        # @office_organiser_location = setting(:office_organiser_location)
-        # @office_client_id = setting(:office_client_id)
-        # @office_secret = setting(:office_secret)
-        # @office_scope = setting(:office_scope)
-        # @office_site = setting(:office_site)
-        # @office_token_url = setting(:office_token_url)
-        # @office_options = setting(:office_options)
-        # @office_room = (setting(:office_room) || system.email)
-        # client = OAuth2::Client.new(@office_client_id, @office_secret, {site: @office_site, token_url: @office_token_url})
-
-
-        # begin
-        #     access_token = client.client_credentials.get_token({
-        #         :scope => @office_scope
-        #         # :client_secret => ENV["OFFICE_APP_CLIENT_SECRET"],
-        #         # :client_id => ENV["OFFICE_APP_CLIENT_ID"]
-        #     }).token
-        # rescue Exception => e
-        #     logger.debug e.message
-        #     logger.debug e.backtrace.inspect
-        #     raise e
-        # end
-
-
-        # Set out domain, endpoint and content type
-        # domain = 'https://graph.microsoft.com'
-        # host = 'graph.microsoft.com'
-        # endpoint = "/v1.0/users/#{@office_room}/events"
-        # content_type = 'application/json;odata.metadata=minimal;odata.streaming=true'
-
-        # # Create the request URI and config
-        # office_api = UV::HttpEndpoint.new(domain, tls_options: {host_name: host})
-        # headers = {
-        #     'Authorization' => "Bearer #{access_token}",
-        #     'Content-Type' => content_type
-        # }
-
         # Make the request
-        response = @client.get_bookings_by_room(@office_room, Time.now.midnight, Time.now.tomorrow.midnight)
+        response = @client.get_bookings_by_room(room_id: @office_room, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)
 
 
 
