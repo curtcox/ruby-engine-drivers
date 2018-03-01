@@ -72,7 +72,7 @@ class Amx::AcendoVibe
         mic_mute false
     end
 
-    def mute(muted = true)
+    def mute(id, muted = true)  #id is here for compatibility with /meeting ui, but ignored as there is only one audio output
         state = is_affirmative?(muted) ? 'muted' : 'normal'
         set CMDS[:mute], state
     end
@@ -104,6 +104,10 @@ class Amx::AcendoVibe
     # “aux”, “bluetooth", “hdmi”, “optical” or “usb”
     def source(input)
         set CMDS[:source], input
+    end
+
+    def fader(id, level) # ignore id as there is only out audio output
+        volume(level)
     end
 
     def volume(level)
