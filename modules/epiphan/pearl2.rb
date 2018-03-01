@@ -28,7 +28,7 @@ class Epiphan::Pearl2
     end
 
     def connected
-        schedule.every('10s', true) { status }
+        schedule.every('30s', true) { status }
     end
 
     def status(channel = 1)
