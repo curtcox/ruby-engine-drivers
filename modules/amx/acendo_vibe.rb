@@ -72,9 +72,17 @@ class Amx::AcendoVibe
         mic_mute false
     end
 
-    def mute(id, muted = true)  #id is here for compatibility with /meeting ui, but ignored as there is only one audio output
+    def mutes(ids:, muted: true, **_)
+        mute(ids, muted)
+    end
+
+    def mute(id, muted = true)
         state = is_affirmative?(muted) ? 'muted' : 'normal'
-        set CMDS[:mute], state
+        if (id == 'mic')
+          mic_mute(muted)
+        else
+          set CMDS[:mute], state
+        end
     end
 
     def unmute
@@ -106,8 +114,8 @@ class Amx::AcendoVibe
         set CMDS[:source], input
     end
 
-    def fader(id, level) # ignore id as there is only out audio output
-        volume(level)
+    def fader(id, level)
+        volume(level) if id != 'mic'
     end
 
     def volume(level)
@@ -228,7 +236,7 @@ class Amx::AcendoVibe
 logger.debug "DATA: #{data.inspect}"
         case path[1]
         when 'audmic'
-            self[:mic_mute] = arg == 'muted'
+            self[:mic_mute] = self[:fadermic_mute] = arg == 'muted'
         when 'audio'
             case path[2]
             when 'autoswitch'
@@ -244,9 +252,9 @@ logger.debug "DATA: #{data.inspect}"
             when 'source'
                 self[:source] = arg.to_sym
             when 'state'
-                self[:muted] = arg == 'muted'
+                self[:muted] = self[:faderoutput_mute] = arg == 'muted'
             when 'volume'
-                self[:volume] = arg.to_i
+                self[:volume] = self[:faderoutput] = arg.to_i
             end
         when 'battery'
             self[:battery] = arg
