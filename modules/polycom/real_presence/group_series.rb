@@ -10,7 +10,7 @@ class Polycom::RealPresence::GroupSeries
     include ::Orchestrator::Security
 
     # Communication settings
-    tokenize delimiter: "\r\n"
+    tokenize delimiter: "\r\n", wait_ready: /Password:/i
     delay between_sends: 200
     tcp_port 24
 
@@ -39,7 +39,7 @@ class Polycom::RealPresence::GroupSeries
         send "sleep register\r"
         send "vcbutton register\r"
         send "volume register\r"
-        status
+        call_info
         schedule.every('50s') do
             logger.debug 'Maintaining connection..'
             maintain_connection
@@ -153,7 +153,7 @@ class Polycom::RealPresence::GroupSeries
         encryption: 'encryption',
         far_control_near: 'farcontrolnearcamera',
         h239_enabled: 'h239enable',
-        multipoint_auto_answer: 'mpautoanswer'
+        multipoint_auto_answer: 'mpautoanswer',
         mute_auto_answer: 'muteautoanswer'
     }
 
