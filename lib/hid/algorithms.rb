@@ -1,3 +1,5 @@
+# encoding: ASCII-8BIT
+# frozen_string_literal: true
 
 module HID
     module Algorithms
@@ -35,8 +37,8 @@ module HID
                 facility    = (card_data & FACILITY_MASK) >> 17
                 facility_1s = count_1s(card_data & FAC_PAR_MASK)
 
-                parity_passed = card_1s % 2 == 1 && facility_1s % 2 == 0
-                raise "parity check error" unless parity_passed
+                parity_passed = card_1s.odd? && facility_1s.even?
+                raise 'parity check error' unless parity_passed
 
                 Wiegand26.new(card_data, facility, card)
             end
@@ -47,11 +49,11 @@ module HID
 
                 card_data += card << 1
                 # Build the card parity bit (should be an odd number of ones)
-                card_data += (FAC_PAR_MASK ^ FACILITY_MASK) if count_1s(card) % 2 == 1
+                card_data += (FAC_PAR_MASK ^ FACILITY_MASK) if count_1s(card).odd?
 
                 card_data += facility << 17
                 # Build facility parity bit (should be an even number of ones)
-                card_data += 1 if count_1s(facility) % 2 == 0
+                card_data += 1 if count_1s(facility).even?
 
                 Wiegand26.new(card_data, facility, card)
             end
@@ -74,10 +76,10 @@ module HID
                 odd_count  = count_1s(card_data & PAR_ODD_MASK)
 
                 # Even Parity
-                card_data += (1 << 34) if (even_count % 2 == 1)
+                card_data += (1 << 34) if even_count.odd?
 
                 # Odd Parity
-                card_data += 2 if (odd_count % 2 == 0)
+                card_data += 2 if odd_count.even?
                 card_data = card_data.to_s(2).rjust(35, '0').reverse.to_i(2)
 
                 Wiegand35.new(card_data, facility, card)
@@ -90,11 +92,11 @@ module HID
             def self.from_wiegand(card_data)
                 str = card_data.to_s(2).rjust(35, '0').reverse
                 data = str.to_i(2)
-                even_count = count_1s(data & PAR_EVEN_MASK) + (str[0] == "1" ? 1 : 0)
+                even_count = count_1s(data & PAR_EVEN_MASK) + (str[0] == '1' ? 1 : 0)
                 odd_count  = count_1s(data & PAR_ODD_MASK)
 
-                parity_passed = odd_count % 2 == 1 && even_count % 2 == 0
-                raise "parity check error" unless parity_passed
+                parity_passed = odd_count.odd? && even_count.even?
+                raise 'parity check error' unless parity_passed
 
                 facility = (data & FACILITY_MASK) >> 22
                 card     = (data & CARD_MASK) >> 2

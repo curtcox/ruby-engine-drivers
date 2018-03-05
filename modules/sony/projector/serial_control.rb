@@ -33,8 +33,7 @@ class Sony::Projector::SerialControl
     def disconnected
         schedule.clear
     end
-    
-    
+
     #
     # Power commands
     #
@@ -58,9 +57,7 @@ class Sony::Projector::SerialControl
         options[:priority] ||= 0
         do_send(:get, :power_status, options)
     end
-    
-    
-    
+
     #
     # Input selection
     #
@@ -69,27 +66,25 @@ class Sony::Projector::SerialControl
         hdmi2: [0x00, 0x05]
     }
     INPUTS.merge!(INPUTS.invert)
-    
-    
+
     def switch_to(input)
         input = input.to_sym
         raise 'unknown input' unless INPUTS.has_key? input
 
         do_send(:set, :input, INPUTS[input], delay_on_receive: 500)
         logger.debug { "requested to switch to: #{input}" }
-        
+
         input?
     end
 
     def input?
-        do_send(:get, :input, {:priority => 0})
+        do_send(:get, :input, priority: 0)
     end
 
     def lamp_time?
-        do_send(:get, :lamp_timer, {:priority => 0})
+        do_send(:get, :lamp_timer, priority: 0)
     end
-    
-    
+
     #
     # Mute Audio and Video
     #
@@ -106,7 +101,7 @@ class Sony::Projector::SerialControl
     end
 
     def mute?
-        do_send(:get, :mute, {:priority => 0})
+        do_send(:get, :mute, priority: 0)
     end
 
 
@@ -118,7 +113,7 @@ class Sony::Projector::SerialControl
     [:contrast, :brightness, :color, :hue, :sharpness].each do |command|
         # Query command
         define_method :"#{command}?" do
-            do_send(:get, command, {:priority => 0})
+            do_send(:get, command, priority: 0)
         end
 
         # Set value command
@@ -143,7 +138,7 @@ class Sony::Projector::SerialControl
     }
 
 
-    def received(byte_str, resolve, command)        # Data is default received as a string
+    def received(byte_str, resolve, command)
         # Remove community string (useless)
         logger.debug { "sony proj sent: 0xA9#{byte_to_hex(byte_str)}" }
 
@@ -153,7 +148,7 @@ class Sony::Projector::SerialControl
         resp = data[3..4]
 
         # Check if an ACK/NAK
-        if type == 0x03 
+        if type == 0x03
             if cmd == [0, 0]
                 return :success
             else
@@ -196,8 +191,7 @@ class Sony::Projector::SerialControl
                 self[:input] = INPUTS[resp]
             when :contrast, :brightness, :color, :hue, :sharpness
                 self[COMMANDS[cmd]] = resp[-1]
-            when :error_status
-
+            # when :error_status
             end
         end
 
@@ -224,15 +218,15 @@ class Sony::Projector::SerialControl
         end
 
         # Still waiting on data
-        return false
+        false
     end
 
     def do_poll(*args)
-        power?({:priority => 0}).finally do
+        power?(priority: 0).finally do
             if self[:power]
                 input?
                 mute?
-                do_send(:get, :error_status, {:priority => 0})
+                do_send(:get, :error_status, priority: 0)
                 lamp_time?
             end
         end
@@ -259,7 +253,7 @@ class Sony::Projector::SerialControl
 
     def checksum(cmd)
         check = 0
-        cmd.each { |byte| check = check | byte }
+        cmd.each { |byte| check |= byte }
         check
     end
 
