@@ -78,10 +78,10 @@ class Amx::AcendoVibe
 
     def mute(id, muted = true)
         state = is_affirmative?(muted) ? 'muted' : 'normal'
-        if (id == 'mic')
-          mic_mute(muted)
+        if id == 'mic'
+            mic_mute(muted)
         else
-          set CMDS[:mute], state
+            set CMDS[:mute], state
         end
     end
 
@@ -109,7 +109,7 @@ class Amx::AcendoVibe
         set CMDS[:gain_mode], state
     end
 
-    # “aux”, “bluetooth", “hdmi”, “optical” or “usb”
+    # aux, bluetooth, hdmi, optical or usb
     def source(input)
         set CMDS[:source], input
     end
@@ -162,7 +162,7 @@ class Amx::AcendoVibe
     end
 
     def occupancy_sensitivity(setting)
-        # Valid values: “off”, “low”, “medium” or “high”
+        # Valid values: off, low, medium or high
         set CMDS[:occupancy_sensitivity], setting
     end
 
@@ -172,7 +172,7 @@ class Amx::AcendoVibe
     end
 
     def ring_led(state)
-        # state = “off”, “on” or “pulsing”
+        # state = off, on or pulsing
         set '/ringleds/state', state
     end
 
@@ -233,7 +233,6 @@ class Amx::AcendoVibe
         # ignore echos
         return unless data.length > 2
 
-logger.debug "DATA: #{data.inspect}"
         case path[1]
         when 'audmic'
             self[:mic_mute] = self[:fadermic_mute] = arg == 'muted'
