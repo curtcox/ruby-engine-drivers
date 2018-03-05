@@ -6,10 +6,6 @@ require 'protocols/websocket'
 module Atlona; end
 module Atlona::Omnistream; end
 
-# Configuring input 2 on the atlona
-# HDMI config set: {"id":"hdmi_input","username":"admin","password":"Atlona","config_set":{"name":"hdmi_input","config":[{"audio":{"active":false,"bitdepth":0,"channelcount":0,"codingtype":"Unknown","samplingfrequency":"unknown"},"cabledetect":false,"edid":"Default","hdcp":{"encrypted":false,"support_version":"1.4"},"name":"hdmi_input2","video":{},"number":2,"hdcpSupportVersion":true}]}}
-# Response: {"error": false, "id": "hdmi_input"}
-
 class Atlona::Omnistream::WsProtocol
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
@@ -17,6 +13,7 @@ class Atlona::Omnistream::WsProtocol
 
     # supports encoders and decoders
     descriptive_name 'Atlona Omnistream WS Protocol'
+    # Probably a good idea to differentiate them for support purposes
     generic_name :Decoder
 
     tcp_port 80
@@ -28,6 +25,8 @@ class Atlona::Omnistream::WsProtocol
 
     # Called after dependency reload and settings updates
     def on_update
+        @type = self[:type] = setting(:type) if @type.nil?
+
         @username = setting(:username) || 'admin'
         @password = setting(:password) || 'Atlona'
 
@@ -140,6 +139,7 @@ class Atlona::Omnistream::WsProtocol
             }
         }
 
+        # Grab the details of the ip_input that should be updated
         if video_ip && video_port
             id = base_id + video_inp[-1].to_i - 1
 
@@ -216,6 +216,10 @@ class Atlona::Omnistream::WsProtocol
     def received(data, resolve, command)
         @ws.parse(data)
         :success
+    rescue => e
+        logger.print_error(e, 'parsing websocket data')
+        disconnect
+        :abort
     end
 
     # ====================
@@ -226,7 +230,7 @@ class Atlona::Omnistream::WsProtocol
     def on_open
         logger.debug { "Websocket connected" }
 
-        schedule.every('30s', true) do
+        schedule.every('30s', :immediately) do
             system_info
             alarms
             net
@@ -252,6 +256,7 @@ class Atlona::Omnistream::WsProtocol
             return
         end 
 
+        # get
         case resp[:id]
         when 'systeminfo'
             # type == :decoder or :encoder
@@ -261,6 +266,15 @@ class Atlona::Omnistream::WsProtocol
             self[:model] = data[:model]
             self[:firmware] = data[:firmwareversion]
             self[:uptime] = data[:uptime]
+
+            if @type == :decoder
+                ip_input
+                hdmi_output
+            else
+                hdmi_input
+                sessions
+            end
+
         when 'net'
             self[:mac_address] = data[0][:macaddress]
         when 'alarms'
@@ -269,6 +283,11 @@ class Atlona::Omnistream::WsProtocol
             self[:inputs] = data
         when 'sessions'
             self[:sessions] = data
+            num_sessions = 0
+            data.each do |sess|
+                num_sessions += 1 if sess[:audio][:stream][:destination_address].present? || sess[:video][:stream][:destination_address].present?
+            end
+            self[:num_sessions] = num_sessions
         when 'ip_input'
             ins = {}
             data.each do |input|
@@ -277,6 +296,7 @@ class Atlona::Omnistream::WsProtocol
             self[:ip_inputs] = ins
         when 'hdmi_output'
             self[:outputs] = data
+            self[:num_outputs] = data.length
         end
     end
 
@@ -289,6 +309,4 @@ class Atlona::Omnistream::WsProtocol
     def on_error(error)
         logger.warn "Websocket error: #{error.message}"
     end
-
-    # ====================
 end
