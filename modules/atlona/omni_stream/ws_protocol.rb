@@ -93,7 +93,7 @@ class Atlona::Omnistream::WsProtocol
         val[:audio][:mute] = true
         val["$$hashKey"] = "object:#{id}"
 
-        @ws.text {
+        @ws.text({
             id: "hdmi_output",
             username: @username,
             password: @password,
@@ -101,7 +101,7 @@ class Atlona::Omnistream::WsProtocol
                 name: "hdmi_output",
                 config: [val]
             }
-        }.to_json
+        }.to_json)
 
         val
     end
@@ -191,7 +191,7 @@ class Atlona::Omnistream::WsProtocol
             end
         end
 
-        @ws.text {
+        @ws.text({
             id: "hdmi_output",
             username: @username,
             password: @password,
@@ -199,7 +199,7 @@ class Atlona::Omnistream::WsProtocol
                 name: "hdmi_output",
                 config: [val]
             }
-        }.to_json
+        }.to_json)
 
         val
     end
