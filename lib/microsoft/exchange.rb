@@ -29,7 +29,7 @@ class Microsoft::Exchange
     end
 
     def email_list(field, name=nil)
-        field[:email_addresses][:elems][-1][:entry][:text].gsub(/SMTP:|SIP:/,'')
+        field[:email_addresses][:elems][-1][:entry][:text].gsub(/SMTP:|SIP:|sip:|smtp:/,'')
     end
 
     def phone_list(field, name=nil)
@@ -93,7 +93,7 @@ class Microsoft::Exchange
         STDERR.puts start_time
         STDERR.puts end_time
         STDERR.flush 
-        
+
         # Get booking data for all rooms between time range bounds
         user_free_busy = @ews_client.get_user_availability(rooms,
             start_time: start_time,
