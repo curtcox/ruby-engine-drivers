@@ -43,7 +43,7 @@ class Microsoft::Exchange
         users = []
         fields = {
             display_name: 'name:basic_text',
-            email_addresses: 'email:email_list',
+            # email_addresses: 'email:email_list',
             phone_numbers: 'phone:phone_list',
             culture: 'locale:basic_text',
             department: 'department:basic_text'
@@ -57,6 +57,7 @@ class Microsoft::Exchange
                     output[fields[field.keys[0]].split(':')[0]] = self.__send__(fields[field.keys[0]].split(':')[1], field, field.keys[0])
                 end
             end
+            output[:email] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
             users.push(output)
         end
         STDERR.puts users
