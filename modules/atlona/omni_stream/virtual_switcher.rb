@@ -2,9 +2,9 @@
 # frozen_string_literal: true
 
 module Atlona; end
-module Atlona::Omnistream; end
+module Atlona::OmniStream; end
 
-class Atlona::Omnistream::VirtualSwitcher
+class Atlona::OmniStream::VirtualSwitcher
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 

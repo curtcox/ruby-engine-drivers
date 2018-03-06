@@ -4,9 +4,9 @@
 require 'protocols/websocket'
 
 module Atlona; end
-module Atlona::Omnistream; end
+module Atlona::OmniStream; end
 
-class Atlona::Omnistream::WsProtocol
+class Atlona::OmniStream::WsProtocol
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
@@ -72,7 +72,7 @@ class Atlona::Omnistream::WsProtocol
     ].each do |cmd|
         # Cache the query strings
         # Remove the leading '{' character
-        Queries[cmd] = {
+        Query[cmd] = {
             id: cmd,
             config_get: cmd
         }.to_json[1..-1]
