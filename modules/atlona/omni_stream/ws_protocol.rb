@@ -79,7 +79,9 @@ class Atlona::OmniStream::WsProtocol
 
         # generate the query functions
         define_method cmd do
-            @ws.text("#{@auth}#{Query[cmd]}")
+            data = "#{@auth},#{Query[cmd]}"
+            logger.debug { "requesting: #{data}" }
+            @ws.text(data)
         end
     end
 
@@ -113,7 +115,7 @@ class Atlona::OmniStream::WsProtocol
     def switch(output: 1, video_ip: nil, video_port: nil, audio_ip: nil, audio_port: nil)
         raise 'not supported on encoders' unless @type == :decoder
 
-        out -= 1
+        out = output - 1
         val = self[:outputs][out]
 
         raise "unknown output #{output}" unless val
@@ -231,7 +233,7 @@ class Atlona::OmniStream::WsProtocol
         logger.debug { "Websocket connected" }
 
         schedule.every('30s', :immediately) do
-            system_info
+            systeminfo
             alarms
             net
         end
