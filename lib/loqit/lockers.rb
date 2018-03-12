@@ -40,11 +40,8 @@ class Loqit::Lockers
             }
         }
     end
-
-
-
     def list_lockers
-        response = client.call(:list_lockers,
+        response = @client.call(:list_lockers,
             message: {
                 unitSerial: @serial
             },
