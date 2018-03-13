@@ -3,17 +3,18 @@ require 'active_support/time'
 require 'digest/md5'
 module Loqit; end
 
-
-# lockers_client = Loqit::Lockers.new(
-#     username: 'system',
-#     password: 'system',
-#     endpoint: 'https://DESKTOP-ABH46ML:8082/Cardholder/',
-#     namespace: 'http://www.gallagher.co/security/commandcentre/webservice',
-#     namespaces: {"xmlns:wsdl" => "http://www.gallagher.co/security/commandcentre/cifws", "xmlns:web" => 'http://www.gallagher.co/security/commandcentre/webservice'},
-#     wsdl: 'http://192.168.1.200/soap/server_wsdl.php?wsdl',
-#     log: false,
-#     log_level: nil
+# require 'loqit/lockers'
+# lockers = Loqit::Lockers.new(
+#     username: 'xmltester',
+#     password: 'xmlPassword',
+#     wsdl: 'http://loqit.acgin.com.au/soap/server_wsdl.php?wsdl',
+#     serial: 'BE434080-7277-11E3-BC4D-94C69111930A'
 #     )
+# random_locker = lockers.list_lockers.sample['number']
+# random_status = lockers.show_status(random_locker)
+# random_open = lockers.open_locker(random_locker)
+
+
 
 class Loqit::Lockers
     def initialize(
