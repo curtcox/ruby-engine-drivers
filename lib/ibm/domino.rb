@@ -205,7 +205,7 @@ class Ibm::Domino
         if ending
             ending = convert_to_simpledate(ending).utc.strftime("%Y%m%dT%H%M%S,00Z")
         else
-            ending = date.utc.strftime("%Y%m%dT%H%M%S,00Z")
+            ending = date.tomorrow.utc.strftime("%Y%m%dT%H%M%S,00Z")
         end
 
 
