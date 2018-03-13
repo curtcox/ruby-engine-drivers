@@ -133,17 +133,23 @@ class Microsoft::Office
         end
     end
 
-    def get_users(q: nil, limit: nil, index: 0)
+    def get_users(q: nil, limit: nil, skip_token: nil)
         filter_param = "startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}')" if q
         query_params = {
             '$filter': filter_param,
             '$top': limit,
-            '$skip': index
+            '$skipToken': skip_token
         }.compact
         endpoint = "/v1.0/users"
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
-        JSON.parse(request.body)['value']
+        body = JSON.parse(request.body)
+        if JSON.parse(request.body).key?('@odata.nextLink')
+            return { skip_token: body['@odata.nextLink'].split("skiptoken=")[-1].split("skipToken=")[-1], users: JSON.parse(request.body)['value'] }
+        else
+
+            return { skip_token: nil, users: JSON.parse(request.body)['value'] }
+        end
     end
 
     def get_user(user_id:)
