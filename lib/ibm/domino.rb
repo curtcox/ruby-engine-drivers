@@ -200,12 +200,12 @@ class Ibm::Domino
 
         # Make date a date object from epoch or parsed text
         date = convert_to_simpledate(date)
-        starting = date.yesterday.strftime("%Y%m%d")
+        starting = date.utc.strftime("%Y%m%dT%H%M%S,00Z")
 
         if ending
-            ending = convert_to_simpledate(ending).strftime("%Y%m%d")
+            ending = convert_to_simpledate(ending).utc.strftime("%Y%m%dT%H%M%S,00Z")
         else
-            ending = date.strftime("%Y%m%d")
+            ending = date.tomorrow.utc.strftime("%Y%m%dT%H%M%S,00Z")
         end
 
 

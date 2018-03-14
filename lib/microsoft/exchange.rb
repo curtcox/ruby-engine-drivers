@@ -29,7 +29,7 @@ class Microsoft::Exchange
     end
 
     def email_list(field, name=nil)
-        field[:email_addresses][:elems][-1][:entry][:text].gsub(/SMTP:|SIP:/,'')
+        field[:email_addresses][:elems][-1][:entry][:text].gsub(/SMTP:|SIP:|sip:|smtp:/,'')
     end
 
     def phone_list(field, name=nil)
@@ -43,7 +43,7 @@ class Microsoft::Exchange
         users = []
         fields = {
             display_name: 'name:basic_text',
-            email_addresses: 'email:email_list',
+            # email_addresses: 'email:email_list',
             phone_numbers: 'phone:phone_list',
             culture: 'locale:basic_text',
             department: 'department:basic_text'
@@ -57,6 +57,7 @@ class Microsoft::Exchange
                     output[fields[field.keys[0]].split(':')[0]] = self.__send__(fields[field.keys[0]].split(':')[1], field, field.keys[0])
                 end
             end
+            output[:email] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
             users.push(output)
         end
         STDERR.puts users
@@ -93,7 +94,7 @@ class Microsoft::Exchange
         STDERR.puts start_time
         STDERR.puts end_time
         STDERR.flush 
-        
+
         # Get booking data for all rooms between time range bounds
         user_free_busy = @ews_client.get_user_availability(rooms,
             start_time: start_time,
