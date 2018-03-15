@@ -162,7 +162,7 @@ class Polycom::RealPresence::GroupSeries
         LookupCMD[value.split(' ')[0]] = key
 
         define_method key do |enabled|
-            enabled = is_affirmative?(value) ? 'on' : 'off'
+            enabled = is_affirmative?(enabled) ? 'on' : 'off'
             send "#{value} #{enabled}\r"
         end
 
@@ -174,7 +174,7 @@ class Polycom::RealPresence::GroupSeries
         LookupCMD[value] = key
 
         define_method key do |enabled|
-            enabled = is_affirmative?(value) ? 'yes' : 'no'
+            enabled = is_affirmative?(enabled) ? 'yes' : 'no'
             send "#{value} #{enabled}\r"
         end
 
