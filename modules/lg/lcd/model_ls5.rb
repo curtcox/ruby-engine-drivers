@@ -110,9 +110,12 @@ class Lg::Lcd::ModelLs5
     # NOTE:: We are currently only supporting the PC values here
     Inputs = {
         dvi: 112,
-        hdmi: 160,
-        hdmi2: 161,
-        display_port: 208 
+        hdmi: 0xA0,
+        hdmi_dtv: 0x90,
+        hdmi2: 0xA1,
+        hdmi2_dtv: 0x91,
+        display_port: 0xD0,
+        display_port_dtv: 0xC0
     }
     Inputs.merge!(Inputs.invert)
     def switch_to(source)
