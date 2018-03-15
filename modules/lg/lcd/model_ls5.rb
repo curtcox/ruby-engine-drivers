@@ -79,7 +79,8 @@ class Lg::Lcd::ModelLs5
         wol: 'w',
         no_signal_off: 'g',
         auto_off: 'n',
-        dpm: 'j'
+        dpm: 'j',
+        aspect_ratio: 'c'
     }
     Lookup = Command.invert
 
@@ -161,6 +162,19 @@ class Lg::Lcd::ModelLs5
         mute_display(false)
     end
 
+    # Set Aspect Ratio
+    Ratios = {
+        square: 0x01,
+        wide: 0x02,
+        zoom: 0x04,
+        scan: 0x09,
+        program: 0x06
+    }
+    Ratios.merge!(Ratios.invert)
+    def aspect_ratio(ratio)
+        val = Ratios[ratio.to_sym]
+        do_send(Command[:aspect_ratio], val, name: :aspect_ratio, delay_on_receive: 1000)
+    end
 
     # Status values we are interested in polling
     def do_poll
@@ -292,6 +306,8 @@ class Lg::Lcd::ModelLs5
             else
                 switch_to(self[:input_target])
             end
+        when :aspect_ratio
+            self[:aspect_ratio] = Ratios[resp_value] || :unknown
         when :screen_mute
             # This indicates power status as hard off we are disconnected
             self[:power] = resp_value != 1
