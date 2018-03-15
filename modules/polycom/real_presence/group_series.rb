@@ -108,7 +108,7 @@ class Polycom::RealPresence::GroupSeries
     # Monitor1: far|near-or-far|content-or-far|all
     # Monitor2: near|far|content|near-or-far|content-or-near|content-or-far|all
     # Monitor3: rec-all|rec-far-or-near|near|far|content
-    def configpresentation(setting, monitor: 1)
+    def configpresentation(setting, monitor = 1)
         send "configpresentation monitor#{monitor} #{setting}\r"
     end
 
