@@ -21,6 +21,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:name] = system.name
             self[:help_msg] = setting(:help_msg)
             self[:analytics] = setting(:analytics)
+            self[:Camera] = setting(:Camera)
 
             # Get any default settings
             @defaults = setting(:defaults) || {}
@@ -223,6 +224,13 @@ class Aca::MeetingRoom < Aca::Joiner
             end
         rescue => e
             logger.print_error(e, 'bad cron schedule configuration')
+        end
+
+        if system.exists?(:VidConf) && !@vc_update
+            @vc_update = system.subscribe(:VidConf, 1, :call_status) do |notice|
+                val = notice.value
+                vc_status_changed(notice.value) if val
+            end
         end
 
         # Call the Joiner on_update function
@@ -669,6 +677,7 @@ class Aca::MeetingRoom < Aca::Joiner
         end
 
         switch_mode(@defaults[:shutdown_mode]) if @defaults[:shutdown_mode]
+        self[:vc_content_source] = nil
 
         mixer = system[:Mixer]
 
@@ -784,6 +793,33 @@ class Aca::MeetingRoom < Aca::Joiner
     #
     # MISC FUNCTIONS
     #
+    def init_vc
+        start_cameras
+    end
+
+    def vc_status_changed(state)
+        if state[:answerstate] == 'Unanswered' && state[:direction] == 'Incoming'
+            vc_source = self[:VC].first
+            init_vc
+            present(vc_source, :Display_1)
+            tab(:VC)
+            self[:show_vc_popup] = true
+        else
+            self[:show_vc_popup] = false
+        end
+    end
+
+    def vc_mute(mute)
+        perform_action(mod: :System, func: :vc_mute_actual, args: [mute])
+
+        vidconf = system[:VidConf]
+        vidconf.mute(mute) unless vidconf.nil?
+    end
+
+    def vc_mute_actual(mute)
+        system[:Mixer].mute(self[:mics_mutes], mute) if self[:mics_mutes]
+    end
+
     def start_cameras
         cams = system.all(:Camera)
         cams.power(On)
