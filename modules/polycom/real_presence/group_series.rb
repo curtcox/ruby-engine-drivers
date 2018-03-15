@@ -1,6 +1,8 @@
 # encoding: ASCII-8BIT
 # frozen_string_literal: true
 
+require 'shellwords'
+
 module Polycom; end
 module Polycom::RealPresence; end
 
@@ -308,7 +310,7 @@ class Polycom::RealPresence::GroupSeries
         send "getcallstate\r"
     end
 
-    def dial(number, search == nil)
+    def dial(number, search = nil)
         if number == search
             dial_phone number
         else
@@ -452,7 +454,7 @@ class Polycom::RealPresence::GroupSeries
         when :volume
             self[:volume] = parts[1].to_i
         when :gaddrbook, :addrbook
-            if parts[1][1] == '0'
+            if parts[1][0] == '0'
                 @results = []
                 process_result(response)
             elsif parts[-1] == 'done'
@@ -504,7 +506,7 @@ class Polycom::RealPresence::GroupSeries
     protected
 
     def process_result(address)
-        parts = address.split(/\s/)[2..-1]
+        parts = address.shellsplit[2..-1]
         name = parts.shift
         @results << {
             name: name,
