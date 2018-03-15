@@ -24,9 +24,9 @@ class Polycom::RealPresence::GroupSeries
     end
 
     def on_update
-        # TODO:: select between gaddrbook (global but not skype)
         # addrbook (local) commands
         # globaldir (includes LDAP and Skype)
+        @use_global_addressbook = setting(:global_addressbook) || true
     end
 
     def connected
@@ -39,6 +39,7 @@ class Polycom::RealPresence::GroupSeries
         send "sleep register\r"
         send "vcbutton register\r"
         send "volume register\r"
+        send "listen video\r"
         call_info
         schedule.every('50s') do
             logger.debug 'Maintaining connection..'
@@ -97,6 +98,14 @@ class Polycom::RealPresence::GroupSeries
         send "answer video\r", name: :answer
     end
 
+    # For cisco compatibility
+    def call(action)
+        case action.to_sym
+        when :disconnect
+            hangup
+        end
+    end
+
     def hangup(call_id = nil)
         if call_id
             send "hangup video #{call_id}\r"
@@ -110,6 +119,24 @@ class Polycom::RealPresence::GroupSeries
     # Monitor3: rec-all|rec-far-or-near|near|far|content
     def configpresentation(setting, monitor = 1)
         send "configpresentation monitor#{monitor} #{setting}\r"
+    end
+
+    def select_camera(index)
+        self[:camera_selected] = index
+        send "camera near #{index}\r"
+    end
+
+    def search(text, count = 15)
+        if @use_global_addressbook
+            send "gaddrbook batch search \"#{text}\" \"#{count}\"\r"
+        else
+            send "addrbook batch search \"#{text}\" \"#{count}\"\r"
+        end
+    end
+
+    def camera_tracking(state)
+        value = is_affirmative?(state) ? 'on' : 'off'
+        send "camera near tracking #{value}\r"
     end
 
     OnOffCMDs = {
@@ -228,12 +255,16 @@ class Polycom::RealPresence::GroupSeries
         end
     end
 
+    def mute(value)
+        audio_mute(value)
+    end
+
     def button_press(*keys)
         # succeeded / failed or completed when some keys are not valid
         send "button #{keys.join(' ')}\r"
     end
 
-    def dtmf(char)
+    def send_DTMF(char)
         send "gendial #{char}\r"
     end
 
@@ -244,6 +275,10 @@ class Polycom::RealPresence::GroupSeries
     def volume(value)
         value = in_range(value.to_i, 50)
         send "volume set #{value}\r"
+    end
+
+    def fader(fader_id, level, mixer_index = nil)
+        volume(level)
     end
 
     def volume?
@@ -271,6 +306,14 @@ class Polycom::RealPresence::GroupSeries
         # cs: call[34] speed[384] dialstr[192.168.1.101] state[connected]
         # cs: call[1] inactive
         send "getcallstate\r"
+    end
+
+    def dial(number, search == nil)
+        if number == search
+            dial_phone number
+        else
+            dial_addressbook number
+        end
     end
 
     def dial_phone(number)
@@ -315,8 +358,10 @@ class Polycom::RealPresence::GroupSeries
 
         # play, stop
         if action == :remote
+            auto_show_content(true)
             send "vcbutton #{[action, source].compact.join(' ')}\r"
         else
+            auto_show_content(false)
             send "vcbutton stop\r"
         end
     end
@@ -406,6 +451,45 @@ class Polycom::RealPresence::GroupSeries
             self[:quality_preference] = parts[1]
         when :volume
             self[:volume] = parts[1].to_i
+        when :gaddrbook, :addrbook
+            if parts[1][1] == '0'
+                @results = []
+                process_result(response)
+            elsif parts[-1] == 'done'
+                self[:search_results] = @results
+            else
+                process_result(response)
+            end
+        when :cs
+            # Call state
+            # cs: call[34] chan[0] dialstr[192.168.1.103] state[RINGING]
+            # cs: call[1] inactive
+            if parts[-1] != 'inactive'
+                state = parts[-1].split(/\[|\]/)[-1].downcase
+                self[:call_status] = {
+                    direction: 'unknown', # cisco compat
+                    answerstate: state
+                }
+            end
+        when :active
+            # We are in a call
+            # active: call[34] speed [384]
+            self[:call_status] = {
+                direction: 'unknown', # cisco compat
+                answerstate: 'active'
+            }
+        when :ended
+            # No longer in a call
+            # ended: call[34]
+            self[:call_status] = {}
+        when :listen
+            # listen video ringing
+            if parts[-1] == 'ringing'
+                self[:call_status] = {
+                    direction: 'Incoming',
+                    answerstate: 'Unanswered'
+                }
+            end
         else
             # Assign yes/no and on/off values
             key = LookupCMD[parts[0]]
@@ -415,5 +499,16 @@ class Polycom::RealPresence::GroupSeries
         end
 
         :success
+    end
+
+    protected
+
+    def process_result(address)
+        parts = address.split(/\s/)[2..-1]
+        name = parts.shift
+        @results << {
+            name: name,
+            number: parts.join(' ')
+        }
     end
 end

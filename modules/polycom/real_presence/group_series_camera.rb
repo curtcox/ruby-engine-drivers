@@ -70,6 +70,10 @@ class Polycom::RealPresence::GroupSeriesCamera
         send "#{data}\r"
     end
 
+    def power(state)
+        # no-op
+    end
+
     def maintain_connection
         # Queries the AMX beacon state.
         send "amxdd get\r", name: :connection_maintenance, priority: 0
