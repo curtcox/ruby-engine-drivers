@@ -112,6 +112,7 @@ class Polycom::RealPresence::GroupSeries
         if call_id
             send "hangup video #{call_id}\r"
         else
+            send "vcbutton stop\r"
             send "hangup all\r", name: :hangup_all
         end
     end
@@ -128,11 +129,12 @@ class Polycom::RealPresence::GroupSeries
         send "camera near #{index}\r"
     end
 
-    def search(text, count = 15)
+    def search(text, count = 20)
+        count = count.to_i
         if @use_global_addressbook
-            send "gaddrbook batch search \"#{text}\" \"#{count}\"\r"
+            send "gaddrbook batch search \"#{text}\" \"#{count}\"\r", max_waits: count, name: :search
         else
-            send "addrbook batch search \"#{text}\" \"#{count}\"\r"
+            send "addrbook batch search \"#{text}\" \"#{count}\"\r", max_waits: count, name: :search
         end
     end
 
@@ -391,6 +393,9 @@ class Polycom::RealPresence::GroupSeries
         # Doesn't matter where the event came from
         if response.start_with?('Control event: ')
             response = response.split('Control event: ')[1]
+        elsif response == 'system is not in a call'
+            self[:call_status] = {}
+            return :success
         end
 
         parts = response.split(/\s|:\s*/)
@@ -457,10 +462,12 @@ class Polycom::RealPresence::GroupSeries
             if parts[1][0] == '0'
                 @results = []
                 process_result(response)
+                return :ignore
             elsif parts[-1] == 'done'
                 self[:search_results] = @results
             else
                 process_result(response)
+                return :ignore
             end
         when :cs
             # Call state
@@ -491,6 +498,11 @@ class Polycom::RealPresence::GroupSeries
                     direction: 'Incoming',
                     answerstate: 'Unanswered'
                 }
+            end
+        when :answered
+            # answered: Hang Up
+            if parts[1] == 'Hang'
+                self[:call_status] = {}
             end
         else
             # Assign yes/no and on/off values
