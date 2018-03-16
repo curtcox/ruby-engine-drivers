@@ -22,6 +22,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:help_msg] = setting(:help_msg)
             self[:analytics] = setting(:analytics)
             self[:Camera] = setting(:Camera)
+            self[:hide_vc_sources] = setting(:hide_vc_sources)
 
             # Get any default settings
             @defaults = setting(:defaults) || {}
@@ -474,7 +475,7 @@ class Aca::MeetingRoom < Aca::Joiner
                         mixer = sys[:Mixer]
                         Array(bd[:audio_preset]).each { |preset| mixer.trigger(preset) }
                     end
-                    sys[:Switcher].switch(bd[:routes]) if bd[:routes]
+                    system[:Switcher].switch(bd[:routes]) if bd[:routes]
                     if bd[:execute]
                         bd[:execute].each do |cmd|
                             begin
@@ -584,7 +585,7 @@ class Aca::MeetingRoom < Aca::Joiner
     #
 
     def powerup
-        switch_mode(@defaults[:default_mode], booting: true) if @defaults && @defaults[:default_mode]
+        switch_mode(@defaults[:default_mode], booting: true) if @defaults && @defaults[:default_mode] && self[:state] != :online
 
         # Keep track of displays from neighboring rooms
         @setCamDefaults = true
