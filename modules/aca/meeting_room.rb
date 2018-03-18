@@ -22,6 +22,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:help_msg] = setting(:help_msg)
             self[:analytics] = setting(:analytics)
             self[:Camera] = setting(:Camera)
+            self[:hide_vc_sources] = setting(:hide_vc_sources)
 
             # Get any default settings
             @defaults = setting(:defaults) || {}
@@ -105,7 +106,7 @@ class Aca::MeetingRoom < Aca::Joiner
                 self[:mics] = setting(:mics)
             end
 
-            @sharing_output = self[:outputs].keys.first
+            @sharing_output = self[:outputs].keys.first if self[:outputs]
 
             # Grab lighting presets
             self[:lights_events] = setting(:lights_events)
@@ -474,7 +475,7 @@ class Aca::MeetingRoom < Aca::Joiner
                         mixer = sys[:Mixer]
                         Array(bd[:audio_preset]).each { |preset| mixer.trigger(preset) }
                     end
-                    sys[:Switcher].switch(bd[:routes]) if bd[:routes]
+                    system[:Switcher].switch(bd[:routes]) if bd[:routes]
                     if bd[:execute]
                         bd[:execute].each do |cmd|
                             begin
@@ -587,7 +588,7 @@ class Aca::MeetingRoom < Aca::Joiner
     #
 
     def powerup
-        switch_mode(@defaults[:default_mode], booting: true) if @defaults && @defaults[:default_mode]
+        switch_mode(@defaults[:default_mode], booting: true) if @defaults && @defaults[:default_mode] && self[:state] != :online
 
         # Keep track of displays from neighboring rooms
         @setCamDefaults = true
@@ -802,10 +803,10 @@ class Aca::MeetingRoom < Aca::Joiner
     end
 
     def vc_status_changed(state)
-        if state[:answerstate] == 'Unanswered' && state[:direction] == 'Incoming'
+        if (state[:answerstate] == 'Unanswered' && state[:direction] == 'Incoming') || state[:answerstate] == 'ringing' || state[:answerstate] == 'allocated'
             vc_source = self[:VC].first
             init_vc
-            present(vc_source, :Display_1)
+            present(vc_source, self[:outputs].keys.first)
             tab(:VC)
             self[:show_vc_popup] = true
         else

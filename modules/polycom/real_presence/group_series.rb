@@ -1,6 +1,8 @@
 # encoding: ASCII-8BIT
 # frozen_string_literal: true
 
+require 'shellwords'
+
 module Polycom; end
 module Polycom::RealPresence; end
 
@@ -43,7 +45,7 @@ class Polycom::RealPresence::GroupSeries
         call_info
         schedule.every('50s') do
             logger.debug 'Maintaining connection..'
-            maintain_connection
+            call_info
         end
     end
 
@@ -52,7 +54,7 @@ class Polycom::RealPresence::GroupSeries
     end
 
     protect_method :reboot, :reset, :whoami, :unregister, :register
-    protect_method :maintain_connection, :powerdown, :notify, :nonotify
+    protect_method :powerdown, :notify, :nonotify
 
     def reboot
         send "reboot now\r", name: :reboot
@@ -89,11 +91,6 @@ class Polycom::RealPresence::GroupSeries
         send "nonotify #{event}\r"
     end
 
-    def maintain_connection
-        # Queries the AMX beacon state.
-        send "amxdd get\r", name: :connection_maintenance, priority: 0
-    end
-
     def answer
         send "answer video\r", name: :answer
     end
@@ -108,9 +105,10 @@ class Polycom::RealPresence::GroupSeries
 
     def hangup(call_id = nil)
         if call_id
-            send "hangup video #{call_id}\r"
+            send "hangup video #{call_id}\r", retries: 0
         else
-            send "hangup all\r", name: :hangup_all
+            send "vcbutton stop\r", retries: 0
+            send "hangup all\r", name: :hangup_all, retries: 0
         end
     end
 
@@ -126,11 +124,13 @@ class Polycom::RealPresence::GroupSeries
         send "camera near #{index}\r"
     end
 
-    def search(text, count = 15)
+    def search(text, count = 30)
+        count = count.to_i
         if @use_global_addressbook
-            send "gaddrbook batch search \"#{text}\" \"#{count}\"\r"
+            self[:searching] = true
+            send "gaddrbook batch search \"#{text}\" \"#{count}\"\r", max_waits: (count + 3), name: :search
         else
-            send "addrbook batch search \"#{text}\" \"#{count}\"\r"
+            send "addrbook batch search \"#{text}\" \"#{count}\"\r", max_waits: (count + 3), name: :search
         end
     end
 
@@ -291,14 +291,14 @@ class Polycom::RealPresence::GroupSeries
     end
 
     def call_info(call_id = nil)
-        if call_id
+        if call_id.nil?
             # callinfo begin
             # callinfo:43:Polycom Group Series Demo:192.168.1.101:384:connected:notmuted:outgoing:videocall
             # callinfo end
-            send "callinfo all\r"
+            send "callinfo all\r", max_waits: 10
         else
             # callinfo:36:192.168.1.102:256:connected:muted:outgoing:videocall
-            send "callinfo callid #{call_id}\r"
+            send "callinfo callid #{call_id}\r", max_waits: 10
         end
     end
 
@@ -308,7 +308,7 @@ class Polycom::RealPresence::GroupSeries
         send "getcallstate\r"
     end
 
-    def dial(number, search == nil)
+    def dial(number, search = nil)
         if number == search
             dial_phone number
         else
@@ -389,6 +389,9 @@ class Polycom::RealPresence::GroupSeries
         # Doesn't matter where the event came from
         if response.start_with?('Control event: ')
             response = response.split('Control event: ')[1]
+        elsif response == 'system is not in a call'
+            self[:call_status] = {}
+            return :success
         end
 
         parts = response.split(/\s|:\s*/)
@@ -452,13 +455,17 @@ class Polycom::RealPresence::GroupSeries
         when :volume
             self[:volume] = parts[1].to_i
         when :gaddrbook, :addrbook
-            if parts[1][1] == '0'
+            if parts[1][0] == '0'
+                self[:searching] = true
                 @results = []
                 process_result(response)
+                return :ignore
             elsif parts[-1] == 'done'
+                self[:searching] = false
                 self[:search_results] = @results
             else
                 process_result(response)
+                return :ignore
             end
         when :cs
             # Call state
@@ -478,6 +485,29 @@ class Polycom::RealPresence::GroupSeries
                 direction: 'unknown', # cisco compat
                 answerstate: 'active'
             }
+        when :callinfo
+            if parts[1] == 'begin'
+                @call_data = String.new
+                return :ignore
+            elsif parts[1] == 'end'
+                if @call_data.include?('connected')
+                    if @call_data.include?('outgoing')
+                        self[:call_status] = {
+                            direction: 'outgoing',
+                            answerstate: 'active'
+                        }
+                    else
+                        self[:call_status] = {
+                            direction: 'unknown',
+                            answerstate: 'active'
+                        }
+                    end
+                end
+                @call_data = nil
+            else
+                @call_data << response
+                return :ignore
+            end
         when :ended
             # No longer in a call
             # ended: call[34]
@@ -489,6 +519,11 @@ class Polycom::RealPresence::GroupSeries
                     direction: 'Incoming',
                     answerstate: 'Unanswered'
                 }
+            end
+        when :answered
+            # answered: Hang Up
+            if parts[1] == 'Hang'
+                self[:call_status] = {}
             end
         else
             # Assign yes/no and on/off values
@@ -504,7 +539,7 @@ class Polycom::RealPresence::GroupSeries
     protected
 
     def process_result(address)
-        parts = address.split(/\s/)[2..-1]
+        parts = address.shellsplit[2..-1]
         name = parts.shift
         @results << {
             name: name,
