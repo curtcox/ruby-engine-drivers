@@ -106,7 +106,7 @@ class Aca::MeetingRoom < Aca::Joiner
                 self[:mics] = setting(:mics)
             end
 
-            @sharing_output = self[:outputs].keys.first
+            @sharing_output = self[:outputs].keys.first if self[:outputs]
 
             # Grab lighting presets
             self[:lights_events] = setting(:lights_events)
@@ -800,10 +800,10 @@ class Aca::MeetingRoom < Aca::Joiner
     end
 
     def vc_status_changed(state)
-        if state[:answerstate] == 'Unanswered' && state[:direction] == 'Incoming'
+        if (state[:answerstate] == 'Unanswered' && state[:direction] == 'Incoming') || state[:answerstate] == 'ringing' || state[:answerstate] == 'allocated'
             vc_source = self[:VC].first
             init_vc
-            present(vc_source, :Display_1)
+            present(vc_source, self[:outputs].keys.first)
             tab(:VC)
             self[:show_vc_popup] = true
         else
