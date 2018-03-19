@@ -110,7 +110,6 @@ class Polycom::RealPresence::GroupSeries
         if call_id
             send "hangup video #{call_id}\r", retries: 0
         else
-            send "vcbutton stop\r", retries: 0
             send "hangup all\r", name: :hangup_all, retries: 0
         end
     end
@@ -362,20 +361,26 @@ class Polycom::RealPresence::GroupSeries
         send "sleeptime #{time}\r"
     end
 
-    # :none, :local, :remote
+    # :none, :remote
     def presentation_mode(action, source = nil)
         action = action.to_sym
-
-        self[:presentation] = action
 
         # play, stop
         if action == :remote
             auto_show_content(true)
             send "vcbutton #{['play', source].compact.join(' ')}\r"
+
+            # Polycom turns off it's input and waits for a new source to
+            # be detected and there is no other way to detect this.
+            if self[:presentation] != :remote
+                button_press 'home', 'right', 'select', 'select'
+            end
         else
             auto_show_content(false)
             send "vcbutton stop\r"
         end
+
+        self[:presentation] = action
     end
 
     def presentation_mode?
