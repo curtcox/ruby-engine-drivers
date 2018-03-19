@@ -30,6 +30,7 @@ class Polycom::RealPresence::GroupSeries
         # addrbook (local) commands
         # globaldir (includes LDAP and Skype)
         @use_global_addressbook = setting(:global_addressbook) || true
+        @default_content = setting(:default_content) || 2
     end
 
     def connected
@@ -362,19 +363,13 @@ class Polycom::RealPresence::GroupSeries
     end
 
     # :none, :remote
-    def presentation_mode(action, source = nil)
+    def presentation_mode(action, source = @default_content)
         action = action.to_sym
 
         # play, stop
         if action == :remote
             auto_show_content(true)
             send "vcbutton #{['play', source].compact.join(' ')}\r"
-
-            # Polycom turns off it's input and waits for a new source to
-            # be detected and there is no other way to detect this.
-            if self[:presentation] != :remote
-                button_press 'home', 'right', 'select', 'select'
-            end
         else
             auto_show_content(false)
             send "vcbutton stop\r"
@@ -465,7 +460,7 @@ class Polycom::RealPresence::GroupSeries
             if parts[1] == 'play'
                 self[:presentation] = :remote
             elsif parts[1] == 'stop'
-                self[:presentation] = :local if self[:presentation] == :remote
+                self[:presentation] = :local
             end
         when :vgaqualitypreference
             self[:quality_preference] = parts[1]
