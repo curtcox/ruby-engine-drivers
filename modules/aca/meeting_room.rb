@@ -855,8 +855,13 @@ class Aca::MeetingRoom < Aca::Joiner
     def vc_content(outp, inp)
         vc = self[:sources][outp.to_sym]
         return unless vc && vc[:content]
-        source = self[:sources][inp.to_sym]
-        return unless source
+
+        if inp == ''
+            source = { input: 0 }
+        else
+            source = self[:sources][inp.to_sym]
+            return unless source
+        end
 
         # Perform any subsource selection
         if source[:usb_output]

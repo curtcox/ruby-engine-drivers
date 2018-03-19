@@ -30,6 +30,7 @@ class Polycom::RealPresence::GroupSeries
         # addrbook (local) commands
         # globaldir (includes LDAP and Skype)
         @use_global_addressbook = setting(:global_addressbook) || true
+        @default_content = setting(:default_content) || 2
     end
 
     def connected
@@ -110,7 +111,6 @@ class Polycom::RealPresence::GroupSeries
         if call_id
             send "hangup video #{call_id}\r", retries: 0
         else
-            send "vcbutton stop\r", retries: 0
             send "hangup all\r", name: :hangup_all, retries: 0
         end
     end
@@ -362,11 +362,9 @@ class Polycom::RealPresence::GroupSeries
         send "sleeptime #{time}\r"
     end
 
-    # :none, :local, :remote
-    def presentation_mode(action, source = nil)
+    # :none, :remote
+    def presentation_mode(action, source = @default_content)
         action = action.to_sym
-
-        self[:presentation] = action
 
         # play, stop
         if action == :remote
@@ -376,6 +374,8 @@ class Polycom::RealPresence::GroupSeries
             auto_show_content(false)
             send "vcbutton stop\r"
         end
+
+        self[:presentation] = action
     end
 
     def presentation_mode?
@@ -460,7 +460,7 @@ class Polycom::RealPresence::GroupSeries
             if parts[1] == 'play'
                 self[:presentation] = :remote
             elsif parts[1] == 'stop'
-                self[:presentation] = :local if self[:presentation] == :remote
+                self[:presentation] = :local
             end
         when :vgaqualitypreference
             self[:quality_preference] = parts[1]
