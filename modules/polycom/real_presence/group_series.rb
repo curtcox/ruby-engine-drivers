@@ -329,7 +329,7 @@ class Polycom::RealPresence::GroupSeries
     end
 
     def dial_phone(number)
-        send "dial phone auto \"number\"\r", name: :dial_phone
+        send "dial phone auto \"#{number}\"\r", name: :dial_phone
     end
 
     def dial_addressbook(entry)
