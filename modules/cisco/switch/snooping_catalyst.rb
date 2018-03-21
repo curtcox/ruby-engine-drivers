@@ -93,7 +93,7 @@ class Cisco::Switch::SnoopingCatalyst
 
     def query_snooping_bindings
         @snooping = []
-        do_send 'show ip dhcp snooping binding', max_waits: 10000, retries: 0, name: :snooping
+        do_send 'show ip dhcp snooping binding'
     end
 
     def query_interface_status
@@ -148,7 +148,7 @@ class Cisco::Switch::SnoopingCatalyst
                 @check_interface << interface
 
                 # Delay here is to give the PC some time to negotiate an IP address
-                schedule.in(3000) { query_snooping_bindings }
+                # schedule.in(3000) { query_snooping_bindings }
             elsif data =~ /Down:/
                 logger.debug { "Interface Down: #{interface}" }
                 remove_lookup(interface)
@@ -279,8 +279,6 @@ class Cisco::Switch::SnoopingCatalyst
                     end
                 end
             end
-
-            return :ignore if command[:name] == :snooping
         end
 
         :success
