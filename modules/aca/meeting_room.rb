@@ -8,7 +8,6 @@ class Aca::MeetingRoom < Aca::Joiner
     default_settings joiner_driver: :System
     implements :logic
 
-
     def on_load
         @waiting_for = {}
 
@@ -602,6 +601,48 @@ class Aca::MeetingRoom < Aca::Joiner
             @lights_set = false
         end
 
+        mixer = system[:Mixer]
+        begin
+            if !mixer.nil?
+                if self[:mics]
+                    # Mic mutes
+                    self[:mics].each do |mic|
+                        args = {}
+                        args[:ids] = mic[:mute_id] || mic[:id]
+                        args[:index] = mic[:index] if mic[:index]
+                        args[:type] = mic[:type] if mic[:type]
+                        mixer.query_mutes(args)
+                    end
+
+                    self[:mics].each do |mic|
+                        args = {}
+                        args[:ids] = mic[:id]
+                        args[:index] = mic[:index] if mic[:index]
+                        args[:type] = mic[:type] if mic[:type]
+                        mixer.query_faders(args)
+                    end
+                end
+
+                self[:outputs].each do |key, value|
+                    if value[:no_audio].nil? && value[:mixer_id]
+                        args = {}
+                        args[:ids] = value[:mixer_id]
+                        args[:index] = value[:index] if value[:index]
+                        mixer.query_faders(args)
+
+                        if value[:no_mute].nil?
+                            args = {}
+                            args[:ids] = value[:mute_id] || value[:mixer_id]
+                            args[:index] = value[:index] if value[:index]
+                            mixer.query_mutes(args)
+                        end
+                    end
+                end
+            end
+        rescue => e
+            logger.print_error(e, 'querying fader levels')
+        end
+
 
         self[:tab] = self[:inputs][0] if self[:inputs]
         self[:state] = :online
@@ -741,13 +782,24 @@ class Aca::MeetingRoom < Aca::Joiner
                 end
 
                 # Mute the output if mixer involved
-                if @defaults[:off_preset].nil? && value[:no_audio].nil? && value[:mixer_id]
-                    args = {}
-                    args[:ids] = value[:mute_id] || value[:mixer_id]
-                    args[:muted] = true
-                    args[:index] = value[:mixer_mute_index] || value[:mixer_index] if value[:mixer_mute_index] || value[:mixer_index]
-                    args[:type] = value[:mixer_type] if value[:mixer_type]
-                    mixer.mutes(args)
+                if value[:no_audio].nil?
+                    if value[:mixer_id]
+                        if @defaults[:off_preset].nil?
+                            args = {}
+                            args[:ids] = value[:mute_id] || value[:mixer_id]
+                            args[:muted] = true
+                            args[:index] = value[:mixer_mute_index] || value[:mixer_index] if value[:mixer_mute_index] || value[:mixer_index]
+                            args[:type] = value[:mixer_type] if value[:mixer_type]
+                            mixer.mutes(args)
+                        end
+
+                        if @defaults[:output_level]
+                            mixer.fader(value[:mixer_id], @defaults[:output_level])
+                        end
+                    elsif @defaults[:output_level]
+                        dev = system[key]
+                        dev.volume(@defaults[:output_level]) if !dev.nil?
+                    end
                 end
 
             rescue => e # Don't want to stop powering off devices on an error
