@@ -92,7 +92,6 @@ class Cisco::Switch::SnoopingCatalyst
     end
 
     def query_snooping_bindings
-        @snooping = []
         do_send 'show ip dhcp snooping binding'
     end
 
@@ -169,7 +168,7 @@ class Cisco::Switch::SnoopingCatalyst
 
             # Ignore any duplicates
             @snooping.each do |lease, mac, ip, interface|
-                next unless checked.include?(interface)
+                next if checked.include?(interface)
                 checked << interface
 
                 iface = self[interface] || ::Aca::Tracking::StaticDetails.new
@@ -223,7 +222,7 @@ class Cisco::Switch::SnoopingCatalyst
                 end
             end
 
-            @snooping = []
+            @snooping.clear
 
             return :success
         end
