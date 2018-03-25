@@ -237,7 +237,7 @@ class Lg::Lcd::ModelLs5
         # 5 == 3m
         # 6 == 5m
         # 7 == 10m
-        do_send(Command[:dpm], 4, :f, name: :disable_dpm)
+        do_send(Command[:dpm], time_out.to_i, :f, name: :disable_dpm)
 
         # The action DPM takes needs to be configured using a remote
         # The action should be set to: screen off always

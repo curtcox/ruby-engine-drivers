@@ -22,6 +22,7 @@ class Polycom::RealPresence::GroupSeries
 
 
     def on_load
+        @popupinfo = 0
         on_update
     end
 
@@ -29,6 +30,7 @@ class Polycom::RealPresence::GroupSeries
         # addrbook (local) commands
         # globaldir (includes LDAP and Skype)
         @use_global_addressbook = setting(:global_addressbook) || true
+        @default_content = setting(:default_content) || 2
     end
 
     def connected
@@ -98,6 +100,8 @@ class Polycom::RealPresence::GroupSeries
     # For cisco compatibility
     def call(action)
         case action.to_sym
+        when :accept
+            answer
         when :disconnect
             hangup
         end
@@ -107,7 +111,6 @@ class Polycom::RealPresence::GroupSeries
         if call_id
             send "hangup video #{call_id}\r", retries: 0
         else
-            send "vcbutton stop\r", retries: 0
             send "hangup all\r", name: :hangup_all, retries: 0
         end
     end
@@ -259,6 +262,11 @@ class Polycom::RealPresence::GroupSeries
         audio_mute(value)
     end
 
+    # Valid keys: #|*|0|1|2|3|4|5|6|7|8|9|.
+    # down|left|right|select|up
+    # back|call|graphics|hangup
+    # mute|volume+|volume-|info
+    # camera|delete|directory|home|keyboard|menu|period|pip|preset
     def button_press(*keys)
         # succeeded / failed or completed when some keys are not valid
         send "button #{keys.join(' ')}\r"
@@ -309,15 +317,19 @@ class Polycom::RealPresence::GroupSeries
     end
 
     def dial(number, search = nil)
-        if number == search
-            dial_phone number
+        if !number.present? && !search.present?
+            button_press 'call'
         else
-            dial_addressbook number
+            if number == search
+                dial_phone number
+            else
+                dial_addressbook number
+            end
         end
     end
 
     def dial_phone(number)
-        send "dial phone auto \"number\"\r", name: :dial_phone
+        send "dial phone auto \"#{number}\"\r", name: :dial_phone
     end
 
     def dial_addressbook(entry)
@@ -350,20 +362,20 @@ class Polycom::RealPresence::GroupSeries
         send "sleeptime #{time}\r"
     end
 
-    # :none, :local, :remote
-    def presentation_mode(action, source = nil)
+    # :none, :remote
+    def presentation_mode(action, source = @default_content)
         action = action.to_sym
-
-        self[:presentation] = action
 
         # play, stop
         if action == :remote
             auto_show_content(true)
-            send "vcbutton #{[action, source].compact.join(' ')}\r"
+            send "vcbutton #{['play', source].compact.join(' ')}\r"
         else
             auto_show_content(false)
             send "vcbutton stop\r"
         end
+
+        self[:presentation] = action
     end
 
     def presentation_mode?
@@ -448,7 +460,7 @@ class Polycom::RealPresence::GroupSeries
             if parts[1] == 'play'
                 self[:presentation] = :remote
             elsif parts[1] == 'stop'
-                self[:presentation] = :local if self[:presentation] == :remote
+                self[:presentation] = :local
             end
         when :vgaqualitypreference
             self[:quality_preference] = parts[1]
@@ -524,6 +536,11 @@ class Polycom::RealPresence::GroupSeries
             # answered: Hang Up
             if parts[1] == 'Hang'
                 self[:call_status] = {}
+            end
+        when :popupinfo
+            if parts[1].start_with?('choice')
+                @popupinfo += 1
+                self[:popupinfo] = @popupinfo
             end
         else
             # Assign yes/no and on/off values
