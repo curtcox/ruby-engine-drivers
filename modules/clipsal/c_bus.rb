@@ -44,6 +44,7 @@ class Clipsal::CBus
     end
 
     def on_unload
+        @trigger_groups = setting(:trigger_groups) || [0xCA]
     end
 
     def on_update
@@ -148,10 +149,10 @@ class Clipsal::CBus
     end
 
 
-    def trigger(group, action)
+    def trigger(group, action, application = 0xCA)
         group = group.to_i & 0xFF
         action = action.to_i & 0xFF
-        command = [0x05, 0xCA, 0x00, 0x02, group, action]
+        command = [0x05, application, 0x00, 0x02, group, action]
 
         self["trigger_group_#{group}"] = action
 
@@ -159,11 +160,11 @@ class Clipsal::CBus
     end
 
 
-    def trigger_kill(group)
+    def trigger_kill(group, application = 0xCA)
         group = group.to_i
 
         group = group & 0xFF
-        command = [0x05, 0xCA, 0x00, 0x01, group]
+        command = [0x05, application, 0x00, 0x01, group]
         do_send(command)
     end
 
@@ -195,7 +196,7 @@ class Clipsal::CBus
             current = commands.shift
 
             case application
-            when 0xCA            # Trigger group
+            when *@trigger_groups            # Trigger group
                 case current
                 when 0x02            # Trigger Event (ex: 0504CA00 020101 29)
                     self["trigger_group_#{commands.shift}"] = commands.shift    # Action selector
