@@ -143,6 +143,10 @@ class Microsoft::Exchange
     end
 
     def get_bookings(email:, start_param:DateTime.now, end_param:(DateTime.now + 1.week))
+        if [Integer, String].include?(start_param.class)
+            start_param = DateTime.at(start_param / 1000)
+            end_param = DateTime.at(end_param / 1000)
+        end
         bookings = []
         calendar_id = @ews_client.get_folder(:calendar, opts = {act_as: email }).id
         events = @ews_client.find_items(folder_id: calendar_id, calendar_view: {start_date: start_param, end_date: end_param})
