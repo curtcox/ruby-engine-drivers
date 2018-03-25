@@ -739,6 +739,7 @@ class Aca::MeetingRoom < Aca::Joiner
             begin
                 # Next if joining room
                 next if value[:remote] && (self[key].nil? || self[key][:source] == :none)
+                next if value[:ignore_state_on_shutdown]
 
                 # Blank the source
                 self[key] = {
