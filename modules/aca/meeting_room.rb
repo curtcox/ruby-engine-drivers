@@ -23,6 +23,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:Camera] = setting(:Camera)
             self[:hide_vc_sources] = setting(:hide_vc_sources)
             self[:mics_mutes] = setting(:mics_mutes)
+            @confidence_monitor = setting(:confidence_monitor)
 
             # Get any default settings
             @defaults = setting(:defaults) || {}
@@ -742,6 +743,7 @@ class Aca::MeetingRoom < Aca::Joiner
             begin
                 # Next if joining room
                 next if value[:remote] && (self[key].nil? || self[key][:source] == :none)
+                next if value[:ignore_state_on_shutdown]
 
                 # Blank the source
                 self[key] = {
@@ -897,7 +899,8 @@ class Aca::MeetingRoom < Aca::Joiner
         end
     end
 
-    def select_camera(input, output = nil)
+    def select_camera(source, input, output = nil)
+        self[:selected_camera] = source
         if output
             system[:Switcher].switch({input => output})
         else
@@ -941,6 +944,10 @@ class Aca::MeetingRoom < Aca::Joiner
 
         # So we can keep the UI in sync
         self[:vc_content_source] = inp
+
+        if @confidence_monitor
+            present_actual(inp, @confidence_monitor)
+        end
     end
 
     def wake_pcs

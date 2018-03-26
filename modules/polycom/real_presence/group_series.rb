@@ -22,7 +22,6 @@ class Polycom::RealPresence::GroupSeries
 
 
     def on_load
-        @popupinfo = 0
         on_update
     end
 
@@ -538,9 +537,10 @@ class Polycom::RealPresence::GroupSeries
                 self[:call_status] = {}
             end
         when :popupinfo
-            if parts[1].start_with?('choice')
-                @popupinfo += 1
-                self[:popupinfo] = @popupinfo
+            if parts[1] == 'question'
+                self[:popupinfo] = parts[2].downcase
+            elsif parts[1] == 'answered'
+                self[:popupinfo] = false
             end
         else
             # Assign yes/no and on/off values
