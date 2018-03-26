@@ -155,6 +155,7 @@ class Microsoft::Exchange
             event.get_all_properties!
             booking = {}
             booking[:subject] = event.subject
+            booking[:title] = event.subject
             # booking[:start_date] = event.start.utc.iso8601
             # booking[:end_date] = event.end.utc.iso8601
             booking[:start_date] = event.start.to_i * 1000
