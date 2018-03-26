@@ -44,10 +44,11 @@ class Clipsal::CBus
     end
 
     def on_unload
-        @trigger_groups = setting(:trigger_groups) || [0xCA]
+        
     end
 
     def on_update
+        @trigger_groups = setting(:trigger_groups) || [0xCA]
     end
 
 
