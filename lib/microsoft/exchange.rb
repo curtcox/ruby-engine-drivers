@@ -21,6 +21,9 @@ class Microsoft::Exchange
         @internet_proxy = internet_proxy
         ews_opts = { http_opts: { ssl_verify_mode: 0 } }
         ews_opts[:http_opts][:http_client] = @internet_proxy if @internet_proxy
+        STDERR.puts '--------------- NEW CLIENT CREATED --------------'
+        STDERR.puts "At URL: #{@ews_url} with email: #{@service_account_email} and password #{@service_account_password}"
+        STDERR.puts '-------------------------------------------------'
         @ews_client ||= Viewpoint::EWSClient.new @ews_url, @service_account_email, @service_account_password, ews_opts
     end 
 
@@ -147,6 +150,9 @@ class Microsoft::Exchange
             start_param = DateTime.parse(Time.at(start_param.to_i / 1000).to_s)
             end_param = DateTime.parse(Time.at(end_param.to_i / 1000).to_s)
         end
+        STDERR.puts '---------------- GETTING BOOKINGS ---------------'
+        STDERR.puts "At URL: #{email} with email: #{start_param} and password #{end_param}"
+        STDERR.puts '-------------------------------------------------'
         bookings = []
         calendar_id = @ews_client.get_folder(:calendar, opts = {act_as: email }).id
         events = @ews_client.find_items(folder_id: calendar_id, calendar_view: {start_date: start_param, end_date: end_param})
