@@ -146,6 +146,7 @@ class Microsoft::Exchange
     end
 
     def get_bookings(email:, start_param:DateTime.now, end_param:(DateTime.now + 1.week))
+	begin
         if [Integer, String].include?(start_param.class)
             start_param = DateTime.parse(Time.at(start_param.to_i / 1000).to_s)
             end_param = DateTime.parse(Time.at(end_param.to_i / 1000).to_s)
@@ -180,6 +181,11 @@ class Microsoft::Exchange
             bookings.push(booking)
         }
         bookings
+	rescue Exception => msg  
+	    STDERR.puts msg
+	    STDERR.flush
+	    return []
+	end
     end
 
     def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney')
