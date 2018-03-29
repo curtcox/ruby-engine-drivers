@@ -145,14 +145,14 @@ class Microsoft::Exchange
         free_rooms
     end
 
-    def get_bookings(email:, start_param:DateTime.now, end_param:(DateTime.now + 1.week))
+    def get_bookings(email:, start_param:DateTime.now.midnight, end_param:(DateTime.now.midnight + 1.week))
 	begin
         if [Integer, String].include?(start_param.class)
             start_param = DateTime.parse(Time.at(start_param.to_i / 1000).to_s)
             end_param = DateTime.parse(Time.at(end_param.to_i / 1000).to_s)
         end
         STDERR.puts '---------------- GETTING BOOKINGS ---------------'
-        STDERR.puts "At URL: #{email} with email: #{start_param} and password #{end_param}"
+        STDERR.puts "At email: #{email} with start: #{start_param} and end: #{end_param}"
         STDERR.puts '-------------------------------------------------'
         bookings = []
         calendar_id = @ews_client.get_folder(:calendar, opts = {act_as: email }).id
