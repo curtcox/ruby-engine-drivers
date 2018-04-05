@@ -105,6 +105,9 @@ class Aca::ExchangeBooking
         self[:booking_hide_description] = setting(:booking_hide_description)
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
 
+        @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
+        @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
+
         # Skype join button available 2min before the start of a meeting
         @skype_start_offset = setting(:skype_start_offset) || 120
 
@@ -291,6 +294,9 @@ class Aca::ExchangeBooking
             todays_bookings
         }.then(proc { |bookings|
             self[:today] = bookings
+            if @check_meeting_ending
+                should_notify?
+            end
         }, proc { |e| logger.print_error(e, 'error fetching bookings') })
     end
 
@@ -387,6 +393,53 @@ class Aca::ExchangeBooking
             logger.print_error error, 'creating ad hoc booking'
             thread.reject error # propogate the error
         })
+    end
+
+    def should_notify?
+        bookings = self[:today]
+        return unless bookings.present?
+        now = Time.now.to_i
+
+        current = nil
+        pending = nil
+        found = false
+
+        bookings.sort! { |a, b| a[:end_epoch] <=> b[:end_epoch] }
+        bookings.each do |booking|
+            starting = booking[:start_epoch]
+            ending = booking[:end_epoch]
+
+            if starting < now && ending > now
+                found = true
+                current = ending
+                @current_meeting_title = booking[:Subject]
+            elsif found
+                pending = starting
+                break
+            end
+        end
+
+        if !current
+            self[:meeting_canbe_extended] = false
+            return
+        end
+
+        check_start = current - @check_meeting_ending
+        check_extend = current + @extend_meeting_by
+
+        if now >= check_start && (pending.nil? || pending >= check_extend)
+            self[:meeting_canbe_extended] = current
+        else
+            self[:meeting_canbe_extended] = false
+        end
+    end
+
+    def extend_meeting
+        starting = self[:meeting_canbe_extended]
+        return false unless starting
+
+        ending = starting + @extend_meeting_by
+        create_meeting start: starting * 1000, end: ending * 1000, title: @current_meeting_title
     end
 
 
@@ -581,11 +634,12 @@ class Aca::ExchangeBooking
             start = item[:start][:text]
             ending = item[:end][:text]
 
+            real_start = Time.parse(start)
+            real_end = Time.parse(ending)
+
             # Extract the skype meeting URL
             if set_skype_url
-                real_start = Time.parse(start)
                 start_integer = real_start.to_i - @skype_start_offset
-                real_end = Time.parse(ending)
                 end_integer = real_end.to_i - @skype_end_offset
 
                 if now_int > start_integer && now_int < end_integer
@@ -624,7 +678,9 @@ class Aca::ExchangeBooking
                 :Subject => subject ? subject[:text] : "Private",
                 :owner => item[:organizer][:elems][0][:mailbox][:elems][0][:name][:text],
                 :setup => 0,
-                :breakdown => 0
+                :breakdown => 0,
+                :start_epoch => real_start.to_i,
+                :end_epoch => real_end.to_i
             }
         end
 
