@@ -153,6 +153,7 @@ class Clipsal::CBus
     def trigger(group, action, application = 0xCA)
         group = group.to_i & 0xFF
         action = action.to_i & 0xFF
+        application = application.to_i & 0xFF
         command = [0x05, application, 0x00, 0x02, group, action]
 
         self["trigger_group_#{group}"] = action
@@ -167,6 +168,10 @@ class Clipsal::CBus
         group = group & 0xFF
         command = [0x05, application, 0x00, 0x01, group]
         do_send(command)
+    end
+
+    def raw(hex)
+        do_send(str_to_array(hex_to_byte(hex)))
     end
 
 
