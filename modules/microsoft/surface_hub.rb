@@ -89,7 +89,6 @@ class Microsoft::SurfaceHub
         when :power
             case resp[1].to_i
             when 0, 2
-                logger.debug "GOT POWER IS 0 or 2"
                 self[:power] = Off
             when 1, 5
                 self[:power] = On
