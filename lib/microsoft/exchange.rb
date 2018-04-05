@@ -168,7 +168,7 @@ class Microsoft::Exchange
             booking[:start_date] = event.start.to_i * 1000
             booking[:end_date] = event.end.to_i * 1000
             booking[:body] = event.body
-            booking[:organizer] = {
+            booking[:organiser] = {
                 name: event.organizer.name,
                 email: event.organizer.email
             }
