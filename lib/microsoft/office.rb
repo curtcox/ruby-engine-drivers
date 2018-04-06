@@ -294,7 +294,7 @@ class Microsoft::Office
     end
 
 
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney')
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, timezone:'Sydney')
         description = String(description)
         attendees = Array(attendees)
 
@@ -305,6 +305,8 @@ class Microsoft::Office
         endpoint = "/v1.0/users/#{room.email}/events"
 
         # Ensure our start and end params are Ruby dates and format them in Graph format
+        start_object = ensure_ruby_date(start_param).in_time_zone(timezone)
+        end_object = ensure_ruby_date(end_param).in_time_zone(timezone)
         start_param = ensure_ruby_date(start_param).in_time_zone(timezone).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).in_time_zone(timezone).iso8601.split("+")[0]
 
@@ -361,7 +363,23 @@ class Microsoft::Office
                 }
             },
             attendees: attendees
-        }.to_json
+        }
+
+        if recurrence
+            event[:recurrence] = {
+                pattern: {
+                    type: recurrence,
+                    interval: 1,
+                    daysOfWeek: [start_object.strftime("%A")]
+                },
+                range: {
+                    type: 'noEnd',
+                    startDate: start_object.strftime("%F")
+                }
+            }
+        end
+
+        event = event.to_json
 
         request = graph_request(request_method: 'post', endpoint: endpoint, data: event, password: @delegated)
 
