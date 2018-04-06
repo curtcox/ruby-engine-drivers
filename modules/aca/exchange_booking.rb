@@ -113,6 +113,7 @@ class Aca::ExchangeBooking
 
         # Skype join button not available in the last 8min of a meeting
         @skype_end_offset = setting(:skype_end_offset) || 480
+        @force_skype_extract = setting(:force_skype_extract)
 
         # Because restarting the modules results in a 'swipe' of the last read card
         ignore_first_swipe = true
@@ -626,6 +627,7 @@ class Aca::ExchangeBooking
         end
 
         skype_exists = set_skype_url = system.exists?(:Skype)
+        set_skype_url = true if @force_skype_extract
         now_int = now.to_i
 
         items.select! { |booking| !booking.cancelled? }
@@ -652,8 +654,9 @@ class Aca::ExchangeBooking
                         if body_parts.length > 1
                             links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
                             if links[0].present?
+                                self[:can_join_skype_meeting] = true
                                 set_skype_url = false
-                                system[:Skype].set_uri(links[0])
+                                system[:Skype].set_uri(links[0]) if skype_exists
                             end
                         end
                     end
@@ -684,7 +687,10 @@ class Aca::ExchangeBooking
             }
         end
 
-        system[:Skype].set_uri(nil) if skype_exists && set_skype_url
+        if set_skype_url
+            self[:can_join_skype_meeting] = false
+            system[:Skype].set_uri(nil) if skype_exists
+        end
 
         results
     end
