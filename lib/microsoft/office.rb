@@ -227,7 +227,7 @@ class Microsoft::Office
 
         }.to_json
 
-        request = graph_request(request_method: 'post', endpoint: endpoint, data: post_data, password: @delegated)
+        request = graph_request(request_method: 'post', endpoint: endpoint, data: post_data, password: true)
         check_response(request)
         JSON.parse(request.body)
     end
