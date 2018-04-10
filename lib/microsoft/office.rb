@@ -134,7 +134,16 @@ class Microsoft::Office
     end
 
     def get_users(q: nil, limit: nil)
-        filter_param = "startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}')" if q
+        if q.include?(" ")
+            queries = q.split(" ")
+            filter_params = []
+            queries.each do |q|
+                filter_params.push("(startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))")
+            end
+            filter_param = filter_params.join(" or ")
+        else
+            filter_param = "startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}')" if q
+        end
         query_params = {
             '$filter': filter_param,
             '$top': limit
