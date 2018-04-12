@@ -95,6 +95,7 @@ class Aca::ExchangeBooking
         self[:hide_all] = setting(:hide_all) || false
         self[:touch_enabled] = setting(:touch_enabled) || false
         self[:name] = self[:room_name] = setting(:room_name) || system.name
+        self[:timeout] = setting(:timeout) || false
 
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
         self[:booking_controls] = setting(:booking_controls)
@@ -104,6 +105,9 @@ class Aca::ExchangeBooking
         self[:booking_hide_user] = setting(:booking_hide_user)
         self[:booking_hide_description] = setting(:booking_hide_description)
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
+        self[:last_meeting_started] = setting(:last_meeting_started)
+        self[:cancel_meeting_after] = setting(:cancel_meeting_after)
+
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
