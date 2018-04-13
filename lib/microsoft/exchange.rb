@@ -36,8 +36,20 @@ class Microsoft::Exchange
     end
 
     def phone_list(field, name=nil)
-        puts field
-        field[:phone_numbers][:elems][4][:entry][:text] || field[:phone_numbers][:elems][2][:entry][:text] 
+        phone = nil
+        field[:phone_numbers][:elems].each do |entry|
+            type = entry[:entry][:attribs][:key]
+            text = entry[:entry][:text]
+
+            next unless text.present?
+
+            if type == "MobilePhone"
+                return text
+            elsif type == "BusinessPhone" || phone.present?
+                phone = text
+            end
+        end
+        phone
     end
 
 
