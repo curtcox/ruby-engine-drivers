@@ -66,16 +66,20 @@ class Microsoft::Exchange
 
         ews_users.each do |user|
             output = {}
-            if user[:resolution][:elems][1] && user[:resolution][:elems][1][:contact]
-                user[:resolution][:elems][1][:contact][:elems].each do |field|
-                    if fields.keys.include?(field.keys[0])
-                        output[fields[field.keys[0]].split(':')[0]] = self.__send__(fields[field.keys[0]].split(':')[1], field, field.keys[0])
-                    end
+
+            user[:resolution][:elems][1][:contact][:elems].each do |field|
+                if fields.keys.include?(field.keys[0])
+                    key = field.keys[0].split(':')
+                    val = self.__send__(fields[key[1]], field, field.keys[0])
+                    output[fields[key[0]]] = val if val
                 end
-            else
+            end
+
+            if output[:name].nil?
                 output[:name] = user[:resolution][:elems][0][:mailbox][:elems][0][:name][:text]
             end
             output[:email] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
+            
             users.push(output)
         end
         STDERR.puts users
