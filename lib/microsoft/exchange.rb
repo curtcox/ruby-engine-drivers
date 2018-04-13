@@ -85,10 +85,6 @@ class Microsoft::Exchange
                 STDERR.flush
             end
         end
-        STDERR.puts users
-        STDERR.puts limit
-        STDERR.puts users[0..2]
-        STDERR.flush
         limit ||= users.length
         limit = limit.to_i - 1
         return users[0..limit.to_i]
