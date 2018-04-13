@@ -233,11 +233,11 @@ class Aca::ExchangeBooking
             # sip_spd:Auto sip_num:email@address.com
             entries = []
             task { ews.get_users(q: q, limit: limit) }.value.each do |entry|
-                phone = entry[:phone]
+                phone = entry['phone']
 
                 entries << entry
                 entries << ({
-                    name: entry[:name]
+                    name: entry['name'],
                     phone: phone.gsub(/\D+/, '')
                 }) if phone
             end
