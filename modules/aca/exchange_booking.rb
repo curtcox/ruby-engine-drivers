@@ -217,32 +217,38 @@ class Aca::ExchangeBooking
         end
     end
 
-    def directory_search(q, limit: 30)
+    def directory_search(q, limit: 50)
         # Ensure only a single search is occuring at a time
         if @dir_search
             @dir_search = q
             return
         end
 
+        ews = ::Microsoft::Exchange.new({
+            ews_url: ENV['EWS_URL'] || 'https://outlook.office365.com/ews/Exchange.asmx',
+            service_account_email: ENV['OFFICE_ACCOUNT_EMAIL'],
+            service_account_password: ENV['OFFICE_ACCOUNT_PASSWORD'],
+            internet_proxy: ENV['INTERNET_PROXY']
+        })
+
+        @dir_search = q
+        self[:searching] = true
         begin
-            ews = ::Microsoft::Exchange.new({
-                ews_url: ENV['EWS_URL'] || 'https://outlook.office365.com/ews/Exchange.asmx',
-                service_account_email: ENV['OFFICE_ACCOUNT_EMAIL'],
-                service_account_password: ENV['OFFICE_ACCOUNT_PASSWORD'],
-                internet_proxy: ENV['INTERNET_PROXY']
-            })
-
-            @dir_search = q
             self[:directory] = task { ews.get_users(q: q, limit: limit) }.value
-
-            # Update the search if a change was requested while a search was occuring
-            if @dir_search != q
-                q = @dir_search
-                thread.next_tick { directory_search(q, limit) }
-            end
-        ensure
-            @dir_search = nil
+        rescue => e
+            logger.print_error e, 'searching directory'
+            self[:directory] = []
         end
+
+        # Update the search if a change was requested while a search was occuring
+        if @dir_search != q
+            q = @dir_search
+            thread.next_tick { directory_search(q, limit) }
+        else
+            self[:searching] = false
+        end
+
+        @dir_search = nil
     end
 
     # ======================================
