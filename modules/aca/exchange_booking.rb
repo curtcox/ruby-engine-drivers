@@ -238,7 +238,7 @@ class Aca::ExchangeBooking
                 entries << entry
                 entries << {
                     name: entry[:name]
-                    phone: phone
+                    phone: phone.gsub(/\D+/, '')
                 } if phone
             end
             self[:directory] = entries
