@@ -217,7 +217,7 @@ class Aca::ExchangeBooking
         end
     end
 
-    def directory_search(q, limit: 50)
+    def directory_search(q, limit: 30)
         # Ensure only a single search is occuring at a time
         if @dir_search
             @dir_search = q
@@ -234,7 +234,18 @@ class Aca::ExchangeBooking
         @dir_search = q
         self[:searching] = true
         begin
-            self[:directory] = task { ews.get_users(q: q, limit: limit) }.value
+            # sip_spd:Auto sip_num:email@address.com
+            entries = []
+            task { ews.get_users(q: q, limit: limit) }.value.each do |entry|
+                phone = entry[:phone]
+
+                entries << entry
+                entries << {
+                    name: entry[:name]
+                    phone: phone.gsub(/\D+/, '')
+                } if phone
+            end
+            self[:directory] = entries
         rescue => e
             logger.print_error e, 'searching directory'
             self[:directory] = []
