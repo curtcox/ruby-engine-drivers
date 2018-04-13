@@ -65,19 +65,25 @@ class Microsoft::Exchange
         }
         keys = fields.keys
         ews_users.each do |user|
-            output = {}
-            user[:resolution][:elems][1][:contact][:elems].each do |field|
-                key = field.keys[0]
-                if keys.include?(key)
-                    splits = fields[key].split(':')
-                    output[splits[0]] = self.__send__(splits[1], field, key)
+            begin
+                output = {}
+                user[:resolution][:elems][1][:contact][:elems].each do |field|
+                    key = field.keys[0]
+                    if keys.include?(key)
+                        splits = fields[key].split(':')
+                        output[splits[0]] = self.__send__(splits[1], field, key)
+                    end
                 end
+                if output['name'].nil?
+                    output['name'] = user[:resolution][:elems][0][:mailbox][:elems][0][:name][:text]
+                end
+                output['email'] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
+                users.push(output)
+            rescue => e
+                STDERR.puts "GOT USER WITHOUT EMAIL"
+                STDERR.puts user
+                STDERR.flush
             end
-            if output['name'].nil?
-                output['name'] = user[:resolution][:elems][0][:mailbox][:elems][0][:name][:text]
-            end
-            output['email'] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
-            users.push(output)
         end
         STDERR.puts users
         STDERR.puts limit
