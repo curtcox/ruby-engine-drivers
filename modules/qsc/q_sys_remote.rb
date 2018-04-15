@@ -1,3 +1,6 @@
+# encoding: ASCII-8BIT
+# frozen_string_literal: true
+
 module Qsc; end
 
 class Qsc::QSysRemote
@@ -39,7 +42,7 @@ class Qsc::QSysRemote
     end
 
     def connected
-        schedule.every('1m') do
+        schedule.every('20s') do
             logger.debug "Maintaining Connection"
             no_op
         end
@@ -100,7 +103,7 @@ class Qsc::QSysRemote
     # ------------------
     def component_get(name, *controls, **options)
         # Example usage:
-        # component_get 'My APM', 'ent.xfade.gain', 'ent.xfade.gain2'
+        # component_get 'My AMP', 'ent.xfade.gain', 'ent.xfade.gain2'
 
         controls.collect! do |ctrl|
             {
@@ -114,9 +117,10 @@ class Qsc::QSysRemote
         }, **options)
     end
 
-    def component_set(name, *values, **options)
+    def component_set(name, value, **options)
         # Example usage:
         # component_set 'My APM', { :Name => 'ent.xfade.gain', :Value => -100 }, {...}
+        values = Array(value)
 
         do_send(next_id, cmd: :"Component.Set", params: {
             :Name => name,
@@ -226,7 +230,7 @@ class Qsc::QSysRemote
             sec: :Outputs
         }
     }
-    def fader(name, level, index, type = :matrix_out, **options)
+    def matrix_fader(name, level, index, type = :matrix_out, **options)
         info = Faders[type]
 
         params = {
@@ -245,7 +249,7 @@ class Qsc::QSysRemote
     end
 
     # Named params version
-    def faders(ids:, level:, index:, type: :matrix_out, **options)
+    def matrix_faders(ids:, level:, index:, type: :matrix_out, **options)
         fader(ids, level, index, type, **options)
     end
 
@@ -260,7 +264,7 @@ class Qsc::QSysRemote
             pri: :Outputs
         }
     }
-    def mute(name, value, index, type = :matrix_out, **options)
+    def matrix_mute(name, value, index, type = :matrix_out, **options)
         info = Mutes[type]
 
         params = {
@@ -279,7 +283,7 @@ class Qsc::QSysRemote
     end
 
     # Named params version
-    def mutes(ids:, muted: true, index:, type: :matrix_out, **options)
+    def matrix_mutes(ids:, muted: true, index:, type: :matrix_out, **options)
         mute(ids, muted, index, type, **options)
     end
 
@@ -288,11 +292,41 @@ class Qsc::QSysRemote
     # -------------------
     # RESPONSE PROCESSING
     # -------------------
+    DECODE_OPTIONS = {
+        symbolize_names: true
+    }.freeze
+
     def received(data, resolve, command)
         logger.debug { "QSys sent: #{data}" }
 
-        response = JSON.parse(data)
+        response = JSON.parse(data, DECODE_OPTIONS)
         logger.debug { JSON.pretty_generate(response) }
+
+        result = response[:result]
+        case result
+        when Hash
+            controls = result[:Controls]
+
+            if controls
+                # Probably Component.Get
+                process(controls, name: result[:Name])
+            elsif result[:Platform]
+                # StatusGet
+                self[:platform] = result[:Platform]
+                self[:state] = result[:State]
+                self[:design_name] = result[:DesignName]
+                self[:design_code] = result[:DesignCode]
+                self[:is_redundant] = result[:IsRedundant]
+                self[:is_emulator] = result[:IsEmulator]
+                self[:status] = result[:Status]
+            end
+        when Array
+            # Control.Get
+            process(result)
+        when false
+            # Response failure
+            return :abort
+        end
 
         return :success
     end
@@ -301,13 +335,37 @@ class Qsc::QSysRemote
     protected
 
 
+    BoolVals = ['true', 'false']
+    def process(values, name: nil)
+        component = name.present? ? "#{name}_" : ''
+        values.each do |value|
+            name = value[:Name]
+            val = value[:Value]
+
+            next unless val
+
+            pos = value[:Position]
+            str = value[:String]
+
+            if BoolVals.include?(str)
+                self["fader#{component}#{name}_mute"] = str == 'true'
+            elsif pos
+                # 0 - 1000
+                self["fader#{component}#{name}"] = (pos * 1000).to_i
+            elsif val.is_a?(String)
+                self["#{component}#{name}"] = val
+            else
+                self["fader#{component}#{name}"] = val
+            end
+        end
+    end
+
     def next_id
         @id += 1
         @id
     end
 
     def do_send(id = nil, cmd:, params: {}, **options)
-
         # Build the request
         req = {
             jsonrpc: JsonRpcVer,
@@ -315,6 +373,8 @@ class Qsc::QSysRemote
             params: params
         }
         req[:id] = id if id
+
+        logger.debug { "requesting: #{req}" }
 
         # Append the null terminator
         cmd = req.to_json
