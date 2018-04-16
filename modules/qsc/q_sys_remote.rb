@@ -288,6 +288,61 @@ class Qsc::QSysRemote
     end
 
 
+    # ---------------------
+    # COMPATIBILITY METHODS
+    # ---------------------
+
+    def fader(fader_id, level, component = nil, type = :fader)
+        faders = Array(fader_id)
+        if component
+            faders.map! do |fad|
+                {Name: fad, Value: level}
+            end
+            component_set(component, faders)
+        else
+            faders.each { |fad| control_set(fad, level) }
+        end
+    end
+
+    def faders(ids:, level:, component: nil, type: :fader, **_)
+        fader(ids, level, component, type)
+    end
+
+    def mute(fader_id, value = true, component = nil, type = :fader)
+        val = is_affirmative?(value)
+        fader(fader_id, val, component, type)
+    end
+
+    def mutes(ids:, muted: true, component: nil, type: :fader, **_)
+        mute(ids, muted, component, type)
+    end
+    
+    def unmute(fader_id, component = nil, type = :fader)
+        mute(fader_id, false, component, type)
+    end
+
+    def query_fader(fader_id, component = nil, type = :fader)
+        faders = Array(fader_id)
+
+        if component
+            component_get(component, faders)
+        else
+            control_get(faders)
+        end
+    end
+
+    def query_faders(ids:, component: nil, type: :fader, **_)
+        query_fader(ids, component, type)
+    end
+
+    def query_mute(fader_id, component = nil, type = :fader)
+        query_fader(fader_id, component, type)
+    end
+
+    def query_mutes(ids:, component: nil, type: :fader, **_)
+        query_fader(ids, component, type)
+    end
+
 
     # -------------------
     # RESPONSE PROCESSING
@@ -301,6 +356,12 @@ class Qsc::QSysRemote
 
         response = JSON.parse(data, DECODE_OPTIONS)
         logger.debug { JSON.pretty_generate(response) }
+
+        err = response[:error]
+        if err
+            logger.warn "Error code #{err[:code]} - #{Errors[err[:code]]}\n#{err[:message]}"
+            return :abort
+        end
 
         result = response[:result]
         case result
@@ -323,9 +384,6 @@ class Qsc::QSysRemote
         when Array
             # Control.Get
             process(result)
-        when false
-            # Response failure
-            return :abort
         end
 
         return :success
@@ -347,11 +405,18 @@ class Qsc::QSysRemote
             pos = value[:Position]
             str = value[:String]
 
+            # Seems like string values can be independant of the other values
+            # This should mostly work to detect a string value
+            if val == 0.0 && pos == 0.0 && str[0] != '0'
+                self["#{component}#{name}"] = str
+                next
+            end
+
             if BoolVals.include?(str)
                 self["fader#{component}#{name}_mute"] = str == 'true'
             elsif pos
-                # 0 - 1000
-                self["fader#{component}#{name}"] = (pos * 1000).to_i
+                # Float between 0 and 1
+                self["fader#{component}#{name}"] = pos
             elsif val.is_a?(String)
                 self["#{component}#{name}"] = val
             else
