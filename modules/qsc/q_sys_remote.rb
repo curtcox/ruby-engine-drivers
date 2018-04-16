@@ -39,6 +39,12 @@ class Qsc::QSysRemote
 
 
     def on_load
+        on_update
+    end
+
+    def on_update
+        @db_based_faders = setting(:db_based_faders)
+        @integer_faders = setting(:integer_faders)
     end
 
     def connected
@@ -295,12 +301,23 @@ class Qsc::QSysRemote
     def fader(fader_id, level, component = nil, type = :fader)
         faders = Array(fader_id)
         if component
-            faders.map! do |fad|
-                {Name: fad, Value: level}
+            if @db_based_faders
+                level = level.to_f / 10.0 if @integer_faders
+                faders.map! do |fad|
+                    {Name: fad, Value: level}
+                end
+            else
+                level = level.to_f / 1000.0 if @integer_faders
+                faders.map! do |fad|
+                    {Name: fad, Position: level}
+                end
             end
-            component_set(component, faders, name: "level_#{faders[0]}")
+            component_set(component, faders, name: "level_#{faders[0]}").then do
+                component_get(component, faders)
+            end
         else
-            faders.each { |fad| control_set(fad, level) }
+            reqs = faders.collect { |fad| control_set(fad, level) }
+            reqs.first.then { control_get(faders) }
         end
     end
 
@@ -416,11 +433,19 @@ class Qsc::QSysRemote
                 self["fader#{component}#{name}_mute"] = str == 'true'
             elsif pos
                 # Float between 0 and 1
-                self["fader#{component}#{name}"] = pos
+                if @integer_faders
+                    self["fader#{component}#{name}"] = (pos * 1000).to_i
+                else
+                    self["fader#{component}#{name}"] = pos
+                end
             elsif val.is_a?(String)
                 self["#{component}#{name}"] = val
             else
-                self["fader#{component}#{name}"] = val
+                if @integer_faders
+                    self["fader#{component}#{name}"] = (val * 10).to_i
+                else
+                    self["fader#{component}#{name}"] = val
+                end
             end
         end
     end
