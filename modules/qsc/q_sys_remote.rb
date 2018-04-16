@@ -298,7 +298,7 @@ class Qsc::QSysRemote
             faders.map! do |fad|
                 {Name: fad, Value: level}
             end
-            component_set(component, faders)
+            component_set(component, faders, name: "level_#{faders[0]}")
         else
             faders.each { |fad| control_set(fad, level) }
         end
