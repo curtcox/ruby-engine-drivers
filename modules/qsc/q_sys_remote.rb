@@ -100,7 +100,7 @@ class Qsc::QSysRemote
     end
 
     def control_get(*names, **options)
-        do_send(next_id, cmd: :"Control.Get", params: names, **options)
+        do_send(next_id, cmd: :"Control.Get", params: names.flatten, **options)
     end
 
 
@@ -110,12 +110,8 @@ class Qsc::QSysRemote
     def component_get(name, *controls, **options)
         # Example usage:
         # component_get 'My AMP', 'ent.xfade.gain', 'ent.xfade.gain2'
-
-        controls.collect! do |ctrl|
-            {
-                :Name => ctrl
-            }
-        end
+        controls = controls.flatten
+        controls.collect! { |ctrl| { :Name => ctrl } }
 
         do_send(next_id, cmd: :"Component.Get", params: {
             :Name => name,
@@ -126,7 +122,8 @@ class Qsc::QSysRemote
     def component_set(name, value, **options)
         # Example usage:
         # component_set 'My APM', { :Name => 'ent.xfade.gain', :Value => -100 }, {...}
-        values = Array(value)
+        values = value.is_a?(Array) ? value : [value]
+        # NOTE:: Can't use Array() helper on hashes as they are converted to arrays.
 
         do_send(next_id, cmd: :"Component.Set", params: {
             :Name => name,
@@ -298,26 +295,26 @@ class Qsc::QSysRemote
     # COMPATIBILITY METHODS
     # ---------------------
 
-    def fader(fader_id, level, component = nil, type = :fader)
+    def fader(fader_id, level, component = nil, type = :fader, use_value: false)
         faders = Array(fader_id)
         if component
-            if @db_based_faders
+            if @db_based_faders || use_value
                 level = level.to_f / 10.0 if @integer_faders
-                faders.map! do |fad|
+                fads = faders.map do |fad|
                     {Name: fad, Value: level}
                 end
             else
                 level = level.to_f / 1000.0 if @integer_faders
-                faders.map! do |fad|
+                fads = faders.map do |fad|
                     {Name: fad, Position: level}
                 end
             end
-            component_set(component, faders, name: "level_#{faders[0]}").then do
+            component_set(component, fads, name: "level_#{faders[0]}").then do
                 component_get(component, faders)
             end
         else
             reqs = faders.collect { |fad| control_set(fad, level) }
-            reqs.first.then { control_get(faders) }
+            reqs.last.then { control_get(faders) }
         end
     end
 
@@ -327,7 +324,7 @@ class Qsc::QSysRemote
 
     def mute(fader_id, value = true, component = nil, type = :fader)
         val = is_affirmative?(value)
-        fader(fader_id, val, component, type)
+        fader(fader_id, val, component, type, use_value: true)
     end
 
     def mutes(ids:, muted: true, component: nil, type: :fader, **_)
@@ -422,29 +419,31 @@ class Qsc::QSysRemote
             pos = value[:Position]
             str = value[:String]
 
-            # Seems like string values can be independant of the other values
-            # This should mostly work to detect a string value
-            if val == 0.0 && pos == 0.0 && str[0] != '0'
-                self["#{component}#{name}"] = str
-                next
-            end
-
             if BoolVals.include?(str)
                 self["fader#{component}#{name}_mute"] = str == 'true'
-            elsif pos
-                # Float between 0 and 1
-                if @integer_faders
-                    self["fader#{component}#{name}"] = (pos * 1000).to_i
-                else
-                    self["fader#{component}#{name}"] = pos
-                end
-            elsif val.is_a?(String)
-                self["#{component}#{name}"] = val
             else
-                if @integer_faders
-                    self["fader#{component}#{name}"] = (val * 10).to_i
+                # Seems like string values can be independant of the other values
+                # This should mostly work to detect a string value
+                if val == 0.0 && pos == 0.0 && str[0] != '0'
+                    self["#{component}#{name}"] = str
+                    next
+                end
+                
+                if pos
+                    # Float between 0 and 1
+                    if @integer_faders
+                        self["fader#{component}#{name}"] = (pos * 1000).to_i
+                    else
+                        self["fader#{component}#{name}"] = pos
+                    end
+                elsif val.is_a?(String)
+                    self["#{component}#{name}"] = val
                 else
-                    self["fader#{component}#{name}"] = val
+                    if @integer_faders
+                        self["fader#{component}#{name}"] = (val * 10).to_i
+                    else
+                        self["fader#{component}#{name}"] = val
+                    end
                 end
             end
         end
