@@ -720,6 +720,9 @@ class Aca::ExchangeBooking
 
             logger.debug { item.inspect }
 
+            # Prevent connections handing with TIME_WAIT
+            cli.ews.connection.httpcli.reset_all
+
             subject = item[:subject]
 
             {
