@@ -241,7 +241,7 @@ class Aca::ExchangeBooking
 
                 entries << entry
                 entries << ({
-                    name: entry[:name]
+                    name: entry[:name],
                     phone: phone.gsub(/\D+/, '')
                 }) if phone
             end
