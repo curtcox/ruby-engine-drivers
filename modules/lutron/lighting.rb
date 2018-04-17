@@ -1,5 +1,6 @@
 module Lutron; end
 
+# Documentation: https://aca.im/driver_docs/Lutron/lutron-lighting.pdf
 # Login #1: nwk
 # Login #2: nwk2
 
@@ -37,7 +38,7 @@ class Lutron::Lighting
 
         schedule.every('40s') do
             logger.debug "-- Polling Lutron"
-
+            scene? 1
         end
     end
 
@@ -86,7 +87,9 @@ class Lutron::Lighting
     # AREA COMMANDS
     # =============
     def scene(area, scene, component = :area)
-        send_cmd component.to_s.upcase, area, 6, scene
+        send_cmd(component.to_s.upcase, area, 6, scene).then do
+            scene?(area, component)
+        end
     end
 
     def scene?(area, component = :area)
