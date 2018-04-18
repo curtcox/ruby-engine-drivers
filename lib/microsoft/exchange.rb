@@ -167,7 +167,7 @@ class Microsoft::Exchange
         free_rooms
     end
 
-    def get_bookings(email:, start_param:DateTime.now.midnight, end_param:(DateTime.now.midnight + 1.week))
+    def get_bookings(email:, start_param:DateTime.now.midnight, end_param:(DateTime.now.midnight + 2.days))
 	begin
         if [Integer, String].include?(start_param.class)
             start_param = DateTime.parse(Time.at(start_param.to_i / 1000).to_s)
@@ -217,6 +217,7 @@ class Microsoft::Exchange
 
         booking = {}
         booking[:subject] = subject
+        booking[:title] = subject
         booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop
         # booking[:body] = description
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
