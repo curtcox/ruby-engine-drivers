@@ -365,7 +365,10 @@ class Aca::ExchangeBooking
 
     def cancel_meeting(start_time)
         task {
-            delete_ews_booking (start_time / 1000).to_i
+            if start_time.class == Integer
+                delete_ews_booking (start_time / 1000).to_i
+            else
+                delete_ews_booking start_time.to_i
         }.then(proc { |count|
             logger.debug { "successfully removed #{count} bookings" }
 
