@@ -72,7 +72,14 @@ class Aca::Router
     # Find the shortest path between a source and target node and return the
     # list of nodes which form it.
     def route(source, target)
-
+        _, predecessor = signal_graph.dijkstra target
+        nodes = []
+        next_node = signal_graph[source]
+        until next_node.nil?
+            nodes << next_node
+            next_node = predecessor[next_node.id]
+        end
+        nodes
     end
 end
 
