@@ -631,7 +631,7 @@ class Aca::ExchangeBooking
 
         if @use_act_as
             # TODO:: think this line can be removed??
-            delete_at = Time.parse(delete_at.to_s).to_i
+            # delete_at = Time.parse(delete_at.to_s).to_i
 
             opts = {}
             opts[:act_as] = @ews_room if @ews_room
