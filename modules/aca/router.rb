@@ -136,20 +136,35 @@ class Aca::Router::SignalGraph
         @nodes = ActiveSupport::HashWithIndifferentAccess.new
     end
 
+    def [](id)
+        nodes[id]
+    end
+
     def insert(id)
         nodes[id] ||= Node.new id
         self
     end
 
-    def join(source, target, &selector)
-        nodes[source].join nodes[target], selector
     alias << insert
+
+    # If there is *certainty* the node has no incoming edges (i.e. it was a temp
+    # node used during graph construction), `check_incoming_edges` can be set
+    # to false to keep this O(1) rather than O(n). Using this at any other time
+    # will result in a memory leak and general bad things. Don't do it.
+    def delete(id, check_incoming_edges: true)
+        nodes.except! id
+
+        if check_incoming_edges
+            incoming = proc { |edge| edge.target.id == id }
+            each { |node| nodes.edges.reject!(&incoming) }
+        end
 
         self
     end
 
-    def [](id)
-        nodes[id]
+    def join(source, target, &selector)
+        nodes[source].join nodes[target], selector
+        self
     end
 
     def each(&block)
@@ -252,6 +267,8 @@ class Aca::Router::SignalGraph
 
         # Remove any temp 'matrix device nodes' as we now how fully connected
         # nodes for each input and output.
-        graph.tap { |g| g.nodes.except!(*matrix_nodes) }
+        matrix_nodes.reduce(graph) do |g, node|
+            g.delete node, check_incoming_edges: false
+        end
     end
 end
