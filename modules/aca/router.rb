@@ -197,6 +197,28 @@ class Aca::Router::SignalGraph
         outgoing_edges(id).size
     end
 
+    def dijkstra(id)
+        active = Containers::PriorityQueue.new { |x, y| (x <=> y) == -1 }
+        distance = Hash.new { 1.0 / 0.0 }
+        predecessor = {}
+
+        distance[id] = 0
+        active.push nodes[id], distance[id]
+
+        until active.empty?
+            u = active.pop
+            u.successors.each do |v|
+                alt = distance[u.id] + 1
+                next unless alt < distance[v.id]
+                distance[v.id] = alt
+                predecessor[v.id] = u
+                active.push v, distance[v.id]
+            end
+        end
+
+        [distance, predecessor]
+    end
+
     def inspect
         object_identifier = "#{self.class.name}:0x#{format('%02x', object_id)}"
         nodes = map(&:inspect).join ', '
