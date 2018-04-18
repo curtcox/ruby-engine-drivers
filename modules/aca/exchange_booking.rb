@@ -370,6 +370,7 @@ class Aca::ExchangeBooking
                 delete_ews_booking (start_time / 1000).to_i
             else
                 delete_ews_booking start_time.to_i
+            end
         }.then(proc { |count|
             logger.debug { "successfully removed #{count} bookings" }
 
