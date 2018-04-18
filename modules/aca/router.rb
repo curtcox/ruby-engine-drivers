@@ -62,10 +62,9 @@ class Aca::Router
 
         @signal_graph = SignalGraph.from_map map
 
-        nodes = signal_graph.map(&:id)
-        self[:nodes] = nodes
-        self[:inputs] = nodes.select { |x| signal_graph.outdegree(x).zero? }
-        self[:outputs] = nodes.select { |x| signal_graph.indegree(x).zero? }
+        self[:nodes] = signal_graph.map(&:id)
+        self[:inputs] = signal_graph.sinks.map(&:id)
+        self[:outputs] = signal_graph.sources.map(&:id)
     end
 
     # Given a list of nodes that form a path, execute the device level
@@ -159,14 +158,30 @@ class Aca::Router::SignalGraph
         nodes.values.each(&block)
     end
 
-    def indegree(id)
-        reduce(0) do |degree, node|
-            degree + node.successors.select { |x| x.id == id }.size
+    def sources
+        select { |node| indegree(node.id).zero? }
+    end
+
+    def sinks
+        select { |node| outdegree(node.id).zero? }
+    end
+
+    def incoming_edges(id)
+        reduce(Set.new) do |edges, node|
+            edges | node.successors.select { |x| x.id == id }
         end
     end
 
+    def outgoing_edges(id)
+        nodes[id].edges
+    end
+
+    def indegree(id)
+        incoming_edges(id).size
+    end
+
     def outdegree(id)
-        nodes[id].edges.size
+        outgoing_edges(id).size
     end
 
     def inspect
