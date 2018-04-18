@@ -120,7 +120,7 @@ class Aca::Router::SignalGraph
         end
 
         def eql?(other)
-            id == other.id
+            id == other
         end
 
         def hash
