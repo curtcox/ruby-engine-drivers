@@ -136,13 +136,15 @@ class Aca::Router::SignalGraph
         @nodes = ActiveSupport::HashWithIndifferentAccess.new
     end
 
-    def <<(id)
+    def insert(id)
         nodes[id] ||= Node.new id
         self
     end
 
     def join(source, target, &selector)
         nodes[source].join nodes[target], selector
+    alias << insert
+
         self
     end
 
