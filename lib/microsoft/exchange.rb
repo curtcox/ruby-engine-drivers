@@ -31,6 +31,10 @@ class Microsoft::Exchange
         field[name][:text]
     end
 
+    def close
+        @ews_client.ews.connection.httpcli.reset_all
+    end
+
     def email_list(field, name=nil)
         field[:email_addresses][:elems][-1][:entry][:text].gsub(/SMTP:|SIP:|sip:|smtp:/,'')
     end

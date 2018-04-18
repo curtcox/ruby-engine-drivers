@@ -108,7 +108,8 @@ class Aca::ExchangeBooking
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
         self[:last_meeting_started] = setting(:last_meeting_started)
         self[:cancel_meeting_after] = setting(:cancel_meeting_after)
-
+        self[:booking_min_duration] = setting(:booking_min_duration)
+        self[:booking_max_duration] = setting(:booking_max_duration)
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
@@ -237,11 +238,11 @@ class Aca::ExchangeBooking
             # sip_spd:Auto sip_num:email@address.com
             entries = []
             task { ews.get_users(q: q, limit: limit) }.value.each do |entry|
-                phone = entry[:phone]
+                phone = entry['phone']
 
                 entries << entry
                 entries << ({
-                    name: entry[:name]
+                    name: entry['name'],
                     phone: phone.gsub(/\D+/, '')
                 }) if phone
             end
@@ -724,6 +725,9 @@ class Aca::ExchangeBooking
             end
 
             logger.debug { item.inspect }
+
+            # Prevent connections handing with TIME_WAIT
+            cli.ews.connection.httpcli.reset_all
 
             subject = item[:subject]
 
