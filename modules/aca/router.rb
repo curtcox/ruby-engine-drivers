@@ -112,12 +112,12 @@ class Aca::Router::SignalGraph
             self
         end
 
-        def neighbours
+        def successors
             edges.map(&:target)
         end
 
         def inspect
-            "#{id} --> [#{neighbours.join ' '}]"
+            "#{id} --> [#{successors.join ' '}]"
         end
 
         def to_s
@@ -161,7 +161,7 @@ class Aca::Router::SignalGraph
 
     def indegree(id)
         reduce(0) do |degree, node|
-            degree + node.neighbours.select { |x| x.id == id }.size
+            degree + node.successors.select { |x| x.id == id }.size
         end
     end
 
