@@ -610,9 +610,6 @@ class Aca::OfficeBooking
     def todays_bookings(response, office_organiser_location)
         results = []
         response.each{|booking| 
-
-        meeting_response.each{|booking| 
-
             # start_time = Time.parse(booking['start']['dateTime']).utc.iso8601[0..18] + 'Z'
             # end_time = Time.parse(booking['end']['dateTime']).utc.iso8601[0..18] + 'Z'
             start_time = ActiveSupport::TimeZone.new('UTC').parse(booking['start']['dateTime']).iso8601
