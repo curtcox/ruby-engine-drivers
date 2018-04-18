@@ -112,7 +112,7 @@ class Aca::Router::SignalGraph
         end
 
         def inspect
-            "#{id} --> [#{successors.join ' '}]"
+            "#{id} --> { #{successors.join ', '} }"
         end
 
         def to_s
