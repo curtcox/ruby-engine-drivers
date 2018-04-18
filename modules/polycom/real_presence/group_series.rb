@@ -443,8 +443,12 @@ class Polycom::RealPresence::GroupSeries
                 end
             when :mutestatus
                 if parts[2] == 'near'
-                    self[:muted] = parts[-1] == 'muted'
+                    self[:audio_mute] = parts[-1] == 'muted'
                 end
+            end
+        when :mute
+            if parts[1] == 'near'
+                self[:audio_mute] = parts[-1] == 'on'
             end
         when :mpmode
             self[:multi_point_mode] = parts[1]
