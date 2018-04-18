@@ -84,9 +84,9 @@ end
 # switching.
 #
 # Directivity of the graph is inverted from the signal flow - edges use signal
-# sinks as source and signal sources as their terminus so that a nodes may
-# be efficiently added or removed taking all incoming signal connections with
-# them.
+# sinks as source and signal sources as their terminus. This optimises for
+# cheap removal of signal sinks and better path finding (as most environments
+# will have a small number of displays and a large number of sources).
 class Aca::Router::SignalGraph
     Edge = Struct.new :source, :target, :selector do
         def activate
@@ -248,7 +248,8 @@ class Aca::Router::SignalGraph
                     system[device].switch_to input
                 end
 
-                # Check is the input is a matrix switcher
+                # Check is the input is a matrix switcher or multi-output
+                # device (such as a USB switch).
                 upstream_device, output = source.split '__'
                 next if output.nil?
 
