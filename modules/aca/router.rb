@@ -163,13 +163,13 @@ class Aca::Router::SignalGraph
     end
 
     def incoming_edges(id)
-        reduce(Set.new) do |edges, node|
+        reduce([]) do |edges, node|
             edges | node.successors.select { |x| x.id == id }
         end
     end
 
     def outgoing_edges(id)
-        nodes[id].edges
+        nodes[id].edges.to_a
     end
 
     def indegree(id)
