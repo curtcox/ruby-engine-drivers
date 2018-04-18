@@ -21,7 +21,13 @@ class Aca::Router
     end
 
     def on_update
-        build_graph(setting(:connections) || {})
+        logger.debug 'building graph from signal map'
+
+        @signal_graph = SignalGraph.from_map(setting(:connections) || {})
+
+        self[:nodes] = signal_graph.map(&:id)
+        self[:inputs] = signal_graph.sinks.map(&:id)
+        self[:outputs] = signal_graph.sources.map(&:id)
     end
 
     # Route a set of signals to arbitrary destinations.
@@ -30,7 +36,7 @@ class Aca::Router
     #
     # Multiple sources can be specified simultaneously, or if connecting a
     # single source to a single destination, Ruby's implicit hash syntax can be
-    # exploited to let you express it neatly as `connect source => target`.
+    # used to let you express it neatly as `connect source => target`.
     def connect(map)
         # 1. Turn map -> list of paths (list of lists of nodes)
         # 2. Check for intersections of node lists for different sources
@@ -55,16 +61,6 @@ class Aca::Router
 
     def signal_graph
         @signal_graph ||= SignalGraph.new
-    end
-
-    def build_graph(map)
-        logger.debug 'building graph from signal map'
-
-        @signal_graph = SignalGraph.from_map map
-
-        self[:nodes] = signal_graph.map(&:id)
-        self[:inputs] = signal_graph.sinks.map(&:id)
-        self[:outputs] = signal_graph.sources.map(&:id)
     end
 
     # Given a list of nodes that form a path, execute the device level
