@@ -30,6 +30,8 @@ class Polycom::RealPresence::GroupSeries
         # globaldir (includes LDAP and Skype)
         @use_global_addressbook = setting(:global_addressbook) || true
         @default_content = setting(:default_content) || 2
+        @vmr_prefix = setting(:vmr_prefix) || '60'
+        @vmr_append = setting(:vmr_append) || ''
     end
 
     def connected
@@ -320,7 +322,11 @@ class Polycom::RealPresence::GroupSeries
             button_press 'call'
         else
             if number == search
-                dial_phone number
+                if number.start_with?(@vmr_prefix) && !number.include?('@')
+                    dial_sip "#{number}#{@vmr_append}"
+                else
+                    dial_sip number
+                end
             else
                 dial_addressbook number
             end
@@ -337,6 +343,10 @@ class Polycom::RealPresence::GroupSeries
 
     def dial_addressbook_uid(entry)
         send "dial addressbook_entry #{entry}\r", name: :dial_address
+    end
+
+    def dial_sip(number)
+        send "dial manual auto \"#{number}\" sip\r", name: :dial_phone
     end
 
     def multi_point_mode?
