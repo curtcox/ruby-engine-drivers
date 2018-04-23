@@ -94,7 +94,7 @@ class Sony::Projector::SerialControl
     def mute(val = true)
         logger.debug 'requested to mute'
 
-        actual = is_affirmative?(val) ? [0x00, 0x01] : [0x00, 0x00]
+        actual = is_affirmative?(val) ? [0x00, 0x00] : [0x00, 0x01]
         do_send(:set, :mute, actual, delay_on_receive: 500)
     end
 
