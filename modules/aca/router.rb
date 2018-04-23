@@ -23,7 +23,9 @@ class Aca::Router
     def on_update
         logger.debug 'building graph from signal map'
 
-        @signal_graph = SignalGraph.from_map(setting(:connections) || {})
+        @route_cache = nil
+
+        @signal_graph = SignalGraph.from_map(setting(:connections) || {}).freeze
 
         self[:nodes] = signal_graph.map(&:id)
         self[:inputs] = signal_graph.sinks.map(&:id)
@@ -63,6 +65,12 @@ class Aca::Router
         @signal_graph ||= SignalGraph.new
     end
 
+    def paths
+        @route_cache ||= Hash.new do |hash, node|
+            hash[node] = signal_graph.dijkstra node
+        end
+    end
+
     # Given a list of nodes that form a path, execute the device level
     # interactions to switch a signal across across them.
     def switch(path)
@@ -72,12 +80,20 @@ class Aca::Router
     # Find the shortest path between a source and target node and return the
     # list of nodes which form it.
     def route(source, target)
-        _, predecessor = signal_graph.dijkstra target
+        path = paths[target]
+
+        distance = path.distance_to[source]
+        raise "no route from #{source} to #{target}" if distance.infinite?
+
+        logger.debug do
+            "found route from #{source} to #{target} in #{distance} hops"
+        end
+
         nodes = []
         next_node = signal_graph[source]
         until next_node.nil?
             nodes << next_node
-            next_node = predecessor[next_node.id]
+            next_node = path.predecessor[next_node.id]
         end
         nodes
     end
@@ -95,6 +111,8 @@ end
 # cheap removal of signal sinks and better path finding (as most environments
 # will have a small number of displays and a large number of sources).
 class Aca::Router::SignalGraph
+    Paths = Struct.new :distance_to, :predecessor
+
     Edge = Struct.new :source, :target, :selector do
         def activate
             selector&.call
@@ -206,24 +224,24 @@ class Aca::Router::SignalGraph
 
     def dijkstra(id)
         active = Containers::PriorityQueue.new { |x, y| (x <=> y) == -1 }
-        distance = Hash.new { 1.0 / 0.0 }
+        distance_to = Hash.new { 1.0 / 0.0 }
         predecessor = {}
 
-        distance[id] = 0
-        active.push nodes[id], distance[id]
+        distance_to[id] = 0
+        active.push nodes[id], distance_to[id]
 
         until active.empty?
             u = active.pop
             u.successors.each do |v|
-                alt = distance[u.id] + 1
-                next unless alt < distance[v.id]
-                distance[v.id] = alt
+                alt = distance_to[u.id] + 1
+                next unless alt < distance_to[v.id]
+                distance_to[v.id] = alt
                 predecessor[v.id] = u
-                active.push v, distance[v.id]
+                active.push v, distance_to[v.id]
             end
         end
 
-        [distance, predecessor]
+        Paths.new distance_to, predecessor
     end
 
     def inspect
