@@ -158,7 +158,9 @@ class Aca::Router::SignalGraph
     attr_reader :nodes
 
     def initialize
-        @nodes = ActiveSupport::HashWithIndifferentAccess.new
+        @nodes = ActiveSupport::HashWithIndifferentAccess.new do |_, id|
+            raise ArgumentError, "\"#{id}\" does not exist"
+        end
     end
 
     def [](id)
@@ -166,7 +168,7 @@ class Aca::Router::SignalGraph
     end
 
     def insert(id)
-        nodes[id] ||= Node.new id
+        nodes[id] = Node.new id unless nodes.key? id
         self
     end
 
