@@ -62,8 +62,11 @@ class Sony::Projector::SerialControl
     # Input selection
     #
     INPUTS = {
-        hdmi:  [0x00, 0x04],
-        hdmi2: [0x00, 0x05]
+        hdmi: [0x00, 0x03],
+        hdmi2: [0x00, 0x03],
+        inputa: [0x00, 0x02],
+        inputb: [0x00, 0x03],
+        inputc: [0x00, 0x04]
     }
     INPUTS.merge!(INPUTS.invert)
 
