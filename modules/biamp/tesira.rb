@@ -33,6 +33,7 @@ class Biamp::Tesira
     
     def on_load
         # Implement the Telnet protocol
+        defaults timeout: 15000
         new_telnet_client
         config before_buffering: proc { |data|
             @telnet.buffer data
