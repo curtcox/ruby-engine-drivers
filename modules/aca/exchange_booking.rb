@@ -246,6 +246,9 @@ class Aca::ExchangeBooking
                     phone: phone.gsub(/\D+/, '')
                 }) if phone
             end
+
+            # Ensure the results are unique and pushed to the client
+            entries[0][:id] = rand(10000) if entries.length > 0
             self[:directory] = entries
         rescue => e
             logger.print_error e, 'searching directory'
@@ -668,6 +671,7 @@ class Aca::ExchangeBooking
         end
 
         cli = Viewpoint::EWSClient.new(*@ews_creds)
+        
 
         if @use_act_as
             opts = {}

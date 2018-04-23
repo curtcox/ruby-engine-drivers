@@ -151,13 +151,16 @@ class Panasonic::Camera::He50
     end
 
     def save_preset(name)
-        @presets[name] = {
-            zoom: self[:zoom],
-            pan: self[:pan],
-            tilt: self[:tilt]
-        }
-        define_setting(:presets, @presets)
-        self[:presets] = @presets.keys
+        pantilt
+        zoom.then do
+            @presets[name] = {
+                zoom: self[:zoom],
+                pan: self[:pan],
+                tilt: self[:tilt]
+            }
+            define_setting(:presets, @presets)
+            self[:presets] = @presets.keys
+        end
     end
 
     def joystick(pan_speed, tilt_speed, ignore_invert = false)
