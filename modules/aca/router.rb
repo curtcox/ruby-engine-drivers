@@ -113,31 +113,19 @@ end
 class Aca::Router::SignalGraph
     Paths = Struct.new :distance_to, :predecessor
 
-    Edge = Struct.new :source, :target, :selector do
-        def activate
-            selector&.call
-        end
-    end
-
     class Node
         attr_reader :id, :edges
 
         def initialize(id)
             @id = id.to_sym
-            @edges = Set.new
+            @edges = HashWithIndifferentAccess.new do |_, other_id|
+                raise ArgumentError, "No edge from \"#{id}\" to \"#{other_id}\""
+            end
         end
 
-        def join(other, selector = nil)
-            edges << Edge.new(self, other, selector)
+        def join(other_id, selector = nil)
+            edges[other_id] = selector
             self
-        end
-
-        def successors
-            edges.map(&:target)
-        end
-
-        def inspect
-            "#{id} --> { #{successors.join ', '} }"
         end
 
         def to_s
@@ -176,26 +164,27 @@ class Aca::Router::SignalGraph
 
     # If there is *certainty* the node has no incoming edges (i.e. it was a temp
     # node used during graph construction), `check_incoming_edges` can be set
-    # to false to keep this O(1) rather than O(n). Using this at any other time
-    # will result in a memory leak and general bad things. Don't do it.
+    # to false to keep this O(1) rather than O(n). Using this flag at any other
+    # time will result a corrupt structure.
     def delete(id, check_incoming_edges: true)
         nodes.except! id
 
-        if check_incoming_edges
-            incoming = proc { |edge| edge.target.id == id }
-            each { |node| nodes.edges.reject!(&incoming) }
-        end
+        each { |node| node.edges.delete id } if check_incoming_edges
 
         self
     end
 
     def join(source, target, &selector)
-        nodes[source].join nodes[target], selector
+        nodes[source].join target, selector
         self
     end
 
     def each(&block)
         nodes.values.each(&block)
+    end
+
+    def successors(id)
+        nodes[id].edges.keys.map { |x| nodes[x] }
     end
 
     def sources
@@ -207,13 +196,13 @@ class Aca::Router::SignalGraph
     end
 
     def incoming_edges(id)
-        reduce([]) do |edges, node|
-            edges | node.successors.select { |x| x.id == id }
+        reduce(HashWithIndifferentAccess.new) do |edges, node|
+            edges.tap { |e| e[node.id] = node.edges[id] if node.edges.key? id }
         end
     end
 
     def outgoing_edges(id)
-        nodes[id].edges.to_a
+        nodes[id].edges
     end
 
     def indegree(id)
@@ -234,7 +223,7 @@ class Aca::Router::SignalGraph
 
         until active.empty?
             u = active.pop
-            u.successors.each do |v|
+            successors(u.id).each do |v|
                 alt = distance_to[u.id] + 1
                 next unless alt < distance_to[v.id]
                 distance_to[v.id] = alt
