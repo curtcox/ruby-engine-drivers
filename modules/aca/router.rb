@@ -23,7 +23,7 @@ class Aca::Router
     def on_update
         logger.debug 'building graph from signal map'
 
-        @route_cache = nil
+        @path_cache = nil
 
         @signal_graph = SignalGraph.from_map(setting(:connections) || {}).freeze
 
@@ -66,7 +66,7 @@ class Aca::Router
     end
 
     def paths
-        @route_cache ||= Hash.new do |hash, node|
+        @path_cache ||= Hash.new do |hash, node|
             hash[node] = signal_graph.dijkstra node
         end
     end
@@ -79,21 +79,22 @@ class Aca::Router
 
     # Find the shortest path between a source and target node and return the
     # list of nodes which form it.
-    def route(source, target)
-        path = paths[target]
+    def route(source, sink)
+        path = paths[sink]
 
         distance = path.distance_to[source]
-        raise "no route from #{source} to #{target}" if distance.infinite?
+        raise "no route from #{source} to #{sink}" if distance.infinite?
 
         logger.debug do
-            "found route from #{source} to #{target} in #{distance} hops"
+            "found route from #{source} to #{sink} in #{distance} hops"
         end
 
         nodes = []
-        next_node = signal_graph[source]
-        until next_node.nil?
-            nodes << next_node
-            next_node = path.predecessor[next_node.id]
+        node = signal_graph[source]
+        until node.nil?
+            nodes << node
+            predecessor = path.predecessor[node.id]
+            node = predecessor
         end
         nodes
     end
