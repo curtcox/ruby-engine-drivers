@@ -193,9 +193,9 @@ class Aca::ExchangeBooking
             end
         end
 
-        fetch_bookings
         schedule.clear
-        schedule.every(setting(:update_every) || '5m') { fetch_bookings }
+        schedule.in(rand(10000)) { fetch_bookings }
+        schedule.every((setting(:update_every) || 120000) + rand(10000)) { fetch_bookings }
     end
 
 
