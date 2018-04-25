@@ -15,6 +15,10 @@ class Shure::Microphone::Mxa
 
     tokenize indicator: '< ', delimiter: ' >'
 
+    default_settings({
+        send_meter_levels: false
+    })
+
     def on_load
         on_update
     end
@@ -28,6 +32,7 @@ class Shure::Microphone::Mxa
         end
 
         query_all
+        set_meter_rate(0) unless setting(:send_meter_levels)
     end
 
     def disconnected
@@ -40,11 +45,15 @@ class Shure::Microphone::Mxa
     end
 
     def query_device_id
-        do_send 'GET DEVICE_ID'
+        do_send 'GET DEVICE_ID', name: :device_id
     end
 
     def query_firmware
-        do_send 'GET FW_VER'
+        do_send 'GET FW_VER', name: :firmware
+    end
+
+    def set_meter_rate(rate)
+        do_send 'SET METER_RATE', rate.to_s, name: :meter_rate
     end
 
 
@@ -54,8 +63,8 @@ class Shure::Microphone::Mxa
     end
 
     def mute(val = true)
-        state = val ? 'ON' : 'OFF'
-        do_send "SET DEVICE_AUDIO_MUTE #{state}", name: :mute
+        state = is_affirmative?(val) ? 'ON' : 'OFF'
+        do_send 'SET DEVICE_AUDIO_MUTE', state, name: :mute
     end
 
     def unmute
@@ -69,7 +78,7 @@ class Shure::Microphone::Mxa
     end
 
     def preset(number)
-        do_send "SET PRESET #{number}", name: :preset
+        do_send 'SET PRESET', number.to_s, name: :preset
     end
 
 
@@ -94,7 +103,7 @@ class Shure::Microphone::Mxa
     end
 
     def led_colour_muted(colour)
-        do_send "SET LED_COLOR_MUTED #{colour}"
+        do_send 'SET LED_COLOR_MUTED', colour
     end
 
     def query_led_colour_unmuted
@@ -102,7 +111,7 @@ class Shure::Microphone::Mxa
     end
 
     def led_colour_unmuted(colour)
-        do_send "SET LED_COLOR_UNMUTED #{colour}"
+        do_send 'SET LED_COLOR_UNMUTED', colour
     end
 
     def query_led_state_unmuted
@@ -110,8 +119,8 @@ class Shure::Microphone::Mxa
     end
 
     def led_state_unmuted(on = true)
-        state = on ? 'ON' : 'OFF'
-        do_send "SET LED_STATE_UNMUTED #{state}"
+        state = is_affirmative?(on) ? 'ON' : 'OFF'
+        do_send 'SET LED_STATE_UNMUTED', state
     end
 
     def query_led_state_muted
@@ -119,35 +128,39 @@ class Shure::Microphone::Mxa
     end
 
     def led_state_muted(on = true)
-        state = on ? 'ON' : 'OFF'
-        do_send "SET LED_STATE_MUTED #{state}"
+        state = is_affirmative?(on) ? 'ON' : 'OFF'
+        do_send 'SET LED_STATE_MUTED', state
     end
 
     def disco(enable = true)
         @disco = enable
     end
 
-
     def received(data, resolve, command)
         logger.debug { "-- received: #{data}" }
 
         resp = data.split(' ')
-        param = resp[1].to_sym
+
+        # We want to ignore sample responses
+        if resp[0] == 'SAMPLE'
+            resp[1..-1].each_with_index do |level, index|
+                self["output#{index + 1}"] = level.to_i
+            end
+            return :ignore
+        end
+
+        param = resp[1].downcase.to_sym
         value = resp[2]
 
-        return :abort if param == :ERR
+        return :abort if param == :err
 
         case param
-        when :DEVICE_AUDIO_MUTE then self[:muted] = value == 'ON'
-        when :PRESET then self[:preset] = value.to_i
-        when :DEVICE_ID then self[:device_id] = value
-        when :FIRMWARE then self[:firmware] = value
-        when :DEV_LED_STATE_MUTED then self[:led_muted] = value == 'ON'
-        when :DEV_LED_STATE_UNMUTED then self[:led_unmuted] = value == 'ON'
-        when :LED_COLOR_MUTED
-            self[:led_colour_muted] = value.downcase.to_sym
-        when :LED_COLOR_UNMUTED
-            self[:led_colour_unmuted] = value.downcase.to_sym
+        when :device_audio_mute then self[:muted] = value == 'ON'
+        when :meter_rate, :preset then self[:preset] = value.to_i
+        when :dev_led_state_muted then self[:led_muted] = value == 'ON'
+        when :dev_led_state_unmuted then self[:led_unmuted] = value == 'ON'
+        else
+            self[param] = resp[2]&.downcase
         end
 
         if @disco
@@ -160,7 +173,6 @@ class Shure::Microphone::Mxa
         :success
     end
 
-
     def do_poll
         query_device_id
     end
@@ -169,8 +181,9 @@ class Shure::Microphone::Mxa
     private
 
 
-    def do_send(command, options = {})
-        logger.debug { "-- sending: < #{command} >" }
-        send("< #{command} >", options)
+    def do_send(*command, **options)
+        cmd = "< #{command.join(' ')} >"
+        logger.debug { "-- sending: #{cmd}" }
+        send(cmd, options)
     end
 end
