@@ -103,7 +103,7 @@ class Shure::Microphone::Mxa
     end
 
     def led_colour_muted(colour)
-        do_send 'SET LED_COLOR_MUTED', colour
+        do_send 'SET LED_COLOR_MUTED', colour.to_s.upcase, name: :muted_color
     end
 
     def query_led_colour_unmuted
@@ -111,7 +111,7 @@ class Shure::Microphone::Mxa
     end
 
     def led_colour_unmuted(colour)
-        do_send 'SET LED_COLOR_UNMUTED', colour
+        do_send 'SET LED_COLOR_UNMUTED', colour.to_s.upcase, name: :unmuted_color
     end
 
     def query_led_state_unmuted
@@ -154,6 +154,16 @@ class Shure::Microphone::Mxa
 
         return :abort if param == :err
 
+        if value == 'AUTOMIX_GATE_OUT_EXT_SIG'
+            # REP 2 AUTOMIX_GATE_OUT_EXT_SIG ON
+            if @disco
+                led_colour_unmuted [:RED, :GREEN, :BLUE, :PINK, :PURPLE,
+                                    :YELLOW, :ORANGE, :WHITE].sample
+            end
+            self["output#{resp[1]}_automix"] = resp[3] == 'ON'
+            return :ignore
+        end
+
         case param
         when :device_audio_mute then self[:muted] = value == 'ON'
         when :meter_rate, :preset then self[:preset] = value.to_i
@@ -161,13 +171,6 @@ class Shure::Microphone::Mxa
         when :dev_led_state_unmuted then self[:led_unmuted] = value == 'ON'
         else
             self[param] = resp[2]&.downcase
-        end
-
-        if @disco
-            if data =~ /AUTOMIX_GATE_OUT_EXT_SIG ON/
-                led_colour_unmuted [:RED, :GREEN, :BLUE, :PINK, :PURPLE,
-                                    :YELLOW, :ORANGE, :WHITE].sample
-            end
         end
 
         :success
