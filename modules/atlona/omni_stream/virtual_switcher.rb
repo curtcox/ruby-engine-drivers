@@ -133,8 +133,15 @@ class Atlona::OmniStream::VirtualSwitcher
         info_mapping = {}
 
         system.all(@encoder_name).each do |mod|
-            if mod[:type] == :encoder
-                (1..mod[:num_sessions]).each do |num|
+            # skip any offline devices
+            if mod.nil?
+                index += 1
+                next
+            end
+
+            num_sessions = mod[:num_sessions]
+            if mod[:type] == :encoder && num_sessions
+                (1..num_sessions).each do |num|
                     encoder_mapping[input.to_s] = [mod, num - 1]
                     info_mapping[input.to_s] = {
                         encoder: "#{@encoder_name}_#{index}",
@@ -144,7 +151,7 @@ class Atlona::OmniStream::VirtualSwitcher
                     input += 1
                 end
             else
-                logger.warn "#{@encoder_name}_#{index} is not an encoder"
+                logger.warn "#{@encoder_name}_#{index} is not an encoder or offline"
             end
 
             index += 1
@@ -161,8 +168,15 @@ class Atlona::OmniStream::VirtualSwitcher
         info_mapping = {}
 
         system.all(@decoder_name).each do |mod|
-            if mod[:type] == :decoder
-                (1..mod[:num_outputs]).each do |num|
+            # skip any offline devices
+            if mod.nil?
+                index += 1
+                next
+            end
+
+            num_outputs = mod[:num_outputs]
+            if mod[:type] == :decoder && num_outputs
+                (1..num_outputs).each do |num|
                     decoder_mapping[output.to_s] = [mod, num]
                     info_mapping[output.to_s] = {
                         encoder: "#{@decoder_name}_#{index}",
@@ -172,7 +186,7 @@ class Atlona::OmniStream::VirtualSwitcher
                     output += 1
                 end
             else
-                logger.warn "#{@decoder_name}_#{index} is not an decoder"
+                logger.warn "#{@decoder_name}_#{index} is not an decoder or offline"
             end
 
             index += 1
