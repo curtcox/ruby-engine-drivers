@@ -73,7 +73,7 @@ class Aca::Router
     end
 
     def paths
-        @path_cache ||= Hash.new do |hash, node|
+        @path_cache ||= HashWithIndifferentAccess.new do |hash, node|
             hash[node] = signal_graph.dijkstra node
         end
     end
@@ -257,7 +257,7 @@ class Aca::Router::SignalGraph
 
     def dijkstra(id)
         active = Containers::PriorityQueue.new { |x, y| (x <=> y) == -1 }
-        distance_to = Hash.new { 1.0 / 0.0 }
+        distance_to = HashWithIndifferentAccess.new { 1.0 / 0.0 }
         predecessor = {}
 
         distance_to[id] = 0
