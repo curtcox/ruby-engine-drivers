@@ -24,7 +24,7 @@ class Microsoft::Exchange
         STDERR.puts '--------------- NEW CLIENT CREATED --------------'
         STDERR.puts "At URL: #{@ews_url} with email: #{@service_account_email} and password #{@service_account_password}"
         STDERR.puts '-------------------------------------------------'
-        @ews_client ||= Viewpoint::EWSClient.new @ews_url, @service_account_email, @service_account_password, ews_opts
+        @@ews_client ||= Viewpoint::EWSClient.new @ews_url, @service_account_email, @service_account_password, ews_opts
     end 
 
     def basic_text(field, name)
@@ -32,7 +32,7 @@ class Microsoft::Exchange
     end
 
     def close
-        @ews_client.ews.connection.httpcli.reset_all
+        @@ews_client.ews.connection.httpcli.reset_all
     end
 
     def email_list(field, name=nil)
@@ -58,7 +58,7 @@ class Microsoft::Exchange
 
 
     def get_users(q: nil, limit: nil)
-        ews_users = @ews_client.search_contacts(q)
+        ews_users = @@ews_client.search_contacts(q)
         users = []
         fields = {
             display_name: 'name:basic_text',
@@ -121,7 +121,7 @@ class Microsoft::Exchange
         STDERR.flush 
 
         # Get booking data for all rooms between time range bounds
-        user_free_busy = @ews_client.get_user_availability(rooms,
+        user_free_busy = @@ews_client.get_user_availability(rooms,
             start_time: start_time,
             end_time:   end_time,
             requested_view: :detailed,
@@ -177,9 +177,9 @@ class Microsoft::Exchange
         STDERR.puts "At email: #{email} with start: #{start_param} and end: #{end_param}"
         STDERR.puts '-------------------------------------------------'
         bookings = []
-        calendar_id = @ews_client.get_folder(:calendar, opts = {act_as: email }).id
-        events = @ews_client.find_items(folder_id: calendar_id, calendar_view: {start_date: start_param, end_date: end_param})
-        # events = @ews_client.get_item(:calendar, opts = {act_as: email}).items
+        calendar_id = @@ews_client.get_folder(:calendar, opts = {act_as: email }).id
+        events = @@ews_client.find_items(folder_id: calendar_id, calendar_view: {start_date: start_param, end_date: end_param})
+        # events = @@ews_client.get_item(:calendar, opts = {act_as: email}).items
         events.each{|event|
             event.get_all_properties!
             booking = {}
@@ -230,7 +230,7 @@ class Microsoft::Exchange
             })
         end
 
-        folder = @ews_client.get_folder(:calendar, { act_as: room_email })
+        folder = @@ews_client.get_folder(:calendar, { act_as: room_email })
         appointment = folder.create_item(booking)
         {
             id: appointment.id,
