@@ -109,7 +109,9 @@ class Aca::ExchangeBooking
         self[:last_meeting_started] = setting(:last_meeting_started)
         self[:cancel_meeting_after] = setting(:cancel_meeting_after)
         self[:booking_min_duration] = setting(:booking_min_duration)
+        self[:booking_disable_future] = setting(:booking_disable_future)
         self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:timeout] = setting(:timeout)
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
