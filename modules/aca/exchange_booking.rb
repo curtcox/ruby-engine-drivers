@@ -198,7 +198,7 @@ class Aca::ExchangeBooking
 
         schedule.clear
         schedule.in(rand(10000)) { fetch_bookings }
-        schedule.every((setting(:update_every) || 120000) + rand(10000)) { fetch_bookings }
+        schedule.every((setting(:update_every) || 120000).to_i + rand(10000)) { fetch_bookings }
     end
 
 
