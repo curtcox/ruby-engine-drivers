@@ -150,7 +150,7 @@ class Microsoft::Exchange
                 if item[:calendar_event_array]
                     free_rooms.push({free: false, room: rooms[index], end_time: find_time(item[:calendar_event_array][:elems], :end_time)})
                 end
-                item[:free_busy_view_type] || item[:working_hours]
+                item[:calendar_event_array]
             }
 
             # Back to back meetings still show up so we need to remove these from the results
