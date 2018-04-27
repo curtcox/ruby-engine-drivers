@@ -106,7 +106,9 @@ class Aca::ExchangeBooking
         self[:booking_hide_description] = setting(:booking_hide_description)
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
         self[:booking_min_duration] = setting(:booking_min_duration)
+        self[:booking_disable_future] = setting(:booking_disable_future)
         self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:timeout] = setting(:timeout)
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
