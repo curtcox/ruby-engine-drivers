@@ -144,15 +144,8 @@ class Microsoft::Exchange
             }
         )
 
-        user_free_busy.body[0][:get_user_availability_response][:elems][0][:free_busy_response_array][:elems].each_with_index {|r,index|
+       user_free_busy.body[0][:get_user_availability_response][:elems][0][:free_busy_response_array][:elems].each_with_index {|r,index|
             # Remove meta data (business hours and response type)
-            # r[:free_busy_response][:elems][1][:free_busy_view][:elems].each { |item|
-            #     if item[:calendar_event_array]
-            #         free_rooms.push({free: false, room: rooms[index], end_time: find_time(item[:calendar_event_array][:elems][0], :end_time)}) if !free_rooms.map{|room| room[:room] }.include?(rooms[index])
-            #     end
-            #     item[:calendar_event_array]
-            # }
-
             resp = r[:free_busy_response][:elems][1][:free_busy_view][:elems].delete_if { |item| item[:free_busy_view_type] || item[:working_hours] }
 
             # Back to back meetings still show up so we need to remove these from the results
@@ -160,17 +153,16 @@ class Microsoft::Exchange
                 resp = resp[0][:calendar_event_array][:elems]
 
                 if resp.length == 0
-                    free_rooms.push({free: true, room: rooms[index], end_time: find_time(resp[0], :end_time)})
+                    free_rooms.push(rooms[index])
                 elsif resp.length == 1
-                    free_rooms.push({free: true, room: rooms[index], end_time: find_time(resp[0], :end_time)}) if find_time(resp[0], :start_time) == end_time
-                    free_rooms.push({free: true, room: rooms[index], end_time: find_time(resp[0], :end_time)}) if find_time(resp[0], :end_time) == start_time
+                    free_rooms.push(rooms[index]) if find_time(resp[0], :start_time) == end_time
+                    free_rooms.push(rooms[index]) if find_time(resp[0], :end_time) == start_time
                 end
             elsif resp.length == 0
                 # If response length is 0 then the room is free
-                free_rooms.push({free: true, room: rooms[index], end_time: find_time(resp[0], :end_time)})
+                free_rooms.push(rooms[index])
             end
         }
-
         free_rooms
     end
 
