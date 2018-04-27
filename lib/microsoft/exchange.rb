@@ -147,8 +147,8 @@ class Microsoft::Exchange
         user_free_busy.body[0][:get_user_availability_response][:elems][0][:free_busy_response_array][:elems].each_with_index {|r,index|
             # Remove meta data (business hours and response type)
             resp = r[:free_busy_response][:elems][1][:free_busy_view][:elems].delete_if { |item|
-                if item[:free_busy_view_type] || item[:working_hours]
-                    free_rooms.push({free: false, room: rooms[index], end_time: find_time(item, :end_time)})
+                if item[:calendar_event_array]
+                    free_rooms.push({free: false, room: rooms[index], end_time: find_time(item[:calendar_event_array][:elems], :end_time)})
                 end
                 item[:free_busy_view_type] || item[:working_hours]
             }
