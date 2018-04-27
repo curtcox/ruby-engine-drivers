@@ -25,7 +25,12 @@ class Aca::Router
 
         @path_cache = nil
 
-        @signal_graph = SignalGraph.from_map(setting(:connections) || {}).freeze
+        connections = setting(:connections) || {}
+        begin
+            @signal_graph = SignalGraph.from_map(connections).freeze
+        rescue
+            logger.error 'invalid connection settings'
+        end
 
         self[:nodes] = signal_graph.map(&:id)
         self[:inputs] = signal_graph.sinks.map(&:id)
