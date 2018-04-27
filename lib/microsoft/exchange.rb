@@ -148,7 +148,7 @@ class Microsoft::Exchange
             # Remove meta data (business hours and response type)
             resp = r[:free_busy_response][:elems][1][:free_busy_view][:elems].delete_if { |item|
                 if item[:free_busy_view_type] || item[:working_hours]
-                    free_rooms.push({free: false, room: rooms[index], end_time: find_time(resp[0], :end_time)})
+                    free_rooms.push({free: false, room: rooms[index], end_time: find_time(item, :end_time)})
                 end
                 item[:free_busy_view_type] || item[:working_hours]
             }
