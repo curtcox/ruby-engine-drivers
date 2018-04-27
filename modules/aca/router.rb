@@ -71,14 +71,8 @@ class Aca::Router
         end
     end
 
-    # Given a list of nodes that form a path, execute the device level
-    # interactions to switch a signal across across them.
-    def switch(path)
-
-    end
-
-    # Find the shortest path between a source and target node and return the
-    # list of nodes which form it.
+    # Find the shortest path between between two nodes and return a list of the
+    # nodes which this passes through and their connecting edges.
     def route(source, sink)
         path = paths[sink]
 
@@ -90,22 +84,26 @@ class Aca::Router
         end
 
         nodes = []
+        edges = []
         node = signal_graph[source]
         until node.nil?
             nodes << node
             predecessor = path.predecessor[node.id]
+            edges << predecessor.edges[node.id] unless predecessor.nil?
             node = predecessor
         end
-        nodes
+
+        logger.debug { nodes.join ' ---> ' }
+
+        [nodes, edges]
     end
 end
 
 # Graph data structure for respresentating abstract signal networks.
 #
 # All signal sinks and sources are represented as nodes, with directed edges
-# holding connectivity information and a lambda that can be executed to
-# 'activate' the edge, performing any device level interaction for signal
-# switching.
+# holding connectivity information needed to execute device level interaction
+# to 'activate' the edge.
 #
 # Directivity of the graph is inverted from the signal flow - edges use signal
 # sinks as source and signal sources as their terminus. This optimises for
@@ -113,6 +111,16 @@ end
 # will have a small number of displays and a large number of sources).
 class Aca::Router::SignalGraph
     Paths = Struct.new :distance_to, :predecessor
+
+    Edge = Struct.new :source, :target, :device, :input, :output do
+        def activate
+            if output.nil?
+                system[device].switch_to input
+            else
+                system[device].switch input => output
+            end
+        end
+    end
 
     class Node
         attr_reader :id, :edges
@@ -124,8 +132,8 @@ class Aca::Router::SignalGraph
             end
         end
 
-        def join(other_id, selector = nil)
-            edges[other_id] = selector
+        def join(other_id, datum)
+            edges[other_id] = datum
             self
         end
 
@@ -175,8 +183,9 @@ class Aca::Router::SignalGraph
         self
     end
 
-    def join(source, target, &selector)
-        nodes[source].join target, selector
+    def join(source, target, &block)
+        datum = Edge.new(source, target).tap(&block)
+        nodes[source].join target, datum
         self
     end
 
@@ -283,8 +292,9 @@ class Aca::Router::SignalGraph
             inputs.each_pair do |input, source|
                 # Create a node and edge to each input source
                 graph << source
-                graph.join(device, source) do
-                    system[device].switch_to input
+                graph.join(device, source) do |edge|
+                    edge.device = device
+                    edge.input = input
                 end
 
                 # Check is the input is a matrix switcher or multi-output
@@ -298,8 +308,10 @@ class Aca::Router::SignalGraph
                 matrix_inputs = map[upstream_device]
                 matrix_inputs.each_pair do |matrix_input, upstream_source|
                     graph << upstream_source
-                    graph.join(source, upstream_source) do
-                        system[upstream_device].switch matrix_input => output
+                    graph.join(source, upstream_source) do |edge|
+                        edge.device = upstream_device
+                        edge.input = matrix_input
+                        edge.output = output
                     end
                 end
             end
