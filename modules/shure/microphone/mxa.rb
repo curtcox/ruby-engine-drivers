@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'shellwords'
+
 module Shure; end
 module Shure::Microphone; end
 
@@ -102,6 +104,7 @@ class Shure::Microphone::Mxa
         do_send 'GET LED_COLOR_MUTED'
     end
 
+    # Supported colours: :RED, :GREEN, :BLUE, :PINK, :PURPLE, :YELLOW, :ORANGE, :WHITE
     def led_colour_muted(colour)
         do_send 'SET LED_COLOR_MUTED', colour.to_s.upcase, name: :muted_color
     end
@@ -132,14 +135,12 @@ class Shure::Microphone::Mxa
         do_send 'SET LED_STATE_MUTED', state
     end
 
-    def disco(enable = true)
-        @disco = enable
-    end
-
     def received(data, resolve, command)
         logger.debug { "-- received: #{data}" }
 
-        resp = data.split(' ')
+        # Convert { some data here } to " some data here "
+        # Then use shellsplit to capture the parts and remove whitespace
+        resp = data.gsub(/[\{\}]/, '"').shellsplit.map(&:strip)
 
         # We want to ignore sample responses
         if resp[0] == 'SAMPLE'
@@ -149,28 +150,29 @@ class Shure::Microphone::Mxa
             return :ignore
         end
 
+        return :abort if resp[1] == 'ERR'
+
+        # Check if the first value is a number - channel level details
+        if resp[1] =~ /^[0-9]+$/
+            chann = resp[1]
+            param = resp[2]&.downcase
+            value = resp[3]&.downcase
+
+            self["#{param}_#{chann}"] = value
+            return :success
+        end
+
+        # Global value details
         param = resp[1].downcase.to_sym
         value = resp[2]
 
-        return :abort if param == :err
-
-        if value == 'AUTOMIX_GATE_OUT_EXT_SIG'
-            # REP 2 AUTOMIX_GATE_OUT_EXT_SIG ON
-            if @disco
-                led_colour_unmuted [:RED, :GREEN, :BLUE, :PINK, :PURPLE,
-                                    :YELLOW, :ORANGE, :WHITE].sample
-            end
-            self["output#{resp[1]}_automix"] = resp[3] == 'ON'
-            return :ignore
-        end
-
         case param
         when :device_audio_mute then self[:muted] = value == 'ON'
-        when :meter_rate, :preset then self[:preset] = value.to_i
+        when :meter_rate, :preset then self[param] = value.to_i
         when :dev_led_state_muted then self[:led_muted] = value == 'ON'
         when :dev_led_state_unmuted then self[:led_unmuted] = value == 'ON'
         else
-            self[param] = resp[2]&.downcase
+            self[param] = value&.downcase
         end
 
         :success
