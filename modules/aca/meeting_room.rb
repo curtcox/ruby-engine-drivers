@@ -316,8 +316,11 @@ class Aca::MeetingRoom < Aca::Joiner
         present_actual(source, display)
 
         # Switch Joined rooms to the sharing input (use skipme param)
-        perform_action(mod: :System, func: :do_share, args: [true, source.to_sym], skipMe: true).then do
-            system[:Switcher].switch(@defaults[:sharing_routes]) if @defaults[:sharing_routes]
+        promise = perform_action(mod: :System, func: :present_actual, args: [source, display], skipMe: true)
+        if @defaults[:sharing_routes]
+            promise.then do
+                system[:Switcher].switch(@defaults[:sharing_routes])
+            end
         end
     end
 
@@ -875,6 +878,7 @@ class Aca::MeetingRoom < Aca::Joiner
 
     def vc_mute_actual(mute)
         system[:Mixer].mute(self[:mics_mutes], mute) if self[:mics_mutes]
+        system.all(:CeilingMic).led_colour_unmuted(mute ? :red : :green)
     end
 
     def start_cameras
