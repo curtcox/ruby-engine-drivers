@@ -38,6 +38,7 @@ class Polycom::RealPresence::GroupSeriesCamera
     end
 
     def on_update
+        # {near: {zoom: val, pan: val, tilt: val}}
         @presets = setting(:presets) || {}
         self[:presets] = @presets.keys
 
@@ -168,13 +169,30 @@ class Polycom::RealPresence::GroupSeriesCamera
         name_sym = name.to_sym
         value = @presets[name_sym]
 
-        if value
+        if value && value.is_a?(Integer)
             recall_position value
             true
+        elsif value
+            self[:pan] = values[:pan] || self[:pan]
+            self[:tilt] = values[:tilt] || self[:tilt]
+            self[:zoom] = values[:zoom] || self[:zoom]
+            update_position
         elsif name_sym == :default
             home
         else
             false
+        end
+    end
+
+    def save_preset(name)
+        position?.then do
+            @presets[name] = {
+                zoom: self[:zoom],
+                pan: self[:pan],
+                tilt: self[:tilt]
+            }
+            define_setting(:presets, @presets)
+            self[:presets] = @presets.keys
         end
     end
 
