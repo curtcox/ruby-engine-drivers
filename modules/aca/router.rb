@@ -50,7 +50,6 @@ class Aca::Router
     # single source to a single destination, Ruby's implicit hash syntax can be
     # used to let you express it neatly as `connect source => sink`.
     def connect(signal_map, atomic: false)
-        # Transform the signal map to the nodes and edges used by each source
         routes = {}
         signal_map.each_pair do |source, sinks|
             routes[source] = route_many source, sinks, strict: atomic
@@ -63,12 +62,18 @@ class Aca::Router
 
         check_conflicts routes, strict: atomic
 
-        device_interactions = activate routes, strict: atomic
-
-
-        # 4. Consolidate each path into a success / fail
-        # 5. Raise exceptions / log errors for failures
-        # 6. Return consolidated promise
+        edges = routes.values.map(&:second).reduce(&:|)
+        interactions = edges.map { |e| activate e }
+        thread.finally(interactions).then do |results|
+            _, failed = results.partition(&:last)
+            if failed.empty?
+                logger.debug 'all routes activated successfully'
+                :success
+            else
+                failed.each { |result, _| logger.error result }
+                thread.defer.reject 'failed to activate all routes'
+            end
+        end
     end
 
     protected
@@ -152,22 +157,11 @@ class Aca::Router
         end
     end
 
-    def activate(routes, strict: false)
-        device_exists = proc do |edge|
-            system[edge.device].nil?.!.tap do |exists|
-                message = "#{edge.device} not found in system"
-                raise message if strict
-                logger.warn message
-            end
-        end
-
-        edges = routes.values.map(&:second).reduce(&:|)
-        edges.select(&device_exists).map do |edge|
-            if edge.output.nil?
-                system[edge.device].switch_to edge.input
-            else
-                system[edge.device].switch edge.input => edge.output
-            end
+    def activate(edge)
+        if edge.output.nil?
+            system[edge.device].switch_to edge.input
+        else
+            system[edge.device].switch edge.input => edge.output
         end
     end
 
