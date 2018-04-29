@@ -61,7 +61,15 @@ class Aca::Router
             "Nodes to connect: #{nodes}"
         end
 
-        # Check for intersections / conflicts across sources
+        # Check for intersecting paths across sources
+        routes.values.map(&:first).reduce(&:&).tap do |conflicts|
+            unless conflicts.empty?
+                nodes = conflicts.map(&:to_s).join ', '
+                message = "conflicting signal paths found for #{nodes}"
+                raise ArgumentError, message if atomic
+                logger.warn message
+            end
+        end
 
         # 3. Perform device interactions
         # 4. Consolidate each path into a success / fail
