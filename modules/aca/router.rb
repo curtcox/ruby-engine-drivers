@@ -139,6 +139,9 @@ class Aca::Router
 
     def check_conflicts(routes, strict: false)
         nodes = routes.values.map(&:first)
+
+        return Set.new if nodes.size <= 1
+
         nodes.reduce(&:&).tap do |conflicts|
             unless conflicts.empty?
                 nodes = conflicts.map(&:to_s).join ', '
