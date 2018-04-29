@@ -519,11 +519,12 @@ class Aca::MeetingRoom < Aca::Joiner
 
             # Update the inputs
             inps = (setting(:inputs) + (mode[:inputs] || [])) - (mode[:remove_inputs] || [])
+            inps.uniq!
             inps.each do |input|
                 inp = setting(input) || mode[input]
 
                 if inp
-                    self[input] = Set.new(inp + (mode[input] || [])).to_a
+                    self[input] = Set.new((mode[input] || []) + inp).to_a
                     self[input].each do |source|
                         @input_tab_mapping[source.to_sym] = input
                     end
