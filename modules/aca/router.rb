@@ -103,7 +103,7 @@ class Aca::Router
             node = predecessor
         end
 
-        logger.debug { nodes.join ' ---> ' }
+        logger.debug { edges.map(&:to_s).join ' then ' }
 
         [nodes, edges]
     end
@@ -181,6 +181,10 @@ class Aca::Router::SignalGraph
             else
                 system[device].switch input => output
             end
+        end
+
+        def to_s
+            "#{target} to #{device} (in #{input})"
         end
     end
 
