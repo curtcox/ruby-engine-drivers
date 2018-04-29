@@ -41,29 +41,32 @@ class Aca::Router
 
     # Route a set of signals to arbitrary destinations.
     #
-    # `map` is a hashmap of the structure `{ source: target | [targets] }`
+    # `signal_map`  is a hash of the structure `{ source: sink | [sinks] }`
+    # 'atomic'      may be used to throw an exception, prior to any device
+    #               interaction taking place if any of the routes are not
+    #               possible
     #
     # Multiple sources can be specified simultaneously, or if connecting a
     # single source to a single destination, Ruby's implicit hash syntax can be
-    # used to let you express it neatly as `connect source => target`.
-    def connect(map)
-        # 1. Turn map -> list of paths (list of lists of nodes)
-        # 2. Check for intersections of node lists for different sources
-        #     - get unique nodes for each source
-        #     - intersect lists
-        #     - confirm empty
+    # used to let you express it neatly as `connect source => sink`.
+    def connect(signal_map, atomic: false)
+        # Transform the signal map to the nodes and edges used by each source
+        routes = {}
+        signal_map.each_pair do |source, sinks|
+            routes[source] = route_many source, sinks, atomic: atomic
+        end
+
+        logger.debug do
+            nodes = routes.transform_values { |n, _| n.map(&:to_s) }
+            "Nodes to connect: #{nodes}"
+        end
+
+        # Check for intersections / conflicts across sources
+
         # 3. Perform device interactions
-        #     - step through paths and pair device interactions into tuples representing switch events
-        #     - flatten and uniq
-        #     - remove singular nodes (passthrough)
-        #     - execute interactions
         # 4. Consolidate each path into a success / fail
         # 5. Raise exceptions / log errors for failures
         # 6. Return consolidated promise
-
-        map.each_pair do |source, targets|
-            Array(targets).each { |target| route source, target }
-        end
     end
 
     protected
@@ -101,6 +104,33 @@ class Aca::Router
         end
 
         logger.debug { nodes.join ' ---> ' }
+
+        [nodes, edges]
+    end
+
+    # Find the optimum combined paths requires to route a single source to
+    # multiple sink devices.
+    def route_many(source, sinks, atomic: false)
+        node_exists = proc do |id|
+            signal_graph.include?(id).tap do |exists|
+                unless exists
+                    message = "#{id} does not exist"
+                    raise ArgumentError, message if atomic
+                    logger.warn message
+                end
+            end
+        end
+
+        nodes = Set.new
+        edges = Set.new
+
+        if node_exists[source]
+            Array(sinks).select(&node_exists).each do |sink|
+                n, e = route source, sink
+                nodes |= n
+                edges |= e
+            end
+        end
 
         [nodes, edges]
     end
@@ -187,7 +217,7 @@ class Aca::Router::SignalGraph
     attr_reader :nodes
 
     def initialize
-        @nodes = ActiveSupport::HashWithIndifferentAccess.new do |_, id|
+        @nodes = HashWithIndifferentAccess.new do |_, id|
             raise ArgumentError, "\"#{id}\" does not exist"
         end
     end
@@ -223,6 +253,10 @@ class Aca::Router::SignalGraph
 
     def each(&block)
         nodes.values.each(&block)
+    end
+
+    def include?(id)
+        nodes.key? id
     end
 
     def successors(id)
