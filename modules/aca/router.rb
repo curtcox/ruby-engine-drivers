@@ -53,7 +53,7 @@ class Aca::Router
         # Transform the signal map to the nodes and edges used by each source
         routes = {}
         signal_map.each_pair do |source, sinks|
-            routes[source] = route_many source, sinks, atomic: atomic
+            routes[source] = route_many source, sinks, strict: atomic
         end
 
         logger.debug do
@@ -61,17 +61,11 @@ class Aca::Router
             "Nodes to connect: #{nodes}"
         end
 
-        # Check for intersecting paths across sources
-        routes.values.map(&:first).reduce(&:&).tap do |conflicts|
-            unless conflicts.empty?
-                nodes = conflicts.map(&:to_s).join ', '
-                message = "conflicting signal paths found for #{nodes}"
-                raise ArgumentError, message if atomic
-                logger.warn message
-            end
-        end
+        check_conflicts routes, strict: atomic
 
-        # 3. Perform device interactions
+        device_interactions = activate routes, strict: atomic
+
+
         # 4. Consolidate each path into a success / fail
         # 5. Raise exceptions / log errors for failures
         # 6. Return consolidated promise
@@ -118,12 +112,12 @@ class Aca::Router
 
     # Find the optimum combined paths requires to route a single source to
     # multiple sink devices.
-    def route_many(source, sinks, atomic: false)
+    def route_many(source, sinks, strict: false)
         node_exists = proc do |id|
             signal_graph.include?(id).tap do |exists|
                 unless exists
                     message = "#{id} does not exist"
-                    raise ArgumentError, message if atomic
+                    raise ArgumentError, message if strict
                     logger.warn message
                 end
             end
@@ -141,6 +135,37 @@ class Aca::Router
         end
 
         [nodes, edges]
+    end
+
+    def check_conflicts(routes, strict: false)
+        nodes = routes.values.map(&:first)
+        nodes.reduce(&:&).tap do |conflicts|
+            unless conflicts.empty?
+                nodes = conflicts.map(&:to_s).join ', '
+                message = "conflicting signal paths found for #{nodes}"
+                raise message if strict
+                logger.warn message
+            end
+        end
+    end
+
+    def activate(routes, strict: false)
+        device_exists = proc do |edge|
+            system[edge.device].nil?.!.tap do |exists|
+                message = "#{edge.device} not found in system"
+                raise message if strict
+                logger.warn message
+            end
+        end
+
+        edges = routes.values.map(&:second).reduce(&:|)
+        edges.select(&device_exists).map do |edge|
+            if edge.output.nil?
+                system[edge.device].switch_to edge.input
+            else
+                system[edge.device].switch edge.input => edge.output
+            end
+        end
     end
 
     def check_compatability
@@ -183,14 +208,6 @@ class Aca::Router::SignalGraph
     Paths = Struct.new :distance_to, :predecessor
 
     Edge = Struct.new :source, :target, :device, :input, :output do
-        def activate
-            if output.nil?
-                system[device].switch_to input
-            else
-                system[device].switch input => output
-            end
-        end
-
         def to_s
             "#{target} to #{device} (in #{input})"
         end
