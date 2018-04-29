@@ -34,6 +34,7 @@ class Aca::Router
 
         check_compatability
 
+        # TODO: track active signal source at each node and expose as a hash
         self[:nodes] = signal_graph.map(&:id)
         self[:inputs] = signal_graph.sinks.map(&:id)
         self[:outputs] = signal_graph.sources.map(&:id)
@@ -165,6 +166,7 @@ class Aca::Router
         end
     end
 
+    # TODO: execute this on system device create / remove / stop / start etc
     def check_compatability
         invalid = Set.new
 
