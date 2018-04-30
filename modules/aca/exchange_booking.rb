@@ -374,6 +374,8 @@ class Aca::ExchangeBooking
             if start_time.class == Integer
                 delete_ews_booking (start_time / 1000).to_i
             else
+                # Converts to time object regardless of start_time being string or time object
+                start_time = Time.parse(start_time.to_s)
                 delete_ews_booking start_time.to_i
             end
         }.then(proc { |count|
