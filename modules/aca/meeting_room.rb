@@ -21,6 +21,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:help_msg] = setting(:help_msg)
             self[:analytics] = setting(:analytics)
             self[:Camera] = setting(:Camera)
+            self[:Wired] = setting(:Wired)
             self[:hide_vc_sources] = setting(:hide_vc_sources)
             self[:mics_mutes] = setting(:mics_mutes)
             @confidence_monitor = setting(:confidence_monitor)
@@ -313,6 +314,8 @@ class Aca::MeetingRoom < Aca::Joiner
     end
 
     def present(source, display)
+        return if self[:is_joined] && system.id != self[:joined][:initiator]
+
         present_actual(source, display)
 
         # Switch Joined rooms to the sharing input (use skipme param)
