@@ -269,8 +269,8 @@ class Polycom::RealPresence::GroupSeries
     # mute|volume+|volume-|info
     # camera|delete|directory|home|keyboard|menu|period|pip|preset
     def button_press(*keys)
-        # succeeded / failed or completed when some keys are not valid
-        send "button #{keys.join(' ')}\r"
+        keys = keys.map { |k| k.downcase }
+        keys.each { |key| send "button #{key}\r", delay: 400 }
     end
 
     def send_DTMF(char)
