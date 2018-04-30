@@ -97,6 +97,7 @@ class Aca::ExchangeBooking
         self[:touch_enabled] = setting(:touch_enabled) || false
         self[:name] = self[:room_name] = setting(:room_name) || system.name
         self[:description] = setting(:description) || nil
+        self[:title] = setting(:title) || nil
         self[:timeout] = setting(:timeout) || false
 
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
