@@ -181,7 +181,7 @@ class Microsoft::Exchange
             events = @ews_client.find_items(folder_id: calendar_id, calendar_view: {start_date: start_param, end_date: end_param})
         else
             @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], email)
-            items = @ews_client.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start_param.utc.iso8601, :end_date => end_param.utc.iso8601}})
+            events = @ews_client.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start_param.utc.iso8601, :end_date => end_param.utc.iso8601}})
         end
         # events = @ews_client.get_item(:calendar, opts = {act_as: email}).items
         events.each{|event|
