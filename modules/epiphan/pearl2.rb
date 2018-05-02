@@ -34,7 +34,7 @@ class Epiphan::Pearl2
     def status(channel = 1)
         exec('recorder_status', channel) do |data|
             detail = JSON.parse(data.body, symbolize_names: true)
-            self[:recording] = !detail[:state].empty?
+            self["channel#{channel}"] = detail[:state].present? ? :recording : :idle
             self[:time] = detail[:time]
             self[:total] = detail[:total]
             self[:state] = detail[:state]
@@ -44,7 +44,6 @@ class Epiphan::Pearl2
 
     def record(channel = 1)
         exec('start_recorder', channel) do |data|
-            self[:recording] = true
             self["channel#{channel}"] = :recording
             status
         end
