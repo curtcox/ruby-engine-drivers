@@ -186,7 +186,7 @@ class Lightware::Switcher::LightwareProtocol
                 # Probably a switch command
                 # Returns: O02 I11
                 outp, inp = data.split(' ')
-                self["video#{outp[1..-1]}"] = inp[1..-1].to_i
+                self["video#{outp[1..-1].to_i}"] = inp[1..-1].to_i
             end
         when 'E'
             # Probably Error List
@@ -200,8 +200,8 @@ class Lightware::Switcher::LightwareProtocol
             outputs = data.split(' ')
             outputs.shift
             self[:num_outputs] = outputs.length
-            outputs.each_index do |out|
-                self["video#{out}"] = outputs[out][1..-1].to_i
+            outputs.each_with_index do |input, output|
+                self["video#{output + 1}"] = input.to_i
             end
         when 'M'
             # Probably the all mutes command
