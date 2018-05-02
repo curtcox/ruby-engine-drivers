@@ -238,6 +238,8 @@ class Aca::MeetingRoom < Aca::Joiner
 
         # Call the Joiner on_update function
         super
+    ensure
+        vc_sources
     end
 
 
@@ -584,6 +586,24 @@ class Aca::MeetingRoom < Aca::Joiner
         else
             logger.warn "unabled to find mode #{mode_name} -- bad request?\n#{@modes.inspect}"
         end
+    ensure
+        vc_sources
+    end
+
+    def vc_sources
+        srcs = []
+        Array(self[:inputs]).each do |inp|
+            srcs.concat(Array(self[inp]))
+        end
+        srcs.concat(Array(self[:Wired]))
+
+        vsource = {}
+        srcs.each do |src|
+            s = self[:sources][src]
+            vsource[src] = s if s && !s[:not_vc_content]
+        end
+
+        self[:vc_sources] = vsource
     end
 
 
