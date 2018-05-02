@@ -1,6 +1,8 @@
 # encoding: ASCII-8BIT
 # frozen_string_literal: true
 
+require 'set'
+
 module Lightware; end
 module Lightware::Switcher; end
 
@@ -26,6 +28,7 @@ class Lightware::Switcher::LightwareProtocol
     end
 
     def on_update
+        @ignore_outs = Set.new(Array(setting(:force_available)))
     end
 
     def connected
@@ -180,7 +183,12 @@ class Lightware::Switcher::LightwareProtocol
                 # OSD (output port status)
                 # OSD 111111111111110011111111111100000000000000000000000000000000000000000000000000000
                 data[4..-1].each_char.to_a.each_with_index do |char, index|
-                    self["videoOut#{index + 1}"] = char != '0'
+                    out = index + 1
+                    if @ignore_outs.include? out
+                        self["videoOut#{out}"] = true
+                    else
+                        self["videoOut#{out}"] = char != '0'
+                    end
                 end
             else
                 # Probably a switch command
