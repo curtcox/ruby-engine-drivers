@@ -3,10 +3,10 @@
 require_relative 'case_insensitive_hash'
 
 module Cisco; end
-module Cisco::Spark; end
-module Cisco::Spark::Util; end
+module Cisco::CollaborationEndpoint; end
+module Cisco::CollaborationEndpoint::Util; end
 
-class Cisco::Spark::Util::FeedbackTrie < Cisco::Spark::Util::CaseInsensitiveHash
+class Cisco::CollaborationEndpoint::Util::FeedbackTrie < Cisco::CollaborationEndpoint::Util::CaseInsensitiveHash
     # Insert a response handler block to be notified of updates effecting the
     # specified feedback path.
     def insert(path, &handler)

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module Cisco; end
-module Cisco::Spark; end
-module Cisco::Spark::Xapi; end
+module Cisco::CollaborationEndpoint; end
+module Cisco::CollaborationEndpoint::Xapi; end
 
 # Minimal DSL for mapping Cisco's xAPI to methods.
-module Cisco::Spark::Xapi::Mapper
+module Cisco::CollaborationEndpoint::Xapi::Mapper
     module ApiMapperMethods
         # Bind an xCommand to a module method.
         #

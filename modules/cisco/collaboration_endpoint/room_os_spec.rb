@@ -1,6 +1,6 @@
 require 'thread'
 
-Orchestrator::Testing.mock_device 'Cisco::Spark::RoomOs',
+Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                                   settings: {
                                       peripheral_id: 'MOCKED_ID',
                                       version: 'MOCKED_VERSION'

@@ -3,11 +3,11 @@
 require 'set'
 
 module Cisco; end
-module Cisco::Spark; end
-module Cisco::Spark::Xapi; end
+module Cisco::CollaborationEndpoint; end
+module Cisco::CollaborationEndpoint::Xapi; end
 
 # Pure utility methods for building Cisco xAPI actions.
-module Cisco::Spark::Xapi::Action
+module Cisco::CollaborationEndpoint::Xapi::Action
     ACTION_TYPE ||= Set.new [
         :xConfiguration,
         :xCommand,

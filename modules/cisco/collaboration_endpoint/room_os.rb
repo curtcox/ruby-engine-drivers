@@ -6,25 +6,25 @@ require 'securerandom'
 Dir[File.join(__dir__, '{xapi,util}', '*.rb')].each { |lib| load lib }
 
 module Cisco; end
-module Cisco::Spark; end
+module Cisco::CollaborationEndpoint; end
 
-class Cisco::Spark::RoomOs
+class Cisco::CollaborationEndpoint::RoomOs
     include ::Orchestrator::Constants
     include ::Orchestrator::Security
-    include ::Cisco::Spark::Xapi
-    include ::Cisco::Spark::Util
+    include ::Cisco::CollaborationEndpoint::Xapi
+    include ::Cisco::CollaborationEndpoint::Util
 
     implements :ssh
-    descriptive_name 'Cisco Spark Room Device'
+    descriptive_name 'Cisco Collaboration Endpoint'
     generic_name :VidConf
 
     description <<~DESC
-        Low level driver for any Cisco Spark Room OS device. This may be used
+        Low level driver for any Cisco Room OS device. This may be used
         if direct access is required to the device API, or a required feature
         is not provided by the device specific implementation.
 
         Where possible use the implementation for room device in use
-        (i.e. SX80, Spark Room Kit etc).
+        (i.e. SX80, Room Kit etc).
     DESC
 
     tokenize delimiter: Tokens::COMMAND_RESPONSE,

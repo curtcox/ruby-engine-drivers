@@ -4,12 +4,12 @@ load File.join(__dir__, 'room_os.rb')
 load File.join(__dir__, 'ui_extensions.rb')
 load File.join(__dir__, 'external_source.rb')
 
-class Cisco::Spark::Sx20 < Cisco::Spark::RoomOs
-    include ::Cisco::Spark::Xapi::Mapper
-    include ::Cisco::Spark::UiExtensions
-    include ::Cisco::Spark::ExternalSource
+class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
+    include ::Cisco::CollaborationEndpoint::Xapi::Mapper
+    include ::Cisco::CollaborationEndpoint::UiExtensions
+    include ::Cisco::CollaborationEndpoint::ExternalSource
 
-    descriptive_name 'Cisco Spark SX20'
+    descriptive_name 'Cisco SX20'
     description <<~DESC
         Device access requires an API user to be created on the endpoint.
     DESC

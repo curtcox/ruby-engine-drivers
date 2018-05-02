@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Cisco; end
-module Cisco::Spark; end
-module Cisco::Spark::Util; end
+module Cisco::CollaborationEndpoint; end
+module Cisco::CollaborationEndpoint::Util; end
 
-module Cisco::Spark::Util::Git
+module Cisco::CollaborationEndpoint::Util::Git
     module_function
 
     # Get the commit hash for the passed path.

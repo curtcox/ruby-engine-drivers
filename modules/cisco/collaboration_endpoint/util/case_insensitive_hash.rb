@@ -3,10 +3,10 @@
 require 'active_support/core_ext/hash/indifferent_access'
 
 module Cisco; end
-module Cisco::Spark; end
-module Cisco::Spark::Util; end
+module Cisco::CollaborationEndpoint; end
+module Cisco::CollaborationEndpoint::Util; end
 
-class Cisco::Spark::Util::CaseInsensitiveHash < \
+class Cisco::CollaborationEndpoint::Util::CaseInsensitiveHash < \
         ActiveSupport::HashWithIndifferentAccess
     def [](key)
         super convert_key(key)

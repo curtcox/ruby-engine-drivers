@@ -3,10 +3,10 @@
 require 'json'
 
 module Cisco; end
-module Cisco::Spark; end
-module Cisco::Spark::Xapi; end
+module Cisco::CollaborationEndpoint; end
+module Cisco::CollaborationEndpoint::Xapi; end
 
-module Cisco::Spark::Xapi::Response
+module Cisco::CollaborationEndpoint::Xapi::Response
     class ParserError < StandardError; end
 
     module_function

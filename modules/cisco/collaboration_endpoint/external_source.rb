@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module Cisco; end
-module Cisco::Spark; end
+module Cisco::CollaborationEndpoint; end
 
-module Cisco::Spark::ExternalSource
-    include ::Cisco::Spark::Xapi::Mapper
+module Cisco::CollaborationEndpoint::ExternalSource
+    include ::Cisco::CollaborationEndpoint::Xapi::Mapper
 
     module Hooks
         def connected
