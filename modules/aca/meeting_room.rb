@@ -845,7 +845,7 @@ class Aca::MeetingRoom < Aca::Joiner
 
         # Turn off video wall slave displays
         @vidwalls.each do |key, details|
-            system.all(details[:module]).power(Off)
+            system.all(details[:module]).power(Off) if self[:outputs][key]
         end
 
         self[:state] = :shutdown
@@ -1122,6 +1122,7 @@ class Aca::MeetingRoom < Aca::Joiner
         end
 
         disp_info = self[:outputs][display]
+        wall_details = @vidwalls[display]
 
         # Task 1: switch the display on and to the correct source
         unless disp_info[:no_mod]
@@ -1129,7 +1130,6 @@ class Aca::MeetingRoom < Aca::Joiner
 
             if disp_mod[:power] == Off || disp_mod[:power_target] == Off
                 arity = disp_mod.arity(:power)
-                wall_details = @vidwalls[display]
                 wall_display = system.all(wall_details[:module]) if wall_details
 
                 turn_on_display = proc {
@@ -1197,6 +1197,7 @@ class Aca::MeetingRoom < Aca::Joiner
             # Change the display input
             inp_src = disp_source[:source] || disp_info[:default_source]
             inp_src = disp_info[:input_mapping][inp_src] || inp_src if disp_info[:input_mapping]
+            inp_src = wall_details[:input] if wall_details
             if inp_src && disp_mod[:input] != inp_src
                 disp_mod.switch_to(inp_src)
             end
