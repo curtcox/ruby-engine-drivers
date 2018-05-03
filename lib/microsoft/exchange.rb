@@ -225,7 +225,7 @@ class Microsoft::Exchange
         STDERR.puts "attendees is #{attendees}"
         STDERR.puts "timezone is #{timezone}"
         STDERR.flush
-        description = String(description)
+        # description = String(description)
         attendees = Array(attendees)
 
 
