@@ -10,6 +10,12 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     include ::Cisco::CollaborationEndpoint::ExternalSource
 
     descriptive_name 'Cisco Room Kit'
+    description <<~DESC
+        Control of Cisco RoomKit devices.
+
+        API access requires a local user with the 'integrator' role to be
+        created on the codec.
+    DESC
 
     tokenize delimiter: Tokens::COMMAND_RESPONSE,
              wait_ready: Tokens::LOGIN_COMPLETE

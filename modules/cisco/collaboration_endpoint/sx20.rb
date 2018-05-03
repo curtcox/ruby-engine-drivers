@@ -11,7 +11,10 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
 
     descriptive_name 'Cisco SX20'
     description <<~DESC
-        Device access requires an API user to be created on the endpoint.
+        Control of Cisco SX20 devices.
+
+        API access requires a local user with the 'integrator' role to be
+        created on the codec.
     DESC
 
     tokenize delimiter: Tokens::COMMAND_RESPONSE,
