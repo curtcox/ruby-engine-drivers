@@ -246,6 +246,7 @@ class Microsoft::Exchange
                 attendee: { mailbox: { email_address: attendee}}
             })
         end
+        booking[:body] = description
         STDERR.puts "MAKING REQUEST WITH"
         STDERR.puts booking
         STDERR.flush
