@@ -215,6 +215,16 @@ class Microsoft::Exchange
     end
 
     def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney')
+        STDERR.puts "CREATING NEW BOOKING IN LIBRARY"
+        STDERR.puts "room_email is #{room_email}"
+        STDERR.puts "start_param is #{start_param}"
+        STDERR.puts "end_param is #{end_param}"
+        STDERR.puts "subject is #{subject}"
+        STDERR.puts "description is #{description}"
+        STDERR.puts "current_user is #{current_user}"
+        STDERR.puts "attendees is #{attendees}"
+        STDERR.puts "timezone is #{timezone}"
+        STDERR.flush
         description = String(description)
         attendees = Array(attendees)
 
@@ -233,7 +243,9 @@ class Microsoft::Exchange
                 attendee: { mailbox: { email_address: attendee}}
             })
         end
-
+        STDERR.puts "MAKING REQUEST WITH"
+        STDERR.puts booking
+        STDERR.flush
         folder = @ews_client.get_folder(:calendar, { act_as: room_email })
         appointment = folder.create_item(booking)
         {
