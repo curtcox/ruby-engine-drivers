@@ -50,6 +50,9 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     command 'Audio Microphones Mute' => :mic_mute_on
     command 'Audio Microphones Unmute' => :mic_mute_off
     command 'Audio Microphones ToggleMute' => :mic_mute_toggle
+    def mic_mute(state = On)
+        is_affirmative? state ? mic_mute_on : mic_mute_off
+    end
 
     command 'Audio Sound Play' => :play_sound,
             Sound: [:Alert, :Bump, :Busy, :CallDisconnect, :CallInitiate,
