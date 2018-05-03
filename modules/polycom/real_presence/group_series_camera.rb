@@ -173,9 +173,9 @@ class Polycom::RealPresence::GroupSeriesCamera
             recall_position value
             true
         elsif value
-            self[:pan] = values[:pan] || self[:pan]
-            self[:tilt] = values[:tilt] || self[:tilt]
-            self[:zoom] = values[:zoom] || self[:zoom]
+            self[:pan] = value[:pan] || self[:pan]
+            self[:tilt] = value[:tilt] || self[:tilt]
+            self[:zoom] = value[:zoom] || self[:zoom]
             update_position
         elsif name_sym == :default
             home
