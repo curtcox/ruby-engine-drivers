@@ -214,17 +214,7 @@ class Microsoft::Exchange
 	end
     end
 
-    def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney')
-        STDERR.puts "CREATING NEW BOOKING IN LIBRARY"
-        STDERR.puts "room_email is #{room_email}"
-        STDERR.puts "start_param is #{start_param}"
-        STDERR.puts "end_param is #{end_param}"
-        STDERR.puts "subject is #{subject}"
-        STDERR.puts "description is #{description}"
-        STDERR.puts "current_user is #{current_user}"
-        STDERR.puts "attendees is #{attendees}"
-        STDERR.puts "timezone is #{timezone}"
-        STDERR.flush
+    def create_booking(room_email5c73bb
         description = String(description)
         attendees = Array(attendees)
 
@@ -239,6 +229,9 @@ class Microsoft::Exchange
             attendee: { mailbox: { email_address: current_user.email } }
         }]
         attendees.each do |attendee|
+            if attendee.class != String
+                attendee = attendee['email']
+            end
             booking[:required_attendees].push({
                 attendee: { mailbox: { email_address: attendee}}
             })
