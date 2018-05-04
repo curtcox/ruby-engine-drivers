@@ -34,7 +34,7 @@ class Microsoft::Exchange
     def close
         @ews_client.ews.connection.httpcli.reset_all
     end
-    
+
     def username(field, name=nil)
         username = field[:email_addresses][:elems][0][:entry][:text].split("@")[0].gsub(/SMTP:|SIP:|sip:|smtp:/,'')
         if username.downcase.include?('x500') || username.downcase.include?('x400')
@@ -69,7 +69,7 @@ class Microsoft::Exchange
             phone_numbers: 'phone:phone_list',
             culture: 'locale:basic_text',
             department: 'department:basic_text',
-            email_addresses: 'username:username'
+            email_addresses: 'id:username'
         }
         keys = fields.keys
         ews_users.each do |user|
