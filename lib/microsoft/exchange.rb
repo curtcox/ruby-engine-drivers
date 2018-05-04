@@ -36,9 +36,21 @@ class Microsoft::Exchange
     end
 
     def username(field, name=nil)
-        username = field[:email_addresses][:elems][0][:entry][:text].split("@")[0].gsub(/SMTP:|SIP:|sip:|smtp:/,'')
-        if username.downcase.include?('x500') || username.downcase.include?('x400')
-            username = field[:email_addresses][:elems][-1][:entry][:text].split("@")[0].gsub(/SMTP:|SIP:|sip:|smtp:/,'')
+        username = field[:email_addresses][:elems][0][:entry][:text].split("@")[0]
+        if ['smt','sip'].include?(username.downcase[0..2])
+            username = username.gsub(/SMTP:|SIP:|sip:|smtp:/,'')
+        else
+            username = field[:email_addresses][:elems][-1][:entry][:text].split("@")[0]
+            if ['smt','sip'].include?(username.downcase[0..2])
+                username = username.gsub(/SMTP:|SIP:|sip:|smtp:/,'')
+            else
+                username = field[:email_addresses][:elems][1][:entry][:text].split("@")[0]
+                if ['smt','sip'].include?(username.downcase[0..2])
+                    username = username.gsub(/SMTP:|SIP:|sip:|smtp:/,'')
+                else
+                    username = nil
+                end
+            end
         end
         username
     end
