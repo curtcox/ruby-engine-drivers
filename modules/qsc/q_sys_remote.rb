@@ -409,7 +409,7 @@ class Qsc::QSysRemote
 
     BoolVals = ['true', 'false']
     def process(values, name: nil)
-        component = name.present? ? "#{name}_" : ''
+        component = name.present? ? "_#{name}" : ''
         values.each do |value|
             name = value[:Name]
             val = value[:Value]
@@ -420,29 +420,29 @@ class Qsc::QSysRemote
             str = value[:String]
 
             if BoolVals.include?(str)
-                self["fader#{name}_#{component}_mute"] = str == 'true'
+                self["fader#{name}#{component}_mute"] = str == 'true'
             else
                 # Seems like string values can be independant of the other values
                 # This should mostly work to detect a string value
                 if val == 0.0 && pos == 0.0 && str[0] != '0'
-                    self["#{component}#{name}"] = str
+                    self["#{name}#{component}"] = str
                     next
                 end
 
                 if pos
                     # Float between 0 and 1
                     if @integer_faders
-                        self["fader#{name}_#{component}"] = (pos * 1000).to_i
+                        self["fader#{name}#{component}"] = (pos * 1000).to_i
                     else
-                        self["fader#{name}_#{component}"] = pos
+                        self["fader#{name}#{component}"] = pos
                     end
                 elsif val.is_a?(String)
-                    self["#{component}#{name}"] = val
+                    self["#{name}#{component}"] = val
                 else
                     if @integer_faders
-                        self["fader#{component}#{name}"] = (val * 10).to_i
+                        self["fader#{name}#{component}"] = (val * 10).to_i
                     else
-                        self["fader#{component}#{name}"] = val
+                        self["fader#{name}#{component}"] = val
                     end
                 end
             end
