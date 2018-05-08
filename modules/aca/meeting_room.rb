@@ -883,11 +883,11 @@ class Aca::MeetingRoom < Aca::Joiner
 
     def vc_status_changed(state)
         if (state[:answerstate] == 'Unanswered' && state[:direction] == 'Incoming') || state[:answerstate] == 'ringing' || state[:answerstate] == 'allocated'
+            self[:show_vc_popup] = true
             vc_source = self[:VC].first
             init_vc
             present(vc_source, self[:outputs].keys.first)
             tab(:VC)
-            self[:show_vc_popup] = true
         else
             self[:show_vc_popup] = false
         end
