@@ -420,7 +420,7 @@ class Qsc::QSysRemote
             str = value[:String]
 
             if BoolVals.include?(str)
-                self["fader#{component}#{name}_mute"] = str == 'true'
+                self["fader#{name}_#{component}_mute"] = str == 'true'
             else
                 # Seems like string values can be independant of the other values
                 # This should mostly work to detect a string value
@@ -428,13 +428,13 @@ class Qsc::QSysRemote
                     self["#{component}#{name}"] = str
                     next
                 end
-                
+
                 if pos
                     # Float between 0 and 1
                     if @integer_faders
-                        self["fader#{component}#{name}"] = (pos * 1000).to_i
+                        self["fader#{name}_#{component}"] = (pos * 1000).to_i
                     else
-                        self["fader#{component}#{name}"] = pos
+                        self["fader#{name}_#{component}"] = pos
                     end
                 elsif val.is_a?(String)
                     self["#{component}#{name}"] = val
