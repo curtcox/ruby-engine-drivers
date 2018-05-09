@@ -177,6 +177,9 @@ class Qsc::QSysControl
         mute(mute_id, false, index)
     end
 
+    def mute_toggle(mute_id, index = nil)
+        mute(mute_id, !self["fader#{mute_id}_mute"], index)
+    end
 
     def snapshot(name, index, ramp_time = 1.5)
         send "ssl #{name} #{index} #{ramp_time}\n", wait: false
