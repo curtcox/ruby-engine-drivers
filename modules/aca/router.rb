@@ -77,6 +77,13 @@ class Aca::Router
         end
     end
 
+    # Lookup the name of the input on a sink node that would be used to connect
+    # a source to it.
+    def input_for(source, sink)
+        _, edges = route source, sink
+        edges.last.input
+    end
+
     protected
 
     def signal_graph
