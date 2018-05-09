@@ -16,6 +16,11 @@ class Aca::Router
         devices and complex/layered switching infrastructure.
     DESC
 
+    default_settings(
+        # Nested hash of signal connectivity. See SignalGraph.from_map.
+        connections: {}
+    )
+
     def on_load
         on_update
     end
@@ -25,7 +30,15 @@ class Aca::Router
 
         @path_cache = nil
 
-        connections = setting(:connections) || {}
+        connections = setting(:connections).transform_values do |inputs|
+            # Read in numeric inputs as ints (as JSON based settings do not
+            # allow non-string keys)
+            if inputs.is_a? Hash
+                inputs.transform_keys! { |i| Integer(i) rescue i }
+            else
+                inputs
+            end
+        end
         begin
             @signal_graph = SignalGraph.from_map(connections).freeze
         rescue
