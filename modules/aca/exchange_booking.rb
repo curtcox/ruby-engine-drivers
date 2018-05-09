@@ -383,6 +383,9 @@ class Aca::ExchangeBooking
             self[:meeting_pending] = start_time
             self[:meeting_ending] = false
             self[:meeting_pending_notice] = false
+
+            fetch_bookings
+            true
         }, proc { |error|
             logger.print_error error, 'removing ews booking'
         })
@@ -446,6 +449,7 @@ class Aca::ExchangeBooking
                 make_ews_booking req_params
             end
         }.then(proc { |id|
+            fetch_bookings
             logger.debug { "successfully created booking: #{id}" }
             "Ok"
         }, proc { |error|
