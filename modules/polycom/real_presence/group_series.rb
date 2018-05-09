@@ -321,14 +321,10 @@ class Polycom::RealPresence::GroupSeries
         if !number.present? && !search.present?
             button_press 'call'
         else
-            if number == search
-                if number.start_with?(@vmr_prefix) && !number.include?('@')
-                    dial_sip "#{number}#{@vmr_append}"
-                else
-                    dial_sip number
-                end
+            if number.start_with?(@vmr_prefix) && !number.include?('@')
+                dial_sip "#{number}#{@vmr_append}"
             else
-                dial_addressbook number
+                dial_sip number
             end
         end
     end
