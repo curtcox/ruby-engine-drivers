@@ -21,7 +21,7 @@ class Shure::Microphone::Mxw
     end
 
     def on_update
-        
+        do_send('GET MUTE_BUTTON_STATUS')
     end
 
     def connected
@@ -39,7 +39,17 @@ class Shure::Microphone::Mxw
 
     def received(data, resolve, command)
         logger.debug { "-- received: #{data}" }
-
+        response = data.split(' ')
+        return if response[0] != 'REP'
+     
+        property = response[1]
+        value = response[2]
+        
+        case property
+            when 'MUTE_BUTTON_STATUS'
+                self[:mute_button] = value == 'ON'
+        end
+            
         return :success
     end
 
@@ -54,6 +64,6 @@ class Shure::Microphone::Mxw
 
     def do_send(command, options = {})
         logger.debug { "-- sending: < #{command} >" }
-        send("< #{command} >", options)
+        send("< #{command}" >, options)
     end
 end
