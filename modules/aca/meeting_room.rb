@@ -21,6 +21,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:help_msg] = setting(:help_msg)
             self[:analytics] = setting(:analytics)
             self[:Camera] = setting(:Camera)
+            self[:Wired] = setting(:Wired)
             self[:hide_vc_sources] = setting(:hide_vc_sources)
             self[:mics_mutes] = setting(:mics_mutes)
             @confidence_monitor = setting(:confidence_monitor)
@@ -237,6 +238,8 @@ class Aca::MeetingRoom < Aca::Joiner
 
         # Call the Joiner on_update function
         super
+    ensure
+        vc_sources
     end
 
 
@@ -313,6 +316,8 @@ class Aca::MeetingRoom < Aca::Joiner
     end
 
     def present(source, display)
+        return if self[:is_joined] && system.id != self[:joined][:initiator]
+
         present_actual(source, display)
 
         # Switch Joined rooms to the sharing input (use skipme param)
@@ -584,6 +589,24 @@ class Aca::MeetingRoom < Aca::Joiner
         else
             logger.warn "unabled to find mode #{mode_name} -- bad request?\n#{@modes.inspect}"
         end
+    ensure
+        vc_sources
+    end
+
+    def vc_sources
+        srcs = []
+        Array(self[:inputs]).each do |inp|
+            srcs.concat(Array(self[inp]))
+        end
+        srcs.concat(Array(self[:Wired]))
+
+        vsource = {}
+        srcs.each do |src|
+            s = self[:sources][src]
+            vsource[src] = s if s && !s[:not_vc_content]
+        end
+
+        self[:vc_sources] = vsource
     end
 
 
@@ -845,7 +868,7 @@ class Aca::MeetingRoom < Aca::Joiner
 
         # Turn off video wall slave displays
         @vidwalls.each do |key, details|
-            system.all(details[:module]).power(Off)
+            system.all(details[:module]).power(Off) if self[:outputs][key]
         end
 
         self[:state] = :shutdown
@@ -863,11 +886,11 @@ class Aca::MeetingRoom < Aca::Joiner
 
     def vc_status_changed(state)
         if (state[:answerstate] == 'Unanswered' && state[:direction] == 'Incoming') || state[:answerstate] == 'ringing' || state[:answerstate] == 'allocated'
+            self[:show_vc_popup] = true
             vc_source = self[:VC].first
             init_vc
             present(vc_source, self[:outputs].keys.first)
             tab(:VC)
-            self[:show_vc_popup] = true
         else
             self[:show_vc_popup] = false
         end
@@ -1122,6 +1145,7 @@ class Aca::MeetingRoom < Aca::Joiner
         end
 
         disp_info = self[:outputs][display]
+        wall_details = @vidwalls[display]
 
         # Task 1: switch the display on and to the correct source
         unless disp_info[:no_mod]
@@ -1129,7 +1153,6 @@ class Aca::MeetingRoom < Aca::Joiner
 
             if disp_mod[:power] == Off || disp_mod[:power_target] == Off
                 arity = disp_mod.arity(:power)
-                wall_details = @vidwalls[display]
                 wall_display = system.all(wall_details[:module]) if wall_details
 
                 turn_on_display = proc {
@@ -1197,6 +1220,7 @@ class Aca::MeetingRoom < Aca::Joiner
             # Change the display input
             inp_src = disp_source[:source] || disp_info[:default_source]
             inp_src = disp_info[:input_mapping][inp_src] || inp_src if disp_info[:input_mapping]
+            inp_src = wall_details[:input] if wall_details
             if inp_src && disp_mod[:input] != inp_src
                 disp_mod.switch_to(inp_src)
             end
@@ -1250,6 +1274,14 @@ class Aca::MeetingRoom < Aca::Joiner
         # Perform any custom tasks
         if disp_source[:custom_tasks]
             disp_source[:custom_tasks].each do |task|
+                args = task[:args] || []
+                method = task[:method]
+                system.get_implicit(task[:module]).method_missing(method, *args)
+            end
+        end
+
+        if disp_info[:custom_tasks]
+            disp_info[:custom_tasks].each do |task|
                 args = task[:args] || []
                 method = task[:method]
                 system.get_implicit(task[:module]).method_missing(method, *args)

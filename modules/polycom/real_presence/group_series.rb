@@ -269,8 +269,8 @@ class Polycom::RealPresence::GroupSeries
     # mute|volume+|volume-|info
     # camera|delete|directory|home|keyboard|menu|period|pip|preset
     def button_press(*keys)
-        # succeeded / failed or completed when some keys are not valid
-        send "button #{keys.join(' ')}\r"
+        keys = keys.map { |k| k.downcase }
+        keys.each { |key| send "button #{key}\r", delay: 400 }
     end
 
     def send_DTMF(char)
@@ -321,14 +321,10 @@ class Polycom::RealPresence::GroupSeries
         if !number.present? && !search.present?
             button_press 'call'
         else
-            if number == search
-                if number.start_with?(@vmr_prefix) && !number.include?('@')
-                    dial_sip "#{number}#{@vmr_append}"
-                else
-                    dial_sip number
-                end
+            if number.start_with?(@vmr_prefix) && !number.include?('@')
+                dial_sip "#{number}#{@vmr_append}"
             else
-                dial_addressbook number
+                dial_sip number
             end
         end
     end
@@ -412,6 +408,7 @@ class Polycom::RealPresence::GroupSeries
             response = response.split('Control event: ')[1]
         elsif response == 'system is not in a call'
             self[:call_status] = {}
+            self[:incall] = false
             return :success
         end
 
@@ -510,6 +507,7 @@ class Polycom::RealPresence::GroupSeries
                 direction: 'unknown', # cisco compat
                 answerstate: 'active'
             }
+            self[:incall] = true
         when :callinfo
             if parts[1] == 'begin'
                 @call_data = String.new
@@ -527,6 +525,7 @@ class Polycom::RealPresence::GroupSeries
                             answerstate: 'active'
                         }
                     end
+                    self[:incall] = true
                 end
                 @call_data = nil
             else
@@ -537,6 +536,7 @@ class Polycom::RealPresence::GroupSeries
             # No longer in a call
             # ended: call[34]
             self[:call_status] = {}
+            self[:incall] = false
         when :listen
             # listen video ringing
             if parts[-1] == 'ringing'
@@ -549,6 +549,7 @@ class Polycom::RealPresence::GroupSeries
             # answered: Hang Up
             if parts[1] == 'Hang'
                 self[:call_status] = {}
+                self[:incall] = false
             end
         when :popupinfo
             if parts[1] == 'question'
