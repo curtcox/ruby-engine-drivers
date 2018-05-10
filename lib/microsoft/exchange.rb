@@ -282,7 +282,7 @@ class Microsoft::Exchange
             start: start_param,
             end: end_param,
             attendees: attendees,
-            location: room_email,
+            location: Orchestrator::ControlSystem.find_by_email(room_email).name,
             subject: subject
         }
     end
