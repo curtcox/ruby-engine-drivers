@@ -179,10 +179,10 @@ class Aca::Router
     def activate(edge)
         mod = system[edge.device]
 
-        if edge.nx1? && mod.respond_to(:switch_to)
+        if edge.nx1? && mod.respond_to?(:switch_to)
             mod.switch_to edge.input
 
-        elsif edge.nxn? && mod.respond_to(:switch)
+        elsif edge.nxn? && mod.respond_to?(:switch)
             mod.switch edge.input => edge.output
 
         elsif edge.nx1? && signal_graph.outdegree(edge.source) == 1
