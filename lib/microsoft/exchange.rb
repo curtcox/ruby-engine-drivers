@@ -249,6 +249,13 @@ class Microsoft::Exchange
         booking[:subject] = subject
         booking[:title] = subject
         booking[:location] = room_email
+        booking[:resources] = {
+            attendee: {
+                mailbox: {
+                    email_address: room_email
+                }
+            }
+        }
         booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop
         # booking[:body] = description
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
