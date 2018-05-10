@@ -90,9 +90,32 @@ class Aca::Router
 
     # Lookup the name of the input on a sink node that would be used to connect
     # a source to it.
+    #
+    # This can be used to register the source on devices such as codecs that
+    # support upstream switching.
     def input_for(source, sink)
         _, edges = route source, sink
         edges.last.input
+    end
+
+    # Get the device and associated input immediately upstream of a node.
+    #
+    # Depending on the device API, this may be of use for determining signal
+    # presence.
+    def upstream(source, sink = nil)
+        if sink.nil?
+            edges = signal_graph.incoming_edges source
+            unless edges.size == 1
+                raise ArgumentError "more than one edge to #{source} " \
+                    'please specify a sink'
+            end
+            edge = edges.values.first
+        else
+            _, edges = route source, sink
+            edge = edges.first
+        end
+
+        [edge.device, edge.input]
     end
 
     protected
