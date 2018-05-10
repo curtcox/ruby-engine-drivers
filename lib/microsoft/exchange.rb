@@ -262,6 +262,9 @@ class Microsoft::Exchange
                 attendee: { mailbox: { email_address: attendee}}
             })
         end
+        booking[:required_attendees].push({
+                attendee: { mailbox: { email_address: room_email}}
+            })
         booking[:body] = description
         STDERR.puts "MAKING REQUEST WITH"
         STDERR.puts booking
@@ -278,6 +281,7 @@ class Microsoft::Exchange
             start: start_param,
             end: end_param,
             attendees: attendees,
+            location: room_email,
             subject: subject
         }
     end
