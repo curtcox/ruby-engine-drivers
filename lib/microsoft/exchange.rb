@@ -230,7 +230,7 @@ class Microsoft::Exchange
 	end
     end
 
-    def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney')
+    def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney', use_act_as: false)
         STDERR.puts "CREATING NEW BOOKING IN LIBRARY"
         STDERR.puts "room_email is #{room_email}"
         STDERR.puts "start_param is #{start_param}"
@@ -266,7 +266,12 @@ class Microsoft::Exchange
         STDERR.puts "MAKING REQUEST WITH"
         STDERR.puts booking
         STDERR.flush
-        folder = @ews_client.get_folder(:calendar, { act_as: room_email })
+        if use_act_as
+            folder = @ews_client.get_folder(:calendar, { act_as: room_email })
+        else
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user.email)
+            folder = @ews_client.get_folder(:calendar)
+        end
         appointment = folder.create_item(booking)
         {
             id: appointment.id,
