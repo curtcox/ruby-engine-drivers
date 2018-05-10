@@ -177,17 +177,22 @@ class Aca::Router
     end
 
     def activate(edge)
-        if edge.output.nil?
-            system[edge.device].switch_to edge.input
+        mod = system[edge.device]
+
+        if edge.nx1? && mod.respond_to(:switch_to)
+            mod.switch_to edge.input
+
+        elsif edge.nxn? && mod.respond_to(:switch)
+            mod.switch edge.input => edge.output
+
+        elsif edge.nx1? && signal_graph.outdegree(edge.source) == 1
+            logger.warn "cannot perform switch on #{edge.device}. " \
+                "This may be ok as only one input (#{edge.target}) is defined."
+            thread.defer.resolve
+
         else
-            system[edge.device].switch edge.input => edge.output
-        end
-    end
-
-
-
-
-        else
+            thread.defer.reject "cannot interact with #{edge.device}. " \
+                'Module may be offline or incompatible.'
         end
     end
 end
@@ -208,6 +213,16 @@ class Aca::Router::SignalGraph
     Edge = Struct.new :source, :target, :device, :input, :output do
         def to_s
             "#{target} to #{device} (in #{input})"
+        end
+
+        # Check if the edge is a switchable input on a single output device
+        def nx1?
+            edge.output.nil?
+        end
+
+        # Check if the edge a matrix switcher / multi-output device
+        def nxn?
+            !nx1?
         end
     end
 
