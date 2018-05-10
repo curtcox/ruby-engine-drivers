@@ -217,7 +217,7 @@ class Aca::Router::SignalGraph
 
         # Check if the edge is a switchable input on a single output device
         def nx1?
-            edge.output.nil?
+            output.nil?
         end
 
         # Check if the edge a matrix switcher / multi-output device
