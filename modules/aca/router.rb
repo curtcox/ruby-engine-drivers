@@ -45,8 +45,6 @@ class Aca::Router
             logger.error 'invalid connection settings'
         end
 
-        check_compatability
-
         # TODO: track active signal source at each node and expose as a hash
         self[:nodes] = signal_graph.map(&:id)
         self[:inputs] = signal_graph.sinks.map(&:id)
@@ -186,29 +184,10 @@ class Aca::Router
         end
     end
 
-    # TODO: execute this on system device create / remove / stop / start etc
-    def check_compatability
-        invalid = Set.new
 
-        signal_graph.each do |node|
-            node.edges.each_pair do |_, edge|
-                mod = system[edge.device]
 
-                is_switch = edge.output.nil? && mod.respond_to?(:switch_to)
-                is_matrix = !edge.output.nil? && mod.respond_to?(:switch)
 
-                invalid << edge.device if mod.nil? || !(is_switch || is_matrix)
-            end
-        end
-
-        if invalid.empty?
-            true
         else
-            logger.warn do
-                modules = invalid.to_a.join ', '
-                "incompatible or non-existent modules in config: #{modules}"
-            end
-            false
         end
     end
 end
