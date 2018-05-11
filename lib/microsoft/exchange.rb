@@ -249,13 +249,13 @@ class Microsoft::Exchange
         booking[:subject] = subject
         booking[:title] = subject
         # booking[:location] = room_email
-        booking[:resources] = {
+        booking[:resources] = [{
             attendee: {
                 mailbox: {
                     email_address: room_email
                 }
             }
-        }
+        }]
         booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop
         # booking[:body] = description
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
@@ -285,7 +285,7 @@ class Microsoft::Exchange
             else
                 impersonation_email = current_user.email
             end
-            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], impersonation_email)
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user.email)
             folder = @ews_client.get_folder(:calendar)
         end
         appointment = folder.create_item(booking)
