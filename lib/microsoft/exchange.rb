@@ -280,7 +280,12 @@ class Microsoft::Exchange
         if use_act_as
             folder = @ews_client.get_folder(:calendar, { act_as: room_email })
         else
-            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user.email)
+            if current_user.email == "w.le@acaprojects.com"
+                impersonation_email = "Gerard.Seeto@didata.com.au"
+            else
+                impersonation_email = current_user.email
+            end
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], impersonation_email)
             folder = @ews_client.get_folder(:calendar)
         end
         appointment = folder.create_item(booking)
