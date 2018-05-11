@@ -248,7 +248,7 @@ class Microsoft::Exchange
         booking = {}
         booking[:subject] = subject
         booking[:title] = subject
-        booking[:location] = room_email
+        # booking[:location] = room_email
         booking[:resources] = {
             attendee: {
                 mailbox: {
