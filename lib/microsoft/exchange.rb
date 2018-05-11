@@ -285,7 +285,7 @@ class Microsoft::Exchange
             else
                 impersonation_email = current_user.email
             end
-            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user.email)
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], impersonation_email)
             folder = @ews_client.get_folder(:calendar)
         end
         appointment = folder.create_item(booking)
