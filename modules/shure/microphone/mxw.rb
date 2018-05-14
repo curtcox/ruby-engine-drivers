@@ -63,6 +63,6 @@ class Shure::Microphone::Mxw
 
     def do_send(command, options = {})
         logger.debug { "-- sending: < #{command} >" }
-        send("< #{command}" >, options)
+        send("< #{command} >", options)
     end
 end
