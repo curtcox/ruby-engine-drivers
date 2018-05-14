@@ -17,11 +17,16 @@ class Aca::HttpPing
     def on_update
         @path = setting(:path) || '/'
         @result = setting(:result) || 200
+
+        # Don't update status on connection failure as we maintaining this
+        config update_status: false
     end
 
     def check_status
-        get(@path) do |data|
+        get(@path, name: :check_status) { |data|
             set_connected_state(data.status == @result)
+        }.catch do
+            set_connected_state(false)
         end
     end
 end
