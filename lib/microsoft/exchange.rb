@@ -248,14 +248,14 @@ class Microsoft::Exchange
         booking = {}
         booking[:subject] = subject
         booking[:title] = subject
-        booking[:location] = room_email
-        booking[:resources] = {
+        # booking[:location] = room_email
+        booking[:resources] = [{
             attendee: {
                 mailbox: {
                     email_address: room_email
                 }
             }
-        }
+        }]
         booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop
         # booking[:body] = description
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
@@ -280,7 +280,12 @@ class Microsoft::Exchange
         if use_act_as
             folder = @ews_client.get_folder(:calendar, { act_as: room_email })
         else
-            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user.email)
+            if current_user.email == "w.le@acaprojects.com"
+                impersonation_email = "Gerard.Seeto@didata.com.au"
+            else
+                impersonation_email = current_user.email
+            end
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], impersonation_email)
             folder = @ews_client.get_folder(:calendar)
         end
         appointment = folder.create_item(booking)
@@ -289,7 +294,7 @@ class Microsoft::Exchange
             start: start_param,
             end: end_param,
             attendees: attendees,
-            location: Orchestrator::ControlSystem.find_by_email(room_email).name,
+            # location: Orchestrator::ControlSystem.find_by_email(room_email).name,
             subject: subject
         }
     end
