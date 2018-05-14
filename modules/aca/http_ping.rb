@@ -17,6 +17,9 @@ class Aca::HttpPing
     def on_update
         @path = setting(:path) || '/'
         @result = setting(:result) || 200
+
+        # Don't update status on connection failure as we maintaining this
+        config update_status: false
     end
 
     def check_status
