@@ -107,6 +107,7 @@ class ClearOne::Converge
         do_send type, number, name: type.to_sym
     end
     alias_method :macro, :preset
+    alias_method :trigger, :preset
 
     def start_audio
         do_send "startAudio"
