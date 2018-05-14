@@ -20,8 +20,10 @@ class Aca::HttpPing
     end
 
     def check_status
-        get(@path) do |data|
+        get(@path, name: :check_status) { |data|
             set_connected_state(data.status == @result)
+        }.catch do
+            set_connected_state(false)
         end
     end
 end
