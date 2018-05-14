@@ -21,7 +21,6 @@ class Shure::Microphone::Mxw
     end
 
     def on_update
-        do_send('GET MUTE_BUTTON_STATUS')
     end
 
     def connected
@@ -55,7 +54,7 @@ class Shure::Microphone::Mxw
 
 
     def do_poll
-        # TODO
+        do_send('GET MUTE_BUTTON_STATUS')
     end
 
 
