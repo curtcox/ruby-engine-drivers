@@ -115,6 +115,7 @@ class Aca::ExchangeBooking
         self[:booking_max_duration] = setting(:booking_max_duration)
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
+        self[:icon] = setting(:icon)
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
