@@ -22,8 +22,8 @@ class Aca::Tracking::LocateUser
     end
 
     def lookup(*ips)
-        ips.each do |ip, login, domain|
-            perform_lookup(ip, login, domain)
+        ips.each do |ip, login, domain, hostname|
+            perform_lookup(ip, login, domain, hostname)
         end
     end
 
@@ -61,7 +61,11 @@ class Aca::Tracking::LocateUser
 
     protected
 
-    def perform_lookup(ip, login, domain)
+    def perform_lookup(ip, login, domain, hostname)
+        if hostname && self[hostname] != login
+            save_hostname_mapping(domain, login, hostname)
+        end
+
         # prevents concurrent and repeat lookups for the one IP and user
         return if self[ip] == login || @looking_up[ip]
         begin
@@ -91,6 +95,34 @@ class Aca::Tracking::LocateUser
             logger.print_error(e, "looking up #{ip}")
         ensure
             @looking_up.delete(ip)
+        end
+    end
+
+    def save_hostname_mapping(domain, username, hostname)
+        logger.debug { "Found new machine #{hostname} for #{username}" }
+
+        key = "wifihost-#{domain.downcase}-#{username.downcase}"
+        bucket = User.bucket
+        existing = bucket.get(key, quiet: true)
+
+        if existing
+            if existing[:hostname] == hostname
+                logger.debug { "ignoring #{hostname} as already in database" }
+                return
+            end
+            existing[:hostname] = hostname
+            existing[:updated] = Time.now.to_i
+            bucket.set(key, existing)
+        else
+            time = Time.now.to_i
+            data = {
+                hostname: hostname,
+                username: username,
+                domain: domain,
+                created: time,
+                updated: time
+            }
+            bucket.set(key, data)
         end
     end
 end
