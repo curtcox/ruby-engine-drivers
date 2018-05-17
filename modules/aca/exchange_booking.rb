@@ -754,6 +754,11 @@ class Aca::ExchangeBooking
 
             subject = item[:subject]
 
+            # Set subject to private if sensitive
+            if ['private', 'confidential'].include?(meeting.sensitivity.downcase)
+                subject = "Private"
+            end
+
             {
                 :Start => start,
                 :End => ending,
