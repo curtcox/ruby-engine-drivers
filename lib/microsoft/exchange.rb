@@ -1,6 +1,5 @@
 require 'active_support/time'
 require 'logger'
-require 'viewpoint2'
 
 module Microsoft; end
 
@@ -15,6 +14,13 @@ class Microsoft::Exchange
             internet_proxy:nil,
             logger: Rails.logger
         )
+        begin
+            require 'viewpoint2'
+            rescue LoadError
+                STDERR.puts 'VIEWPOINT NOT PRESENT'
+                STDERR.flush
+            end
+        end
         @ews_url = ews_url
         @service_account_email = service_account_email
         @service_account_password = service_account_password
