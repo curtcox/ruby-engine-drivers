@@ -1267,7 +1267,7 @@ class Aca::MeetingRoom < Aca::Joiner
             end
 
             if disp_source[:audio_deembed]
-                switcher.switch({disp_source[:input] => disp_source[:audio_deembed]})
+                switcher.switch_audio({disp_source[:input] => disp_source[:audio_deembed]})
             end
         end
 
