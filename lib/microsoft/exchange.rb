@@ -17,9 +17,8 @@ class Microsoft::Exchange
         begin
             require 'viewpoint2'
             rescue LoadError
-                STDERR.puts 'VIEWPOINT NOT PRESENT'
-                STDERR.flush
-            end
+            STDERR.puts 'VIEWPOINT NOT PRESENT'
+            STDERR.flush
         end
         @ews_url = ews_url
         @service_account_email = service_account_email
