@@ -21,6 +21,17 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
              wait_ready: Tokens::LOGIN_COMPLETE
     clear_queue_on_disconnect!
 
+    def connected
+        super
+
+        register_feedback '/Event/PresentationPreviewStarted' do
+            self[:local_presentation] = true
+        end
+        register_feedback '/Event/PresentationPreviewStopped' do
+            self[:local_presentation] = false
+        end
+    end
+
     status 'Audio Microphones Mute' => :mic_mute
     status 'Audio Volume' => :volume
     status 'RoomAnalytics PeoplePresence' => :presence_detected

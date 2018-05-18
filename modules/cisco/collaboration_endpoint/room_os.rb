@@ -55,6 +55,8 @@ class Cisco::CollaborationEndpoint::RoomOs
             schedule.every('30s') { heartbeat timeout: 35 }
         end
 
+        push_config
+
         sync_config
     end
 
@@ -116,7 +118,7 @@ class Cisco::CollaborationEndpoint::RoomOs
     # @param settings [Hash] the configuration values to apply
     # @param [::Libuv::Q::Promise] resolves when the commands complete
     def xconfiguration(path, settings)
-        send_xconfigurations path, settings
+        send_xconfigurations path => settings
     end
 
     # Trigger a status update for the specified path.
@@ -190,9 +192,22 @@ class Cisco::CollaborationEndpoint::RoomOs
     end
 
     # Apply a set of configurations.
-    def send_xconfigurations(path, settings)
+    def send_xconfigurations(config)
+        flatten = lambda do |hash|
+            hash.each_with_object({}) do |(k, v), h|
+                if v.is_a? Hash
+                    v = flatten[v] if v.values.any? { |x| x.is_a? Hash }
+                    h["#{k} #{h_k}"] = h_v
+                else
+                    h[k] = v
+                end
+            end
+        end
+
+        config = flatten[config]
+
         # The API only allows a single setting to be applied with each request.
-        interactions = settings.to_a.map do |(setting, value)|
+        interactions = settings.map do |setting, value|
             send_xconfiguration(path, setting, value)
         end
 
@@ -201,12 +216,7 @@ class Cisco::CollaborationEndpoint::RoomOs
             if resolved.all?
                 :success
             else
-                failures = resolved.zip(settings.keys)
-                                   .reject(&:first)
-                                   .map(&:last)
-
-                thread.defer.reject 'Could not apply all settings. ' \
-                    "Failed on #{failures.join ', '}."
+                thread.defer.reject 'Failed to apply all settings.'
             end
         end
     end
@@ -355,6 +365,11 @@ class Cisco::CollaborationEndpoint::RoomOs
         send_xstatus path do |value|
             self[status_key] = value
         end
+    end
+
+    def push_config
+        config = setting(:device_config) || {}
+        send_xconfigurations config
     end
 
     def sync_config
