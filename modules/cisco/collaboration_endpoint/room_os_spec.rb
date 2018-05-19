@@ -306,7 +306,7 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                 }
             JSON
         )
-    expect(status[:standby_state]).to be :Standby
+    expect(status[:standby_state]).to be true
 
     # -------------------------------------------------------------------------
     section 'Commands'
