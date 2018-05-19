@@ -144,6 +144,10 @@ class Cisco::CollaborationEndpoint::RoomOs
 
     # Perform the actual command execution - this allows device implementations
     # to protect access to #xcommand and still refer the gruntwork here.
+    #
+    # @param comand [String] the xAPI command to execute
+    # @param args [Hash] the command keyword args
+    # @return [::Libuv::Q::Promise] that will resolve when execution is complete
     def send_xcommand(command, args = {})
         request = Action.xcommand command, args
 
@@ -176,6 +180,11 @@ class Cisco::CollaborationEndpoint::RoomOs
     end
 
     # Apply a single configuration on the device.
+    #
+    # @param path [String] the configuration path
+    # @param setting [String] the configuration parameter
+    # @param value [#to_s] the configuration value
+    # @return [::Libuv::Q::Promise]
     def send_xconfiguration(path, setting, value)
         request = Action.xconfiguration path, setting, value
 
@@ -192,6 +201,9 @@ class Cisco::CollaborationEndpoint::RoomOs
     end
 
     # Apply a set of configurations.
+    #
+    # @param config [Hash] a deeply nested hash of the configurations to apply
+    # @return [::Libuv::Q::Promise]
     def send_xconfigurations(config)
         # Reduce the config to a strucure of { [path] => value }
         flatten = lambda do |h, path = [], settings = {}|
@@ -220,6 +232,7 @@ class Cisco::CollaborationEndpoint::RoomOs
     #
     # @param path [String]
     # @yield [response] a pre-parsed response object for the status query
+    # @return [::Libuv::Q:Promise]
     def send_xstatus(path)
         request = Action.xstatus path
 
