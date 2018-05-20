@@ -207,7 +207,7 @@ class Cisco::CollaborationEndpoint::RoomOs
     def send_xconfigurations(config)
         # Reduce the config to a strucure of { [path] => value }
         flatten = lambda do |h, path = [], settings = {}|
-            return settings.update(path => h) unless h.is_a? Hash
+            return settings.merge!(path => h) unless h.is_a? Hash
             h.each { |key, subtree| flatten[subtree, path + [key], settings] }
             settings
         end
@@ -215,7 +215,7 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         # The API only allows a single setting to be applied with each request.
         interactions = config.map do |(*path, setting), value|
-            send_xconfiguration path, setting, value
+            send_xconfiguration path.join(' '), setting, value
         end
 
         thread.finally(interactions).then do |results|
