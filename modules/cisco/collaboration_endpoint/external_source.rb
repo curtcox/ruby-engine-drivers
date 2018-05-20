@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+load File.join(__dir__, 'xapi', 'mapper.rb')
+
 module Cisco; end
 module Cisco::CollaborationEndpoint; end
 
