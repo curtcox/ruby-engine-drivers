@@ -3,7 +3,12 @@ require 'thread'
 Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                                   settings: {
                                       peripheral_id: 'MOCKED_ID',
-                                      version: 'MOCKED_VERSION'
+                                      version: 'MOCKED_VERSION',
+                                      device_config: {
+                                          Audio: {
+                                              DefaultVolume: 100
+                                          }
+                                      }
                                   } do
     # Patch in some tracking of request UUID's so we can form and validate
     # device comms.
@@ -70,6 +75,18 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                         "status":"OK"
                     }
                 },
+                "ResultId": \"#{id_pop}\"
+            }
+        JSON
+    )
+
+    # -------------------------------------------------------------------------
+    section 'Config push'
+
+    should_send "xConfiguration Audio DefaultVolume: 100 | resultId=\"#{id_peek}\"\n"
+    responds(
+        <<~JSON
+            {
                 "ResultId": \"#{id_pop}\"
             }
         JSON
