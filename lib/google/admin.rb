@@ -107,8 +107,8 @@ class Google::Admin
         # Ensure our start and end params are Ruby dates and format them in Graph format
         start_object = ensure_ruby_date(start_param)
         end_object = ensure_ruby_date(end_param)
-        start_param = Google::Apis::CalendarV3::EventDateTime.new { date_time: start_object, timezone: timezone },
-        end_param = Google::Apis::CalendarV3::EventDateTime.new { date_time: end_object, timezone: timezone },
+        start_param = Google::Apis::CalendarV3::EventDateTime.new { date_time: start_object, timezone: timezone }
+        end_param = Google::Apis::CalendarV3::EventDateTime.new { date_time: end_object, timezone: timezone }
 
         event_params = {
             start: start_param,
