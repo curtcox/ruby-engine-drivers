@@ -114,11 +114,19 @@ class Cisco::CollaborationEndpoint::RoomOs
 
     # Push a configuration settings to the device.
     #
-    # @param path [String] the configuration path
+    # May be specified as either a deeply nested hash of settings, or a
+    # pre-concatenated path along with a subhash for drilling through deeper
+    # parts of the tree.
+    #
+    # @param path [Hash, String] the configuration or top level path
     # @param settings [Hash] the configuration values to apply
     # @param [::Libuv::Q::Promise] resolves when the commands complete
-    def xconfiguration(path, settings)
-        send_xconfigurations path => settings
+    def xconfiguration(path, settings = nil)
+        if settings.nil?
+            send_xconfigurations path
+        else
+            send_xconfigurations path => settings
+        end
     end
 
     # Trigger a status update for the specified path.
