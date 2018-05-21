@@ -88,7 +88,7 @@ class Google::Admin
         @calendar.delete_event(room_id, booking_id)
     end
 
-    def get_bookings(email, start_param, end_param)
+    def get_bookings(email:, start_param:nil, end_param:nil)
         if start_param.nil?
             start_param = DateTime.now
             end_param = DateTime.now + 1.hour
@@ -109,8 +109,8 @@ class Google::Admin
         end_param = ensure_ruby_date(end_param)
 
         event_params = {
-            start: Google::Apis::CalendarV3::EventDateTime.new (date_time: start_param, timezone: timezone),
-            end: Google::Apis::CalendarV3::EventDateTime.new (date_time: end_param, timezone: timezone),
+            start: Google::Apis::CalendarV3::EventDateTime.new { date_time: start_param, timezone: timezone },
+            end: Google::Apis::CalendarV3::EventDateTime.new { date_time: end_param, timezone: timezone },
             summary: subject,
             description: description
         }
