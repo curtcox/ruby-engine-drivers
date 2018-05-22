@@ -313,7 +313,7 @@ module Cisco::TelePresence::SxSeriesCommon
 
     def process_results(result)
         case result[1].downcase.to_sym
-        when :resultset
+        when :phonebooksearchresult, :resultset
             @listing_phonebook = true
 
             case result[2]
