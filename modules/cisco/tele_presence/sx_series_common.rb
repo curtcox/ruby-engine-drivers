@@ -8,6 +8,7 @@ module Cisco::TelePresence::SxSeriesCommon
     end
     
     def on_update
+        @corporate_dir = setting(:use_corporate_directory) || false
         @default_source = setting(:presentation) || 3
         @phonebook_source = setting(:phonebook_source) || "Local" #"Local" or "Corporate"
         @count = 0
@@ -114,6 +115,7 @@ module Cisco::TelePresence::SxSeriesCommon
         :SearchField => :Name
     }
     def search(text, opts = {})
+        opts[:PhonebookType] ||= 'Corporate' if @corporate_dir
         opts = SearchDefaults.merge(opts)
         opts[:SearchString] = text
         command(:phonebook, :search, params(opts), name: :phonebook, max_waits: 400)
