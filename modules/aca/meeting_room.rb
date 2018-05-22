@@ -882,6 +882,7 @@ class Aca::MeetingRoom < Aca::Joiner
     def init_vc
         start_cameras
         system[:VidConf].wake
+        system[:VidConf].clear_search.results
     end
 
     def vc_status_changed(state)
