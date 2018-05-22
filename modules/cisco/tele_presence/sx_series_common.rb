@@ -118,6 +118,11 @@ module Cisco::TelePresence::SxSeriesCommon
         opts[:SearchString] = text
         command(:phonebook, :search, params(opts), name: :phonebook, max_waits: 400)
     end
+    
+    def clear_search_results
+        self[:search_results] = nil
+    end
+
 
     # Options include: auto, custom, equal, fullscreen, overlay, presentationlargespeaker, presentationsmallspeaker, prominent, single, speaker_full
     def layout(mode, target = :local)
@@ -304,7 +309,7 @@ module Cisco::TelePresence::SxSeriesCommon
 
     def process_results(result)
         case result[1].downcase.to_sym
-        when :resultset
+        when :phonebooksearchresult
             @listing_phonebook = true
 
             case result[2]
