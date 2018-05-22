@@ -10,7 +10,6 @@ module Cisco::TelePresence::SxSeriesCommon
     def on_update
         @corporate_dir = setting(:use_corporate_directory) || false
         @default_source = setting(:presentation) || 3
-        @phonebook_source = setting(:phonebook_source) || "Local" #"Local" or "Corporate"
         @count = 0
     end
     
@@ -109,7 +108,7 @@ module Cisco::TelePresence::SxSeriesCommon
     end
 
     SearchDefaults = {
-        :PhonebookType => @phonebook_source.to_sym,
+        :PhonebookType => :Local,
         :Limit => 10,
         :ContactType => :Contact,
         :SearchField => :Name
