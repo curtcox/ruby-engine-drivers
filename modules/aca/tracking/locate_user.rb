@@ -14,16 +14,33 @@ class Aca::Tracking::LocateUser
     generic_name :LocateUser
     implements :logic
 
+    default_settings({
+        meraki_enabled: false,
+        meraki_scanner: 'https://url.to.scanner',
+        meraki_secret: 'give me access'
+    })
+
     def on_load
         @looking_up = {}
     end
 
     def on_update
+        @meraki_enabled = setting(:meraki_enabled)
+        if @meraki_enabled
+            @scanner = UV::HttpEndpoint.new(@setting(:meraki_scanner), {
+                headers: {
+                    Authorization: "Bearer #{setting(:meraki_secret)}"
+                }
+            })
+        else
+            @scanner = nil
+        end
     end
 
     def lookup(*ips)
+        ttl = 10.minutes.ago.to_i
         ips.each do |ip, login, domain, hostname|
-            perform_lookup(ip, login, domain, hostname)
+            perform_lookup(ip, login, domain, hostname, ttl)
         end
     end
 
@@ -59,9 +76,11 @@ class Aca::Tracking::LocateUser
         end
     end
 
+
     protected
 
-    def perform_lookup(ip, login, domain, hostname)
+
+    def perform_lookup(ip, login, domain, hostname, ttl)
         if hostname && self[hostname] != login
             save_hostname_mapping(domain, login, hostname)
         end
@@ -83,13 +102,29 @@ class Aca::Tracking::LocateUser
                 self[mac] = login
                 self[ip] = login
             else
-                logger.debug {
-                    if mac
-                        "MAC #{mac} known for #{ip} : #{login}"
-                    else
-                        "unable to locate MAC for #{ip}"
+                if @meraki_enabled && mac.nil?
+                    resp = @scanner.get("/meraki/#{ip}").value
+                    if resp.status == 200
+                        details = JSON.parse(data, symbolize_names: true)
+
+                        if details[:seenEpoch] > ttl
+                            mac = details[:clientMac]
+
+                            if self[mac] != login
+                                logger.debug { "Meraki found #{mac} for #{ip} == #{login}" }
+
+                                # NOTE:: Wireless MAC addresses stored seperately from wired MACs
+                                user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
+                                user.add(mac)
+
+                                self[mac] = login
+                                self[ip] = login
+                            end
+                        end
                     end
-                }
+                end
+
+                logger.debug { "unable to locate MAC for #{ip}" } if mac.nil?
             end
         rescue => e
             logger.print_error(e, "looking up #{ip}")
@@ -108,6 +143,7 @@ class Aca::Tracking::LocateUser
         if existing
             if existing[:hostname] == hostname
                 logger.debug { "ignoring #{hostname} as already in database" }
+                self[hostname] = username
                 return
             end
             existing[:hostname] = hostname
@@ -124,5 +160,7 @@ class Aca::Tracking::LocateUser
             }
             bucket.set(key, data)
         end
+
+        self[hostname] = username
     end
 end
