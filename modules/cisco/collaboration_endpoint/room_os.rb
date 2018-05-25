@@ -159,7 +159,10 @@ class Cisco::CollaborationEndpoint::RoomOs
     def send_xcommand(command, args = {})
         request = Action.xcommand command, args
 
-        do_send request, name: command do |response|
+        # FIXME: commands are currently unnamed. Need to add a way of tagging
+        # related commands for better queue management.
+
+        do_send request do |response|
             # The result keys are a little odd: they're a concatenation of the
             # last two command elements and 'Result', unless the command
             # failed in which case it's just 'Result'.
