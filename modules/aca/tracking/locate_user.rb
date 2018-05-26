@@ -27,7 +27,7 @@ class Aca::Tracking::LocateUser
     def on_update
         @meraki_enabled = setting(:meraki_enabled)
         if @meraki_enabled
-            @scanner = UV::HttpEndpoint.new(@setting(:meraki_scanner), {
+            @scanner = UV::HttpEndpoint.new(setting(:meraki_scanner), {
                 headers: {
                     Authorization: "Bearer #{setting(:meraki_secret)}"
                 }
@@ -103,7 +103,7 @@ class Aca::Tracking::LocateUser
                 self[ip] = login
             else
                 if @meraki_enabled && mac.nil?
-                    resp = @scanner.get("/meraki/#{ip}").value
+                    resp = @scanner.get(path: "/meraki/#{ip}").value
                     if resp.status == 200
                         details = JSON.parse(data, symbolize_names: true)
 
