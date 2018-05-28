@@ -15,10 +15,6 @@ class Cisco::Cmx
         }
     end
 
-    DECODE_OPTIONS = {
-        symbolize_names: true
-    }.freeze
-
     def locate(user: nil, ip: nil, mac: nil)
         query = { sortBy: 'lastLocatedTime:DESC' }
         query[:ipAddress] = ip if ip
@@ -46,11 +42,22 @@ class Cisco::Cmx
         return nil if resp.status == 204
         raise "request failed #{resp.status}\n#{resp.body}" unless (200...300).include?(resp.status)
 
-        locations = JSON.parse(resp.body, DECODE_OPTIONS)
+        locations = JSON.parse(resp.body, symbolize_names: true)
         locations.select! { |loc| @ssid.include?(loc[:ssId]) } if @ssid
         return nil if locations.length == 0
 
         map = locations[0][:mapInfo][:mapHierarchyString].split('>')
+        campus = @floor_mappings[map[0]]
+        building = @floor_mappings[map[1]]
+
+        if building.is_a?(Hash)
+            level = building[map[2]]
+            zone = building[map[3]]
+            building = building[:id]
+        else
+            level = @floor_mappings[map[2]]
+            zone = @floor_mappings[map[3]]
+        end
 
         {
             x: locations[0][:mapCoordinate][:x],
@@ -60,10 +67,10 @@ class Cisco::Cmx
             confidence: (locations[0][:confidenceFactor] / 2),
             last_seen: locations[0][:changedOn] / 1000,
             user_active: locations[0][:currentlyTracked],
-            campus: @floor_mappings[map[0]] || map[0],
-            building: @floor_mappings[map[1]] || map[1],
-            level: @floor_mappings[map[2]] || map[2],
-            zone: @floor_mappings[map[3]] || map[3],
+            campus: campus || map[0],
+            building: building || map[1],
+            level: level || map[2],
+            zone: zone || map[3],
             map_id: locations[0][:mapInfo][:floorRefId]
         }
     end
