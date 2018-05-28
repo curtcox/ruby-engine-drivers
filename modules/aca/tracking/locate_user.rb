@@ -105,7 +105,7 @@ class Aca::Tracking::LocateUser
                 if @meraki_enabled && mac.nil?
                     resp = @scanner.get(path: "/meraki/#{ip}").value
                     if resp.status == 200
-                        details = JSON.parse(data, symbolize_names: true)
+                        details = JSON.parse(resp.body, symbolize_names: true)
 
                         if details[:seenEpoch] > ttl
                             mac = details[:clientMac]
