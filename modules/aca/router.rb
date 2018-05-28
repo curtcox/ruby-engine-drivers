@@ -98,7 +98,7 @@ class Aca::Router
         edges.last.input
     end
 
-    # Get the device and associated input immediately upstream of a node.
+    # Get the device and associated input immediately upstream of an input node.
     #
     # Depending on the device API, this may be of use for determining signal
     # presence.
@@ -106,16 +106,36 @@ class Aca::Router
         if sink.nil?
             edges = signal_graph.incoming_edges source
             unless edges.size == 1
-                raise ArgumentError "more than one edge to #{source} " \
+                raise ArgumentError, "more than one edge to #{source}, " \
                     'please specify a sink'
             end
-            edge = edges.values.first
+            _, edge = edges.first
         else
             _, edges = route source, sink
             edge = edges.first
         end
 
         [edge.device, edge.input]
+    end
+
+    # Get the device immediately preceeding an output node.
+    #
+    # This may be used walking back up the signal graph to find a decoder for
+    # and output device.
+    def downstream(sink, source = nil)
+        if source.nil?
+            edges = signal_graph.outgoing_edges sink
+            unless edges.size == 1
+                raise ArgumentError, "more than one input to #{sink}, " \
+                    'please specify a source'
+            end
+            _, edge = edges.first
+        else
+            _, edges = route source, sink
+            edge = edges.last
+        end
+
+        edge.target
     end
 
     protected
