@@ -12,7 +12,7 @@ class Samsung::Displays::MdSeries
 
     # Discovery Information
     tcp_port 1515
-    descriptive_name 'Samsung MD & DM Series LCD'
+    descriptive_name 'Samsung MD, DM & QM Series LCD'
     generic_name :Display
 
 # Markdown description
@@ -97,7 +97,8 @@ DESC
         :speaker => 0x68,
         :net_standby => 0xB5,   # Keep NIC active in standby
         :eco_solution => 0xE6,  # Eco options (auto power off)
-        :auto_power => 0x33
+        :auto_power => 0x33,
+        :screen_split => 0xB2    # Tri / quad split (larger panels only)
     }
     COMMAND.merge!(COMMAND.invert)
 
@@ -173,6 +174,31 @@ DESC
         self[:input_target] = input
         do_send(:input, INPUTS[input], options)
     end
+
+
+    SCALE = {
+        fill: 0x09,
+        fit:  0x20
+    }.tap { |x| x.merge!(x.invert).freeze }
+
+    def split(inputs = [:hdmi, :hdmi2, :hdmi3, :dvi], layout = 0, options = {})
+        unless (3..4).cover? inputs.size
+            logger.error 'display can only be split between 3 or 4 sources'
+            return
+        end
+
+        data = [
+            1, # enable split
+            0, # sound from screen section 1
+            layout
+        ]
+        data += inputs.flat_map do |input|
+            [INPUTS[input], SCALE[:fit]]
+        end
+
+        do_send(:screen_split, data, options)
+    end
+
 
     def volume(vol, options = {})
         vol = in_range(vol.to_i, 100)
