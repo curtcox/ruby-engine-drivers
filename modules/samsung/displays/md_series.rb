@@ -183,21 +183,25 @@ DESC
         fit:  0x20
     }.tap { |x| x.merge!(x.invert).freeze }
 
-    def split(inputs = [:hdmi, :hdmi2, :hdmi3, :hdmi4], layout = 0, options = {})
-        unless (3..4).cover? inputs.size
-            logger.error 'display can only be split between 3 or 4 sources'
+    def split(enable = On, inputs = [:hdmi2, :hdmi3, :hdmi4], layout = 0, options = {})
+        unless (2..3).cover? inputs.size
+            logger.error 'display can only be split between 3 or 4 sources ' \
+                '(including current primary source)'
             return
         end
 
+        enable = is_affirmative? enable
+
         data = [
-            1, # enable split
-            0, # sound from screen section 1
-            layout
-        ]
-        data += inputs.flat_map do |input|
-            input = input.to_sym if input.is_a? String
-            [INPUTS[input], SCALE[:fit]]
-        end
+            enable ? 1 : 0,
+            0,              # sound from screen section 1
+            layout,         # layout mode (1..6)
+            SCALE[:fit],    # scaling for main source
+            inputs.flat_map do |input|
+                input = input.to_sym if input.is_a? String
+                [INPUTS[input], SCALE[:fit]]
+            end
+        ].flatten
 
         do_send(:screen_split, data, options)
     end
