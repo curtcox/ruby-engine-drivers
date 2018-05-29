@@ -30,40 +30,54 @@ class Google::Admin
         @scopes = scopes || [ 'https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/admin.directory.user']
         @admin_email = admin_email
         @domain = domain
-        @authorization = Google::Auth.get_application_default(scopes)
 
         admin_api = Google::Apis::AdminDirectoryV1
         @admin = admin_api::DirectoryService.new
-        @authorization.sub = @admin_email
-        @admin.authorization = @authorization
 
         calendar_api = Google::Apis::CalendarV3
         @calendar = calendar_api::CalendarService.new
-        @calendar.authorization = authorization
     end 
 
     def get_users(q: nil, limit: nil)
+        authorization = Google::Auth.get_application_default(@scopes).dup
+        authorization.sub = @admin_email
+        @admin.authorization = authorization
         options = {
             domain: @domain
         }
         options[:query] = q if q
-        options[:maxResults] = (limit || 500)
+        options[:max_results] = (limit || 500)
         users = @admin.list_users(options)
-        users.users
+        users.users.map do |u| 
+            primary_email = nil
+            u.emails.each do |email|
+                primary_email = email['address'] if email['primary']
+            end
+            {
+                name: u.name.full_name,
+                email: primary_email
+            }
+        end
     end
 
     def get_user(user_id:)
+        authorization = Google::Auth.get_application_default(@scopes).dup
+        authorization.sub = @admin_email
+        @admin.authorization = authorization
         options = {
             domain: @domain
         }
         options[:query] = user_id
-        options[:maxResults] = 1
+        options[:max_results] = 1
         users = @admin.list_users(options)
         users.users[0]
     end
 
 
     def get_available_rooms(room_ids:, start_param:, end_param:)
+        authorization = Google::Auth.get_application_default(@scopes).dup
+        authorization.sub = @admin_email
+        @calendar.authorization = authorization
         now = Time.now
         start_param = ensure_ruby_date((start_param || now))
         end_param = ensure_ruby_date((end_param || (now + 1.hour)))
@@ -85,10 +99,16 @@ class Google::Admin
     end
 
     def delete_booking(room_id:, booking_id:)
+        authorization = Google::Auth.get_application_default(@scopes).dup
+        authorization.sub = @admin_email
+        @calendar.authorization = authorization
         @calendar.delete_event(room_id, booking_id)
     end
 
     def get_bookings(email:, start_param:nil, end_param:nil)
+        authorization = Google::Auth.get_application_default(@scopes).dup
+        authorization.sub = @admin_email
+        @calendar.authorization = authorization
         if start_param.nil?
             start_param = DateTime.now
             end_param = DateTime.now + 1.hour
@@ -98,6 +118,9 @@ class Google::Admin
     end
 
     def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, timezone:'Sydney')
+        authorization = Google::Auth.get_application_default(@scopes).dup
+        authorization.sub = @admin_email
+        @calendar.authorization = authorization
         description = String(description)
         attendees = Array(attendees)
 
@@ -107,8 +130,8 @@ class Google::Admin
         # Ensure our start and end params are Ruby dates and format them in Graph format
         start_object = ensure_ruby_date(start_param)
         end_object = ensure_ruby_date(end_param)
-        start_param = Google::Apis::CalendarV3::EventDateTime.new { date_time: start_object, timezone: timezone }
-        end_param = Google::Apis::CalendarV3::EventDateTime.new { date_time: end_object, timezone: timezone }
+        start_param = Google::Apis::CalendarV3::EventDateTime.new({ date_time: start_object, timezone: timezone })
+        end_param = Google::Apis::CalendarV3::EventDateTime.new({ date_time: end_object, timezone: timezone })
 
         event_params = {
             start: start_param,
@@ -125,7 +148,7 @@ class Google::Admin
             response_status: 'accepted'
         }
         attendees = [
-            Google::Apis::CalendarV3::EventAttendee.new room_attendee_options
+            Google::Apis::CalendarV3::EventAttendee.new(room_attendee_options)
         ]
 
         # Add the attendees
@@ -134,12 +157,12 @@ class Google::Admin
                 display_name: a[:name],
                 email: a[:email]
             }
-            Google::Apis::CalendarV3::EventAttendee.new attendee_options
+            Google::Apis::CalendarV3::EventAttendee.new(attendee_options)
         }
         event_params[:attendees] = attendees
 
         # Add the current_user as an attendee
-        event_params[:creator] = Google::Apis::CalendarV3::Event::Creator.new { display_name: current_user.name, email: current_user.email }
+        event_params[:creator] = Google::Apis::CalendarV3::Event::Creator.new({ display_name: current_user.name, email: current_user.email })
 
         event = Google::Apis::CalendarV3::Event.new event_params
 
