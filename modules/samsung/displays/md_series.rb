@@ -361,7 +361,8 @@ DESC
             when :hard_off
                 self[:hard_off] = value == 0
             when :screen_split
-                self[:screen_split] = value.positive?
+                state = value[0]
+                self[:screen_split] = state.positive?
             end
             :success
 
