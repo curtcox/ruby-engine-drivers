@@ -17,7 +17,11 @@ class Aca::Tracking::LocateUser
     default_settings({
         meraki_enabled: false,
         meraki_scanner: 'https://url.to.scanner',
-        meraki_secret: 'give me access'
+        meraki_secret: 'give me access',
+        cmx_enabled: false,
+        cmx_host: "http://cmxlocationsandbox.cisco.com",
+        cmx_user: "learning",
+        cmx_pass: "learning"
     })
 
     def on_load
@@ -34,6 +38,17 @@ class Aca::Tracking::LocateUser
             })
         else
             @scanner = nil
+        end
+
+        @cmx_enabled = setting(:cmx_enabled)
+        if @cmx_enabled
+            @cmx = UV::HttpEndpoint.new(setting(:cmx_host), {
+                headers: {
+                    Authorization: [setting(:cmx_user), setting(:cmx_pass)]
+                }
+            })
+        else
+            @cmx_query = nil
         end
     end
 
@@ -112,6 +127,27 @@ class Aca::Tracking::LocateUser
 
                             if self[mac] != login
                                 logger.debug { "Meraki found #{mac} for #{ip} == #{login}" }
+
+                                # NOTE:: Wireless MAC addresses stored seperately from wired MACs
+                                user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
+                                user.add(mac)
+
+                                self[mac] = login
+                                self[ip] = login
+                            end
+                        end
+                    end
+                end
+
+                if @cmx_enabled && mac.nil?
+                    resp = @cmx.get(path: '/api/location/v2/clients', query: {ipAddress: ip}).value
+                    if resp.status != 204 && (200...300).include?(resp.status)
+                        locations = JSON.parse(resp.body, symbolize_names: true)
+                        if locations.length > 0 && locations[0][:currentlyTracked] == true
+                            mac = locations[0][:macAddress]
+
+                            if self[mac] != login
+                                logger.debug { "CMX found #{mac} for #{ip} == #{login}" }
 
                                 # NOTE:: Wireless MAC addresses stored seperately from wired MACs
                                 user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
