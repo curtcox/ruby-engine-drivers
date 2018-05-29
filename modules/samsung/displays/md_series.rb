@@ -159,6 +159,8 @@ DESC
         :hdmi2_pc => 0x24,
         :hdmi3 => 0x31,
         :hdmi3_pc => 0x32,
+        :hdmi4 => 0x33,
+        :hdmi4_pc => 0x34,
         :display_port => 0x25,
         :dtv => 0x40,
         :media => 0x60,
@@ -181,7 +183,7 @@ DESC
         fit:  0x20
     }.tap { |x| x.merge!(x.invert).freeze }
 
-    def split(inputs = [:hdmi, :hdmi2, :hdmi3, :dvi], layout = 0, options = {})
+    def split(inputs = [:hdmi, :hdmi2, :hdmi3, :hdmi4], layout = 0, options = {})
         unless (3..4).cover? inputs.size
             logger.error 'display can only be split between 3 or 4 sources'
             return
@@ -193,6 +195,7 @@ DESC
             layout
         ]
         data += inputs.flat_map do |input|
+            input = input.to_sym if input.is_a? String
             [INPUTS[input], SCALE[:fit]]
         end
 
