@@ -48,7 +48,7 @@ class Aca::Tracking::LocateUser
                 }
             })
         else
-            @cmx_query = nil
+            @cmx = nil
         end
     end
 
