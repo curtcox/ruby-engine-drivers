@@ -329,45 +329,47 @@ DESC
         logger.debug { "Samsung sent #{byte_to_hex(response)}" }
 
         data = str_to_array(response)
-        if data[2] == 3     # Check for correct data length
-            status = data[3]
-            command = data[4]
-            value = data[5]
 
-            if status == 0x41 # 'A'
-                case COMMAND[command]
-                when :panel_mute
-                    self[:power] = value == 0
-                when :volume
-                    self[:volume] = value
-                    if self[:audio_mute] && value > 0
-                        self[:audio_mute] = false
-                    end
-                when :brightness
-                    self[:brightness] = value
-                when :input
-                    self[:input] = INPUTS[value]
-                    if not self[:input_stable]
-                        if self[:input_target] == self[:input]
-                            self[:input_stable] = true
-                        else
-                            switch_to(self[:input_target])
-                        end
-                    end
-                when :speaker
-                    self[:speaker] = Speaker_Modes[value]
-                when :hard_off
-                    self[:hard_off] = value == 0
+        len = data[2]
+        status = data[3]
+        command = data[4]
+        value = len == 1 ? data[5] : data[5, len]
+
+        case status
+        when 0x41 # Ack
+            case COMMAND[command]
+            when :panel_mute
+                self[:power] = value == 0
+            when :volume
+                self[:volume] = value
+                if self[:audio_mute] && value > 0
+                    self[:audio_mute] = false
                 end
-
-                return :success
-            else
-                logger.debug "Samsung failed with: #{byte_to_hex(array_to_str(data))}"
-                return :failed  # Failed response
+            when :brightness
+                self[:brightness] = value
+            when :input
+                self[:input] = INPUTS[value]
+                if not self[:input_stable]
+                    if self[:input_target] == self[:input]
+                        self[:input_stable] = true
+                    else
+                        switch_to(self[:input_target])
+                    end
+                end
+            when :speaker
+                self[:speaker] = Speaker_Modes[value]
+            when :hard_off
+                self[:hard_off] = value == 0
             end
+            :success
+
+        when 0x4e # Nak
+            logger.debug "Samsung failed with: #{byte_to_hex(array_to_str(data))}"
+            :failed  # Failed response
+
         else
             logger.debug "Samsung aborted with: #{byte_to_hex(array_to_str(data))}"
-            return :abort   # unknown result
+            :abort   # unknown result
         end
     end
 
