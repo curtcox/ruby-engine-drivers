@@ -360,6 +360,8 @@ DESC
                 self[:speaker] = Speaker_Modes[value]
             when :hard_off
                 self[:hard_off] = value == 0
+            when :screen_split
+                self[:screen_split] = value.positive?
             end
             :success
 
