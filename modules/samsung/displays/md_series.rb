@@ -178,34 +178,30 @@ DESC
     end
 
 
-    SCALE = {
+    SCALE_MODE = {
         fill: 0x09,
         fit:  0x20
     }.tap { |x| x.merge!(x.invert).freeze }
 
-    def split(enable = On, inputs = [:hdmi2, :hdmi3, :hdmi4], layout = 0, options = {})
-        unless (2..3).cover? inputs.size
-            logger.error 'display can only be split between 3 or 4 sources ' \
-                '(including current primary source)'
-            return
-        end
-
-        enable = is_affirmative? enable
+    # Activite the internal compositor. Can either split 3 or 4 ways.
+    def split(inputs = [:hdmi, :hdmi2, :hdmi3], layout: 0, scale: :fit, **options)
+        main_source = inputs.shift
 
         data = [
-            enable ? 1 : 0,
-            0,              # sound from screen section 1
-            layout,         # layout mode (1..6)
-            SCALE[:fit],    # scaling for main source
+            1,                  # enable
+            0,                  # sound from screen section 1
+            layout,             # layout mode (1..6)
+            SCALE_MODE[scale],  # scaling for main source
             inputs.flat_map do |input|
                 input = input.to_sym if input.is_a? String
-                [INPUTS[input], SCALE[:fit]]
+                [INPUTS[input], SCALE_MODE[scale]]
             end
         ].flatten
 
-        do_send(:screen_split, data, options)
+        switch_to(main_source, options).then do
+            do_send(:screen_split, data, options)
+        end
     end
-
 
     def volume(vol, options = {})
         vol = in_range(vol.to_i, 100)
