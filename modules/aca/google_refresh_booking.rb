@@ -161,6 +161,7 @@ class Aca::GoogleRefreshBooking
             @google_secret = setting(:google_client_secret)
             @google_redirect_uri = setting(:google_redirect_uri)
             @google_refresh_token = setting(:google_refresh_token)
+            @google_admin_email = setting(:google_admin_email)
             @google_scope = setting(:google_scope)
             @google_room = (setting(:google_room) || system.email)
             # supports: SMTP, PSMTP, SID, UPN (user principle name)
@@ -323,21 +324,32 @@ class Aca::GoogleRefreshBooking
 
         # client = OAuth2::Client.new(@google_client_id, @google_secret, {site: @google_site, token_url: @google_token_url})
 
-        options = {
-            client_id: @google_client_id,
-            client_secret: @google_secret,
-            scope: @google_scope,
-            redirect_uri: @google_redirect_uri,
-            refresh_token: @google_refresh_token,
-            grant_type: "refresh_token"
-        }
 
-        authorization = Google::Auth::UserRefreshCredentials.new options
+        # options = {
+        #     client_id: @google_client_id,
+        #     client_secret: @google_secret,
+        #     scope: @google_scope,
+        #     redirect_uri: @google_redirect_uri,
+        #     refresh_token: @google_refresh_token,
+        #     grant_type: "refresh_token"
+        # }
+        # logger.info "AUTHORIZING WITH OPTIONS:"
+        # STDERR.puts "AUTHORIZING WITH OPTIONS:"
+        # STDERR.puts options
+        # logger.info options
+        # STDERR.puts @google_admin_email
+        # logger.info @google_admin_email
+        # STDERR.flush
 
-        #Calendar = Google::Apis::CalendarV3
-        calendar = Calendar::CalendarService.new
+        # authorization = Google::Auth::UserRefreshCredentials.new options
+
+        authorization = Google::Auth.get_application_default(@google_scope).dup
+        authorization.sub = @google_admin_email
+
+        calendar_api = Google::Apis::CalendarV3
+        calendar = calendar_api::CalendarService.new
         calendar.authorization = authorization
-        events = calendar.list_events(system.email)
+        events = calendar.list_events(system.email, time_min: Time.now.midnight.iso8601, time_max: Time.now.tomorrow.midnight.iso8601).items
         
         task {
             todays_bookings(events)
@@ -567,16 +579,12 @@ class Aca::GoogleRefreshBooking
         results = []
 
         events.each{|event| 
-            start_time = ActiveSupport::TimeZone.new('UTC').parse(event.start_time).iso8601[0..18]
-            end_time = ActiveSupport::TimeZone.new('UTC').parse(event.end_time).iso8601[0..18]
-
-            organiser = ""
             
             results.push({
-                :Start => start_time,
-                :End => end_time,
-                :Subject => event.title,
-                :owner => organiser
+                :Start => event.start.date_time.utc.iso8601,
+                :End => event.end.date_time.utc.iso8601,
+                :Subject => event.summary,
+                :owner => event.organizer.display_name
                 # :setup => 0,
                 # :breakdown => 0
             })
@@ -587,5 +595,10 @@ class Aca::GoogleRefreshBooking
 
         results
     end
-    # =======================================
+    
+    def log(data)
+        STDERR.puts data
+        logger.info data
+        STDERR.flush
+    end
 end
