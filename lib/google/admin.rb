@@ -114,7 +114,20 @@ class Google::Admin
             end_param = DateTime.now + 1.hour
         end
 
-        events = calendar.list_events(email, time_min: start_param, time_max: end_param).items
+        events = @calendar.list_events(email, time_min: start_param.iso8601, time_max: end_param.iso8601).items
+        events.map do |event|
+            {
+                start_date: event.start.date_time.to_i * 1000,
+                end_date: event.end.date_time.to_i * 1000,     
+                Start: event.start.date_time.utc.iso8601,
+                End: event.end.date_time.utc.iso8601,
+                subject: event.summary,
+                title: event.summary,
+                description: event.description,
+                attendees: event.attendees.map {|a| {name: a.display_name, email: a.email} },
+                id: event.id
+            }
+        end
     end
 
     def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, timezone:'Sydney')
@@ -140,17 +153,6 @@ class Google::Admin
             description: description
         }
     
-        # Add the room as an attendee
-        room_attendee_options = {
-            resource: true,
-            display_name: room.name,
-            email: room_email,
-            response_status: 'accepted'
-        }
-        attendees = [
-            Google::Apis::CalendarV3::EventAttendee.new(room_attendee_options)
-        ]
-
         # Add the attendees
         attendees.map!{|a|
             attendee_options = {
@@ -159,6 +161,17 @@ class Google::Admin
             }
             Google::Apis::CalendarV3::EventAttendee.new(attendee_options)
         }
+
+        # Add the room as an attendee
+        room_attendee_options = {
+            resource: true,
+            display_name: room.name,
+            email: room_email,
+            response_status: 'accepted'
+        }
+
+        attendees.push(Google::Apis::CalendarV3::EventAttendee.new(room_attendee_options))
+
         event_params[:attendees] = attendees
 
         # Add the current_user as an attendee
@@ -184,9 +197,9 @@ class Google::Admin
                 end
 
                 # Convert to datetimes
-                date = DateTime.at(date)           
+                date = DateTime.parse(Time.at(date).to_s)
             else
-                date = DateTime.parse(date)                
+                date = DateTime.parse(date.to_s)                
             end
         end
         return date
