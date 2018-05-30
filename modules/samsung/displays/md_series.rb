@@ -325,37 +325,38 @@ DESC
         end
     end
 
+    RESPONSE_STATUS = {
+        ack: 0x41,
+        nak: 0x4e
+    }.tap { |x| x.merge!(x.invert).freeze }
+
     def received(response, resolve, command)
         logger.debug { "Samsung sent #{byte_to_hex(response)}" }
 
-        data = str_to_array(response)
+        rx = str_to_array response
 
-        len = data[2]
-        status = data[3]
-        command = data[4]
-        value = len == 1 ? data[5] : data[5, len]
+        unless rx.pop == (rx.reduce(:+) & 0xFF)
+            logger.error 'invalid checksum'
+            return :retry
+        end
 
-        case status
-        when 0x41 # Ack
+        _, _, _, status, command, *value = rx
+        value = value.first if value.length == 1
+
+        case RESPONSE_STATUS[status]
+        when :ack
             case COMMAND[command]
             when :panel_mute
                 self[:power] = value == 0
             when :volume
                 self[:volume] = value
-                if self[:audio_mute] && value > 0
-                    self[:audio_mute] = false
-                end
+                self[:audio_mute] = false if value > 0
             when :brightness
                 self[:brightness] = value
             when :input
                 self[:input] = INPUTS[value]
-                if not self[:input_stable]
-                    if self[:input_target] == self[:input]
-                        self[:input_stable] = true
-                    else
-                        switch_to(self[:input_target])
-                    end
-                end
+                self[:input_stable] = self[:input] == self[:input_target]
+                switch_to self[:input_target] unless self[:input_stable]
             when :speaker
                 self[:speaker] = Speaker_Modes[value]
             when :hard_off
@@ -366,7 +367,7 @@ DESC
             end
             :success
 
-        when 0x4e # Nak
+        when :nak
             logger.debug "Samsung failed with: #{byte_to_hex(array_to_str(data))}"
             :failed  # Failed response
 
@@ -374,16 +375,6 @@ DESC
             logger.debug "Samsung aborted with: #{byte_to_hex(array_to_str(data))}"
             :abort   # unknown result
         end
-    end
-
-    # Currently not used. We could check it if we like :)
-    def check_checksum(byte_str)
-        response = str_to_array(byte_str)
-        check = 0
-        response[0..-2].each do |byte|
-            check = (check + byte) & 0xFF
-        end
-        response[-1] == check
     end
 
     # Called by the Abstract Tokenizer
@@ -400,15 +391,6 @@ DESC
         end
     end
 
-    # Called by do_send to create a checksum
-    def checksum(command)
-        check = 0
-        command.each do |byte|
-            check = (check + byte) & 0xFF
-        end
-        command << check
-    end
-
     def do_send(command, data = [], options = {})
         data = Array(data)
 
@@ -417,9 +399,10 @@ DESC
             command = COMMAND[command]
         end
 
-        data = [command, @id, data.length] + data    # Build request (0xFF is screen id)
-        checksum(data)                                # Add checksum
+        data = [command, @id, data.length] + data     # Build request
+        data << (data.reduce(:+) & 0xFF)              # Add checksum
         data = [0xAA] + data                          # Add header
+
         send(array_to_str(data), options)
     end
 end
