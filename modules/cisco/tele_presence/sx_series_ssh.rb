@@ -5,6 +5,9 @@ load File.expand_path('./sx_series_common.rb', File.dirname(__FILE__))
 class Cisco::TelePresence::SxSeriesSsh < Cisco::TelePresence::SxSsh
     include Cisco::TelePresence::SxSeriesCommon
 
+    # Communication settings
+    tokenize delimiter: "\r"
+
     # Discovery Information
     descriptive_name 'Cisco TelePresence (secure)'
     generic_name :VidConf
