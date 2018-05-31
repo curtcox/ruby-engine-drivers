@@ -43,6 +43,7 @@ DESC
         # Meta data for inquiring interfaces
         self[:type] = :lcd
         self[:input_stable] = true
+        self[:input_target] ||= :hdmi
     end
 
     def on_unload
