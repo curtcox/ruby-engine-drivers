@@ -78,7 +78,8 @@ class Biamp::Tesira
             do_send build(:DEVICE, :recallPresetByName, number_or_name)
         end
     end
-
+    alias_method :trigger, :preset
+        
     def start_audio
         do_send "DEVICE startAudio"
     end
