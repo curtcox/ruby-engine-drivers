@@ -245,6 +245,10 @@ module Cisco::TelePresence::SxSeriesCommon
             command :FarEndControl, :Camera, :Move, "CallId:#{call_id} Value:#{req}"
         end
     end
+    
+    def wake(**options)
+        command :Standby, :Deactivate, params(options)
+    end
 
     
     
