@@ -751,7 +751,9 @@ class Aca::MeetingRoom < Aca::Joiner
         end
 
         switch_mode(@defaults[:shutdown_mode]) if @defaults[:shutdown_mode]
+        
         self[:vc_content_source] = nil
+        shutdown_vc
 
         mixer = system[:Mixer]
 
@@ -879,10 +881,18 @@ class Aca::MeetingRoom < Aca::Joiner
     #
     # MISC FUNCTIONS
     #
+    
+    def shutdown_vc
+        vidconf = system[:VidConf]
+        vidconf.call('disconnect')
+        vc_mute true
+    end
+    
     def init_vc
-        start_cameras
+        system[:VidConf].clear_search_results
         system[:VidConf].wake
-        system[:VidConf].clear_search.results
+        start_cameras
+        vc_mute false
     end
 
     def vc_status_changed(state)
@@ -898,10 +908,9 @@ class Aca::MeetingRoom < Aca::Joiner
     end
 
     def vc_mute(mute)
-        perform_action(mod: :System, func: :vc_mute_actual, args: [mute])
-
         vidconf = system[:VidConf]
         vidconf.mute(mute) unless vidconf.nil?
+        perform_action(mod: :System, func: :vc_mute_actual, args: [mute])
     end
 
     def vc_mute_actual(mute)
