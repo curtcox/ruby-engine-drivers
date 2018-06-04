@@ -267,7 +267,7 @@ module Cisco::TelePresence::SxSeriesCommon
         }), name: :standby_delay)
     end
 
-    def sleep
+    def sleep(**options)
         command :Standby, :Activate, params(options)
     end
     
