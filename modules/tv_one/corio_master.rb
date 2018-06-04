@@ -77,6 +77,45 @@ class TvOne::CorioMaster
         end
     end
 
+    # Provide some meta programming to enable the driver format to match the
+    # device capabilities.
+    #
+    # @see Proxy
+    def method_missing(*context)
+        sender = ->(command) { do_send command }
+        Proxy.new(sender).__send__(*context)
+    end
+
+    # Build an execution context for deeply nested device state / behaviour.
+    #
+    # This will continue to return itself, building up a path, until called
+    # with a method ending in one of the following execution flags:
+    #   '='  assign a value to a device property
+    #   '?'  query the current value of a property
+    #   '!'  execute an on-device action
+    class Proxy
+        def initialize(sender, path = [])
+            @sender = sender
+            @path = path
+        end
+
+        def method_missing(name, *args)
+            segment, action = name.to_s.match(/^(\w+)(\=|\?|\!)?$/).captures
+            @path << segment
+
+            case action
+                when '='
+                    @sender.call "#{@path.join '.'} = #{args.first}"
+                when '?'
+                    @sender.call "#{@path.join '.'}"
+                when '!'
+                    @sender.call "#{@path.join '.'}()"
+                else
+                    self
+                end
+            end
+        end
+    end
 
     # Runs any command provided
     def send_command(cmd)
