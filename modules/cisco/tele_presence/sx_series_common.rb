@@ -194,10 +194,11 @@ module Cisco::TelePresence::SxSeriesCommon
     end
 
     def video_output_mode(video_mode)
-        # NOTE: video_mode should be Single or Dual or Auto
+        # NOTE: video_mode should be "Single" or "Dual" or "Auto"
         configuration('Video', params({
             :Monitors => video_mode
         }), name: :video_output_mode)
+        self[:video_output_mode] = video_mode
     end
     
     def video_output_mode?
