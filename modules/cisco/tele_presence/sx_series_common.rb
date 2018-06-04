@@ -187,9 +187,9 @@ module Cisco::TelePresence::SxSeriesCommon
     end
 
     def select_presentation(index)
-        # NOTE:: Index should be a number
-        command('xConfiguration Video', params({
-            :DefaultPresentationSource => index
+        # NOTE: Index should be a number (generally 1-4)
+        configuration('Video Presentation', params({
+            :DefaultSource => index
         }), name: :select_presentation)
     end
 
