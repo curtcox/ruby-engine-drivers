@@ -199,6 +199,11 @@ module Cisco::TelePresence::SxSeriesCommon
             :Monitors => video_mode
         }), name: :video_output_mode)
     end
+    
+    def video_output_mode?
+        status 'Video Monitors'
+    end
+    
     # ====================
     # END Common functions
     # ====================
@@ -386,8 +391,13 @@ module Cisco::TelePresence::SxSeriesCommon
                 end
             end
         when :video
-            if result[2] == 'Selfview' && result[3] == 'Mode:'
-                self[:camera_pip] = result[4] == 'On'
+            case result[2] 
+                when 'Monitors:'
+                    self[:video_output_mode] = result[3]
+                when 'Selfview'
+                    if result[3] == 'Mode:'
+                        self[:camera_pip] = (result[4] == 'On')
+                    end
             end
         when :audio
             if result[2] == 'Microphones' && result[3] == 'Mute:'
