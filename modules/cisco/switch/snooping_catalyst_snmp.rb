@@ -25,6 +25,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
     })
 
     def on_load
+        # flag to indicate if processing is occuring
+        @processing = nil
+
         @check_interface = ::Set.new
         @reserved_interface = ::Set.new
         self[:interfaces] = [] # This will be updated via query
@@ -84,50 +87,116 @@ class Cisco::Switch::SnoopingCatalystSNMP
         schedule.clear
     end
 
-    def query_snooping_bindings
-        # http://www.circitor.fr/Mibs/Html/C/CISCO-DHCP-SNOOPING-MIB.php#CdsBindingsEntry
-        # cdsBindingsTable: 1.3.6.1.4.1.9.9.380.1.4.1
-        #
-        # A row instance contains the Mac address, IP address type, IP address, VLAN number, interface number, leased time, and status of this instance.
+    AddressType = {
+        0  => :unknown,
+        1  => :ipv4,
+        2  => :ipv6,
+        3  => :ipv4z,
+        4  => :ipv6z,
+        16 => :dns
+    }.freeze
 
-        @client.walk(oid: "1.3.6.1.4.1.9.9.380.1.4.1.1") do |oid_code, value|
-            oid_code = oid_code.split('.')[-1]
-            interface = @if_mappings[oid_code]
-            logger.debug { "snooping #{oid_code}, #{interface}: #{value}" }
+    AcceptAddress = [:ipv4, :ipv6, :ipv4z, :ipv6z].freeze
 
-            next unless interface
+    BindingStatus = {
+        1 => :active,
+        2 => :not_in_service,
+        3 => :not_ready,
+        4 => :create_and_go,
+        5 => :create_and_wait,
+        6 => :destroy
+    }.freeze
 
-            # TODO:: extract value data
+    EntryParts = {
+        '1' => :vlan,
+        '2' => :mac_address,
+        '3' => :addr_type,
+        '4' => :ip_address,
+        '5' => :interface,
+        '6' => :leased_time, # in seconds
+        '7' => :binding_status,
+        '8' => :hostname
+    }.freeze
+
+    SnoopingEntry = Struct.new(:id, *EntryParts.values) do
+        def address_type
+            AddressType[self.addr_type]
+        end
+
+        def status
+            BindingStatus[self.binding_status]
+        end
+
+        def mac
+            self.mac_address
+        end
+
+        def ip
+            self.ip_address
         end
     end
 
-    def query_index_mappings
-        mappings = {}
+    # A row instance contains the Mac address, IP address type, IP address, VLAN number, interface number, leased time, and status of this instance.
+    # http://www.oidview.com/mibs/9/CISCO-DHCP-SNOOPING-MIB.html
+    # http://www.snmplink.org/OnLineMIB/Cisco/index.html#1634
+    def query_snooping_bindings
+        return @processing if @processing
+        @processing = :query_snooping_bindings
+        
+        logger.debug "extracting snooping table"
 
-        # Index short name lookup
-        # ifName: 1.3.6.1.2.1.31.1.1.1.1.xx  (where xx is the ifIndex)
-        # manager.walk(oid: "1.3.6.1.2.1.31.1.1.1.1").to_a
+        entries = {}
+        @client.walk(oid: "1.3.6.1.4.1.9.9.380.1.4.1").each do |oid_code, value|
+            part, entry_id = oid_code[28..-1].split('.', 2)
+            next if entry_id.nil?
 
-        logger.debug "Querying for index mappings"
-        @client.walk(oid: "1.3.6.1.2.1.31.1.1.1.1") do |oid_code, value|
-            oid_code = oid_code.split('.')[-1]
-            logger.debug { "index #{oid_code}: #{value}" }
-            mappings[oid_code] = value
+            entry = entries[entry_id] || SnoopingEntry.new
+            entry.id = entry_id
+            entry.__send__("#{EntryParts[part]}=", value)
+            entries[entry_id] = entry
         end
+
+        entries = entries.values.select { |e| e.status == :active && AcceptAddress.include?(e.address_type) }
+        entries.each do |entry|
+
+        end
+
+        next unless interface && @check_interface.include?(interface)
+    ensure
+        @processing = nil
+    end
+
+    # Index short name lookup
+    # ifName: 1.3.6.1.2.1.31.1.1.1.1.xx  (where xx is the ifIndex)
+    def query_index_mappings
+        return @processing if @processing
+        @processing = :query_index_mappings
+
+        logger.debug "mapping ifIndex to port names"
+
+        mappings = {}
+        @client.walk(oid: "1.3.6.1.2.1.31.1.1.1.1").each do |oid_code, value|
+            oid_code = oid_code[23..-1]
+            mappings[oid_code.to_i] = value.downcase
+        end
+
+        logger.debug { "found #{mappings.length} ports" }
 
         @if_mappings = mappings
+    ensure
+        @processing = nil
     end
 
+    # ifOperStatus: 1.3.6.1.2.1.2.2.1.8.xx == up(1), down(2), testing(3)
     def query_interface_status
-        # ifOperStatus: 1.3.6.1.2.1.2.2.1.8.xx == up(1), down(2), testing(3)
-        # manager.walk(oid: "1.3.6.1.2.1.2.2.1.8").to_a
+        return @processing if @processing
+        @processing = :query_interface_status
 
-        # Lookup the name of the interface in the mappings
-        logger.debug "Querying interface status"
-        @client.walk(oid: "1.3.6.1.2.1.2.2.1.8") do |oid_code, value|
-            oid_code = oid_code.split('.')[-1]
-            interface = @if_mappings[oid_code]
-            logger.debug { "iface #{oid_code}, #{interface}: #{value}" }
+        logger.debug "querying interface status"
+
+        @client.walk(oid: "1.3.6.1.2.1.2.2.1.8").each do |oid_code, value|
+            oid_code = oid_code[20..-1]
+            interface = @if_mappings[oid_code.to_i]
 
             next unless interface
 
@@ -145,6 +214,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
         end
 
         self[:interfaces] = @check_interface.to_a
+    ensure
+        @processing = nil
     end
 
     def query_connected_devices
