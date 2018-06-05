@@ -17,11 +17,12 @@ class Atlona::OmniStream::VirtualSwitcher
     end
 
     def on_update
+        @routes ||= {}
         @encoder_name = setting(:encoder_name) || :Encoder
         @decoder_name = setting(:decoder_name) || :Decoder
     end
 
-    def switch(map, switch_video: true, switch_audio: true)
+    def switch(map, switch_video: true, switch_audio: true, enable_override: nil)
         inputs = get_encoders
         outputs = get_decoders
 
@@ -29,6 +30,8 @@ class Atlona::OmniStream::VirtualSwitcher
             begin
                 inp = inp.to_s
                 if inp == '0'
+                    enable = enable_override.nil? ? false : enable_override
+
                     # mute the audio and video
                     if switch_video
                         video_ip = ""
@@ -39,6 +42,8 @@ class Atlona::OmniStream::VirtualSwitcher
                         audio_port = 1200
                     end
                 else
+                    enable = enable_override.nil? ? true : enable_override
+
                     input, session = inputs[inp]
                     if input.nil?
                         logger.warn "input not found switching #{inp} => #{outs}"
@@ -69,6 +74,7 @@ class Atlona::OmniStream::VirtualSwitcher
                 end
 
                 Array(outs).each do |out|
+                    @routes[out] = inp
                     output, index = outputs[out.to_s]
 
                     if output.nil?
@@ -76,12 +82,15 @@ class Atlona::OmniStream::VirtualSwitcher
                         next
                     end
 
-                    output.switch(output: index, video_ip: video_ip, video_port: video_port, audio_ip: audio_ip, audio_port: audio_port)
+                    output.switch(output: index, video_ip: video_ip, video_port: video_port, audio_ip: audio_ip, audio_port: audio_port, enable: enable)
                 end
             rescue => e
                 logger.print_error(e, "switching #{inp} => #{outs}")
             end
         end
+
+        self[:routes] = @routes.dup
+        true
     end
 
     def switch_video(map)
@@ -97,7 +106,7 @@ class Atlona::OmniStream::VirtualSwitcher
     end
 
     def unmute_video(outputs)
-        # need to restore the stream...
+        switch_video({'0' => outputs}, enable_override: true)
     end
 
     def mute_audio(outputs, mute = true)
