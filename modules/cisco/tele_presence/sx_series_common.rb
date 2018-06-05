@@ -281,14 +281,21 @@ module Cisco::TelePresence::SxSeriesCommon
                 if @listing_phonebook
                     @listing_phonebook = false
 
-                    # expose results
+                    # expose results, unique every time
+                    if @results.length > 0
+                        @search_count ||= 0
+                        @search_count += 1
+                        @results[0][:count] = @search_count
+                    end
                     self[:search_results] = @results
                 elsif @call_status
                     @call_status[:id] = @last_call_id
                     self[:call_status] = @call_status
                     if @call_status.empty?
+                        self[:incall] = false
                         self[:content_available] = false
                     else
+                        self[:incall] = true
                         content_available?
                         if @call_status[:status] == 'OnHold'
                             self[:presentation] = :none
@@ -300,6 +307,7 @@ module Cisco::TelePresence::SxSeriesCommon
                         self[:previous_call] = self[:call_status][:callbacknumber]
                     end
 
+                    self[:incall] = false
                     self[:call_status] = {}
                     @last_call_id = nil
                     @call_status = nil
