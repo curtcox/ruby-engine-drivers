@@ -35,6 +35,8 @@ module Cisco::CollaborationEndpoint::Xapi::Action
                   "Invalid action type. Must be one of #{ACTION_TYPE}."
         end
 
+        kwargs.merge! args.pop if args.last.is_a? Hash
+
         kwargs = kwargs.compact.map do |name, value|
             value = "\"#{value}\"" if value.is_a? String
             "#{name}: #{value}"

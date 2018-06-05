@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+load File.join(__dir__, 'xapi', 'mapper.rb')
+
 module Cisco; end
 module Cisco::CollaborationEndpoint; end
 
@@ -22,11 +24,6 @@ module Cisco::CollaborationEndpoint::ExternalSource
 
     def self.included(base)
         base.prepend Hooks
-    end
-
-    def source_audio(state)
-        mode = is_affirmative?(state) ? :On : :Off
-        send_xconfiguration 'Audio Input HDMI 3', :Mode, mode
     end
 
     # TODO: protect methods (via ::Orchestrator::Security) that manipulate

@@ -104,11 +104,8 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     # The 'integrator' account can't active/deactive SpeakerTrack, but we can
     # cut off access via a configuration setting.
     def speaker_track(state = On)
-        if is_affirmative? state
-            send_xconfiguration 'Cameras SpeakerTrack', :Mode, :Auto
-        else
-            send_xconfiguration 'Cameras SpeakerTrack', :Mode, :Off
-        end
+        mode = is_affirmative?(state) ? :Auto : :Off
+        send_xconfiguration 'Cameras SpeakerTrack', :Mode, mode
     end
 
     command 'Standby Deactivate' => :powerup
