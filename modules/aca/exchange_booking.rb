@@ -768,7 +768,7 @@ class Aca::ExchangeBooking
 
 
             # Set subject to private if sensitive
-            if ['private', 'confidential'].include?(meeting.sensitivity.downcase)
+            if ['private', 'confidential'].include?(meeting.sensitivity.downcase) || item[:subject].empty?
                 subject = "Private"
             else
                 subject = item[:subject][:text]
