@@ -85,7 +85,7 @@ class Atlona::OmniStream::WsProtocol
         end
     end
 
-    def mute(value = true, output: 1)
+    def audio_mute(value = true, output: 1)
         raise 'not supported on encoders' unless @type == :decoder
 
         output -= 1
@@ -108,11 +108,20 @@ class Atlona::OmniStream::WsProtocol
         val
     end
 
-    def unmute(output: 1)
+    def audio_unmute(output: 1)
         mute(false, output: output)
     end
 
-    def switch(output: 1, video_ip: nil, video_port: nil, audio_ip: nil, audio_port: nil)
+    def mute(value = true, output: 1)
+        raise 'not supported on encoders' unless @type == :decoder
+        switch(enable: !value, output: output, video_ip: '', video_port: 1, audio_ip: '', audio_port: 1)
+    end
+
+    def unmute
+        mute(false)
+    end
+
+    def switch(output: 1, video_ip: nil, video_port: nil, audio_ip: nil, audio_port: nil, enable: true)
         raise 'not supported on encoders' unless @type == :decoder
 
         out = output - 1
@@ -147,8 +156,13 @@ class Atlona::OmniStream::WsProtocol
 
             inp = inputs[video_inp]
             inp["$$hashKey"] = id
-            inp[:multicast][:address] = video_ip
-            inp[:port] = video_port
+            if video_ip.empty?
+                inp[:enabled] = enable
+            else
+                inp[:enabled] = enable
+                inp[:multicast][:address] = video_ip
+                inp[:port] = video_port
+            end
 
             configs << inp
         end
@@ -158,8 +172,13 @@ class Atlona::OmniStream::WsProtocol
 
             inp = inputs[audio_inp]
             inp["$$hashKey"] = id
-            inp[:multicast][:address] = audio_ip
-            inp[:port] = audio_port
+            if audio_ip.empty?
+                inp[:enabled] = enable
+            else
+                inp[:enabled] = enable
+                inp[:multicast][:address] = audio_ip
+                inp[:port] = audio_port
+            end
 
             configs << inp
         end
