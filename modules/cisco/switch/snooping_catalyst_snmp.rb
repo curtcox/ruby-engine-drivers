@@ -21,7 +21,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     default_settings({
         building: 'building_code',
-        reserve_time: 5.minutes.to_i
+        reserve_time: 5.minutes.to_i,
+
+        snmp_options: {
+            snmp_version: 1,
+            community: 'public'
+        }
     })
 
     def on_load
@@ -65,20 +70,18 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def connected
-        proxy = Protocols::Snmp.new(self)
-        @client = NETSNMP::Client.new({
-            proxy: proxy, version: "2c",
-            community: "public"
-        })
+        settings = setting(:snmp_options).to_h.symbolize_keys
+        settings[:proxy] = Protocols::Snmp.new(self)
+        @client = NETSNMP::Client.new(settings)
 
         query_index_mappings
-        schedule.in(1000) { query_connected_devices }
+        schedule.in(10000) { query_connected_devices }
         schedule.every('1m') do
             query_connected_devices
             check_reservations if @reserve_time > 0
         end
 
-        schedule.every('30m') do
+        schedule.every('10m') do
             query_index_mappings
         end
     end
@@ -107,14 +110,15 @@ class Cisco::Switch::SnoopingCatalystSNMP
         6 => :destroy
     }.freeze
 
+    # cdsBindingsEntry
     EntryParts = {
-        '1' => :vlan,
-        '2' => :mac_address,
+        '1' => :vlan,        # Cisco has made this not-accessible
+        '2' => :mac_address, # Cisco has made this not-accessible
         '3' => :addr_type,
         '4' => :ip_address,
         '5' => :interface,
-        '6' => :leased_time, # in seconds
-        '7' => :binding_status,
+        '6' => :leased_time,    # in seconds
+        '7' => :binding_status, # can set this to destroy to delete entry
         '8' => :hostname
     }.freeze
 
@@ -123,16 +127,18 @@ class Cisco::Switch::SnoopingCatalystSNMP
             AddressType[self.addr_type]
         end
 
-        def status
-            BindingStatus[self.binding_status]
-        end
-
+        # ignore the first .
         def mac
-            self.mac_address
+            self.id.split('.')[1..-1].map { |i| i.to_i.to_s(16).rjust(2, '0') }.join('')
         end
 
         def ip
-            self.ip_address
+            case self.address_type
+            when :ipv4, :ipv4z
+                self.ip_address.split(' ').map { |i| i.to_i(16).to_s }.join('.')
+            else
+                nil
+            end
         end
     end
 
@@ -145,6 +151,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         
         logger.debug "extracting snooping table"
 
+        # Walking cdsBindingsTable
         entries = {}
         @client.walk(oid: "1.3.6.1.4.1.9.9.380.1.4.1").each do |oid_code, value|
             part, entry_id = oid_code[28..-1].split('.', 2)
@@ -156,12 +163,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
             entries[entry_id] = entry
         end
 
-        entries = entries.values.select { |e| e.status == :active && AcceptAddress.include?(e.address_type) }
+        # Process the bindings
+        entries = entries.values # TODO:: sort based on lease time
         entries.each do |entry|
+            interface = @if_mappings[entry.interface]
+            next unless interface && @check_interface.include?(interface)
 
+            # TODO
         end
-
-        next unless interface && @check_interface.include?(interface)
     ensure
         @processing = nil
     end
