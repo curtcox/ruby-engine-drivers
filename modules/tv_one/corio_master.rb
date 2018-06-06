@@ -46,6 +46,13 @@ class TvOne::CorioMaster
     end
     alias switch_to preset
 
+    def switch(signal_map)
+        interactions = signal_map.flat_map do |slot, windows|
+            Array(windows).map { |window| set "#{window}.Input", slot }
+        end
+        thread.finally(*interactions).then { sync_state }
+    end
+
     def window(id, property, value)
         set "Window#{id}.#{property}", value
     end
