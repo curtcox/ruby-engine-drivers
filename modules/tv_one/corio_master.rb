@@ -19,21 +19,14 @@ class TvOne::CorioMaster
     # ------------------------------
     # Calllbacks
 
-    def on_load
-        on_update
-    end
-
-    def on_update
-        @username = setting :username
-        @password = setting :password
-    end
-
     def connected
         schedule.every('60s') do
             do_poll
         end
 
-        exec('login', @username, @password, priority: 99).then do
+        username = setting :username
+        password = setting :password
+        exec('login', username, password, priority: 99).then do
             query 'CORIOmax.Serial_Number', expose_as: :serial_number
             query 'CORIOmax.Software_Version', expose_as: :firmware
         end
