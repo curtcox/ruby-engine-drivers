@@ -27,7 +27,7 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
         CORIOmax.Software_Version = V1.30701.P4 Master\r
         !Done CORIOmax.Software_Version\r
     RX
-    expect(status[:firmware]).to be('V1.30701.P4 Master')
+    expect(status[:firmware]).to eq('V1.30701.P4 Master')
 
     exec(:preset, 1)
         .should_send("Preset.Take = 1\r\n")
@@ -35,5 +35,6 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
             Preset.Take = 1\r
             !Done Preset.Take\r
         RX
+    wait_tick
     expect(status[:preset]).to be(1)
 end
