@@ -166,6 +166,7 @@ class Cisco::Switch::SnoopingCatalyst
             # Newest lease first
             @snooping.sort! { |a, b| b[0] <=> a[0] }
 
+            # NOTE:: Same as snooping_catalyst_snmp.rb
             # Ignore any duplicates
             @snooping.each do |lease, mac, ip, interface|
                 next if checked.include?(interface)
