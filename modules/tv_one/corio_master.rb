@@ -11,8 +11,7 @@ class TvOne::CorioMaster
     descriptive_name 'tvOne CORIOmaster image processor'
     generic_name :VideoWall
 
-    tokenize delimiter: /(?<=^!(Info)|(Done)|(Error)|(Event)).*\r\n/,
-             wait_ready: 'Interface Ready'
+    tokenize wait_ready: 'Interface Ready', callback: :tokenize
 
     default_settings username: 'admin', password: 'adminpw'
 
@@ -114,6 +113,16 @@ class TvOne::CorioMaster
                        x.sub(/^#{message}\.?/, '').downcase!.to_sym
                    end
         end
+    end
+
+    def tokenize(buffer)
+        result_line_start = buffer.index(/^!/)
+
+        return false unless result_line_start
+
+        result_line_end = buffer.index("\r\n", result_line_start)
+
+        result_line_end || false
     end
 
     def received(data, resolve, command)
