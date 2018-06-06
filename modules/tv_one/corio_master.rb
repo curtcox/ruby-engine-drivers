@@ -118,11 +118,11 @@ class TvOne::CorioMaster
                        .to_h
                        .transform_values! do |val|
                            case val
-                           when /^\d+$/ then Integer val
-                           when 'NULL'  then nil
-                           when 'Off'   then false
-                           when 'On'    then true
-                           else              val
+                           when /^-?\d+$/    then Integer val
+                           when 'NULL'       then nil
+                           when /(Off)|(No)/ then false
+                           when /(On)|(Yes)/ then true
+                           else                   val
                            end
                        end
 
