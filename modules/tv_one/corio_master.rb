@@ -69,12 +69,13 @@ class TvOne::CorioMaster
 
     def sync_state
         deep_query = lambda do |key|
-            query key do |children|
+            query key do |properties|
                 status_var = key.downcase.to_sym
-                self[status_var] ||= {}
-                children.each do |child|
-                    query(child) { |status| self[status_var][child] = status }
-                end
+                self[status_var] = properties
+                properties.select { |_, v| v == '<...>' }
+                          .each do |k, _|
+                              query(k) { |subtree| properties[k] = subtree }
+                          end
             end
         end
 
