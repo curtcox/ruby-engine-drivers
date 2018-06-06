@@ -80,15 +80,23 @@ class TvOne::CorioMaster
         send "#{path} = #{val}\r\n", opts
     end
 
-    def query(path, expose_as: nil, **opts, &blk)
+    def query(path, expose_as: nil, **opts, &callback)
         logger.debug { "querying #{path}" }
-        blk = ->(val) { self[expose_as] = val } unless expose_as.nil?
-        opts[:emit] ||= ->(d, r, c) { received d, r, c, &blk } unless blk.nil?
+
+        if expose_as || callback
+            opts[:on_receive] = lambda do |*args|
+                received(*args) do |val|
+                    self[expose_as] = val unless expose_as.nil?
+                    callback&.call val
+                end
+            end
+        end
+
         send "#{path}\r\n", opts
     end
 
-    def parse_response(lines)
-        updates = lines.map { |line| line.split ' = ' }
+    def parse_response(lines, command)
+        updates = lines.map { |line| line.chop.split ' = ' }
                        .to_h
                        .transform_values! do |val|
                            case val
@@ -100,17 +108,17 @@ class TvOne::CorioMaster
                            end
                        end
 
-        if updates.size == 1 && updates.include?(message)
+        if updates.size == 1 && updates.include?(command)
             # Single property query
-            updates.first.value
+            updates.values.first
         elsif updates.values.all?(&:nil?)
             # Property list
             updates.keys
         else
             # Property set
-            updates.reject { |k, _| k.end_with '()' }
+            updates.reject { |k, _| k.end_with? '()' }
                    .transform_keys! do |x|
-                       x.sub(/^#{message}\.?/, '').downcase!.to_sym
+                       x.sub(/^#{command}\.?/, '').downcase!.to_sym
                    end
         end
     end
@@ -122,19 +130,27 @@ class TvOne::CorioMaster
 
         result_line_end = buffer.index("\r\n", result_line_start)
 
-        result_line_end || false
+        if result_line_end
+            result_line_end + 2
+        else
+            false
+        end
     end
 
     def received(data, resolve, command)
         logger.debug { "received: #{data}" }
 
         *body, result = data.lines
-        type, message = /^!(\w+)\W*(.*)$/.match(result).captures
+        type, message = /^!(\w+)\W*(.*)\r\n$/.match(result).captures
 
         case type
         when 'Done'
-            yield parse_response body if block_given?
-            :success
+            if command[:data].start_with? message
+                yield parse_response body, message if block_given?
+                :success
+            else
+                :ignore
+            end
         when 'Info'
             logger.info message
             :success
