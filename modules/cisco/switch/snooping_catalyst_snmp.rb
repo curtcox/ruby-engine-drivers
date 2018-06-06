@@ -135,6 +135,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 # Example response: "0A B2 C4 45"
                 self.ip_address.split(' ').map { |i| i.to_i(16).to_s }.join('.')
             else
+                # TODO:: IPv6
                 nil
             end
         end
