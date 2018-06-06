@@ -36,7 +36,7 @@ class TvOne::CorioMaster
 
         exec('login', @username, @password, priority: 99).then do
             query 'CORIOmax.Serial_Number', expose_as: :serial_number
-            query 'CORIOmax.Software_Version', expose_as: :version
+            query 'CORIOmax.Software_Version', expose_as: :firmware
         end
     end
 
