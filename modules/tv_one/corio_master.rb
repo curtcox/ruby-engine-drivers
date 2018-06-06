@@ -29,6 +29,7 @@ class TvOne::CorioMaster
         exec('login', username, password, priority: 99).then do
             query 'CORIOmax.Serial_Number', expose_as: :serial_number
             query 'CORIOmax.Software_Version', expose_as: :firmware
+            sync_state
         end
     end
 
@@ -41,7 +42,7 @@ class TvOne::CorioMaster
     # Main API
 
     def preset(id)
-        set('Preset.Take', id).then { self[:preset] = id }
+        set('Preset.Take', id).then { sync_state }
     end
     alias switch_to preset
 
@@ -54,9 +55,25 @@ class TvOne::CorioMaster
 
 
     def do_poll
-        logger.debug 'polling device state'
+        logger.debug 'polling device'
 
         query 'Preset.Take', expose_as: :preset
+    end
+
+    def sync_state
+        deep_query = lambda do |key|
+            query key do |children|
+                status_var = key.downcase.to_sym
+                self[status_var] ||= {}
+                children.each do |child|
+                    query(child) { |status| self[status_var][child] = status }
+                end
+            end
+        end
+
+        deep_query['Windows']
+        deep_query['Canvases']
+        deep_query['Layouts']
     end
 
     # ------------------------------
@@ -79,7 +96,7 @@ class TvOne::CorioMaster
         if expose_as || callback
             opts[:on_receive] = lambda do |*args|
                 received(*args) do |val|
-                    self[expose_as] = val unless expose_as.nil?
+                    self[expose_as.to_sym] = val unless expose_as.nil?
                     callback&.call val
                 end
             end
