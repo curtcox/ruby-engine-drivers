@@ -12,6 +12,7 @@ class Microsoft::Exchange
             service_account_email:,
             service_account_password:,
             internet_proxy:nil,
+            all_day_bookings:true,
             logger: Rails.logger
         )
         begin
@@ -225,6 +226,10 @@ class Microsoft::Exchange
                     email: attendee.email
                 }
             } if event.required_attendees
+
+            if !all_day_bookings
+                next if event.all_day?
+            end
             bookings.push(booking)
         }
         bookings
