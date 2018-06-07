@@ -48,7 +48,15 @@ class TvOne::CorioMaster
 
     def switch(signal_map)
         interactions = signal_map.flat_map do |slot, windows|
-            Array(windows).map { |window| set "#{window}.Input", slot }
+            Array(windows).map do |window|
+                if window.is_a?(String) && /Window\d+/i =~ window
+                    set "#{window}.Input", slot
+                elsif window.is_a? Integer
+                    set "Window#{window}.Input", slot
+                else
+                    thread.defer.reject "invalid window: #{window}"
+                end
+            end
         end
         thread.finally(*interactions).then { sync_state }
     end

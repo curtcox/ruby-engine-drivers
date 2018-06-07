@@ -3,6 +3,27 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
                                       username: 'admin',
                                       password: 'adminpw'
                                   } do
+    # Util to clear out any state_sync queries
+    def sync_state
+        should_send "Preset.Take\r\n"
+        responds <<~RX
+            Preset.Take = 1\r
+            !Done Preset.Take\r
+        RX
+        should_send "Windows\r\n"
+        responds <<~RX
+            !Done Windows\r
+        RX
+        should_send "Canvases\r\n"
+        responds <<~RX
+            !Done Canvases\r
+        RX
+        should_send "Layouts\r\n"
+        responds <<~RX
+            !Done Layouts\r
+        RX
+    end
+
     transmit <<~INIT
         // ===================\r
         //  CORIOmaster - CORIOmax\r
@@ -29,24 +50,8 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
     RX
     expect(status[:firmware]).to eq('V1.30701.P4 Master')
 
-    # Fudge the initial status query - check this latest in the tests
-    should_send "Preset.Take\r\n"
-    responds <<~RX
-        Preset.Take = 1\r
-        !Done Preset.Take\r
-    RX
-    should_send "Windows\r\n"
-    responds <<~RX
-        !Done Windows\r
-    RX
-    should_send "Canvases\r\n"
-    responds <<~RX
-        !Done Canvases\r
-    RX
-    should_send "Layouts\r\n"
-    responds <<~RX
-        !Done Layouts\r
-    RX
+    sync_state
+
 
     exec(:exec, 'System.Reset')
         .should_send("System.Reset()\r\n")
@@ -124,6 +129,7 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
         }
     )
 
+
     exec(:preset, 1)
         .should_send("Preset.Take = 1\r\n")
         .responds(
@@ -132,19 +138,25 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
                 !Done Preset.Take\r
             RX
         )
-        .should_send("Preset.Take\r\n") # Mock the status query
+    wait_tick
+    sync_state
+    expect(status[:preset]).to be(1)
+
+    exec(:switch, 'Slot1.In1' => 1, 'Slot1.In2' => 2)
+        .should_send("Window1.Input = Slot1.In1\r\n")
         .responds(
             <<~RX
-                Preset.Take = 1\r
-                !Done Preset.Take\r
+                Window1.Input = Slot1.In1\r
+                !Done Window1.Input\r
             RX
         )
-        .should_send("Windows\r\n")
-        .responds("!Done Windows\r\n")
-        .should_send("Canvases\r\n")
-        .responds("!Done Canvases\r\n")
-        .should_send("Layouts\r\n")
-        .responds("!Done Layouts\r\n")
+        .should_send("Window2.Input = Slot1.In2\r\n")
+        .responds(
+            <<~RX
+                Window2.Input = Slot1.In2\r
+                !Done Window2.Input\r
+            RX
+        )
     wait_tick
-    expect(status[:preset]).to be(1)
+    sync_state
 end
