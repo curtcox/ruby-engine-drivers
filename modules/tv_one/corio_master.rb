@@ -27,7 +27,7 @@ class TvOne::CorioMaster
         username = setting :username
         password = setting :password
         exec('login', username, password, priority: 99).then do
-            query 'CORIOmax.Serial_Number', expose_as: :serial_number
+            query 'CORIOmax.Serial_Number',    expose_as: :serial_number
             query 'CORIOmax.Software_Version', expose_as: :firmware
             sync_state
         end
@@ -63,28 +63,14 @@ class TvOne::CorioMaster
 
     def do_poll
         logger.debug 'polling device'
-
         query 'Preset.Take', expose_as: :preset
     end
 
     def sync_state
-        deep_query = lambda do |key|
-            query key do |properties|
-                subqueries = \
-                    properties.select { |_, v| v == '<...>' }
-                              .map do |k, _|
-                                  query(k) { |subtree| properties[k] = subtree }
-                              end
-                thread.finally(*subqueries).then do
-                    status_var = key.downcase.to_sym
-                    self[status_var] = properties
-                end
-            end
-        end
-
-        deep_query['Windows']
-        deep_query['Canvases']
-        deep_query['Layouts']
+        query 'Preset.Take',   expose_as: :preset
+        deep_query 'Windows',  expose_as: :windows
+        deep_query 'Canvases', expose_as: :canvases
+        deep_query 'Layouts',  expose_as: :layouts
     end
 
     # ------------------------------
@@ -114,6 +100,25 @@ class TvOne::CorioMaster
         end
 
         send "#{path}\r\n", opts
+    end
+
+    def deep_query(path, expose_as: nil, **opts, &callback)
+        defer = thread.defer
+        query path, opts do |props|
+            subqueries = []
+            if props.is_a? Hash
+                subqueries = props.select { |_, v| v == '<...>' }
+                                  .map do |k, _|
+                                      deep_query(k) { |v| props[k] = v }
+                                  end
+            end
+            thread.finally(*subqueries).then do
+                self[expose_as] = props unless expose_as.nil?
+                callback&.call props
+                defer.resolve
+            end
+        end
+        defer.promise
     end
 
     def parse_response(lines, command)
