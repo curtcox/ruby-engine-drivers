@@ -166,7 +166,7 @@ class TvOne::CorioMaster
 
         case type
         when 'Done'
-            if command[:data].start_with? message
+            if command[:data] =~ /^#{message}/i
                 yield parse_response body, message if block_given?
                 :success
             else
