@@ -719,7 +719,7 @@ class Aca::ExchangeBooking
         results = items.collect do |meeting|
             all_day_bookings = ENV['ALL_DAY_BOOKINGS'] || true
             if !all_day_bookings
-                next if meeting.ews_item.all_day?
+                next if meeting.all_day?
             end
             item = meeting.ews_item
             start = item[:start][:text]
