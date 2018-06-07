@@ -722,7 +722,7 @@ class Aca::ExchangeBooking
             ending = item[:end][:text]
             all_day_bookings = ENV['ALL_DAY_BOOKINGS'] || true
             if !all_day_bookings
-                next if (Time.parse(start) - Time.parse(ending)).to_i > 86399
+                next if (Time.parse(ending) - Time.parse(start)).to_i > 86399
             end
 
             real_start = Time.parse(start)
