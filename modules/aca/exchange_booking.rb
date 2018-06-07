@@ -720,7 +720,7 @@ class Aca::ExchangeBooking
             item = meeting.ews_item
             start = item[:start][:text]
             ending = item[:end][:text]
-            all_day_bookings = Boolean(ENV['HIDE_ALL_DAY_BOOKINGS']) || false
+            all_day_bookings = setting(:hide_all_day_bookings) || false
             if !all_day_bookings
                 if (Time.parse(ending) - Time.parse(start)).to_i > 86399
                     STDERR.puts "SKIPPING #{item[:subject][:text]}"
