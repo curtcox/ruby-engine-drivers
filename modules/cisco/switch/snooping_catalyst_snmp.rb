@@ -381,10 +381,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
         self[:reserved] = @reserved_interface.to_a
     end
 
-    def format(mac)
-        mac.gsub(/(0x|[^0-9A-Fa-f])*/, "").downcase
-    end
-
     def check_reservations
         remove = []
 
@@ -400,10 +396,5 @@ class Cisco::Switch::SnoopingCatalystSNMP
             @reserved_interface -= remove
             self[:reserved] = @reserved_interface.to_a
         end
-    end
-
-    def normalise(interface)
-        # Port-channel == po
-        interface.downcase.gsub('tengigabitethernet', 'te').gsub('gigabitethernet', 'gi').gsub('fastethernet', 'fa')
     end
 end
