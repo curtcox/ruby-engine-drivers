@@ -36,6 +36,8 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
     responds "!Info : User admin Logged In\r\n"
     expect(status[:connected]).to be(true)
 
+    sync_state
+
     should_send "CORIOmax.Serial_Number\r\n"
     responds <<~RX
         CORIOmax.Serial_Number = 2218031005149\r
@@ -49,8 +51,6 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
         !Done CORIOmax.Software_Version\r
     RX
     expect(status[:firmware]).to eq('V1.30701.P4 Master')
-
-    sync_state
 
 
     exec(:exec, 'System.Reset')

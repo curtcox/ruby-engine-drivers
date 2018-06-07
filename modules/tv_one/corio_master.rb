@@ -24,12 +24,9 @@ class TvOne::CorioMaster
             do_poll
         end
 
-        username = setting :username
-        password = setting :password
-        exec('login', username, password, priority: 99).then do
+        init_connection.then do
             query 'CORIOmax.Serial_Number',    expose_as: :serial_number
             query 'CORIOmax.Software_Version', expose_as: :firmware
-            sync_state
         end
     end
 
@@ -68,6 +65,13 @@ class TvOne::CorioMaster
 
     protected
 
+
+    def init_connection
+        username = setting :username
+        password = setting :password
+
+        exec('login', username, password, priority: 99).then { sync_state }
+    end
 
     def do_poll
         logger.debug 'polling device'
