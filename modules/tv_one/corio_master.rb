@@ -75,10 +75,12 @@ class TvOne::CorioMaster
     end
 
     def sync_state
-        query 'Preset.Take',   expose_as: :preset
-        deep_query 'Windows',  expose_as: :windows
-        deep_query 'Canvases', expose_as: :canvases
-        deep_query 'Layouts',  expose_as: :layouts
+        thread.finally(
+            query('Preset.Take',   expose_as: :preset),
+            deep_query('Windows',  expose_as: :windows),
+            deep_query('Canvases', expose_as: :canvases),
+            deep_query('Layouts',  expose_as: :layouts)
+        )
     end
 
     # ------------------------------
