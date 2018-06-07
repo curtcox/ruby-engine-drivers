@@ -367,14 +367,15 @@ class Aca::ExchangeBooking
     # ======================================
 
     def start_meeting(meeting_ref)
-        now = Time.now
-        self[:last_meeting_started] = now.to_i * 1000
-        self[:meeting_pending] = now.to_i * 1000
-        self[:meeting_ending] = false
-        self[:meeting_pending_notice] = false
-        define_setting(:last_meeting_started, now.to_i * 1000)
 
         if meeting_ref - (now.to_i * 1000) > 300000
+            now = Time.now
+            self[:last_meeting_started] = now.to_i * 1000
+            self[:meeting_pending] = now.to_i * 1000
+            self[:meeting_ending] = false
+            self[:meeting_pending_notice] = false
+            define_setting(:last_meeting_started, now.to_i * 1000)
+
             # Actually edit the booking to have the new start time
             items = get_todays_bookings
 
@@ -386,6 +387,12 @@ class Aca::ExchangeBooking
                    meeting.ews_item.update_item!(start: now.iso8601)
                 end
             end
+        else
+            self[:last_meeting_started] = meeting_ref
+            self[:meeting_pending] = meeting_ref
+            self[:meeting_ending] = false
+            self[:meeting_pending_notice] = false
+            define_setting(:last_meeting_started, meeting_ref)
         end
 
     end
