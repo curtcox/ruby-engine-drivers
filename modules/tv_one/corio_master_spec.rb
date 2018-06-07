@@ -29,6 +29,30 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
     RX
     expect(status[:firmware]).to eq('V1.30701.P4 Master')
 
+    exec(:exec, 'System.Reset')
+        .should_send("System.Reset()\r\n")
+        .responds <<~RX
+            !Info: Rebooting...\r
+        RX
+    expect(result).to be(:success)
+
+    exec(:set, 'Window1.Input', 'Slot3.In1')
+        .should_send("Window1.Input = Slot3.In1\r\n")
+        .responds <<~RX
+            Window1.Input = Slot3.In1\r
+            !Done Window1.Input\r
+        RX
+    expect(result).to be(:success)
+
+    exec(:query, 'Window1.Input', expose_as: :status_var_test)
+        .should_send("Window1.Input\r\n")
+        .responds <<~RX
+            Window1.Input = Slot3.In1\r
+            !Done Window1.Input\r
+        RX
+    expect(result).to be(:success)
+    expect(status[:status_var_test]).to eq('Slot3.In1')
+
     exec(:preset, 1)
         .should_send("Preset.Take = 1\r\n")
         .responds <<~RX
@@ -36,5 +60,6 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
             !Done Preset.Take\r
         RX
     wait_tick
+    expect(result).to be(:success)
     expect(status[:preset]).to be(1)
 end
