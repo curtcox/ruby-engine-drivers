@@ -717,13 +717,13 @@ class Aca::ExchangeBooking
 
         items.select! { |booking| !booking.cancelled? }
         results = items.collect do |meeting|
-            all_day_bookings = ENV['ALL_DAY_BOOKINGS'] || true
-            if !all_day_bookings
-                next if meeting.all_day?
-            end
             item = meeting.ews_item
             start = item[:start][:text]
             ending = item[:end][:text]
+            all_day_bookings = ENV['ALL_DAY_BOOKINGS'] || true
+            if !all_day_bookings
+                next if (Time.parse(start) - Time.parse(ending)).to_i > 86399
+            end
 
             real_start = Time.parse(start)
             real_end = Time.parse(ending)

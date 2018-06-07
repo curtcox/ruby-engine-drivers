@@ -228,7 +228,7 @@ class Microsoft::Exchange
             } if event.required_attendees
 
             if !all_day_bookings
-                next if event.all_day?
+                next if (event.end - event.start) > 86399
             end
             bookings.push(booking)
         }
