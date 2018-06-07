@@ -107,6 +107,10 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
         send_xconfiguration 'Cameras SpeakerTrack', :Mode, mode
     end
 
+    command 'Conference DoNotDisturb Activate' => :do_not_disturb_activate,
+            Timeout_: (1..1440)
+    command 'Conference DoNotDisturb Deactivate' => :do_not_disturb_deactivate
+
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby
