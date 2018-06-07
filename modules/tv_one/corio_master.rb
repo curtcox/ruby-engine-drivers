@@ -83,41 +83,49 @@ class TvOne::CorioMaster
 
     def set(path, val, **opts)
         logger.debug { "setting #{path} to #{val}" }
+
+        defer = thread.defer
+
         opts[:name] ||= path.to_sym
-        send "#{path} = #{val}\r\n", opts
+        send("#{path} = #{val}\r\n", opts).then do
+            defer.resolve val
+        end
+
+        defer.promise
     end
 
-    def query(path, expose_as: nil, **opts, &callback)
+    def query(path, expose_as: nil, **opts)
         logger.debug { "querying #{path}" }
 
-        if expose_as || callback
-            opts[:on_receive] = lambda do |*args|
-                received(*args) do |val|
-                    self[expose_as.to_sym] = val unless expose_as.nil?
-                    callback&.call val
-                end
+        defer = thread.defer
+
+        opts[:on_receive] = lambda do |*args|
+            received(*args) do |val|
+                self[expose_as.to_sym] = val unless expose_as.nil?
+                defer.resolve val
             end
         end
 
         send "#{path}\r\n", opts
+
+        defer.promise
     end
 
-    def deep_query(path, expose_as: nil, **opts, &callback)
+    def deep_query(path, expose_as: nil, **opts)
+        logger.debug { "deep querying #{path}" }
+
         defer = thread.defer
-        query path, opts do |props|
-            subqueries = []
-            if props.is_a? Hash
-                subqueries = props.select { |_, v| v == '<...>' }
-                                  .map do |k, _|
-                                      deep_query(k) { |v| props[k] = v }
-                                  end
+
+        query(path, opts).then do |val|
+            if val.is_a? Hash
+                val.each_pair do |k, v|
+                    val[k] = deep_query(k).value if v == '<...>'
+                end
             end
-            thread.finally(*subqueries).then do
-                self[expose_as] = props unless expose_as.nil?
-                callback&.call props
-                defer.resolve
-            end
+            self[expose_as] = val unless expose_as.nil?
+            defer.resolve val
         end
+
         defer.promise
     end
 
