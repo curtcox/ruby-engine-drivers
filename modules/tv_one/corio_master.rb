@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TvOne; end
 
 # Documentation: https://aca.im/driver_docs/TV+One/CORIOmaster-Commands-v1.7.0.pdf
