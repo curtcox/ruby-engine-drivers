@@ -59,7 +59,9 @@ class TvOne::CorioMaster
     end
 
     def window(id, property, value)
-        set "Window#{id}.#{property}", value
+        set("Window#{id}.#{property}", value).then do
+            self[:windows][:"window#{id}"] = query("Window#{id}").value
+        end
     end
 
 
