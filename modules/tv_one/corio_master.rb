@@ -39,7 +39,7 @@ class TvOne::CorioMaster
     # Main API
 
     def preset(id)
-        set('Preset.Take', id).then { sync_state }
+        set('Preset.Take', id).finally { sync_state }
     end
     alias switch_to preset
 
@@ -55,7 +55,7 @@ class TvOne::CorioMaster
                 end
             end
         end
-        thread.finally(*interactions).then { sync_state }
+        thread.finally(*interactions).finally { sync_state }
     end
 
     def window(id, property, value)
