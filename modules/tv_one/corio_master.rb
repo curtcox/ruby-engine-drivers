@@ -46,7 +46,7 @@ class TvOne::CorioMaster
     def switch(signal_map)
         interactions = signal_map.flat_map do |slot, windows|
             Array(windows).map do |id|
-                id = win[/\d+/].to_i if win.is_a? String
+                id = id[/\d+/].to_i if id.is_a? String
                 window id, 'Input', slot
             end
         end
