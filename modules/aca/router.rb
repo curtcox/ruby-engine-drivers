@@ -80,10 +80,10 @@ class Aca::Router
             _, failed = results.partition(&:last)
             if failed.empty?
                 logger.debug 'all routes activated successfully'
-                :success
+                signal_map
             else
                 failed.each { |result, _| logger.error result }
-                thread.defer.reject 'failed to activate all routes'
+                thread.reject 'failed to activate all routes'
             end
         end
     end
@@ -231,10 +231,10 @@ class Aca::Router
         elsif edge.nx1? && signal_graph.outdegree(edge.source) == 1
             logger.warn "cannot perform switch on #{edge.device}. " \
                 "This may be ok as only one input (#{edge.target}) is defined."
-            thread.defer.resolve
+            thread.defer.resolve.promise
 
         else
-            thread.defer.reject "cannot interact with #{edge.device}. " \
+            thread.reject "cannot interact with #{edge.device}. " \
                 'Module may be offline or incompatible.'
         end
     end
