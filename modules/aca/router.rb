@@ -257,17 +257,19 @@ end
 class Aca::Router::SignalGraph
     Paths = Struct.new :distance_to, :predecessor
 
-    Edge = Struct.new :source, :target, :device, :input, :output do
-        def device=(device)
-            super(device.try(:to_sym) || device)
-        end
+    class Edge
+        attr_reader :source, :target, :device, :input, :output
 
-        def input=(input)
-            super(input.try(:to_sym) || input)
-        end
+        Meta = Struct.new(:device, :input, :output)
 
-        def output=(output)
-            super(output.try(:to_sym) || output)
+        def initialize(source, target, &blk)
+            @source = source
+            @target = target
+
+            meta = Meta.new.tap(&blk)
+            @device = meta.device&.to_sym
+            @input  = meta.input.try(:to_sym) || meta.input
+            @output = meta.output.try(:to_sym) || meta.output
         end
 
         def to_s
@@ -347,7 +349,7 @@ class Aca::Router::SignalGraph
     end
 
     def join(source, target, &block)
-        datum = Edge.new(source, target).tap(&block)
+        datum = Edge.new(source, target, &block)
         nodes[source].join target, datum
         self
     end
