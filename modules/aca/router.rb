@@ -258,6 +258,18 @@ class Aca::Router::SignalGraph
     Paths = Struct.new :distance_to, :predecessor
 
     Edge = Struct.new :source, :target, :device, :input, :output do
+        def device=(device)
+            super(device.try(:to_sym) || device)
+        end
+
+        def input=(input)
+            super(input.try(:to_sym) || input)
+        end
+
+        def output=(output)
+            super(output.try(:to_sym) || output)
+        end
+
         def to_s
             "#{target} to #{device} (in #{input})"
         end
