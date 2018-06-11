@@ -227,9 +227,10 @@ class Microsoft::Exchange
                     email: attendee.email
                 }
             } if event.required_attendees
-
             if @hide_all_day_bookings
-                next if (event.end - event.start) > 86399
+                STDERR.puts "SKIPPING #{event.subject}"
+                STDERR.flush
+                next if event.end.to_time - event.start.to_time > 86399
             end
             bookings.push(booking)
         }
