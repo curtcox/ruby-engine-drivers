@@ -721,7 +721,7 @@ class Aca::ExchangeBooking
             start = item[:start][:text]
             ending = item[:end][:text]
             all_day_bookings = setting(:hide_all_day_bookings) || false
-            if !all_day_bookings
+            if all_day_bookings
                 if (Time.parse(ending) - Time.parse(start)).to_i > 86399
                     STDERR.puts "SKIPPING #{item[:subject][:text]}"
                     STDERR.flush

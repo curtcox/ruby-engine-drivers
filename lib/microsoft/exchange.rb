@@ -25,6 +25,7 @@ class Microsoft::Exchange
         @service_account_email = service_account_email
         @service_account_password = service_account_password
         @internet_proxy = internet_proxy
+        @hide_all_day_bookings = hide_all_day_bookings
         ews_opts = { http_opts: { ssl_verify_mode: 0 } }
         ews_opts[:http_opts][:http_client] = @internet_proxy if @internet_proxy
         STDERR.puts '--------------- NEW CLIENT CREATED --------------'
@@ -227,7 +228,7 @@ class Microsoft::Exchange
                 }
             } if event.required_attendees
 
-            if hide_all_day_bookings
+            if @hide_all_day_bookings
                 next if (event.end - event.start) > 86399
             end
             bookings.push(booking)
