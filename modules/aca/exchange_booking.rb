@@ -801,7 +801,7 @@ class Aca::ExchangeBooking
             system[:Skype].set_uri(nil) if skype_exists
         end
 
-        results
+        results.compact
     end
     # =======================================
 end
