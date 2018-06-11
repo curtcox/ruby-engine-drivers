@@ -57,11 +57,14 @@ class Aca::Router
     # 'atomic'      may be used to throw an exception, prior to any device
     #               interaction taking place if any of the routes are not
     #               possible
+    # `force`       may be used to force all switching, regardless of if the
+    #               associated device module is already reporting it's on the
+    #               correct input
     #
     # Multiple sources can be specified simultaneously, or if connecting a
     # single source to a single destination, Ruby's implicit hash syntax can be
     # used to let you express it neatly as `connect source => sink`.
-    def connect(signal_map, atomic: false)
+    def connect(signal_map, atomic: false, force: false)
         routes = {}
         signal_map.each_pair do |source, sinks|
             routes[source] = route_many source, sinks, strict: atomic
@@ -75,7 +78,7 @@ class Aca::Router
         check_conflicts routes, strict: atomic
 
         edges = routes.values.map(&:second).reduce(&:|)
-        interactions = edges.map { |e| activate e }
+        interactions = edges.map { |e| activate e, force: force }
         thread.finally(interactions).then do |results|
             _, failed = results.partition(&:last)
             if failed.empty?
@@ -219,19 +222,20 @@ class Aca::Router
         end
     end
 
-    def activate(edge)
+    def activate(edge, force: false)
         mod = system[edge.device]
 
         if edge.nx1? && mod.respond_to?(:switch_to)
-            mod.switch_to edge.input
+            needs_switch = mod[:input] != edge.input
+            mod.switch_to edge.input if needs_switch || force
 
         elsif edge.nxn? && mod.respond_to?(:switch)
+            # TODO: define standard API for exposing matrix state
             mod.switch edge.input => edge.output
 
         elsif edge.nx1? && signal_graph.outdegree(edge.source) == 1
             logger.warn "cannot perform switch on #{edge.device}. " \
                 "This may be ok as only one input (#{edge.target}) is defined."
-            thread.defer.resolve.promise
 
         else
             thread.reject "cannot interact with #{edge.device}. " \
