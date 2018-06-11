@@ -24,7 +24,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         reserve_time: 5.minutes.to_i,
 
         snmp_options: {
-            snmp_version: 1,
+            version: 1,
             community: 'public'
         }
     })
