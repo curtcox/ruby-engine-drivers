@@ -100,54 +100,51 @@ class Aca::Router
         end
     end
 
-    # Lookup the name of the input on a sink node that would be used to connect
-    # a source to it.
+    # Lookup the input on a sink node that would be used to connect a specific
+    # source to it.
     #
-    # This can be used to register the source on devices such as codecs that
-    # support upstream switching.
-    def input_for(source, sink)
+    # `on` may be ommited if the source node has only one neighbour (e.g. is
+    # an input node) and you wish to query the phsycial input associated with
+    # it. Similarly `on` maybe used to look up the input used by any other node
+    # within the graph that would be used to show `source`.
+    def input_for(source, on: nil)
+        sink = on || upstream(source)
         _, edges = route source, sink
         edges.last.input
     end
 
-    # Get the device and associated input immediately upstream of an input node.
+    # Get the node immediately upstream of an input node.
     #
     # Depending on the device API, this may be of use for determining signal
     # presence.
     def upstream(source, sink = nil)
         if sink.nil?
             edges = signal_graph.incoming_edges source
-            unless edges.size == 1
-                raise ArgumentError, "more than one edge to #{source}, " \
-                    'please specify a sink'
-            end
-            _, edge = edges.first
+            raise "no outputs from #{source}" if edges.empty?
+            raise "multiple outputs from #{source}, please specify a sink" \
+                if edges.size > 1
         else
             _, edges = route source, sink
-            edge = edges.first
         end
 
-        [edge.device, edge.input]
+        edges.first.source
     end
 
-    # Get the device immediately preceeding an output node.
+    # Get the node immediately downstream of an output node.
     #
     # This may be used walking back up the signal graph to find a decoder for
-    # and output device.
+    # an output device.
     def downstream(sink, source = nil)
         if source.nil?
             edges = signal_graph.outgoing_edges sink
-            unless edges.size == 1
-                raise ArgumentError, "more than one input to #{sink}, " \
-                    'please specify a source'
-            end
-            _, edge = edges.first
+            raise "no inputs to #{sink}" if edges.empty?
+            raise "multiple inputs to #{sink}, please specify a source" \
+                if edges.size > 1
         else
             _, edges = route source, sink
-            edge = edges.last
         end
 
-        edge.target
+        edges.last.target
     end
 
 
