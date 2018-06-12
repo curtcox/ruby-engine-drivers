@@ -71,12 +71,12 @@ class Lutron::Lighting
         send_cmd component.to_s.upcase, device, 1, level, time
     end
 
-    def blinds(device, action, component = :area)
+    def blinds(device, action, component = :shadegrp)
         case action.to_s.downcase
         when 'raise', 'up'
-            send_cmd component.to_s.upcase, device, 2
-        when 'lower', 'down'
             send_cmd component.to_s.upcase, device, 3
+        when 'lower', 'down'
+            send_cmd component.to_s.upcase, device, 2
         when 'stop'
             send_cmd component.to_s.upcase, device, 4
         end
