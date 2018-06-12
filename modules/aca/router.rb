@@ -16,10 +16,15 @@ class Aca::Router
         devices and complex/layered switching infrastructure.
     DESC
 
+
     default_settings(
         # Nested hash of signal connectivity. See SignalGraph.from_map.
         connections: {}
     )
+
+
+    # ------------------------------
+    # Callbacks
 
     def on_load
         on_update
@@ -50,6 +55,10 @@ class Aca::Router
         self[:inputs] = signal_graph.sinks.map(&:id)
         self[:outputs] = signal_graph.sources.map(&:id)
     end
+
+
+    # ------------------------------
+    # Public API
 
     # Route a set of signals to arbitrary destinations.
     #
@@ -140,6 +149,10 @@ class Aca::Router
 
         edge.target
     end
+
+
+    # ------------------------------
+    # Internals
 
     protected
 
