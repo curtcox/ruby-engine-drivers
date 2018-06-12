@@ -949,6 +949,10 @@ class Aca::MeetingRoom < Aca::Joiner
             inp = src[:input]
             out = src[:output]
             system[:Switcher].switch({inp => out}) if inp && out
+            
+            # Enable or disable Cisco Speakertrack for this camera
+            speaker_track_setting = src[:auto_camera] # true/false/nil. When nil, no command is sent
+            system[:VidConf].speaker_track(speaker_track_setting) unless speaker_track_setting.nil?
         end
     end
 
