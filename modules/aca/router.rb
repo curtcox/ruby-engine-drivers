@@ -78,7 +78,7 @@ class Aca::Router
         check_conflicts routes, strict: atomic
 
         edges = routes.values.map(&:second).reduce(&:|)
-        interactions = edges.map { |e| activate e, force: force }
+        interactions = edges.map { |e| activate e, force }
         thread.finally(interactions).then do |results|
             _, failed = results.partition(&:last)
             if failed.empty?
@@ -222,7 +222,7 @@ class Aca::Router
         end
     end
 
-    def activate(edge, force: false)
+    def activate(edge, force = false)
         mod = system[edge.device]
 
         if edge.nx1? && mod.respond_to?(:switch_to)
