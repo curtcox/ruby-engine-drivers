@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Lutron; end
 
 # Documentation: https://aca.im/driver_docs/Lutron/lutron-lighting.pdf
@@ -25,9 +27,6 @@ class Lutron::Lighting
         on_update
     end
 
-    def on_unload
-    end
-
     def on_update
         @login = setting(:login) || 'nwk'
         @trigger_type = setting(:trigger) || :area
@@ -37,7 +36,7 @@ class Lutron::Lighting
         send "#{@login}\r\n", priority: 9999
 
         schedule.every('40s') do
-            logger.debug "-- Polling Lutron"
+            logger.debug '-- Polling Lutron'
             scene? 1
         end
     end
@@ -66,7 +65,7 @@ class Lutron::Lighting
         level = in_range(level.to_i, 100)
         seconds = (rate.to_i / 1000).to_i
         min = seconds / 60
-        seconds = seconds - (min * 60)
+        seconds -= min * 60
         time = "#{min.to_s.rjust(2, '0')}:#{seconds.to_s.rjust(2, '0')}"
         send_cmd component.to_s.upcase, device, 1, level, time
     end
@@ -141,9 +140,9 @@ class Lutron::Lighting
 
     def light_level(area, level, component = nil, fade = 1000)
         if component
-            level(area, level, rate = 1000, component)
+            level(area, level, fade, component)
         else
-            level(area, level, rate = 1000, :area)
+            level(area, level, fade, :area)
         end
     end
 
@@ -202,7 +201,7 @@ class Lutron::Lighting
             return :abort
         end
 
-        return :success
+        :success
     end
 
     protected
