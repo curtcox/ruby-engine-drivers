@@ -66,7 +66,7 @@ class Aca::Router
     # 'atomic'      may be used to throw an exception, prior to any device
     #               interaction taking place if any of the routes are not
     #               possible
-    # `force`       may be used to force all switching, regardless of if the
+    # `force`       control if switch events should be forced, even when the
     #               associated device module is already reporting it's on the
     #               correct input
     #
