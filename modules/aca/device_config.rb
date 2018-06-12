@@ -5,7 +5,7 @@ module Aca; end
 class Aca::DeviceConfig
     include ::Orchestrator::Constants
 
-    descriptive_name 'Device Config Manager'
+    descriptive_name 'ACA Device Config Manager'
     generic_name :DeviceConfig
     implements :logic
     description <<~DESC
