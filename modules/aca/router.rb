@@ -388,13 +388,13 @@ class Aca::Router::SignalGraph
     end
 
     def incoming_edges(id)
-        reduce(HashWithIndifferentAccess.new) do |edges, node|
-            edges.tap { |e| e[node.id] = node.edges[id] if node.edges.key? id }
+        reduce([]) do |edges, node|
+            edges << node.edges[id] if node.edges.key? id
         end
     end
 
     def outgoing_edges(id)
-        nodes[id].edges
+        nodes[id].edges.values
     end
 
     def indegree(id)
