@@ -385,7 +385,7 @@ class Aca::Router::SignalGraph
     end
 
     def incoming_edges(id)
-        reduce([]) do |edges, node|
+        each_with_object([]) do |node, edges|
             edges << node.edges[id] if node.edges.key? id
         end
     end
