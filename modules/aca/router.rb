@@ -251,6 +251,8 @@ class Aca::Router
             thread.reject "cannot interact with #{edge.device}. " \
                 'Module may be offline or incompatible.'
         end
+    rescue => e
+        thread.reject "error connecting #{edge.target} to #{edge.source}: #{e}"
     end
 end
 
