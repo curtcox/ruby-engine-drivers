@@ -10,7 +10,7 @@ module Aca::Tracking; end
 
 class Aca::Tracking::PeopleCounter
     include ::Orchestrator::Constants
-    include Orchestrator::StateBinder
+    include ::Orchestrator::StateBinder
     descriptive_name 'ACA People Count'
     generic_name :Count
     implements :logic
