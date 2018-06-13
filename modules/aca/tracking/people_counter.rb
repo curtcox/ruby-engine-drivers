@@ -57,7 +57,7 @@ class Aca::Tracking::PeopleCounter
         current = get_current_booking(@todays_bookings)
 
         # Add the change to the dataset for that meeting
-        current_dataset = ::Aca::Tracking::PeopleCount.find_by_id("count-#{current[:id]}") || create_dataset(new_count, current)
+        current_dataset = Aca::Tracking::PeopleCount.find_by_id("count-#{current[:id]}") || create_dataset(new_count, current)
 
         # Check if the new count is max
         dataset.maximum = new_count if new_count > dataset.maximum
@@ -71,7 +71,7 @@ class Aca::Tracking::PeopleCounter
 
     def create_dataset(count, booking)
         logger.info "Creating a dataset"
-        dataset = ::Aca::Tracking::PeopleCount.new
+        dataset = Aca::Tracking::PeopleCount.new
 
         # # Dataset attrs
         # attribute :room_email,   type: String  
@@ -155,7 +155,7 @@ class Aca::Tracking::PeopleCounter
         self[:todays_bookings] = []
         schedule.clear
         logger.info "Starting booking update in 30s"
-        schedule.in('30s') { 
+        schedule.in('10s') { 
             logger.info "Grabbing bookings to update"
             self[:todays_bookings] = system[:Bookings][:today]
             booking_changed(self[:todays_bookings])
