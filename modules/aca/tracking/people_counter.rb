@@ -66,7 +66,12 @@ class Aca::Tracking::PeopleCounter
         logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
         # Add the change to the dataset for that meeting
-        current_dataset = Aca::Tracking::PeopleCount.find_by_id("count-#{current[:id]}") || create_dataset(new_count, current)
+        current_dataset = Aca::Tracking::PeopleCount.find_by_id("count-#{current[:id]}")
+        if current_dataset.nil?
+            current_dataset = create_dataset(new_count, current)
+            logger.info "Created dataset with ID: #{current_dataset.id}"
+            logger.info "Created dataset with counts: #{current_dataset.counts}"
+        end
 
         # Check if the new count is max
         current_dataset.maximum = new_count if new_count > current_dataset.maximum
@@ -101,7 +106,6 @@ class Aca::Tracking::PeopleCounter
         dataset.median = count
         dataset.booking_id = booking[:id]
         dataset.organiser = booking[:owner]
-        logger.info "Created dataset with ID: #{dataset.id}"
         return dataset if dataset.save!
     end
 
