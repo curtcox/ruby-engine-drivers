@@ -79,22 +79,23 @@ class Aca::Router
             routes[source] = route_many source, sinks, strict: atomic
         end
 
-        logger.debug do
-            nodes = routes.transform_values { |n, _| n.map(&:to_s) }
-            "Nodes to connect: #{nodes}"
-        end
-
         check_conflicts routes, strict: atomic
 
         edges = routes.values.map(&:second).reduce(&:|)
+        edges, unroutable = edges.partition { |e| can_activate? e }
+        raise 'can not perform all routes' if unroutable.any? && atomic
+
         interactions = edges.map { |e| activate e, force }
+
         thread.finally(interactions).then do |results|
-            _, failed = results.partition(&:last)
+            failed = edges.zip(results).reject { |_, (_, resolved)| resolved }
             if failed.empty?
                 logger.debug 'all routes activated successfully'
                 signal_map
             else
-                failed.each { |result, _| logger.error result }
+                failed.each do |edge, (error, _)|
+                    logger.error "could not switch #{edge}: #{error}"
+                end
                 thread.reject 'failed to activate all routes'
             end
         end
@@ -232,27 +233,44 @@ class Aca::Router
         end
     end
 
+    def can_activate?(edge)
+        mod = system[edge.device]
+
+        fail_with = proc do |reason|
+            logger.warn "#{edge.device} #{reason} - can not switch #{edge}"
+            return false
+        end
+
+        fail_with['does not exist'] if mod.nil?
+
+        fail_with['offline'] if mod[:connected] == false
+
+        if edge.nx1? && !mod.respond_to?(:switch_to)
+            if signal_graph.outdegree(edge.source) == 1
+                logger.info "can not switch #{edge.device}. " \
+                    "This may be ok as only one input (#{edge.target}) exists."
+            else
+                fail_with['missing #switch_to']
+            end
+        end
+
+        fail_with['missing #switch'] if edge.nxn? && !mod.respond_to?(:switch)
+
+        true
+    end
+
     def activate(edge, force = false)
         mod = system[edge.device]
 
-        if edge.nx1? && mod.respond_to?(:switch_to)
+        if edge.nx1?
             needs_switch = mod[:input] != edge.input
             mod.switch_to edge.input if needs_switch || force
-
-        elsif edge.nxn? && mod.respond_to?(:switch)
+        elsif edge.nxn?
             # TODO: define standard API for exposing matrix state
             mod.switch edge.input => edge.output
-
-        elsif edge.nx1? && signal_graph.outdegree(edge.source) == 1
-            logger.warn "cannot perform switch on #{edge.device}. " \
-                "This may be ok as only one input (#{edge.target}) is defined."
-
         else
-            thread.reject "cannot interact with #{edge.device}. " \
-                'Module may be offline or incompatible.'
+            raise 'unexpected edge type'
         end
-    rescue => e
-        thread.reject "error connecting #{edge.target} to #{edge.source}: #{e}"
     end
 end
 
