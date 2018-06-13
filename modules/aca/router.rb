@@ -95,9 +95,11 @@ class Aca::Router
                 signal_map
             else
                 failed.each do |edge, (error, _)|
-                    logger.error "could not switch #{edge}: #{error}"
+                    logger.warn "could not switch #{edge}: #{error}"
                 end
-                thread.reject 'failed to activate all routes'
+                message = 'failed to activate all routes'
+                logger.error message
+                thread.reject message
             end
         end
     end
