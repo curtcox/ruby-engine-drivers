@@ -66,6 +66,7 @@ class Aca::Tracking::PeopleCounter
         current_dataset.maximum = new_count if new_count > current_dataset.maximum
 
         # Update the dataset with the new count
+        current_dataset.counts_will_change!
         current_dataset.counts.push(Time.now.to_i, new_count)
 
         # Save it back
