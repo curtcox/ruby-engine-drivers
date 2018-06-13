@@ -29,9 +29,9 @@ class Aca::Tracking::PeopleCounter
         self[:todays_bookings] = details
         logger.info "Got new bookings, clearing schedule"
         schedule.clear
-        if Time.parse(meeting[:End]) > Time.now
-            logger.info "Calculating average at #{meeting[:End]}"
-            details.each do |meeting|
+        details.each do |meeting|
+            if Time.parse(meeting[:End]) > Time.now
+                logger.info "Calculating average at #{meeting[:End]}"
                 schedule.at(meeting[:End]) {
                     calculate_average(meeting)
                 }
