@@ -53,7 +53,7 @@ class Aca::Tracking::PeopleCounter
     end
 
     def count_changed(new_count)
-
+        return if self[:todays_bookings].nil? || self[:todays_bookings].empty?
         # Check the current meeting
         current = get_current_booking(self[:todays_bookings])
         
