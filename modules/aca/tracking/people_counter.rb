@@ -22,13 +22,11 @@ class Aca::Tracking::PeopleCounter
 
     durations = []
     total_duration = 0
-    @todays_bookings = nil
     events = []
 
     def booking_changed(details)
         return if details.nil?
         self[:todays_bookings] = details
-        @todays_bookings = details
         details.each do |meeting|
             schedule.at(meeting[:End]) {
                 calculate_average(meeting) if Time.parse(meeting[:End]) > Time.now
@@ -55,10 +53,11 @@ class Aca::Tracking::PeopleCounter
     end
 
     def count_changed(new_count)
-        logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
         # Check the current meeting
-        current = get_current_booking(@todays_bookings)
+        current = get_current_booking(self[:todays_bookings])
+        
+        logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
         # Add the change to the dataset for that meeting
         current_dataset = Aca::Tracking::PeopleCount.find_by_id("count-#{current[:id]}") || create_dataset(new_count, current)
