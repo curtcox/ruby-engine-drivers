@@ -57,6 +57,7 @@ class Aca::Tracking::PeopleCounter
         return if self[:todays_bookings].nil? || self[:todays_bookings].empty?
         # Check the current meeting
         current = get_current_booking(self[:todays_bookings])
+        return if current.nil?
         
         logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
