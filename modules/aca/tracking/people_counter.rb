@@ -1,3 +1,4 @@
+require 'aca/tracking/people_count'
 module Enumerable
   def each_with_previous
     self.inject(nil){|prev, curr| yield prev, curr; curr}
