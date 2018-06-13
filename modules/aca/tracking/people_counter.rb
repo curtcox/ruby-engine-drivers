@@ -51,6 +51,8 @@ class Aca::Tracking::PeopleCounter
     end
 
     def count_changed(new_count)
+        logger.info "Count changed: #{new_count}"
+
         # Check the current meeting
         current = get_current_booking(@todays_bookings)
 
@@ -68,6 +70,7 @@ class Aca::Tracking::PeopleCounter
     end
 
     def create_dataset(count, booking)
+        logger.info "Creating a dataset"
         dataset = ::Aca::Tracking::PeopleCount.new
 
         # # Dataset attrs
@@ -88,10 +91,14 @@ class Aca::Tracking::PeopleCounter
         dataset.median = count
         dataset.booking_id = booking[:id]
         dataset.organiser = booking[:owner]
+        dataset.id = "count-#{booking[:id]}"
+        logger.info "Created dataset with ID: #{dataset.id}"
         return dataset if dataset.save!
     end
 
     def calculate_average(meeting) 
+        logger.info "Calculating average for: #{meeting[:id]}"
+        
         # Set up our holding vars
         durations = []
         total_duration = 0
@@ -141,11 +148,18 @@ class Aca::Tracking::PeopleCounter
         self[:name] = system.name
         self[:views] = 0
         self[:state] = 'Idle'
+        self[:todays_bookings] = []
+        on_update
     end
 
     def on_update
         schedule.clear
-        schedule.every('10s') { update_state }
+        logger.info "Starting booking update in 30s"
+        schedule.in('30s') { 
+            logger.info "Grabbing bookings to update"
+            self[:todays_bookings] = system[:Bookings][:today]
+            booking_changed(self[:todays_bookings])
+        }
     end
 
     def update_state
