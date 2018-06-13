@@ -42,7 +42,7 @@ class Aca::Tracking::PeopleCounter
         details.each do |meeting|
             # Grab the start and end
             meeting_start = Time.at(meeting[:start_epoch]).to_i
-            meeting_end = Time.at(meeting[:start_epoch]).to_i
+            meeting_end = Time.at(meeting[:end_epoch]).to_i
 
             # If it's past the start time and before the end time
             if start_time >= meeting_start && start_time < meeting_end 
