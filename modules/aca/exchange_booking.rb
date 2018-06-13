@@ -791,7 +791,8 @@ class Aca::ExchangeBooking
                 :setup => 0,
                 :breakdown => 0,
                 :start_epoch => real_start.to_i,
-                :end_epoch => real_end.to_i
+                :end_epoch => real_end.to_i,
+                :id => meeting.id
             }
         end
 
