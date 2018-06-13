@@ -26,6 +26,7 @@ class Aca::Tracking::PeopleCounter
 
     def booking_changed(details)
         return if details.nil?
+        self[:todays_bookings] = details
         @todays_bookings = details
         details.each do |meeting|
             schedule.at(meeting[:End]) {
