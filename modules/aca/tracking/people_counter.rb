@@ -63,7 +63,7 @@ class Aca::Tracking::PeopleCounter
         current_dataset = Aca::Tracking::PeopleCount.find_by_id("count-#{current[:id]}") || create_dataset(new_count, current)
 
         # Check if the new count is max
-        dataset.maximum = new_count if new_count > dataset.maximum
+        current_dataset.maximum = new_count if new_count > current_dataset.maximum
 
         # Update the dataset with the new count
         current_dataset.counts.push(Time.now.to_i, new_count)
