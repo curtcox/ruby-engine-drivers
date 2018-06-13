@@ -55,7 +55,7 @@ class Aca::Tracking::PeopleCounter
     end
 
     def count_changed(new_count)
-        logger.info "Count changed: #{new_count}"
+        logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
         # Check the current meeting
         current = get_current_booking(@todays_bookings)
