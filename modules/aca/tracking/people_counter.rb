@@ -27,6 +27,7 @@ class Aca::Tracking::PeopleCounter
     def booking_changed(details)
         return if details.nil?
         self[:todays_bookings] = details
+        schedule.clear
         details.each do |meeting|
             schedule.at(meeting[:End]) {
                 calculate_average(meeting) if Time.parse(meeting[:End]) > Time.now
@@ -67,7 +68,7 @@ class Aca::Tracking::PeopleCounter
 
         # Update the dataset with the new count
         current_dataset.counts_will_change!
-        current_dataset.counts.push(Time.now.to_i, new_count)
+        current_dataset.counts.push([Time.now.to_i, new_count])
 
         # Save it back
         current_dataset.save!
