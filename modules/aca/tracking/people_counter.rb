@@ -119,7 +119,7 @@ class Aca::Tracking::PeopleCounter
         # Get the dataset
         dataset = ::Aca::Tracking::PeopleCount.find_by_id("count-#{meeting[:id]}") 
 
-        events = dataset.counts
+        events = dataset.counts.dup
 
         # Calculate array of weighted durations
         events.each_with_previous do |prev, curr|
