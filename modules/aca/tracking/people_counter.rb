@@ -40,6 +40,7 @@ class Aca::Tracking::PeopleCounter
     def get_current_booking(details)
         start_time = Time.now.to_i
         # For every meeting
+        current = nil
         details.each do |meeting|
             # Grab the start and end
             meeting_start = Time.at(meeting[:start_epoch]).to_i
@@ -47,9 +48,10 @@ class Aca::Tracking::PeopleCounter
 
             # If it's past the start time and before the end time
             if start_time >= meeting_start && start_time < meeting_end 
-               return meeting
+               current = meeting
             end
         end
+        current
     end
 
     def count_changed(new_count)
