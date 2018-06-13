@@ -29,7 +29,7 @@ class Aca::Tracking::PeopleCounter
         @todays_bookings = details
         details.each do |meeting|
             schedule.at(meeting[:End]) {
-                calculate_average(meeting)
+                calculate_average(meeting) if Time.parse(meeting[:End]) > Time.now
             }
         end
         
@@ -91,7 +91,6 @@ class Aca::Tracking::PeopleCounter
         dataset.median = count
         dataset.booking_id = booking[:id]
         dataset.organiser = booking[:owner]
-        dataset.id = "count-#{booking[:id]}"
         logger.info "Created dataset with ID: #{dataset.id}"
         return dataset if dataset.save!
     end
