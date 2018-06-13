@@ -145,14 +145,14 @@ class Aca::Tracking::PeopleCounter
 
 
     def on_load
-        self[:name] = system.name
-        self[:views] = 0
-        self[:state] = 'Idle'
-        self[:todays_bookings] = []
         on_update
     end
 
     def on_update
+        self[:name] = system.name
+        self[:views] = 0
+        self[:state] = 'Idle'
+        self[:todays_bookings] = []
         schedule.clear
         logger.info "Starting booking update in 30s"
         schedule.in('30s') { 
