@@ -1,3 +1,5 @@
+module Aca; end
+module Aca::Tracking
 class Aca::Tracking::PeopleCount < CouchbaseOrm::Base
     design_document :pcount
 
@@ -11,4 +13,12 @@ class Aca::Tracking::PeopleCount < CouchbaseOrm::Base
     attribute :median,       type: Integer
     attribute :organiser,    type: String
     attribute :counts,       type: Array, default: []
+
+    protected
+
+
+    before_create :set_id
+    def set_id
+        self.id = "count-#{self.booking_id}"
+    end
 end
