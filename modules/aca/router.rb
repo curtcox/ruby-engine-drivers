@@ -82,6 +82,7 @@ class Aca::Router
         check_conflicts routes, strict: atomic
 
         edges = routes.values.map(&:second).reduce(&:|)
+
         edges, unroutable = edges.partition { |e| can_activate? e }
         raise 'can not perform all routes' if unroutable.any? && atomic
 
@@ -89,7 +90,7 @@ class Aca::Router
 
         thread.finally(interactions).then do |results|
             failed = edges.zip(results).reject { |_, (_, resolved)| resolved }
-            if failed.empty?
+            if (failed + unroutable).empty?
                 logger.debug 'all routes activated successfully'
                 signal_map
             else
