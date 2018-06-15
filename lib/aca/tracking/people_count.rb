@@ -12,7 +12,7 @@ class Aca::Tracking::PeopleCount < CouchbaseOrm::Base
     attribute :average,      type: Integer 
     attribute :median,       type: Integer
     attribute :organiser,    type: String
-    attribute :counts,       type: Array, default: []
+    attribute :counts,       type: Array, default: lambda { [] }
 
     protected
 
