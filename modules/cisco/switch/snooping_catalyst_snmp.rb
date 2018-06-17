@@ -3,6 +3,7 @@
 
 require 'set'
 require 'protocols/snmp'
+require 'trap_dispatcher'
 
 module Cisco; end
 module Cisco::Switch; end
@@ -85,6 +86,24 @@ class Cisco::Switch::SnoopingCatalystSNMP
         schedule.every('10m') do
             query_index_mappings
         end
+    end
+
+    def on_unload
+        td = TrapDispatcher.instance
+        td.ignore(@resolved_ip) if @resolved_ip
+    end
+
+    def hostname_resolution(ip)
+        td = TrapDispatcher.instance
+        td.ignore(@resolved_ip) if @resolved_ip
+        @resolved_ip = ip
+        td.register(thread, logger, ip) do |pdu, ip, port|
+            check_link_state(pdu)
+        end
+    end
+
+    def check_link_state(pdu)
+        logger.debug { "processing trap PDU" }
     end
 
     AddressType = {
