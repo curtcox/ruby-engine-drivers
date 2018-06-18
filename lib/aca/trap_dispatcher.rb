@@ -5,33 +5,32 @@ require 'libuv'
 require 'netsnmp'
 require 'singleton'
 
-class TrapDispatcher
-    include Singleton
+module Aca; end
 
-    V1_Trap = 4
-    Inform = 6
-    V2_Trap = 7
-
+class Aca::SnmpManager
     def initialize
         # IP => callback
         @mappings = {}
 
         # Server start time
         @boots = Time.now.to_i
+    end
 
-        # Bind to the UDP port (162)
-        @reactor = Libuv::Reactor.default
-        @reactor.schedule { configure_server }
+    V1_Trap = 4
+    Inform = 6
+    V2_Trap = 7
+
+    # provide a callback for responding to informs
+    def send_cb(&block)
+        @send_cb = block
     end
 
     def register(thread, logger, ip, **settings, &block)
-        @reactor.schedule { @mappings[ip] = [thread, logger, settings, block] }
-        nil
+        @mappings[ip] = [thread, logger, settings, block]
     end
 
     def ignore(ip)
-        @reactor.schedule { @mappings.delete ip }
-        nil
+        @mappings.delete ip
     end
 
     # Returns the time in seconds since the Agent booted
@@ -41,14 +40,7 @@ class TrapDispatcher
         Time.now.to_i - @boots
     end
 
-    protected
-
-    def configure_server
-        @server = @reactor.udp { |data, ip, port|
-            new_message(data, ip, port)
-        }.bind('0.0.0.0', 162).start_read
-    end
-
+    # Process a message from an agent
     def new_message(data, ip, port)
         thread, logger, settings, callback = @mappings[ip]
         return unless thread
@@ -62,7 +54,8 @@ class TrapDispatcher
         if version == 3
             sec_params_asn = ::OpenSSL::ASN1.decode(headers[2].value).value
             community = sec_params_asn[0].value # technically the engine_id
-        elsif [1, 2].include?(version)
+        elsif [0, 1, 2].include?(version)
+            # version == 0 : SNMP v1
             community = headers[1].value
         else
             logger.warn "unknown SNMP version #{version}"
@@ -106,7 +99,7 @@ class TrapDispatcher
                 encoded_response = response_pdu.to_der
             end
 
-            @server.send(ip, port, encoded_response)
+            @send_cb.call(ip, port, encoded_response)
             thread.schedule { callback.call(request_pdu, ip, port) }
 
         when V1_Trap, V2_Trap
@@ -118,5 +111,40 @@ class TrapDispatcher
         end
     rescue => e
         logger.print_error e, 'processing SNMP message'
+    end
+end
+
+class Aca::TrapDispatcher
+    include Singleton
+
+    def initialize
+        # Configure our manager
+        @manager = ::Aca::SnmpManager.new
+
+        # Bind to the UDP port (162)
+        @reactor = Libuv::Reactor.default
+        @reactor.schedule { configure_server }
+    end
+
+    def register(thread, logger, ip, **settings, &block)
+        @reactor.schedule { @manager.register(thread, logger, ip, **settings, &block) }
+        nil
+    end
+
+    def ignore(ip)
+        @reactor.schedule { @manager.ignore(ip) }
+        nil
+    end
+
+    protected
+
+    def configure_server
+        @server = @reactor.udp { |data, ip, port|
+            new_message(data, ip, port)
+        }.bind('0.0.0.0', 162).start_read
+
+        @manager.send_cb do |ip, port, response|
+            @server.send(ip, port, response)
+        end
     end
 end

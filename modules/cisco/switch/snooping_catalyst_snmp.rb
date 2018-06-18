@@ -3,7 +3,7 @@
 
 require 'set'
 require 'protocols/snmp'
-require 'trap_dispatcher'
+require 'aca/trap_dispatcher'
 
 module Cisco; end
 module Cisco::Switch; end
@@ -63,6 +63,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         settings = setting(:snmp_options).to_h.symbolize_keys
         settings[:proxy] = Protocols::Snmp.new(self)
         @client = NETSNMP::Client.new(settings)
+        @community = settings[:community]
 
         self[:name] = @switch_name = setting(:switch_name)
         self[:ip_address] = remote_address
@@ -89,12 +90,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def on_unload
-        td = TrapDispatcher.instance
+        td = ::Aca::TrapDispatcher.instance
         td.ignore(@resolved_ip) if @resolved_ip
     end
 
     def hostname_resolution(ip)
-        td = TrapDispatcher.instance
+        td = ::Aca::TrapDispatcher.instance
         td.ignore(@resolved_ip) if @resolved_ip
         @resolved_ip = ip
         td.register(thread, logger, ip) do |pdu, ip, port|
@@ -103,7 +104,47 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def check_link_state(pdu)
-        logger.debug { "processing trap PDU" }
+        logger.warn "community mismatch: trap #{pdu.community.inspect} != #{@community.inspect}" unless @community == pdu.community
+
+        # Looks like: http://www.alvestrand.no/objectid/1.3.6.1.2.1.2.2.1.html
+        # <NETSNMP::PDU:0x007ffed43bb1b0 @version=0, @community="public",
+        #   @error_status=0, @error_index=3, @type=4, @varbinds=[
+        #       #<NETSNMP::Varbind:0x007ffed43bb048 @oid="1.3.6.1.2.1.2.2.1.1.26", @type=nil, @value=26>, (ifEntry)
+        #       #<NETSNMP::Varbind:0x007ffed43bae68 @oid="1.3.6.1.2.1.2.2.1.2.26", @type=nil, @value="GigabitEthernet1/0/19">,
+        #       #<NETSNMP::Varbind:0x007ffed43bacb0 @oid="1.3.6.1.2.1.2.2.1.3.26", @type=nil, @value=6>,  (port type 6 == ethernet)
+        #       #<NETSNMP::Varbind:0x007ffed43baad0 @oid="1.3.6.1.4.1.9.2.2.1.1.20.26", @type=nil, @value="up">
+        #   ], @request_id=1>
+
+        ifIndex = nil
+        state = nil
+        pdu.varbinds.each do |var|
+            oid = var.oid
+            # 1.3.6.1.2.1.2.2.1 == ifEntry
+            if oid.start_with?('1.3.6.1.2.1.2.2.1.1')
+                # port description
+                ifIndex = var.value
+            elsif oid.start_with?('1.3.6.1.4.1.9.2.2.1.1.20')
+                # port state
+                state = var.value.to_sym
+            end
+        end
+        on_trap(ifIndex, state) if ifIndex && state
+    end
+
+    # The SNMP trap handler will notify of changes in interface state
+    def on_trap(ifIndex, state)
+        interface = @if_mappings[ifIndex]
+        case state
+        when :up
+            logger.debug { "Interface Up: #{interface}" }
+            remove_reserved(interface)
+            @check_interface << interface
+        when :down
+            logger.debug { "Interface Down: #{interface}" }
+            remove_lookup(interface)
+        end
+
+        self[:interfaces] = @check_interface.to_a
     end
 
     AddressType = {
@@ -158,22 +199,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 nil
             end
         end
-    end
-
-    # The SNMP trap handler will notify of changes in interface state
-    def on_trap(ifIndex, state)
-        interface = @if_mappings[ifIndex]
-        if state == :up
-            logger.debug { "Interface Up: #{interface}" }
-            remove_reserved(interface)
-            @check_interface << interface
-        elsif state == :down
-            logger.debug { "Interface Down: #{interface}" }
-            remove_lookup(interface)
-        end
-
-        self[:interfaces] = @check_interface.to_a
-        nil
     end
 
     # A row instance contains the Mac address, IP address type, IP address, VLAN number, interface number, leased time, and status of this instance.
