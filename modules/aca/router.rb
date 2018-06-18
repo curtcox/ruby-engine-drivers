@@ -485,9 +485,16 @@ class Aca::Router::SignalGraph
 
         matrix_nodes = []
 
-        to_hash = proc { |x| x.is_a?(Array) ? Hash[(1..x.size).zip x] : x }
+        connections = map.with_indifferent_access.transform_values! do |inputs|
+            case inputs
+            when Array then (1..inputs.size).zip(inputs).to_h
+            when Hash  then inputs
+            else
+                raise ArgumentError, 'inputs must be a Hash or Array'
+            end
+        end
 
-        map.transform_values!(&to_hash).each_pair do |device, inputs|
+        connections.each_pair do |device, inputs|
             # Create the node for the signal sink
             graph << device
 
@@ -501,13 +508,13 @@ class Aca::Router::SignalGraph
 
                 # Check is the input is a matrix switcher or multi-output
                 # device (such as a USB switch).
-                upstream_device, output = source.split '__'
+                upstream_device, output = source.to_s.split '__'
                 next if output.nil?
 
                 matrix_nodes |= [upstream_device]
 
                 # Push in nodes and edges to each matrix input
-                matrix_inputs = map[upstream_device]
+                matrix_inputs = connections[upstream_device]
                 matrix_inputs.each_pair do |matrix_input, upstream_source|
                     graph << upstream_source
                     graph.join(source, upstream_source) do |edge|
@@ -521,8 +528,8 @@ class Aca::Router::SignalGraph
 
         # Remove any temp 'matrix device nodes' as we now how fully connected
         # nodes for each input and output.
-        matrix_nodes.reduce(graph) do |g, node|
-            g.delete node, check_incoming_edges: false
-        end
+        matrix_nodes.each { |id| graph.delete id, check_incoming_edges: false }
+
+        graph
     end
 end
