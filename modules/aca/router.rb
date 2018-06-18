@@ -31,29 +31,7 @@ class Aca::Router
     end
 
     def on_update
-        logger.debug 'building graph from signal map'
-
-        @path_cache = nil
-
-        connections = setting(:connections).transform_values do |inputs|
-            # Read in numeric inputs as ints (as JSON based settings do not
-            # allow non-string keys)
-            if inputs.is_a? Hash
-                inputs.transform_keys! { |i| Integer(i) rescue i }
-            else
-                inputs
-            end
-        end
-        begin
-            @signal_graph = SignalGraph.from_map(connections).freeze
-        rescue
-            logger.error 'invalid connection settings'
-        end
-
-        # TODO: track active signal source at each node and expose as a hash
-        self[:nodes] = signal_graph.map(&:id)
-        self[:inputs] = signal_graph.sinks.map(&:id)
-        self[:outputs] = signal_graph.sources.map(&:id)
+        load_from_map setting(:connections)
     end
 
 
@@ -167,6 +145,18 @@ class Aca::Router
         end
     end
 
+    def load_from_map(connections)
+        logger.debug 'building graph from signal map'
+
+        @path_cache = nil
+        @signal_graph = SignalGraph.from_map(connections).freeze
+
+        # TODO: track active signal source at each node and expose as a hash
+        self[:nodes] = signal_graph.map(&:id)
+        self[:inputs] = signal_graph.sinks.map(&:id)
+        self[:outputs] = signal_graph.sources.map(&:id)
+    end
+
     # Find the shortest path between between two nodes and return a list of the
     # nodes which this passes through and their connecting edges.
     def route(source, sink)
@@ -194,7 +184,7 @@ class Aca::Router
         [nodes, edges]
     end
 
-    # Find the optimum combined paths requires to route a single source to
+    # Find the optimum combined paths required to route a single source to
     # multiple sink devices.
     def route_many(source, sinks, strict: false)
         node_exists = proc do |id|
@@ -455,6 +445,21 @@ class Aca::Router::SignalGraph
         "{ #{to_a.join ', '} }"
     end
 
+    # Pre-parse a connection map into a normalised nested hash structure for
+    # parsing into a graph.
+    def self.normalise(map)
+        map.with_indifferent_access.transform_values! do |inputs|
+            case inputs
+            when Array
+                (1..inputs.size).zip(inputs).to_h
+            when Hash
+                inputs.transform_keys { |x| Integer(x) rescue x }
+            else
+                raise ArgumentError, 'inputs must be a Hash or Array'
+            end
+        end
+    end
+
     # Build a signal map from a nested hash of input connectivity.
     #
     # `map` should be of the structure
@@ -483,14 +488,7 @@ class Aca::Router::SignalGraph
 
         matrix_nodes = []
 
-        connections = map.with_indifferent_access.transform_values! do |inputs|
-            case inputs
-            when Array then (1..inputs.size).zip(inputs).to_h
-            when Hash  then inputs
-            else
-                raise ArgumentError, 'inputs must be a Hash or Array'
-            end
-        end
+        connections = normalise map
 
         connections.each_pair do |device, inputs|
             # Create the node for the signal sink
