@@ -374,10 +374,8 @@ class Aca::Router::SignalGraph
     # to false to keep this O(1) rather than O(n). Using this flag at any other
     # time will result a corrupt structure.
     def delete(id, check_incoming_edges: true)
-        nodes.except! id
-
+        nodes.delete(id) { raise ArgumentError, "\"#{id}\" does not exist" }
         each { |node| node.edges.delete id } if check_incoming_edges
-
         self
     end
 
