@@ -108,10 +108,11 @@ class Clipsal::CBus
         level = level & 0xFF
         application = application & 0xFF
 
-        stop_fading(group)
-        command = [0x05, application, 0x00, rate, group, level]
+        # stop_fading(group)
+        stop_f = cmd_string([0x05, 0x38, 0x00, 0x09, group])
+        command = stop_f + cmd_string([0x05, application, 0x00, rate, group, level])
 
-        do_send(command)
+        send(command, name: "level_#{application}_#{group}")
     end
 
     def stop_fading(group)
@@ -275,6 +276,10 @@ class Clipsal::CBus
         return (check % 0x100) == 0x00
     end
 
+    def cmd_string(command)
+        string = byte_to_hex(command << checksum(command)).upcase
+        "\\#{string}\r"
+    end
 
     def do_send(command, options = {})
         string = byte_to_hex(command << checksum(command)).upcase
