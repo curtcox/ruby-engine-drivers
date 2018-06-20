@@ -51,8 +51,10 @@ class Aca::SlackConcierge
                 messages[i]['email'] = message['username'].split(' (')[1][0..-2] if message.key?('username')
                 authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
                 user = User.find_by_email(authority_id, messages[i]['email'])
-                messages[i]['last_sent'] = user.last_message_sent
-                messages[i]['last_read'] = user.last_message_read
+                if !user.nil?
+                    messages[i]['last_sent'] = user.last_message_sent
+                    messages[i]['last_read'] = user.last_message_read
+                end
                 # update_last_message_read(messages[i]['email'])
             else
                 messages[i]['name'] = message['username']
