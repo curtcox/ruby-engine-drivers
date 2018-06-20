@@ -54,6 +54,9 @@ class Aca::SlackConcierge
                 if !user.nil?
                     messages[i]['last_sent'] = user.last_message_sent
                     messages[i]['last_read'] = user.last_message_read
+                else
+                    messages[i]['last_sent'] = nil
+                    messages[i]['last_read'] = nil
                 end
                 # update_last_message_read(messages[i]['email'])
             else
