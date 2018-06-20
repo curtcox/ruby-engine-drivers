@@ -32,6 +32,13 @@ class Aca::SlackConcierge
         message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, thread_ts: thread_id, username: 'Concierge'
     end
 
+    def update_last_message_read(email)
+        authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
+        user = User.find_by_email(authority_id, email)
+        user.last_message_read = Time.now.to_i * 1000
+        user.save!
+    end
+
     def get_threads
         messages = @client.web_client.channels_history({channel: setting(:channel), oldest: (Time.now - 12.months).to_i, count: 1000})['messages']
         messages.delete_if{ |message|
@@ -42,6 +49,11 @@ class Aca::SlackConcierge
             if message['username'].include?('(')
                 messages[i]['name'] = message['username'].split(' (')[0] if message.key?('username')
                 messages[i]['email'] = message['username'].split(' (')[1][0..-2] if message.key?('username')
+                authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
+                user = User.find_by_email(authority_id, email)
+                messages[i]['last_sent'] = user.last_message_sent
+                messages[i]['last_read'] = user.last_message_read
+                # update_last_message_read(messages[i]['email'])
             else
                 messages[i]['name'] = message['username']
             end
@@ -68,6 +80,12 @@ class Aca::SlackConcierge
         messages = JSON.parse(response.body)['messages']
         self["thread_#{thread_id}"] = messages
         return nil
+    end
+
+    def update_read_time(thread_id)
+        user = User.find(User.bucket.get("slack-user-#{thread_id}", quiet: true))
+        user.last_message_read = Time.now.to_i * 1000
+        user.save!
     end
 
     protected
@@ -110,20 +128,31 @@ class Aca::SlackConcierge
                 if data.key?('subtype') && data['subtype'] == 'message_replied'
                     next
                 end
+                user_email = nil
                 # # This is not a reply 
                 if data.key?('thread_ts')
+                    #  if data['username'].include?('(')
+                    #     user_email = data['username'].split(' (')[1][0..-2] if data.key?('username')
+                    # end
                     get_thread(data['ts'])
                     get_thread(data['thread_ts'])
                 else
-                    logger.info "Adding thread too binding"
+                    logger.info "Adding thread to binding"
                     if data['username'].include?('(')
                         data['name'] = data['username'].split(' (')[0] if data.key?('username')
                         data['email'] = data['username'].split(' (')[1][0..-2] if data.key?('username')
+                        # user_email = data['email']
                     else
                         data['name'] = data['username']
                     end
                     messages = self["threads"].dup.unshift(data)
                     self["threads"] = messages
+                    # if user_email
+                    #     authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
+                    #     user = User.find_by_email(authority_id, user_email)
+                    #     user.last_message_read = Time.now.to_i * 1000
+                    #     user.save!
+                    # end
                     logger.debug "Getting threads! "
                     get_threads
                 end
