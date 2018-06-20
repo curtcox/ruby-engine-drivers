@@ -34,6 +34,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         # flag to indicate if processing is occuring
         @processing = nil
         @process_queue = []
+        @if_mappings = {}
 
         @check_interface = ::Set.new
         @reserved_interface = ::Set.new
@@ -76,17 +77,18 @@ class Cisco::Switch::SnoopingCatalystSNMP
     def connected
         schedule.clear
 
-        query_index_mappings
-        schedule.in(10000) { query_connected_devices }
+        # Grab the initial state
+        next_tick { query_connected_devices }
+
+        # Connected device polling (in case a trap was dropped by the network)
+        # Also expires any desk reservations
         schedule.every('1m') do
             query_connected_devices
             check_reservations if @reserve_time > 0
         end
 
         # There is a possibility that these will change on switch reboot
-        schedule.every('10m') do
-            query_index_mappings
-        end
+        schedule.every('10m') { query_index_mappings }
     end
 
     def on_unload
@@ -98,9 +100,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         td = ::Aca::TrapDispatcher.instance
         td.ignore(@resolved_ip) if @resolved_ip
         @resolved_ip = ip
-        td.register(thread, logger, ip) do |pdu, ip, port|
-            check_link_state(pdu)
-        end
+        td.register(thread, logger, ip) { |pdu| check_link_state(pdu) }
     end
 
     def check_link_state(pdu)
@@ -351,6 +351,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     def query_connected_devices
         logger.debug "Querying for connected devices"
+        query_index_mappings if @if_mappings.empty?
         query_interface_status
         query_snooping_bindings
     end
