@@ -909,7 +909,7 @@ class Aca::MeetingRoom < Aca::Joiner
 
     def vc_mute(mute)
         vidconf = system[:VidConf]
-        vidconf.mute(mute) unless vidconf.nil?
+        vidconf.mute(mute) unless vidconf.nil? || setting(:disable_vc_mute)
         perform_action(mod: :System, func: :vc_mute_actual, args: [mute])
     end
 
