@@ -87,11 +87,15 @@ class Aca::Slack
             messages = JSON.parse(response.body)['messages']
             
             {
+                last_sent: user.last_message_sent
+                last_read: user.last_message_read
                 thread_id: thread_id,
                 messages: messages
             }
         else
             {
+                last_sent: user.last_message_sent
+                last_read: user.last_message_read
                 thread_id: nil,
                 messages: []
             }
