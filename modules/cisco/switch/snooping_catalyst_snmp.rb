@@ -378,7 +378,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             # Next tick schedule will be killed when the module is stopped
             # i.e. this prevents infinite loops if requests take a long time
             # and the queue is never empty.
-            schedule.in(0) do
+            next_tick do
                 # Allow the next request to occur
                 @processing = nil
 
