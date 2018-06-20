@@ -11,6 +11,12 @@ class Aca::SlackConcierge
     generic_name :Slack
     implements :logic
 
+    def log(msg)
+        logger.info msg
+        STDERR.puts msg
+        STDERR.flush
+    end
+
     def on_load
         on_update
     end
@@ -50,6 +56,10 @@ class Aca::SlackConcierge
                 messages[i]['name'] = message['username'].split(' (')[0] if message.key?('username')
                 messages[i]['email'] = message['username'].split(' (')[1][0..-2] if message.key?('username')
                 authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
+                log("GOT AUTHORITY ID")
+                log(authority_id)
+                log("GOT EMAIL")
+                log(messages[i]['email'])
                 user = User.find_by_email(authority_id, messages[i]['email'])
                 if !user.nil?
                     messages[i]['last_sent'] = user.last_message_sent
