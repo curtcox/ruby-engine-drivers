@@ -3,7 +3,7 @@
 module Samsung; end
 module Samsung::Displays; end
 
-# Documentation: https://aca.im/driver_docs/Samsung/MDC+Protocol+2015+v13.7c.pdf
+# Documentation: https://aca.im/driver_docs/Samsung/MDC%20Protocol%202015%20v13.7c.pdf
 
 class Samsung::Displays::MdSeries
     include ::Orchestrator::Constants

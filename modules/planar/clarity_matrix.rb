@@ -1,6 +1,6 @@
 module Planar; end
 
-# Documentation: https://aca.im/driver_docs/Planar/020-1028-00+RS232+for+Matrix.pdf
+# Documentation: https://aca.im/driver_docs/Planar/020-1028-00%20RS232%20for%20Matrix.pdf
 #  also https://aca.im/driver_docs/Planar/020-0567-05_WallNet_guide.pdf
 
 class Planar::ClarityMatrix

@@ -1,7 +1,7 @@
 module Philips; end
 module Philips::Display; end
 
-# Documentation: https://aca.im/driver_docs/Philips/The+SICP+Commands+Document+V1.88_20150819.pdf
+# Documentation: https://aca.im/driver_docs/Philips/The%20SICP%20Commands%20Document%20V1.88_20150819.pdf
 
 class Philips::Display::SicpProtocol
     include ::Orchestrator::Constants

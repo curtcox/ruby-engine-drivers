@@ -1,7 +1,7 @@
 module Shure; end
 module Shure::Microphone; end
 
-# Documentation: https://aca.im/driver_docs/Shure/MXA910+command+strings.pdf
+# Documentation: https://aca.im/driver_docs/Shure/MXA910%20command%20strings.pdf
 
 class Shure::Microphone::Mxw
     include ::Orchestrator::Constants

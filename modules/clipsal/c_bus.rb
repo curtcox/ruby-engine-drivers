@@ -1,8 +1,8 @@
 module Clipsal; end
 
 
-# Documentation: https://aca.im/driver_docs/Clipsal/CBUS+Lighting+Application.pdf
-#  and https://s3-ap-southeast-2.amazonaws.com/aca.im/driver_docs/Clipsal/CBUS+Trigger+Control+Application.pdf
+# Documentation: https://aca.im/driver_docs/Clipsal/CBUS-Lighting-Application.pdf
+#  and https://aca.im/driver_docs/Clipsal/CBUS-Trigger-Control-Application.pdf
 #
 # ACA Recommendations: https://s3-ap-southeast-2.amazonaws.com/aca.im/driver_docs/Clipsal/C-BusLightingSpec.pdf
 
