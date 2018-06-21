@@ -290,9 +290,16 @@ class Aca::Router::SignalGraph
             @target = target
 
             meta = Meta.new.tap(&blk)
+            normalise_io = lambda do |x|
+                if x.is_a? String
+                    x[/^\d+$/]&.to_i || x.to_sym
+                else
+                    x
+                end
+            end
             @device = meta.device&.to_sym
-            @input  = meta.input.try(:to_sym) || meta.input
-            @output = meta.output.try(:to_sym) || meta.output
+            @input  = normalise_io[meta.input]
+            @output = normalise_io[meta.output]
         end
 
         def to_s
