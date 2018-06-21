@@ -365,15 +365,25 @@ class Microsoft::Office
                 locationEmailAddress: room.email
             },
             isOrganizer: false,
-            organizer: {
+            attendees: attendees
+        }
+
+        if current_user
+            event[:organizer] = {
                 emailAddress: {
                     address: current_user.email,
                     name: current_user.name
                 }
-            },
-            attendees: attendees
-        }
-
+            }
+        else
+            event[:organizer] = {
+                emailAddress: {
+                    address: room.email,
+                    name: room.name
+                }
+            }
+        end
+        
         if recurrence
             event[:recurrence] = {
                 pattern: {
