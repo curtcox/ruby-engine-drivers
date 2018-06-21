@@ -1,6 +1,6 @@
 module ClockAudio; end
 
-# Documentation: https://aca.im/driver_docs/Clock+Audio/CDT100_Module.axs
+# Documentation: https://aca.im/driver_docs/Clock%20Audio/CDT100_Module.axs
 
 class ClockAudio::Cdt100
     include ::Orchestrator::Constants

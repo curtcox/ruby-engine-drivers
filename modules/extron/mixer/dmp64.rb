@@ -2,7 +2,7 @@ load File.expand_path('../base.rb', File.dirname(__FILE__))
 module Extron::Mixer; end
 
 
-# Documentation: https://aca.im/driver_docs/Extron/Extron+DMP64+DSP.pdf
+# Documentation: https://aca.im/driver_docs/Extron/Extron%20DMP64%20DSP.pdf
 #
 # Volume outputs
 # 60000 == volume 1

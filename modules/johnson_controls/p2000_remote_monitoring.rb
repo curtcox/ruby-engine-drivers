@@ -2,8 +2,8 @@ require 'nokogiri'
 
 module JohnsonControls; end
 
-# Documentation: https://aca.im/driver_docs/Johnson+Controls/P2000+v4+remote+monitoring.pdf
-#  also https://aca.im/driver_docs/Johnson+Controls/p2000+v3+remote+monitoring.pdf
+# Documentation: https://aca.im/driver_docs/Johnson%20Controls/P2000%20v4%20remote%20monitoring.pdf
+#  also https://aca.im/driver_docs/Johnson%20Controls/p2000%20v3%20remote%20monitoring.pdf
 
 # Works with both the HTTP and raw ASCII protocols
 class JohnsonControls::P2000RemoteMonitoring

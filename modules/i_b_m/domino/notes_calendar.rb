@@ -3,7 +3,7 @@
 module IBM; end
 module IBM::Domino; end
 
-# Documentation: https://aca.im/driver_docs/IBM/Domino+Freebusy+Service.pdf
+# Documentation: https://aca.im/driver_docs/IBM/Domino%20Freebusy%20Service.pdf
 #  also https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=Calendar_events_GET&content=apicontent
 #  also https://www-10.lotus.com/ldd/ddwiki.nsf/xpAPIViewer.xsp?lookupName=IBM+Domino+Access+Services+9.0.1#action=openDocument&res_title=JSON_representation_of_an_event_das901&content=apicontent
 
