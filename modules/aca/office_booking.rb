@@ -520,6 +520,11 @@ class Aca::OfficeBooking
             attendees: [ emailAddress: { address: organizer, name: "User"}]
         }.to_json
 
+        
+        if organizer.nil?
+            booking_data[:attendees] = []
+        end
+
         logger.debug "Creating booking:"
         logger.debug booking_data
 
