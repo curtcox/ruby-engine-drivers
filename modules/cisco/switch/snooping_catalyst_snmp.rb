@@ -2,6 +2,7 @@
 # encoding: ASCII-8BIT
 
 require 'set'
+require 'ipaddr'
 require 'protocols/snmp'
 require 'aca/trap_dispatcher'
 
@@ -198,11 +199,15 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         def ip
             case self.address_type
-            when :ipv4, :ipv4z
+            when :ipv4
+                # DISPLAY-HINT "1d.1d.1d.1d"
                 # Example response: "0A B2 C4 45"
                 self.ip_address.split(' ').map { |i| i.to_i(16).to_s }.join('.')
+            when :ipv6
+                # DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
+                # IPAddr will present the IPv6 address in it's short form
+                IPAddr.new(self.ip_address.gsub(' ', '').scan(/..../).join(':')).to_s
             else
-                # TODO:: IPv6
                 nil
             end
         end
