@@ -338,12 +338,14 @@ class Microsoft::Office
         })
 
         # Add the current user as an attendee
-        attendees.push({
-            emailAddress: {
-                address: current_user[:email],
-                name: current_user[:name]
-            }
-        })
+        if current_user
+            attendees.push({
+                emailAddress: {
+                    address: current_user[:email],
+                    name: current_user[:name]
+                }
+            })
+        end
 
         # Create our event which will eventually be stringified
         event = {
