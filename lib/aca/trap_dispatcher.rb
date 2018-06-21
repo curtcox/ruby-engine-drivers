@@ -140,7 +140,7 @@ class Aca::TrapDispatcher
 
     def configure_server
         @server = @reactor.udp { |data, ip, port|
-            new_message(data, ip, port)
+            @manager.new_message(data, ip, port)
         }.bind('0.0.0.0', 162).start_read
 
         @manager.send_cb do |ip, port, response|
