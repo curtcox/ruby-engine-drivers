@@ -3,7 +3,7 @@
 module Strong; end
 module Strong::Receiver; end
 
-# Documentation: https://aca.im/driver_docs/Strong/SRT54XX+and+SRT+70XX+RS232+Protocol.pdf
+# Documentation: https://aca.im/driver_docs/Strong/SRT54XX%20and%20SRT%2070XX%20RS232%20Protocol.pdf
 
 class Strong::Receiver::Srt5Srt7
     include ::Orchestrator::Constants

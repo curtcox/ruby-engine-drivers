@@ -1,6 +1,6 @@
 module ScreenTechnics; end
 
-# Documentation: https://aca.im/driver_docs/Screen+Technics/Screen+Technics+IP+Connect+module.pdf
+# Documentation: https://aca.im/driver_docs/Screen%20Technics/Screen%20Technics%20IP%20Connect%20module.pdf
 # Default user: Admin
 # Default pass: Connect
 

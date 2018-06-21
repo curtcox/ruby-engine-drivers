@@ -271,7 +271,7 @@ class Panasonic::Projector::Tcp
     end
 
     # Apply the password hash to the command if a password is required
-    def apply_password(data, command)
+    def apply_password(data)
         if @use_pass
             data = "#{@pass}#{data}"
         end

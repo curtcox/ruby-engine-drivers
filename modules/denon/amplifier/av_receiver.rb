@@ -2,7 +2,7 @@
 module Denon; end
 module Denon::Amplifier; end
 
-# Protocol: https://aca.im/driver_docs/Denon/Denon+AVR+PROTOCOL+V7.5.0.pdf
+# Protocol: https://aca.im/driver_docs/Denon/Denon%20AVR%20PROTOCOL%20V7.5.0.pdf
 #
 #     NOTE:: Denon doesn't respond to commands that request the current state
 #         (ie if the volume is 100 and you request 100 it will not respond)

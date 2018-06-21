@@ -1,7 +1,7 @@
 module Philips; end
 
-# Documentation: https://aca.im/driver_docs/Philips/Dynet+Integrators+hand+book+for+the+DNG232+V2.pdf
-#  also https://aca.im/driver_docs/Philips/DyNet+1+Opcode+Master+List+-+2012-08-29.xls
+# Documentation: https://aca.im/driver_docs/Philips/Dynet%20Integrators%20hand%20book%20for%20the%20DNG232%20V2.pdf
+#  also https://aca.im/driver_docs/Philips/DyNet%201%20Opcode%20Master%20List%20-%202012-08-29.xls
 
 class Philips::Dynalite
     include ::Orchestrator::Constants

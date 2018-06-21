@@ -14,16 +14,48 @@ class Aca::Tracking::LocateUser
     generic_name :LocateUser
     implements :logic
 
+    default_settings({
+        meraki_enabled: false,
+        meraki_scanner: 'https://url.to.scanner',
+        meraki_secret: 'give me access',
+        cmx_enabled: false,
+        cmx_host: 'http://cmxlocationsandbox.cisco.com',
+        cmx_user: 'learning',
+        cmx_pass: 'learning'
+    })
+
     def on_load
         @looking_up = {}
     end
 
     def on_update
+        @meraki_enabled = setting(:meraki_enabled)
+        if @meraki_enabled
+            @scanner = UV::HttpEndpoint.new(setting(:meraki_scanner), {
+                headers: {
+                    Authorization: "Bearer #{setting(:meraki_secret)}"
+                }
+            })
+        else
+            @scanner = nil
+        end
+
+        @cmx_enabled = setting(:cmx_enabled)
+        if @cmx_enabled
+            @cmx = UV::HttpEndpoint.new(setting(:cmx_host), {
+                headers: {
+                    Authorization: [setting(:cmx_user), setting(:cmx_pass)]
+                }
+            })
+        else
+            @cmx = nil
+        end
     end
 
     def lookup(*ips)
-        ips.each do |ip, login, domain|
-            perform_lookup(ip, login, domain)
+        ttl = 10.minutes.ago.to_i
+        ips.each do |ip, login, domain, hostname|
+            perform_lookup(ip, login, domain, hostname, ttl)
         end
     end
 
@@ -59,9 +91,15 @@ class Aca::Tracking::LocateUser
         end
     end
 
+
     protected
 
-    def perform_lookup(ip, login, domain)
+
+    def perform_lookup(ip, login, domain, hostname, ttl)
+        if hostname && self[hostname] != login
+            save_hostname_mapping(domain, login, hostname)
+        end
+
         # prevents concurrent and repeat lookups for the one IP and user
         return if self[ip] == login || @looking_up[ip]
         begin
@@ -79,18 +117,86 @@ class Aca::Tracking::LocateUser
                 self[mac] = login
                 self[ip] = login
             else
-                logger.debug {
-                    if mac
-                        "MAC #{mac} known for #{ip} : #{login}"
-                    else
-                        "unable to locate MAC for #{ip}"
+                if @meraki_enabled && mac.nil?
+                    resp = @scanner.get(path: "/meraki/#{ip}").value
+                    if resp.status == 200
+                        details = JSON.parse(resp.body, symbolize_names: true)
+
+                        if details[:seenEpoch] > ttl
+                            mac = details[:clientMac]
+
+                            if self[mac] != login
+                                logger.debug { "Meraki found #{mac} for #{ip} == #{login}" }
+
+                                # NOTE:: Wireless MAC addresses stored seperately from wired MACs
+                                user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
+                                user.add(mac)
+
+                                self[mac] = login
+                                self[ip] = login
+                            end
+                        end
                     end
-                }
+                end
+
+                if @cmx_enabled && mac.nil?
+                    resp = @cmx.get(path: '/api/location/v2/clients', query: {ipAddress: ip}).value
+                    if resp.status != 204 && (200...300).include?(resp.status)
+                        locations = JSON.parse(resp.body, symbolize_names: true)
+                        if locations.present? && locations[0][:currentlyTracked] == true
+                            mac = locations[0][:macAddress]
+
+                            if self[mac] != login
+                                logger.debug { "CMX found #{mac} for #{ip} == #{login}" }
+
+                                # NOTE:: Wireless MAC addresses stored seperately from wired MACs
+                                user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
+                                user.add(mac)
+
+                                self[mac] = login
+                                self[ip] = login
+                            end
+                        end
+                    end
+                end
+
+                logger.debug { "unable to locate MAC for #{ip}" } if mac.nil?
             end
         rescue => e
             logger.print_error(e, "looking up #{ip}")
         ensure
             @looking_up.delete(ip)
         end
+    end
+
+    def save_hostname_mapping(domain, username, hostname)
+        logger.debug { "Found new machine #{hostname} for #{username}" }
+
+        key = "wifihost-#{domain.downcase}-#{username.downcase}"
+        bucket = User.bucket
+        existing = bucket.get(key, quiet: true)
+
+        if existing
+            if existing[:hostname] == hostname
+                logger.debug { "ignoring #{hostname} as already in database" }
+                self[hostname] = username
+                return
+            end
+            existing[:hostname] = hostname
+            existing[:updated] = Time.now.to_i
+            bucket.set(key, existing)
+        else
+            time = Time.now.to_i
+            data = {
+                hostname: hostname,
+                username: username,
+                domain: domain,
+                created: time,
+                updated: time
+            }
+            bucket.set(key, data)
+        end
+
+        self[hostname] = username
     end
 end
