@@ -518,12 +518,14 @@ class Aca::OfficeBooking
             end: { dateTime: end_time, timeZone: "UTC" },
             location: { displayName: @office_room, locationEmailAddress: @office_room },
             attendees: [ emailAddress: { address: organizer, name: "User"}]
-        }.to_json
+        }
 
-        
+
         if organizer.nil?
             booking_data[:attendees] = []
         end
+
+        booking_data = booking_data.to_json
 
         logger.debug "Creating booking:"
         logger.debug booking_data
