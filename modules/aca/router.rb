@@ -445,8 +445,15 @@ class Aca::Router::SignalGraph
         "{ #{to_a.join ', '} }"
     end
 
-    # Pre-parse a connection map into a normalised nested hash structure for
-    # parsing into a graph.
+    # Pre-parse a connection map into a normalised nested hash structure
+    # suitable for parsing into the graph.
+    #
+    # This assums the input map has come from passed JSON so takes care of
+    # mapping keys back to integers (where suitable) and expanding sources
+    # specified as an array into a nested Hash. The target normalised output is
+    #
+    #     { output: { device_input: source } }
+    #
     def self.normalise(map)
         map.with_indifferent_access.transform_values! do |inputs|
             case inputs
@@ -460,16 +467,36 @@ class Aca::Router::SignalGraph
         end
     end
 
-    # Build a signal map from a nested hash of input connectivity.
+    # Extract module references from a connection map.
     #
-    # `map` should be of the structure
+    # This is a destructive operation that will tranform outputs specified as
+    # `device as output` to simply `output` and return a Hash of the structure
+    # `{ output: device }`.
+    def self.extract_mods!(map)
+        mods = HashWithIndifferentAccess.new
+
+        map.transform_keys! do |key|
+            mod, node = key.to_s.split ' as '
+            node ||= mod
+            mods[node] = mod.to_sym
+            node
+        end
+
+        mods
+    end
+
+    # Build a signal map from a nested hash of input connectivity. The input
+    # map should be of the structure
+    #
     #     { device: { input_name: source } }
     #   or
     #     { device: [source] }
     #
     # When inputs are specified as an array, 1-based indicies will be used.
     #
-    # Sources which exist on matrix switchers are defined as "device__output".
+    # Sources that refer to the output of a matrix switcher are defined as
+    # "device__output" (using two underscores to seperate the output
+    # name/number and device).
     #
     # For example, a map containing two displays and 2 laptop inputs, all
     # connected via 2x2 matrix switcher would be:
@@ -480,15 +507,23 @@ class Aca::Router::SignalGraph
     #         Display_2: {
     #             hdmi: :Switcher_1__2
     #         },
-    #         Switcher_1: [:Laptop_1, :Laptop_2]
+    #         Switcher_1: [:Laptop_1, :Laptop_2],
     #     }
     #
+    # Device keys should relate to module id's for control. These may also be
+    # aliased by defining them as as "mod as device". This can be used to
+    # provide better readability (e.g. "Display_1 as Left_LCD") or to segment
+    # them so that only specific routes are allowed. This approach enables
+    # devices such as centralised matrix switchers split into multiple virtual
+    # switchers that only have access to a subset of the inputs.
     def self.from_map(map)
         graph = new
 
         matrix_nodes = []
 
         connections = normalise map
+
+        mods = extract_mods! connections
 
         connections.each_pair do |device, inputs|
             # Create the node for the signal sink
@@ -498,8 +533,8 @@ class Aca::Router::SignalGraph
                 # Create a node and edge to each input source
                 graph << source
                 graph.join(device, source) do |edge|
-                    edge.device = device
-                    edge.input = input
+                    edge.device = mods[device]
+                    edge.input  = input
                 end
 
                 # Check is the input is a matrix switcher or multi-output
@@ -514,8 +549,8 @@ class Aca::Router::SignalGraph
                 matrix_inputs.each_pair do |matrix_input, upstream_source|
                     graph << upstream_source
                     graph.join(source, upstream_source) do |edge|
-                        edge.device = upstream_device
-                        edge.input = matrix_input
+                        edge.device = mods[upstream_device]
+                        edge.input  = matrix_input
                         edge.output = output
                     end
                 end
