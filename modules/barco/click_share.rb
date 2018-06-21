@@ -1,6 +1,6 @@
 module Barco; end
 
-# Documentation: https://aca.im/driver_docs/Barco/barco+clickshare+api.pdf
+# Documentation: https://aca.im/driver_docs/Barco/barco-clickshare-api.pdf
 
 class Barco::ClickShare
     include ::Orchestrator::Constants
