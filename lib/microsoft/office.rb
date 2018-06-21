@@ -47,13 +47,13 @@ class Microsoft::Office
     end 
 
     def graph_token
-       @graph_token ||= @graph_client.client_credentials.get_token({
+       @graph_token = @graph_client.client_credentials.get_token({
             :scope => @app_scope
         }).token
     end
 
     def password_graph_token
-        @graph_token ||= @graph_client.password.get_token(
+        @graph_token = @graph_client.password.get_token(
         @service_account_email,
         @service_account_password,
         {
