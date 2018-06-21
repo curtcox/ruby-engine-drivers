@@ -100,6 +100,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
         td = ::Aca::TrapDispatcher.instance
         td.ignore(@resolved_ip) if @resolved_ip
         @resolved_ip = ip
+
+        logger.debug { "Registering for trap notifications from #{ip}" }
         td.register(thread, logger, ip) { |pdu| check_link_state(pdu) }
     end
 
@@ -134,13 +136,18 @@ class Cisco::Switch::SnoopingCatalystSNMP
     # The SNMP trap handler will notify of changes in interface state
     def on_trap(ifIndex, state)
         interface = @if_mappings[ifIndex]
+        if interface.nil?
+            logger.debug { "Notify: no interface found for #{ifIndex} - #{state}" }
+            return
+        end
+
         case state
         when :up
-            logger.debug { "Interface Up: #{interface}" }
+            logger.debug { "Notify Up: #{interface}" }
             remove_reserved(interface)
             @check_interface << interface
         when :down
-            logger.debug { "Interface Down: #{interface}" }
+            logger.debug { "Notify Down: #{interface}" }
             remove_lookup(interface)
         end
 
