@@ -173,7 +173,7 @@ class Aca::Router
         edges = []
         node = signal_graph[source]
         until node.nil?
-            nodes << node
+            nodes.unshift node
             predecessor = path.predecessor[node.id]
             edges << predecessor.edges[node.id] unless predecessor.nil?
             node = predecessor
