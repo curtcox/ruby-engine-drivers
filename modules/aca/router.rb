@@ -448,11 +448,11 @@ class Aca::Router::SignalGraph
     # Pre-parse a connection map into a normalised nested hash structure
     # suitable for parsing into the graph.
     #
-    # This assums the input map has come from passed JSON so takes care of
+    # This assumes the input map has been parsed from JSON so takes care of
     # mapping keys back to integers (where suitable) and expanding sources
     # specified as an array into a nested Hash. The target normalised output is
     #
-    #     { output: { device_input: source } }
+    #     { device: { input: source } }
     #
     def self.normalise(map)
         map.with_indifferent_access.transform_values! do |inputs|
@@ -492,7 +492,7 @@ class Aca::Router::SignalGraph
     #   or
     #     { device: [source] }
     #
-    # When inputs are specified as an array, 1-based indicies will be used.
+    # When inputs are specified as an array, 1-based indices will be used.
     #
     # Sources that refer to the output of a matrix switcher are defined as
     # "device__output" (using two underscores to seperate the output
