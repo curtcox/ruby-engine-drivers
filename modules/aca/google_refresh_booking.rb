@@ -164,6 +164,7 @@ class Aca::GoogleRefreshBooking
             @google_admin_email = setting(:google_admin_email)
             @google_scope = setting(:google_scope)
             @google_room = (setting(:google_room) || system.email)
+            @google_timezone = setting(:timezone) || "Sydney"
             # supports: SMTP, PSMTP, SID, UPN (user principle name)
             # NOTE:: Using UPN we might be able to remove the LDAP requirement
             @google_connect_type = (setting(:google_connect_type) || :SMTP).to_sym
@@ -348,7 +349,7 @@ class Aca::GoogleRefreshBooking
         calendar_api = Google::Apis::CalendarV3
         calendar = calendar_api::CalendarService.new
         calendar.authorization = authorization
-        events = calendar.list_events(system.email, time_min: Time.now.midnight.iso8601, time_max: Time.now.tomorrow.midnight.iso8601).items
+        events = calendar.list_events(system.email, time_min: ActiveSupport::TimeZone.new(@google_timezone).now.midnight.iso8601, time_max: ActiveSupport::TimeZone.new(@google_timezone).now.tomorrow.midnight.iso8601).items
         
         task {
             todays_bookings(events)
