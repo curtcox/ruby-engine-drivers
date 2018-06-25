@@ -721,7 +721,7 @@ class Aca::ExchangeBooking
 
                 if now_int > start_integer && now_int < end_integer
                     if first
-                        self[:last_meeting_started] = start_integer
+                        self[:last_meeting_started] = start_integer * 1000
                     end
                     meeting.get_all_properties!
 
