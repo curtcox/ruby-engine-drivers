@@ -99,6 +99,7 @@ class Aca::ExchangeBooking
         self[:description] = setting(:description) || nil
         self[:title] = setting(:title) || nil
         self[:timeout] = setting(:timeout) || false
+        self[:endable] = setting(:endable) || false
 
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
         self[:booking_controls] = setting(:booking_controls)
@@ -704,7 +705,7 @@ class Aca::ExchangeBooking
         set_skype_url = true if @force_skype_extract
         now_int = now.to_i
 
-        items.select! { |booking| !booking.cancelled? }
+        # items.select! { |booking| !booking.cancelled? }
         results = items.collect do |meeting|
             item = meeting.ews_item
             start = item[:start][:text]
@@ -759,16 +760,7 @@ class Aca::ExchangeBooking
             # Prevent connections handing with TIME_WAIT
             # cli.ews.connection.httpcli.reset_all
 
-            subject = item[:subject]
-
-
-            if ['private', 'confidential'].include?(meeting.sensitivity.downcase) || subject.nil? || subject.empty?
-                subject = "Private"
-            else
-                subject = subject[:text]
-            end
-
-
+            subject = item[:subject][:text]
             {
                 :Start => start,
                 :End => ending,
