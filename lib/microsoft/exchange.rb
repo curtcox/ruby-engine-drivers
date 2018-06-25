@@ -265,7 +265,7 @@ class Microsoft::Exchange
         # booking[:body] = description
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
         booking[:required_attendees] = [{
-            attendee: { mailbox: { email_address: current_user.email } }
+            attendee: { mailbox: { email_address: current_user[:email] } }
         }]
         attendees.each do |attendee|
             if attendee.class != String
@@ -285,7 +285,7 @@ class Microsoft::Exchange
         if use_act_as
             folder = @ews_client.get_folder(:calendar, { act_as: room_email })
         else
-            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user.email)
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user[:email])
             folder = @ews_client.get_folder(:calendar)
         end
         appointment = folder.create_item(booking)
