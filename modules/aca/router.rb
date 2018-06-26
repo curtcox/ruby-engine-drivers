@@ -230,7 +230,7 @@ class Aca::Router
         mod = system[edge.device]
 
         fail_with = proc do |reason|
-            logger.warn "#{edge.device} #{reason} - can not switch #{edge}"
+            logger.warn "mod #{edge.device} #{reason} - can not switch #{edge}"
             return false
         end
 
