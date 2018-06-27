@@ -99,7 +99,8 @@ class Aca::ExchangeBooking
         self[:description] = setting(:description) || nil
         self[:title] = setting(:title) || nil
         self[:timeout] = setting(:timeout) || false
-        self[:endable] = setting(:endable) || false
+        self[:booking_endable] = setting(:booking_endable) || false
+        self[:booking_ask_end] = setting(:booking_ask_end) || false
 
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
         self[:booking_controls] = setting(:booking_controls)
@@ -355,7 +356,7 @@ class Aca::ExchangeBooking
     # ROOM BOOKINGS:
     # ======================================
     def fetch_bookings(first=false)
-        logger.debug { "looking up todays emails for #{@ews_room}" }
+        logger.debug { "looking up todays emails for #{@ews_room}" }z
         task {
             todays_bookings(first)
         }.then(proc { |bookings|
