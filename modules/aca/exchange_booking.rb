@@ -356,7 +356,7 @@ class Aca::ExchangeBooking
     # ROOM BOOKINGS:
     # ======================================
     def fetch_bookings(first=false)
-        logger.debug { "looking up todays emails for #{@ews_room}" }z
+        logger.debug { "looking up todays emails for #{@ews_room}" }
         task {
             todays_bookings(first)
         }.then(proc { |bookings|
