@@ -8,7 +8,7 @@ class Laser::SetTopBox6000
 
 
     # Discovery Information
-    descriptive_name 'Laser STB-6000'
+    descriptive_name 'Laser STB-6000 + GlobalCache'
     generic_name :Receiver
     implements :logic
 
