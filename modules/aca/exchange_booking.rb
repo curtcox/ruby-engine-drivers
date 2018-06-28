@@ -407,6 +407,7 @@ class Aca::ExchangeBooking
     # If last meeting started !== meeting pending then
     #  we'll show a warning on the in room touch panel
     def set_meeting_pending(meeting_ref)
+        return if self[:last_meeting_started] == meeting_ref
         self[:meeting_ending] = false
         self[:meeting_pending] = meeting_ref
         self[:meeting_pending_notice] = true
@@ -515,7 +516,9 @@ class Aca::ExchangeBooking
         return false unless starting
 
         ending = starting + @extend_meeting_by
-        create_meeting start: starting * 1000, end: ending * 1000, title: @current_meeting_title
+        create_meeting(start: starting * 1000, end: ending * 1000, title: @current_meeting_title).then do
+            start_meeting(starting * 1000)
+        end
     end
 
 
