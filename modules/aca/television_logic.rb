@@ -62,7 +62,7 @@ class Aca::TelevisionLogic
 
         # {"commands": [{"name": "blah", "func": "power", "args": [true]}]}
         cmds = setting(:commands)
-        if cmds
+        if cmds.present?
             @cmd_lookup = {}
             self[:commands] = cmds.collect do |cmd|
                 name = cmd[:name]
