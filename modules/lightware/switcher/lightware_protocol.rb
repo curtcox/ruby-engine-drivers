@@ -6,7 +6,7 @@ require 'set'
 module Lightware; end
 module Lightware::Switcher; end
 
-# Documentation: https://aca.im/driver_docs/Lightware/lightware+protocol+(MX-FR+series).pdf
+# Documentation: https://aca.im/driver_docs/Lightware/lightware%20protocol%20(MX-FR%20series).pdf
 
 class Lightware::Switcher::LightwareProtocol
     include ::Orchestrator::Constants

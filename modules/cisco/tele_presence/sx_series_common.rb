@@ -262,7 +262,19 @@ module Cisco::TelePresence::SxSeriesCommon
         command :Standby, :Deactivate, params(options)
     end
 
-    
+    def sleep_time(delay = 1)
+        configuration('Standby', params({
+            :Control => 'On'
+        }), name: :standby)
+
+        configuration('Standby', params({
+            :Delay => delay
+        }), name: :standby_delay)
+    end
+
+    def sleep(**options)
+        command :Standby, :Activate, params(options)
+    end
     
     ResponseType = {
         '**' => :complete,

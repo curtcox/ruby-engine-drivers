@@ -1,23 +1,30 @@
+# frozen_string_literal: true
+
 module Lutron; end
 
-class Lutron::Lighting
+# Documentation: https://aca.im/driver_docs/Lutron/lutron-lighting.pdf
+# Login #1: nwk
+# Login #2: nwk2
 
+# Login: lutron
+# Password: integration
+
+class Lutron::Lighting
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
+    # Discovery Information
     tcp_port 23
     descriptive_name 'Lutron Lighting Gateway'
     generic_name :Lighting
 
+    # Communication settings
     tokenize delimiter: "\r\n"
     wait_response false
     delay between_sends: 100
 
     def on_load
         on_update
-    end
-
-    def on_unload
     end
 
     def on_update
@@ -27,8 +34,9 @@ class Lutron::Lighting
 
     def connected
         send "#{@login}\r\n", priority: 9999
+
         schedule.every('40s') do
-            logger.debug "-- Polling Lutron"
+            logger.debug '-- Polling Lutron'
             scene? 1
         end
     end
@@ -41,16 +49,23 @@ class Lutron::Lighting
         send_cmd 'RESET', 0
     end
 
+    # on or off
     def lighting(device, state, action = 1)
         level = is_affirmative?(state) ? 100 : 0
         light_level(device, level, 1, 0)
     end
 
+
+    # ===============
+    # OUTPUT COMMANDS
+    # ===============
+
+    # dimmers, CCOs, or other devices in a system that have a controllable output
     def level(device, level, rate = 1000, component = :output)
         level = in_range(level.to_i, 100)
         seconds = (rate.to_i / 1000).to_i
         min = seconds / 60
-        seconds = seconds - (min * 60)
+        seconds -= min * 60
         time = "#{min.to_s.rjust(2, '0')}:#{seconds.to_s.rjust(2, '0')}"
         send_cmd component.to_s.upcase, device, 1, level, time
     end
@@ -67,6 +82,9 @@ class Lutron::Lighting
     end
 
 
+    # =============
+    # AREA COMMANDS
+    # =============
     def scene(area, scene, component = :area)
         send_cmd(component.to_s.upcase, area, 6, scene).then do
             scene?(area, component)
@@ -76,8 +94,6 @@ class Lutron::Lighting
     def scene?(area, component = :area)
         send_query component.to_s.upcase, area, 6
     end
-
-
 
     def occupancy?(area)
         send_query 'AREA', area, 8
@@ -92,10 +108,13 @@ class Lutron::Lighting
         send_cmd 'AREA', area, 7, val
     end
 
+
+    # ===============
+    # DEVICE COMMANDS
+    # ===============
     def button_press(area, button)
         send_cmd 'DEVICE', area, button, 3
     end
-
 
     def led(area, device, state)
         val = if state.is_a?(Integer)
@@ -111,17 +130,22 @@ class Lutron::Lighting
         send_query 'DEVICE', area, device, 9
     end
 
+
+    # =============
+    # COMPATIBILITY
+    # =============
     def trigger(area, scene)
         scene(area, scene, @trigger_type)
     end
 
     def light_level(area, level, component = nil, fade = 1000)
         if component
-            level(area, level, rate = 1000, component)
+            level(area, level, fade, component)
         else
-            level(area, level, rate = 1000, :area)
+            level(area, level, fade, :area)
         end
     end
+
 
     Errors = {
         '1' => 'Parameter count mismatch',
@@ -141,6 +165,7 @@ class Lutron::Lighting
 
     def received(data, resolve, command)
         logger.debug { "Lutron sent: #{data}" }
+
         parts = data.split(',')
         component = parts[0][1..-1].downcase
 
@@ -151,9 +176,9 @@ class Lutron::Lighting
             param = parts[3]
 
             case action
-            when 1
+            when 1 # level
                 self[:"#{component}#{area}_level"] = param.to_f
-            when 6
+            when 6 # Scene
                 self[:"#{component}#{area}"] = param.to_i
             when 7
                 self[:"#{component}#{area}_daylight"] = param == '1'
@@ -166,18 +191,18 @@ class Lutron::Lighting
             action = parts[3].to_i
 
             case action
-            when 7
+            when 7 # Scene
                 self[:"device#{area}_#{device}"] = parts[4].to_i
-            when 9
+            when 9 # LED state
                 self[:"device#{area}_#{device}_led"] = parts[4].to_i
-            end   
+            end
         when :error
             logger.warn "error #{parts[1]}: #{Errors[parts[1]]}"
             return :abort
         end
-        return :success
-    end
 
+        :success
+    end
 
     protected
 

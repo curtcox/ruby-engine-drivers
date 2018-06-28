@@ -179,7 +179,7 @@ class Cisco::Switch::SnoopingCatalyst
 
                     # NOTE:: Same as username found
                     details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
-                    reserved = details.connected(mac, @reserve_time, {
+                    details.connected(mac, @reserve_time, {
                         device_ip: ip,
                         switch_ip: remote_address,
                         hostname: @hostname,
@@ -197,7 +197,7 @@ class Cisco::Switch::SnoopingCatalyst
 
                         # NOTE:: Same as new connection
                         details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
-                        reserved = details.connected(mac, @reserve_time, {
+                        details.connected(mac, @reserve_time, {
                             device_ip: ip,
                             switch_ip: remote_address,
                             hostname: @hostname,
@@ -209,7 +209,7 @@ class Cisco::Switch::SnoopingCatalyst
                         self[interface] = details.details
                     end
 
-                elsif not iface.reserved
+                elsif !iface.reserved
                     # We don't know the user who is at this desk...
                     details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
                     reserved = details.check_for_user(@reserve_time)
@@ -218,8 +218,8 @@ class Cisco::Switch::SnoopingCatalyst
                 elsif iface.clash
                     # There was a reservation clash - is there still a clash?
                     details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
-                    reserved = details.check_for_user(@reserve_time)
-                    self[interface] = details.details if !details.clash?
+                    details.check_for_user(@reserve_time)
+                    self[interface] = details.details unless details.clash?
                 end
             end
 

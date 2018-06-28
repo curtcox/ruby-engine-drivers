@@ -19,9 +19,9 @@ class Aca::Tracking::LocateUser
         meraki_scanner: 'https://url.to.scanner',
         meraki_secret: 'give me access',
         cmx_enabled: false,
-        cmx_host: "http://cmxlocationsandbox.cisco.com",
-        cmx_user: "learning",
-        cmx_pass: "learning"
+        cmx_host: 'http://cmxlocationsandbox.cisco.com',
+        cmx_user: 'learning',
+        cmx_pass: 'learning'
     })
 
     def on_load
@@ -143,7 +143,7 @@ class Aca::Tracking::LocateUser
                     resp = @cmx.get(path: '/api/location/v2/clients', query: {ipAddress: ip}).value
                     if resp.status != 204 && (200...300).include?(resp.status)
                         locations = JSON.parse(resp.body, symbolize_names: true)
-                        if locations.length > 0 && locations[0][:currentlyTracked] == true
+                        if locations.present? && locations[0][:currentlyTracked] == true
                             mac = locations[0][:macAddress]
 
                             if self[mac] != login

@@ -1,39 +1,36 @@
+# encoding: UTF-8
 # frozen_string_literal: true
-# encoding: ASCII-8BIT
+
+require 'libuv'
+require 'netsnmp'
+require 'singleton'
 
 module Aca; end
-module Aca::Tracking; end
 
-class Aca::Tracking::SnmpSwitchMonitoring
-    include ::Orchestrator::Constants
+class Aca::SnmpManager
+    def initialize
+        # IP => callback
+        @mappings = {}
 
-    descriptive_name 'ACA SNMP Switch Monitoring'
-    generic_name :SNMP_Trap
-    implements :logic
+        # Server start time
+        @boots = Time.now.to_i
+    end
 
     V1_Trap = 4
     Inform = 6
     V2_Trap = 7
 
-    def on_load
-        @boots = Time.now.to_i
-        on_update
+    # provide a callback for responding to informs
+    def send_cb(&block)
+        @send_cb = block
     end
 
-    def on_update
-        # Ensure server is stopped
-        on_unload
-        configure_server
+    def register(thread, logger, ip, **settings, &block)
+        @mappings[ip] = [thread, logger, settings, block]
     end
 
-    def on_unload
-        if @server
-            @server.close
-            @server = nil
-
-            # Stop the server if started
-            logger.info "server stopped"
-        end
+    def ignore(ip)
+        @mappings.delete ip
     end
 
     # Returns the time in seconds since the Agent booted
@@ -43,19 +40,11 @@ class Aca::Tracking::SnmpSwitchMonitoring
         Time.now.to_i - @boots
     end
 
-    protected
-
-    def configure_server
-        port = setting(:port) || 162
-
-        @server = thread.udp { |data, ip, port|
-            process(data, ip, port)
-        }.bind('0.0.0.0', port).start_read
-
-        logger.info "trap server started"
-    end
-
+    # Process a message from an agent
     def new_message(data, ip, port)
+        thread, logger, settings, callback = @mappings[ip]
+        return unless thread
+
         # Grab the message version
         asn_tree = ::OpenSSL::ASN1.decode(data)
         headers = asn_tree.value
@@ -65,7 +54,8 @@ class Aca::Tracking::SnmpSwitchMonitoring
         if version == 3
             sec_params_asn = ::OpenSSL::ASN1.decode(headers[2].value).value
             community = sec_params_asn[0].value # technically the engine_id
-        elsif [1, 2].include?(version)
+        elsif [0, 1, 2].include?(version)
+            # version == 0 : SNMP v1
             community = headers[1].value
         else
             logger.warn "unknown SNMP version #{version}"
@@ -74,9 +64,9 @@ class Aca::Tracking::SnmpSwitchMonitoring
 
         # Extract the PDU payload
         if version == 3
-            security = setting(community)
+            security = settings[community]
             if security
-                request_pdu, engine_id, engine_boots, engine_time = ::NETSNMP::Message.decode(data, security_parameters: security)
+                request_pdu, _engine_id, _engine_boots, _engine_time = ::NETSNMP::Message.decode(data, security_parameters: security)
             else
                 logger.warn "no security defined for SNMPv3 messages to #{community.inspect}"
                 return
@@ -109,23 +99,52 @@ class Aca::Tracking::SnmpSwitchMonitoring
                 encoded_response = response_pdu.to_der
             end
 
-            @server.send(ip, port, encoded_response)
-            inform(request_pdu, ip, port)
+            @send_cb.call(ip, port, encoded_response)
+            thread.schedule { callback.call(request_pdu, ip, port) }
 
         when V1_Trap, V2_Trap
             logger.debug { "received trap from #{ip}" }
             # reference: https://github.com/hallidave/ruby-snmp/blob/320e2395c082c8f54f070ce3be05d96f1dbfb500/lib/snmp/pdu.rb#L354
-            inform(request_pdu, ip, port)
+            thread.schedule { callback.call(request_pdu, ip, port) }
         else
             logger.debug { "ignoring unexpected SNMP request type #{request_pdu.type}" }
         end
     rescue => e
         logger.print_error e, 'processing SNMP message'
     end
+end
 
-    # Send response to the appropriate switch
-    def inform(pdu, ip, port)
-        # TODO:: map the switches to IP's so we can route signals
-        logger.debug { "informing switch #{ip} of trap #{pdu.oid} and #{pdu.value}" }
+class Aca::TrapDispatcher
+    include Singleton
+
+    def initialize
+        # Configure our manager
+        @manager = ::Aca::SnmpManager.new
+
+        # Bind to the UDP port (162)
+        @reactor = Libuv::Reactor.default
+        @reactor.schedule { configure_server }
+    end
+
+    def register(thread, logger, ip, **settings, &block)
+        @reactor.schedule { @manager.register(thread, logger, ip, **settings, &block) }
+        nil
+    end
+
+    def ignore(ip)
+        @reactor.schedule { @manager.ignore(ip) }
+        nil
+    end
+
+    protected
+
+    def configure_server
+        @server = @reactor.udp { |data, ip, port|
+            @manager.new_message(data, ip, port)
+        }.bind('0.0.0.0', 162).start_read
+
+        @manager.send_cb do |ip, port, response|
+            @server.send(ip, port, response)
+        end
     end
 end

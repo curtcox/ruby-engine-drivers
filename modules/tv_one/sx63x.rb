@@ -1,6 +1,6 @@
 module TvOne; end
 
-# Documentation: https://aca.im/driver_docs/TV+One/SX-632-634.pdf
+# Documentation: https://aca.im/driver_docs/TV%20One/SX-632-634.pdf
 
 class TvOne::Sx63x
     include ::Orchestrator::Constants

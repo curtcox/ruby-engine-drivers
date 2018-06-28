@@ -104,7 +104,7 @@ class ClearOne::Converge
 
 
     def preset(number, type = :macro)
-        do_send type, number, name: type.to_sym
+        do_send type, number, delay: 400
     end
     alias_method :macro, :preset
     alias_method :trigger, :preset
