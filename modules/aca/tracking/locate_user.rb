@@ -61,13 +61,33 @@ class Aca::Tracking::LocateUser
         @warnings ||= {}
     end
 
-    protect_method :clear_warnings, :warnings
+    protect_method :clear_warnings, :warnings, :clean_up
+
     def clear_warnings
         @warnings = {}
     end
 
+    # Provides a list of users and the black listed mac addresses
+    # This allows one to update configuration of these machines
     def warnings
         @warnings
+    end
+
+    # Removes all the references to a particular vendors mac addresses
+    def clean_up(vendor_mac)
+        count = 0
+
+        view = Aca::Tracking::UserDevices.by_macs
+        view.stream do |devs|
+            macs = devs.macs.select {|m| m.start_with?(vendor_mac) }
+            next if macs.empty?
+            macs.each do |m|
+                count += 1
+                devs.remove(m)
+            end
+        end
+
+        "cleaned up #{count} references"
     end
 
     def lookup(*ips)
