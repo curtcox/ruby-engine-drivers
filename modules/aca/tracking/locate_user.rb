@@ -3,12 +3,14 @@
 module Aca; end
 module Aca::Tracking; end
 
+require 'set'
 require 'aca/tracking/switch_port'
 ::Orchestrator::DependencyManager.load('Aca::Tracking::UserDevices', :model, :force)
 ::Aca::Tracking::UserDevices.ensure_design_document!
 
 class Aca::Tracking::LocateUser
     include ::Orchestrator::Constants
+    include ::Orchestrator::Security
 
     descriptive_name 'IP and Username to MAC lookup'
     generic_name :LocateUser
@@ -21,7 +23,11 @@ class Aca::Tracking::LocateUser
         cmx_enabled: false,
         cmx_host: 'http://cmxlocationsandbox.cisco.com',
         cmx_user: 'learning',
-        cmx_pass: 'learning'
+        cmx_pass: 'learning',
+        ignore_vendors: {
+            # https://en.wikipedia.org/wiki/MAC_address#Address_details
+            "Good Way Docking Stations" => "0050b6"
+        }
     })
 
     def on_load
@@ -50,6 +56,18 @@ class Aca::Tracking::LocateUser
         else
             @cmx = nil
         end
+
+        @blacklist = Set.new((setting(:ignore_vendors) || {}).values)
+        @warnings ||= {}
+    end
+
+    protect_method :clear_warnings, :warnings
+    def clear_warnings
+        @warnings = {}
+    end
+
+    def warnings
+        @warnings
     end
 
     def lookup(*ips)
@@ -107,6 +125,11 @@ class Aca::Tracking::LocateUser
             logger.debug { "Looking up #{ip} for #{domain}\\#{login}" }
 
             mac = Aca::Tracking::SwitchPort.find_by_device_ip(ip)&.mac_address
+            if mac && @blacklist.include?(mac[0..5])
+                logger.warn "blacklisted device detected for #{domain}\\#{login}"
+                @warnings[login] = mac
+                return
+            end
 
             if mac && self[mac] != login
                 logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
