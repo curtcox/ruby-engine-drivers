@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 # encoding: ASCII-8BIT
 
-require 'protocols/snmp'
-require 'aca/trap_dispatcher'
+# TODO:: We can use traps instead of polling
+# require 'aca/trap_dispatcher'
 
 module Kentix; end
 
@@ -16,7 +16,7 @@ class Kentix::MultiSensor
     generic_name :Sensor
     implements :service
 
-    default_settings communication_key: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+    default_settings communication_key: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
 
     def on_load
         on_update
@@ -24,7 +24,7 @@ class Kentix::MultiSensor
 
     def on_update
         # default is a hash of an empty string
-        @key = setting(:communication_key) || 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'
+        @key = setting(:communication_key)
     end
 
     def connected
