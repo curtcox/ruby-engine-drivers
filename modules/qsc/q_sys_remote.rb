@@ -18,7 +18,7 @@ class Qsc::QSysRemote
     tokenize delimiter: "\0"
 
 
-    JsonRpcVer = '2.0'.freeze
+    JsonRpcVer = '2.0'
     Errors = {
         -32700 => 'Parse error. Invalid JSON was received by the server.',
         -32600 => 'Invalid request. The JSON sent is not a valid Request object.',
@@ -330,7 +330,7 @@ class Qsc::QSysRemote
     def mutes(ids:, muted: true, component: nil, type: :fader, **_)
         mute(ids, muted, component, type)
     end
-    
+
     def unmute(fader_id, component = nil, type = :fader)
         mute(fader_id, false, component, type)
     end
