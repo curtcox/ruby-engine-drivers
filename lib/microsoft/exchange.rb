@@ -272,7 +272,9 @@ class Microsoft::Exchange
         # booking[:body] = description
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
         booking[:required_attendees] = [{
-            attendee: { mailbox: { email_address: current_user[:email] } }
+            mailbox = { email_address: current_user[:email] }
+            mailbox[:name] = current_user[:name] if current_user.key?('name')
+            attendee: { mailbox:  mailbox }
         }]
         attendees.each do |attendee|
             if attendee.class != String
