@@ -3,7 +3,6 @@ require 'thread'
 Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                                   settings: {
                                       peripheral_id: 'MOCKED_ID',
-                                      version: 'MOCKED_VERSION',
                                       device_config: {
                                           Audio: {
                                               DefaultVolume: 100
@@ -66,7 +65,7 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
     # -------------------------------------------------------------------------
     section 'System registration'
 
-    should_send "xCommand Peripherals Connect ID: \"MOCKED_ID\" Name: \"ACAEngine\" SoftwareInfo: \"MOCKED_VERSION\" Type: ControlSystem | resultId=\"#{id_peek}\"\n"
+    should_send "xCommand Peripherals Connect ID: \"MOCKED_ID\" Name: \"ACAEngine\" Type: ControlSystem | resultId=\"#{id_peek}\"\n"
     responds(
         <<~JSON
             {

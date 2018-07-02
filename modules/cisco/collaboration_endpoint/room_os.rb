@@ -368,7 +368,6 @@ class Cisco::CollaborationEndpoint::RoomOs
 
     def load_settings
         load_setting :peripheral_id, default: SecureRandom.uuid, persist: true
-        load_setting :version, default: Meta.version(self)
     end
 
     # Bind arbitary device feedback to a status variable.
@@ -404,7 +403,6 @@ class Cisco::CollaborationEndpoint::RoomOs
         send_xcommand 'Peripherals Connect',
                       ID: self[:peripheral_id],
                       Name: 'ACAEngine',
-                      SoftwareInfo: self[:version],
                       Type: :ControlSystem
     end
 
