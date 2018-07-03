@@ -31,7 +31,11 @@ class Aca::Router
     end
 
     def on_update
-        load_from_map setting(:connections)
+        connections = setting :connections
+
+        logger.warn 'no connections defined' unless connections
+
+        load_from_map(connections || {})
     end
 
 
