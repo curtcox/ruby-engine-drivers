@@ -528,7 +528,9 @@ class Aca::MeetingRoom < Aca::Joiner
             # Update the inputs
             inps = (setting(:inputs) + (mode[:inputs] || [])) - (mode[:remove_inputs] || [])
             inps.uniq!
-            inps.each do |input|
+
+            # Camera is special
+            (inps + [:Camera]).uniq.each do |input|
                 inp = setting(input) || mode[input]
 
                 if inp
