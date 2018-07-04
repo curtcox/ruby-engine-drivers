@@ -131,6 +131,13 @@ class Qsc::QSysRemote
         }, **options)
     end
 
+    def component_trigger(component, trigger, **options)
+        do_send(next_id, cmd: :"Component.Trigger", params: {
+            :Name => component,
+            :Controls => [{ :Name => trigger }]
+        }, **options)
+    end
+
     def get_components(**options)
         do_send(next_id, cmd: :"Component.GetComponents", **options)
     end
@@ -299,15 +306,11 @@ class Qsc::QSysRemote
         faders = Array(fader_id)
         if component
             if @db_based_faders || use_value
-                level = level.to_f / 10.0 if @integer_faders
-                fads = faders.map do |fad|
-                    {Name: fad, Value: level}
-                end
+                level = level.to_f / 10.0 if @integer_faders && !use_value
+                fads = faders.map { |fad| {Name: fad, Value: level} }
             else
                 level = level.to_f / 1000.0 if @integer_faders
-                fads = faders.map do |fad|
-                    {Name: fad, Position: level}
-                end
+                fads = faders.map { |fad| {Name: fad, Position: level} }
             end
             component_set(component, fads, name: "level_#{faders[0]}").then do
                 component_get(component, faders)
