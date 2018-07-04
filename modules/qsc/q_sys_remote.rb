@@ -18,7 +18,7 @@ class Qsc::QSysRemote
     tokenize delimiter: "\0"
 
 
-    JsonRpcVer = '2.0'.freeze
+    JsonRpcVer = '2.0'
     Errors = {
         -32700 => 'Parse error. Invalid JSON was received by the server.',
         -32600 => 'Invalid request. The JSON sent is not a valid Request object.',
@@ -128,6 +128,13 @@ class Qsc::QSysRemote
         do_send(next_id, cmd: :"Component.Set", params: {
             :Name => name,
             :Controls => values
+        }, **options)
+    end
+
+    def component_trigger(component, trigger, **options)
+        do_send(next_id, cmd: :"Component.Trigger", params: {
+            :Name => component,
+            :Controls => [{ :Name => trigger }]
         }, **options)
     end
 
@@ -299,15 +306,11 @@ class Qsc::QSysRemote
         faders = Array(fader_id)
         if component
             if @db_based_faders || use_value
-                level = level.to_f / 10.0 if @integer_faders
-                fads = faders.map do |fad|
-                    {Name: fad, Value: level}
-                end
+                level = level.to_f / 10.0 if @integer_faders && !use_value
+                fads = faders.map { |fad| {Name: fad, Value: level} }
             else
                 level = level.to_f / 1000.0 if @integer_faders
-                fads = faders.map do |fad|
-                    {Name: fad, Position: level}
-                end
+                fads = faders.map { |fad| {Name: fad, Position: level} }
             end
             component_set(component, fads, name: "level_#{faders[0]}").then do
                 component_get(component, faders)
@@ -330,7 +333,7 @@ class Qsc::QSysRemote
     def mutes(ids:, muted: true, component: nil, type: :fader, **_)
         mute(ids, muted, component, type)
     end
-    
+
     def unmute(fader_id, component = nil, type = :fader)
         mute(fader_id, false, component, type)
     end
