@@ -181,7 +181,7 @@ class Microsoft::Office
         room_response.select! { |room| room['email'] == room_id }
     end
 
-    def get_available_rooms(room_ids:, start_param:, end_param:, attendees:[])
+    def get_available_rooms(rooms:, start_param:, end_param:)
         endpoint = "/v1.0/users/#{@service_account_email}/findMeetingTimes" 
         now = Time.now
         start_ruby_param = ensure_ruby_date((start_param || now))
@@ -191,24 +191,13 @@ class Microsoft::Office
         end_param = (end_ruby_param + 30.minutes).utc.iso8601.split("+")[0]
 
         # Add the attendees
-        attendees.map!{|a|
+        rooms.map!{|room|
             { 
                 type: 'required',
                 emailAddress: {
-                    address: a[:email],
-                    name: a[:name]
+                    address: room[:email],
+                    name: room[:name]
             }   }
-        }
-
-        location_constraint = {
-            isRequired: true,
-            locations: room_ids.map{ |email| 
-                {
-                    locationEmailAddress: email, 
-                    resolveAvailability: true
-                }
-            },
-            suggestLocation: false
         }
 
         time_constraint = {
@@ -226,8 +215,7 @@ class Microsoft::Office
         }
 
         post_data = {
-            attendees: attendees,
-            locationConstraint: location_constraint,
+            attendees: rooms,
             timeConstraint: time_constraint,
             maxCandidates: 1000,
             returnSuggestionReasons: true,
