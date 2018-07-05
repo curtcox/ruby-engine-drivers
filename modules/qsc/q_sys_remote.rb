@@ -3,6 +3,8 @@
 
 module Qsc; end
 
+# Documentation: https://aca.im/driver_docs/QSC/QRCDocumentation.pdf
+
 class Qsc::QSysRemote
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
