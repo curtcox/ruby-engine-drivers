@@ -24,7 +24,7 @@ class Echo360::DeviceCapture
 
     def on_update
         # Configure authentication
-        config({
+        defaults({
             headers: {
                 authorization: [setting(:username), setting(:password)]
             }
@@ -69,9 +69,10 @@ class Echo360::DeviceCapture
         end
     end
 
+    # This will auto-start a recording
     def capture(name, duration, profile = nil)
         profile ||= self[:capture_profiles][0]
-        post('capture/new_capture', body: {
+        post('/capture/new_capture', body: {
             description: name,
             duration: duration.to_i,
             capture_profile_name: profile
@@ -83,7 +84,7 @@ class Echo360::DeviceCapture
 
     def test_capture(name, duration, profile = nil)
         profile ||= self[:capture_profiles][0]
-        post('capture/confidence_monitor', body: {
+        post('/capture/confidence_monitor', body: {
             description: name,
             duration: duration.to_i,
             capture_profile_name: profile
@@ -94,7 +95,7 @@ class Echo360::DeviceCapture
     end
 
     def extend(duration)
-        post('capture/confidence_monitor', body: {
+        post('/capture/confidence_monitor', body: {
             duration: duration.to_i
         }) do |response|
             response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
@@ -102,13 +103,13 @@ class Echo360::DeviceCapture
     end
 
     def pause
-        post('capture/pause') do |response|
+        post('/capture/pause') do |response|
             response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
         end
     end
 
     def start
-        post('capture/record') do |response|
+        post('/capture/record') do |response|
             response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
         end
     end
@@ -117,7 +118,7 @@ class Echo360::DeviceCapture
     alias_method :record, :start
 
     def stop
-        post('capture/stop') do |response|
+        post('/capture/stop') do |response|
             response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
         end
     end
