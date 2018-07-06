@@ -10,6 +10,7 @@ class Cisco::Cmx
         @ldap = Array(use_ou)
         @floor_mappings = floor_mappings
         @ssid = Array(ssid) if ssid
+        @api_version = api_version
         @path = "/api/location/v#{api_version}/clients"
         @headers = {
             authorization: [user, pass]
@@ -48,32 +49,64 @@ class Cisco::Cmx
         locations.select! { |loc| @ssid.include?(loc[:ssId]) } if @ssid
         return nil if locations.length == 0
 
-        map = locations[0][:mapInfo][:mapHierarchyString].split('>')
+        if @api_version == 3
+            map = locations[0][:locationMapHierarchy].split('>')
+        else
+            map = locations[0][:mapInfo][:mapHierarchyString].split('>')
+        end
         campus = @floor_mappings[map[0]]
         building = @floor_mappings[map[1]]
+        x_max = nil
+        y_max = nil
 
         if building.is_a?(Hash)
             level = building[map[2]]
-            zone = building[map[3]]
-            building = building[:id]
+            if level.is_a?(Hash)
+                x_max = level[:x_max]
+                y_max = level[:y_max]
+                level = level[:id]
+            else
+                x_max = building[:x_max]
+                y_max = building[:y_max]
+                zone = building[map[3]]
+                building = building[:id]
+            end
         else
             level = @floor_mappings[map[2]]
             zone = @floor_mappings[map[3]]
         end
 
-        {
-            x: locations[0][:mapCoordinate][:x],
-            y: locations[0][:mapCoordinate][:y],
-            x_max: locations[0][:mapInfo][:floorDimension][:width],
-            y_max: locations[0][:mapInfo][:floorDimension][:length],
-            confidence: (locations[0][:confidenceFactor] / 2),
-            last_seen: locations[0][:changedOn] / 1000,
-            user_active: locations[0][:currentlyTracked],
-            campus: campus || map[0],
-            building: building || map[1],
-            level: level || map[2],
-            zone: zone || map[3],
-            map_id: locations[0][:mapInfo][:floorRefId]
-        }
+        location = locations[0]
+        if @api_version == 3
+            {
+                x: location[:locationCoordinate][:x],
+                y: location[:locationCoordinate][:y],
+                x_max: x_max,
+                y_max: y_max,
+                confidence: (location[:confidenceFactor] / 2),
+                last_seen: location[:timestamp] / 1000,
+                user_active: location[:associated],
+                campus: campus || map[0],
+                building: building || map[1],
+                level: level || map[2],
+                zone: zone || map[3],
+                map_id: location[:floorRefId]
+            }
+        else
+            {
+                x: location[:mapCoordinate][:x],
+                y: location[:mapCoordinate][:y],
+                x_max: location[:mapInfo][:floorDimension][:width],
+                y_max: location[:mapInfo][:floorDimension][:length],
+                confidence: (location[:confidenceFactor] / 2),
+                last_seen: location[:changedOn] / 1000,
+                user_active: location[:currentlyTracked],
+                campus: campus || map[0],
+                building: building || map[1],
+                level: level || map[2],
+                zone: zone || map[3],
+                map_id: location[:mapInfo][:floorRefId]
+            }
+        end
     end
 end
