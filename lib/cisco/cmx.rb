@@ -16,8 +16,9 @@ class Cisco::Cmx
         }
     end
 
-    def locate(user: nil, ip: nil, mac: nil)
-        query = { sortBy: 'lastLocatedTime:DESC' }
+    def locate(user: nil, ip: nil, mac: nil, sort: 'lastLocatedTime:DESC')
+        query = {}
+        query[:sortBy] = sort if sort
         query[:ipAddress] = ip if ip
         query[:macAddress] = mac if mac
 
