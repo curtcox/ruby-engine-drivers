@@ -65,7 +65,7 @@ class Echo360::DeviceCapture
 
     def upload(id)
         post("/diagnostics/recovery/#{id}/upload") do |response|
-            response.status == 200 ? response.data : :abort
+            response.status == 200 ? response.body : :abort
         end
     end
 
@@ -77,7 +77,7 @@ class Echo360::DeviceCapture
             duration: duration.to_i,
             capture_profile_name: profile
         }) do |response|
-            response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
+            response.status == 200 ? Hash.from_xml(response.body)['ok']['text'] : :abort
         end
         state
     end
@@ -89,7 +89,7 @@ class Echo360::DeviceCapture
             duration: duration.to_i,
             capture_profile_name: profile
         }) do |response|
-            response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
+            response.status == 200 ? Hash.from_xml(response.body)['ok']['text'] : :abort
         end
         state
     end
@@ -98,19 +98,19 @@ class Echo360::DeviceCapture
         post('/capture/confidence_monitor', body: {
             duration: duration.to_i
         }) do |response|
-            response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
+            response.status == 200 ? Hash.from_xml(response.body)['ok']['text'] : :abort
         end
     end
 
     def pause
         post('/capture/pause') do |response|
-            response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
+            response.status == 200 ? Hash.from_xml(response.body)['ok']['text'] : :abort
         end
     end
 
     def start
         post('/capture/record') do |response|
-            response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
+            response.status == 200 ? Hash.from_xml(response.body)['ok']['text'] : :abort
         end
     end
 
@@ -119,7 +119,7 @@ class Echo360::DeviceCapture
 
     def stop
         post('/capture/stop') do |response|
-            response.status == 200 ? Hash.from_xml(response.data)['ok']['text'] : :abort
+            response.status == 200 ? Hash.from_xml(response.body)['ok']['text'] : :abort
         end
     end
 
