@@ -120,3 +120,63 @@ GET /api/location/v2/clients
     }, ...
 ]
 ```
+
+## Example V3 API Request
+
+```
+GET /api/location/v3/clients?username=xyz
+[
+    {
+        "notificationType": "locationupdate",
+        "subscriptionName": "CMX_Api_Server_Notification_1",
+        "eventId": 572966,
+        "locationMapHierarchy": "CiscoCampus>Building 9>Level 4",
+        "locationCoordinate": {
+            "x": 84.5761,
+            "y": 84.75132,
+            "z": 0,
+            "unit": "FEET"
+        },
+        "geoCoordinate": {
+            "latitude": -999,
+            "longitude": -999,
+            "unit": "DEGREES"
+        },
+        "confidenceFactor": 24,
+        "apMacAddress": "70:df:2f:b5:38:60",
+        "associated": true,
+        "username": "W52910",
+        "ipAddress": [
+            "172.20.0.59",
+            "fe80:0000:0000:0000:f953:31c3:a5c9:1865"
+        ],
+        "ssid": "wsa",
+        "band": "IEEE_802_11_A",
+        "floorId": 788149884915780900,
+        "floorRefId": "788149884915780818",
+        "entity": "WIRELESS_CLIENTS",
+        "deviceId": "f4:8c:50:53:bc:09",
+        "lastSeen": "2018-07-06T16:04:10.486+0800",
+        "rawLocation": {
+            "rawX": -999,
+            "rawY": -999,
+            "unit": "FEET"
+        },
+        "tagVendorData": null,
+        "locComputeType": "RSSI",
+        "manufacturer": "Intel Corporate",
+        "maxDetectedRssi": {
+            "apMacAddress": "70:df:2f:bb:cd:40",
+            "band": "IEEE_802_11_A",
+            "slot": 1,
+            "rssi": -53,
+            "antennaIndex": 0,
+            "lastHeardInSeconds": 0
+        },
+        "timestamp": 1530864250486,
+        "sourceNotification": "127.0.0.1",
+        "sourceNotificationKey": "127.0.0.1,2",
+        "notificationTime": "1530864250491"
+    }
+]
+```
