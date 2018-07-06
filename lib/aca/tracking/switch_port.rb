@@ -229,6 +229,6 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
 
     before_create :set_id
     def set_id
-        self.id = "swport-#{self.switch_ip}-#{interface}"
+        self.id = "swport-#{self.switch_ip.downcase}-#{interface}"
     end
 end
