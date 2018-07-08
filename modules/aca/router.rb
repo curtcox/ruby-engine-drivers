@@ -219,7 +219,7 @@ class Aca::Router
         edges = {}
 
         signal_map.each_pair do |source, sinks|
-            n, e = route_many source, sinks, strict: atomic
+            n, e = route_many source, sinks, strict: strict
             nodes[source] = n
             edges[source] = e
         end
