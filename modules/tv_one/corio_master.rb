@@ -82,17 +82,17 @@ class TvOne::CorioMaster
     # Get the presets available for recall - for some inexplicible reason this
     # has a wildly different API to the rest of the system state...
     def query_preset_list(expose_as: nil)
-        exec('Routing.Preset.PresetList').then do |presets|
-
-            presets.transform_keys { |key| key[/\d+/].to_i }
-                   .transform_values do |val|
-                       name, canvas, time = val.split ','
-                       {
-                           name:   name,
-                           canvas: canvas,
-                           time:   time
-                       }
-                   end
+        exec('Routing.Preset.PresetList').then do |preset_list|
+            presets = preset_list.each_with_object({}) do |preset, h|
+                key, val = preset.split '='
+                id = key[/\d+/].to_i
+                name, canvas, time = val.split ','
+                h[id] = {
+                    name:   name,
+                    canvas: canvas,
+                    time:   time.to_i
+                }
+            end
 
             self[expose_as.to_sym] = presets unless expose_as.nil?
 
@@ -176,17 +176,20 @@ class TvOne::CorioMaster
     end
 
     def parse_response(lines, command)
-        updates = lines.map { |line| line.chop.split ' = ' }
-                       .to_h
-                       .transform_values! do |val|
-                           case val
-                           when /^-?\d+$/    then Integer val
-                           when 'NULL'       then nil
-                           when /(Off)|(No)/ then false
-                           when /(On)|(Yes)/ then true
-                           else                   val
-                           end
-                       end
+        kv_pairs = lines.map do |line|
+            k, v = line.chop.split ' = '
+            [k, v]
+        end
+
+        updates = kv_pairs.to_h.transform_values! do |val|
+            case val
+            when /^-?\d+$/    then Integer val
+            when 'NULL'       then nil
+            when /(Off)|(No)/ then false
+            when /(On)|(Yes)/ then true
+            else                   val
+            end
+        end
 
         if updates.size == 1 && updates.include?(command)
             # Single property query

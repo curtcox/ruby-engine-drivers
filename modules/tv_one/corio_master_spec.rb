@@ -133,6 +133,24 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
         }
     )
 
+    exec(:query_preset_list)
+        .should_send("Routing.Preset.PresetList()\r\n")
+        .responds(
+            <<~RX
+                Routing.Preset.PresetList[1]=Sharing-Standard,Canvas1,0\r
+                Routing.Preset.PresetList[2]=Standard-4-Screen,Canvas1,0\r
+                Routing.Preset.PresetList[3]=Standard-10-Screen,Canvas1,0\r
+                Routing.Preset.PresetList[11]=Clear,Canvas1,0\r
+                !Done Routing.Preset.PresetList()\r
+            RX
+        )
+    expect(result).to eq(
+        1  => { name: 'Sharing-Standard',   canvas: 'Canvas1', time: 0 },
+        2  => { name: 'Standard-4-Screen',  canvas: 'Canvas1', time: 0 },
+        3  => { name: 'Standard-10-Screen', canvas: 'Canvas1', time: 0 },
+        11 => { name: 'Clear',              canvas: 'Canvas1', time: 0 }
+    )
+
 
     exec(:preset, 1)
         .should_send("Preset.Take = 1\r\n")
