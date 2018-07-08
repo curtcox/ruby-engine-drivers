@@ -56,19 +56,16 @@ class Aca::Router
     # single source to a single destination, Ruby's implicit hash syntax can be
     # used to let you express it neatly as `connect source => sink`.
     def connect(signal_map, atomic: false, force: false)
-        routes = {}
-        signal_map.each_pair do |source, sinks|
-            routes[source] = route_many source, sinks, strict: atomic
-        end
+        edges = map_to_edges signal_map, strict: atomic
 
-        check_conflicts routes, strict: atomic
+        edge_list = edges.values.reduce(&:|)
 
-        edges = routes.values.map(&:second).reduce(&:|)
+        edge_list.select! { |e| needs_activation? e, ignore_status: force }
 
-        edges, unroutable = edges.partition { |e| can_activate? e }
+        edge_list, unroutable = edge_list.partition { |e| can_activate? e }
         raise 'can not perform all routes' if unroutable.any? && atomic
 
-        interactions = edges.map { |e| activate e, force }
+        interactions = edge_list.map { |e| activate e }
 
         thread.finally(interactions).then do |results|
             failed = edges.zip(results).reject { |_, (_, resolved)| resolved }
@@ -215,19 +212,49 @@ class Aca::Router
         [nodes, edges]
     end
 
-    def check_conflicts(routes, strict: false)
-        nodes = routes.values.map(&:first)
+    # Given a signal map, convert it to a hash still keyed on source id's, but
+    # containing the edges within the graph to be utilised.
+    def map_to_edges(signal_map, strict: false)
+        nodes = {}
+        edges = {}
 
-        return Set.new if nodes.size <= 1
-
-        nodes.reduce(&:&).tap do |conflicts|
-            unless conflicts.empty?
-                nodes = conflicts.map(&:to_s).join ', '
-                message = "conflicting signal paths found for #{nodes}"
-                raise message if strict
-                logger.warn message
-            end
+        signal_map.each_pair do |source, sinks|
+            n, e = route_many source, sinks, strict: atomic
+            nodes[source] = n
+            edges[source] = e
         end
+
+        conflicts = nodes.size > 1 ? nodes.values.reduce(&:&) : Set.new
+        unless conflicts.empty?
+            sources = nodes.reject { |(_, n)| (n & conflicts).empty? }.keys
+            message = "routes for #{sources.join ', '} intersect"
+            raise message if strict
+            logger.warn message
+        end
+
+        edges
+    end
+
+    def needs_activation?(edge, ignore_status: false)
+        mod = system[edge.device]
+
+        fail_with = proc do |reason|
+            logger.info "module for #{edge.device} #{reason} - skipping #{edge}"
+            return false
+        end
+
+        single_source = signal_graph.outdegree(edge.source) == 1
+
+        fail_with['does not exist, but appears to be an alias'] \
+            if mod.nil? && single_source
+
+        fail_with['already on correct input'] \
+            if edge.nx1? && mod[:input] == edge.input && !ignore_status
+
+        fail_with['has an incompatible api, but only a single input defined'] \
+            if edge.nx1? && !mod.respond_to?(:switch_to) && single_source
+
+        true
     end
 
     def can_activate?(edge)
@@ -242,28 +269,21 @@ class Aca::Router
 
         fail_with['offline'] if mod[:connected] == false
 
-        if edge.nx1? && !mod.respond_to?(:switch_to)
-            if signal_graph.outdegree(edge.source) == 1
-                logger.info "can not switch #{edge.device}. " \
-                    "This may be ok as only one input (#{edge.target}) exists."
-            else
-                fail_with['missing #switch_to']
-            end
-        end
+        fail_with['has an incompatible api (missing #switch_to)'] \
+            if edge.nx1? && !mod.respond_to?(:switch_to)
 
-        fail_with['missing #switch'] if edge.nxn? && !mod.respond_to?(:switch)
+        fail_with['has an incompatible api (missing #switch)'] \
+            if edge.nxn? && !mod.respond_to?(:switch)
 
         true
     end
 
-    def activate(edge, force = false)
+    def activate(edge)
         mod = system[edge.device]
 
         if edge.nx1?
-            needs_switch = mod[:input] != edge.input
-            mod.switch_to edge.input if needs_switch || force
+            mod.switch_to edge.input
         elsif edge.nxn?
-            # TODO: define standard API for exposing matrix state
             mod.switch edge.input => edge.output
         else
             raise 'unexpected edge type'
