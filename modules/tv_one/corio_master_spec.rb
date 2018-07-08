@@ -58,7 +58,7 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
         .responds <<~RX
             !Info: Rebooting...\r
         RX
-    expect(result).to be(:success)
+    expect(result).to eq('Rebooting...')
 
     exec(:set, 'Window1.Input', 'Slot3.In1')
         .should_send("Window1.Input = Slot3.In1\r\n")

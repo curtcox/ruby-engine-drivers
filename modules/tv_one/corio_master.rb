@@ -190,7 +190,7 @@ class TvOne::CorioMaster
         if updates.size == 1 && updates.include?(command)
             # Single property query
             updates.values.first
-        elsif updates.values.all?(&:nil?)
+        elsif !updates.empty? && updates.values.all?(&:nil?)
             # Property list
             updates.keys
         else
@@ -232,6 +232,7 @@ class TvOne::CorioMaster
             end
         when 'Info'
             logger.info message
+            yield message if block_given?
             :success
         when 'Error'
             logger.error message
