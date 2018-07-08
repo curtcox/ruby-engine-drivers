@@ -113,7 +113,16 @@ class TvOne::CorioMaster
 
     def exec(command, *params, **opts)
         logger.debug { "executing #{command}" }
+
+        defer = thread.defer
+
+        opts[:on_receive] = lambda do |*args|
+            received(*args) { |val| defer.resolve val }
+        end
+
         send "#{command}(#{params.join ','})\r\n", opts
+
+        defer.promise
     end
 
     def set(path, val, **opts)
