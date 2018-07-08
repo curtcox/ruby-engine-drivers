@@ -68,17 +68,23 @@ class Aca::Router
         interactions = edge_list.map { |e| activate e }
 
         thread.finally(interactions).then do |results|
-            failed = edges.zip(results).reject { |_, (_, resolved)| resolved }
-            if (failed + unroutable).empty?
+            failed = edge_list.zip(results).reject { |_, (_, success)| success }
+
+            edges_with_errors = unroutable
+            failed.each do |edge, (error, _)|
+                logger.warn "could not switch #{edge}: #{error}"
+                edges_with_errors << edge
+            end
+
+            if edges_with_errors.empty?
                 logger.debug 'all routes activated successfully'
                 signal_map
+            elsif atomic
+                thread.reject 'failed to activate all routes'
             else
-                failed.each do |edge, (error, _)|
-                    logger.warn "could not switch #{edge}: #{error}"
+                signal_map.select do |source, _|
+                    (edges[source] & edges_with_errors).empty?
                 end
-                message = 'failed to activate all routes'
-                logger.error message
-                thread.reject message
             end
         end
     end
