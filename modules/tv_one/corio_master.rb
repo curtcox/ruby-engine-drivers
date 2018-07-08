@@ -57,8 +57,9 @@ class TvOne::CorioMaster
 
     def window(id, property, value)
         set("Window#{id}.#{property}", value).then do
-            self[:windows][:"window#{id}"][property.downcase.to_sym] = value
-            signal_status :windows
+            self[:windows] = (self[:windows] || {}).deep_merge(
+                :"window#{id}" => { property.downcase.to_sym => value }
+            )
         end
     end
 

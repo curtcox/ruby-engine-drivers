@@ -158,5 +158,6 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
             RX
         )
     wait_tick
-    sync_state
+    expect(status[:windows][:window1][:input]).to eq('Slot1.In1')
+    expect(status[:windows][:window2][:input]).to eq('Slot1.In2')
 end
