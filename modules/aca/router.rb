@@ -471,7 +471,9 @@ class Aca::Router::SignalGraph
             when Array
                 (1..inputs.size).zip(inputs).to_h
             when Hash
-                inputs.transform_keys { |x| Integer(x) rescue x }
+                inputs.transform_keys do |key|
+                    key.to_s[/^\d+$/]&.to_i || key
+                end
             else
                 raise ArgumentError, 'inputs must be a Hash or Array'
             end
