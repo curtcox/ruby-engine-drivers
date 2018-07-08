@@ -78,9 +78,30 @@ class TvOne::CorioMaster
         query 'Preset.Take', expose_as: :preset
     end
 
+    # Get the presets available for recall - for some inexplicible reason this
+    # has a wildly different API to the rest of the system state...
+    def query_preset_list(expose_as: nil)
+        exec('Preset.PresetList').then do |presets|
+            presets.transform_keys { |key| key[/\d+/].to_i }
+                   .transform_values do |val|
+                       name, canvas, time = val.split ','
+                       {
+                           name:   name,
+                           canvas: canvas,
+                           time:   time
+                       }
+                   end
+
+            self[expose_as] = presets unless expose_as.nil?
+
+            presets
+        end
+    end
+
     def sync_state
         thread.finally(
             query('Preset.Take',   expose_as: :preset),
+            query_preset_list(     expose_as: :presets),
             deep_query('Windows',  expose_as: :windows),
             deep_query('Canvases', expose_as: :canvases),
             deep_query('Layouts',  expose_as: :layouts)
