@@ -10,6 +10,10 @@ Orchestrator::Testing.mock_device 'TvOne::CorioMaster',
             Preset.Take = 1\r
             !Done Preset.Take\r
         RX
+        should_send "Routing.Preset.PresetList()\r\n"
+        responds <<~RX
+            !Done Routing.Preset.PresetList()\r
+        RX
         should_send "Windows\r\n"
         responds <<~RX
             !Done Windows\r

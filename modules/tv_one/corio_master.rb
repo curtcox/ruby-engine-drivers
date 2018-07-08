@@ -82,7 +82,8 @@ class TvOne::CorioMaster
     # Get the presets available for recall - for some inexplicible reason this
     # has a wildly different API to the rest of the system state...
     def query_preset_list(expose_as: nil)
-        exec('Preset.PresetList').then do |presets|
+        exec('Routing.Preset.PresetList').then do |presets|
+
             presets.transform_keys { |key| key[/\d+/].to_i }
                    .transform_values do |val|
                        name, canvas, time = val.split ','
@@ -93,7 +94,7 @@ class TvOne::CorioMaster
                        }
                    end
 
-            self[expose_as] = presets unless expose_as.nil?
+            self[expose_as.to_sym] = presets unless expose_as.nil?
 
             presets
         end
