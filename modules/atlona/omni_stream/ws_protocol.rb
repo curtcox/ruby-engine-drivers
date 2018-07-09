@@ -139,53 +139,60 @@ class Atlona::OmniStream::WsProtocol
         video_inp = video_inp.present? ? video_inp : "ip_input#{@video_in_default}"
 
         base_id = 14
-        configs = []
         request = {
             id: "ip_input",
             username: @username,
             password: @password,
             config_set: {
-                name: "ip_input",
-                config: configs
+                name: "ip_input"
             }
         }
 
         # Grab the details of the ip_input that should be updated
         if video_ip && video_port
-            id = base_id + video_inp[-1].to_i - 1
+            number = video_inp[-1].to_i
+            id = base_id + number - 1
 
             inp = inputs[video_inp]
-            inp["$$hashKey"] = id
+            inp["$$hashKey"] = "object:#{id}"
+            inp[:number] = number
             if video_ip.empty?
                 inp[:enabled] = enable
             else
                 inp[:enabled] = enable
                 inp[:multicast][:address] = video_ip
+                inp[:multicast][:tempAddress] = ''
                 inp[:port] = video_port
             end
 
-            configs << inp
+            request[:config_set][:config] = [inp]
+            logger.debug { "switch video:\n#{request}" }
+            @ws.text request.to_json
         end
 
         if audio_ip && audio_port
-            id = base_id + audio_inp[-1].to_i - 1
+            number = audio_inp[-1].to_i
+            id = base_id + number - 1
 
             inp = inputs[audio_inp]
-            inp["$$hashKey"] = id
+            inp["$$hashKey"] = "object:#{id}"
+            inp[:number] = number
             if audio_ip.empty?
                 inp[:enabled] = enable
             else
                 inp[:enabled] = enable
                 inp[:multicast][:address] = audio_ip
+                inp[:multicast][:tempAddress] = ''
                 inp[:port] = audio_port
             end
 
-            configs << inp
+            request[:config_set][:config] = [inp]
+            logger.debug { "switch audio:\n#{request}" }
+            @ws.text request.to_json
         end
 
-        raise 'no video or audio stream config provided' if configs.empty?
-
-        @ws.text request.to_json
+        raise 'no video or audio stream config provided' unless request[:config_set][:config]
+        true
     end
 
     def select_input(output: 1, video_input: 1, audio_input: 2)
