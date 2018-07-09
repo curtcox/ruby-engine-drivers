@@ -29,6 +29,13 @@ class Echo360::DeviceCapture
                 authorization: [setting(:username), setting(:password)]
             }
         })
+
+        schedule.clear
+        schedule.every('15s') do
+            logger.debug '-- Polling Capture'
+            system_status
+            capture_status
+        end
     end
 
     STATUS_CMDS = {
