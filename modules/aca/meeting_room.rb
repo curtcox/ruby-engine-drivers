@@ -22,6 +22,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:analytics] = setting(:analytics)
             self[:Camera] = setting(:Camera)
             self[:Wired] = setting(:Wired)
+            self[:vc_show_pres_layout] = setting(:vc_show_pres_layout)
             self[:hide_vc_sources] = setting(:hide_vc_sources)
             self[:mics_mutes] = setting(:mics_mutes)
             @confidence_monitor = setting(:confidence_monitor)
