@@ -29,7 +29,7 @@ class Microsoft::Exchange
         ews_opts = { http_opts: { ssl_verify_mode: 0 } }
         ews_opts[:http_opts][:http_client] = @internet_proxy if @internet_proxy
         STDERR.puts '--------------- NEW CLIENT CREATED --------------'
-        STDERR.puts "At URL: #{@ews_url} with email: #{@service_account_email} and password #{@service_account_password}"
+        STDERR.puts "At URL: #{@ews_url} with email: #{@service_account_email}"
         STDERR.puts '-------------------------------------------------'
         @ews_client ||= Viewpoint::EWSClient.new @ews_url, @service_account_email, @service_account_password, ews_opts
     end 
@@ -141,51 +141,55 @@ class Microsoft::Exchange
         STDERR.puts "Getting available rooms with"
         STDERR.puts start_time
         STDERR.puts end_time
-        STDERR.flush 
+        STDERR.flush
 
-        # Get booking data for all rooms between time range bounds
-        user_free_busy = @ews_client.get_user_availability(rooms,
-            start_time: start_time,
-            end_time:   end_time,
-            requested_view: :detailed,
-            time_zone: {
-                bias: -600,
-                standard_time: {
-                    bias: -60,
-                    time: "03:00:00",
-                    day_order: 1,
-                    month: 10,
-                    day_of_week: 'Sunday'
-                },
-                daylight_time: {
-                    bias: 0,
-                    time: "02:00:00",
-                    day_order: 1,
-                    month: 4,
-                    day_of_week: 'Sunday'
+        rooms.each_slice(99).each do |room_subset|
+
+            # Get booking data for all rooms between time range bounds
+            user_free_busy = @ews_client.get_user_availability(room_subset,
+                start_time: start_time,
+                end_time:   end_time,
+                requested_view: :detailed,
+                time_zone: {
+                    bias: -600,
+                    standard_time: {
+                        bias: -60,
+                        time: "03:00:00",
+                        day_order: 1,
+                        month: 10,
+                        day_of_week: 'Sunday'
+                    },
+                    daylight_time: {
+                        bias: 0,
+                        time: "02:00:00",
+                        day_order: 1,
+                        month: 4,
+                        day_of_week: 'Sunday'
+                    }
                 }
-            }
-        )
+            )
 
-       user_free_busy.body[0][:get_user_availability_response][:elems][0][:free_busy_response_array][:elems].each_with_index {|r,index|
-            # Remove meta data (business hours and response type)
-            resp = r[:free_busy_response][:elems][1][:free_busy_view][:elems].delete_if { |item| item[:free_busy_view_type] || item[:working_hours] }
+           user_free_busy.body[0][:get_user_availability_response][:elems][0][:free_busy_response_array][:elems].each_with_index {|r,index|
+                # Remove meta data (business hours and response type)
+                resp = r[:free_busy_response][:elems][1][:free_busy_view][:elems].delete_if { |item| item[:free_busy_view_type] || item[:working_hours] }
 
-            # Back to back meetings still show up so we need to remove these from the results
-            if resp.length == 1
-                resp = resp[0][:calendar_event_array][:elems]
+                # Back to back meetings still show up so we need to remove these from the results
+                if resp.length == 1
+                    resp = resp[0][:calendar_event_array][:elems]
 
-                if resp.length == 0
-                    free_rooms.push(rooms[index])
-                elsif resp.length == 1
-                    free_rooms.push(rooms[index]) if find_time(resp[0], :start_time) == end_time
-                    free_rooms.push(rooms[index]) if find_time(resp[0], :end_time) == start_time
+                    if resp.length == 0
+                        free_rooms.push(room_subset[index])
+                    elsif resp.length == 1
+                        free_rooms.push(room_subset[index]) if find_time(resp[0], :start_time) == end_time
+                        free_rooms.push(room_subset[index]) if find_time(resp[0], :end_time) == start_time
+                    end
+                elsif resp.length == 0
+                    # If response length is 0 then the room is free
+                    free_rooms.push(room_subset[index])
                 end
-            elsif resp.length == 0
-                # If response length is 0 then the room is free
-                free_rooms.push(rooms[index])
-            end
-        }
+            }
+        end
+
         free_rooms
     end
 
