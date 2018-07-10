@@ -115,9 +115,11 @@ class Aca::ExchangeBooking
         self[:booking_min_duration] = setting(:booking_min_duration)
         self[:booking_disable_future] = setting(:booking_disable_future)
         self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:hide_all_day_bookings] = setting(:hide_all_day_bookings)
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
         self[:icon] = setting(:icon)
+        @hide_all_day_bookings = Boolean(setting(:hide_all_day_bookings))
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
@@ -761,6 +763,10 @@ class Aca::ExchangeBooking
 
             logger.debug { item.inspect }
 
+            if @hide_all_day_bookings
+                next if Time.parse(ending) - Time.parse(start) > 86399
+            end
+
             # Prevent connections handing with TIME_WAIT
             # cli.ews.connection.httpcli.reset_all
 
@@ -776,6 +782,7 @@ class Aca::ExchangeBooking
                 :end_epoch => real_end.to_i
             }
         end
+        results.compact!
 
         if set_skype_url
             self[:can_join_skype_meeting] = false
