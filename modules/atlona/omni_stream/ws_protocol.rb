@@ -310,11 +310,14 @@ class Atlona::OmniStream::WsProtocol
         when 'hdmi_input'
             self[:inputs] = data
         when 'sessions'
-            self[:sessions] = data
+            sessions = []
             num_sessions = 0
             data.each do |sess|
-                num_sessions += 1 if sess[:audio][:stream][:destination_address].present? || sess[:video][:stream][:destination_address].present?
+                next unless sess[:audio][:stream][:enabled] || sess[:video][:stream][:enabled]
+                sessions << sess
+                num_sessions += 1
             end
+            self[:sessions] = sessions
             self[:num_sessions] = num_sessions
         when 'ip_input'
             ins = {}
