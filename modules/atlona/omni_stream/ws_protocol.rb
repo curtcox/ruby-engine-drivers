@@ -134,9 +134,9 @@ class Atlona::OmniStream::WsProtocol
         audio_inp = val[:audio][:input]
         video_inp = val[:video][:input]
 
-        # An empty string means no stream is selected
-        audio_inp = audio_inp.present? ? audio_inp : "ip_input#{@audio_in_default}"
-        video_inp = video_inp.present? ? video_inp : "ip_input#{@video_in_default}"
+        # An empty string means no stream is selected and we don't want to switch
+        audio_ip = nil unless audio_inp.present?
+        video_ip = nil unless video_inp.present?
 
         base_id = 14
         request = {
