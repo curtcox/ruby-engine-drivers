@@ -19,6 +19,8 @@ class Aca::Tracking::PeopleCount < CouchbaseOrm::Base
 
     before_create :set_id
 
+    view :all, emit_key: :room_email
+
     def set_id
         self.id = "count-#{self.booking_id}"
     end
