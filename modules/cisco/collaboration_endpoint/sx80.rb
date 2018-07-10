@@ -62,6 +62,9 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
 
+    command 'Audio Volume Set' => :volume,
+            Level: (0..100)
+
     command 'Call Disconnect' => :hangup, CallId_: Integer
     command 'Dial' => :dial,
             Number:  String,
