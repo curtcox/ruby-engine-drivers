@@ -264,10 +264,10 @@ class Aca::Router
         thread.finally(interactions).then do |results|
             edges.zip(results).each do |edge, (result, resolved)|
                 if resolved
-                    success |= edge
+                    success << edge
                 else
                     logger.warn "failed to switch #{edge}: #{result}"
-                    failed |= edge
+                    failed << edge
                 end
             end
             [success, failed]
