@@ -43,8 +43,8 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
     expect(graph.indegree(:laptop)).to be(1)
     expect(graph.outdegree(:display)).to be(1)
     expect(graph.outdegree(:laptop)).to be(0)
-    expect(graph.sources.map(&:id)).to include(:display)
-    expect(graph.sinks.map(&:id)).to include(:laptop)
+    expect(graph.sources).to include(:display)
+    expect(graph.sinks).to include(:laptop)
 
     # Edge inspection
     edge = graph[:display].edges[:laptop]
@@ -139,11 +139,11 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     graph = SignalGraph.from_map(signal_map)
 
-    expect(graph.sources.map(&:id)).to contain_exactly(:Left_LCD, :Right_LCD)
+    expect(graph.sources).to contain_exactly(:Left_LCD, :Right_LCD)
 
-    expect(graph.sinks.map(&:id)).to contain_exactly(*(:a..:g).to_a)
+    expect(graph.sinks).to contain_exactly(*(:a..:g).to_a)
 
-    routes = graph.sources.map(&:id).map { |id| [id, graph.dijkstra(id)] }.to_h
+    routes = graph.sources.map { |id| [id, graph.dijkstra(id)] }.to_h
     expect(routes[:Left_LCD].distance_to[:a]).to be(2)
     expect(routes[:Left_LCD].distance_to[:c]).to be(2)
     expect(routes[:Left_LCD].distance_to[:e]).to be_infinite
