@@ -552,13 +552,13 @@ class Aca::Router::SignalGraph
     # `device as output` to simply `output` and return a Hash of the structure
     # `{ output: device }`.
     def self.extract_mods!(map)
-        mods = {}
+        mods = HashWithIndifferentAccess.new
 
         map.transform_keys! do |key|
-            mod, node = key.to_s.split(' as ').map(&:to_sym)
+            mod, node = key.to_s.split(' as ')
             node ||= mod
             mods[node] = mod
-            node
+            node.to_sym
         end
 
         mods

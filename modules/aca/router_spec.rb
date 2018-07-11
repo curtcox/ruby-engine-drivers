@@ -107,11 +107,11 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     mods = SignalGraph.extract_mods!(normalised_map)
     expect(mods).to eq(
-        Left_LCD:   :Display_1,
-        Right_LCD:  :Display_2,
-        Switcher_1: :Switcher_1,
-        SubSwitchA: :Switcher_2,
-        SubSwitchB: :Switcher_2
+        'Left_LCD'   => 'Display_1',
+        'Right_LCD'  => 'Display_2',
+        'Switcher_1' => 'Switcher_1',
+        'SubSwitchA' => 'Switcher_2',
+        'SubSwitchB' => 'Switcher_2'
     )
     expect(normalised_map).to eq(
         Left_LCD: {
