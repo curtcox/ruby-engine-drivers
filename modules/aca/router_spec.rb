@@ -161,8 +161,6 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
     # -------------------------------------------------------------------------
     section 'Routing'
 
-    exec(:load_from_map, signal_map)
-
     exec(:route, :a, :Left_LCD)
     nodes, edges = result
     expect(nodes.map(&:id)).to contain_exactly(:a, :Switcher_1__1, :Left_LCD)
@@ -181,6 +179,15 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
     expect { exec(:route, :e, :Left_LCD) }.to \
         raise_error('no route from e to Left_LCD')
 
+    # -------------------------------------------------------------------------
+    section 'Edge maps'
+
+    exec(:build_edge_map, a: :Left_LCD, b: :Right_LCD)
+    edge_map = result
+    expect(edge_map.keys).to contain_exactly(:a, :b)
+    expect(edge_map[:a]).to be_a(Hash)
+    expect(edge_map[:a][:Left_LCD]).to be_a(Array)
+
 
     # -------------------------------------------------------------------------
     section 'Graph queries'
@@ -190,4 +197,7 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     exec(:input_for, :a, on: :Left_LCD)
     expect(result).to be(:hdmi)
+
+    exec(:upstream, :g)
+    expect(result).to be(:Right_LCD)
 end
