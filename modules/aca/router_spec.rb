@@ -155,6 +155,10 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
 
     # -------------------------------------------------------------------------
+
+    exec(:load_from_map, signal_map)
+
+    # -------------------------------------------------------------------------
     section 'Routing'
 
     exec(:load_from_map, signal_map)
@@ -176,4 +180,14 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     expect { exec(:route, :e, :Left_LCD) }.to \
         raise_error('no route from e to Left_LCD')
+
+
+    # -------------------------------------------------------------------------
+    section 'Graph queries'
+
+    exec(:input_for, :a)
+    expect(result).to be(1)
+
+    exec(:input_for, :a, on: :Left_LCD)
+    expect(result).to be(:hdmi)
 end

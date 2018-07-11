@@ -97,8 +97,15 @@ class Aca::Router
     # it. Similarly `on` maybe used to look up the input used by any other node
     # within the graph that would be used to show `source`.
     def input_for(source, on: nil)
-        sink = on || upstream(source)
-        _, edges = route source, sink
+        if on.nil?
+            edges = signal_graph.incoming_edges source
+            raise "no outputs from #{source}" if edges.empty?
+            raise "multiple outputs from #{source}, please specify a sink" \
+                unless edges.map(&:device).uniq.size == 1
+        else
+            _, edges = route source, on
+        end
+
         edges.last.input
     end
 
