@@ -35,7 +35,7 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
         edge.device = :Display_1
         edge.input  = :hdmi
     end
-    expect(graph.successors(:display)).to include(graph[:laptop])
+    expect(graph.successors(:display)).to include(:laptop)
 
     # Graph structural inspection
     # note: signal flow is inverted from graph directivity
@@ -163,7 +163,7 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     exec(:route, :a, :Left_LCD)
     nodes, edges = result
-    expect(nodes.map(&:id)).to contain_exactly(:a, :Switcher_1__1, :Left_LCD)
+    expect(nodes).to contain_exactly(:a, :Switcher_1__1, :Left_LCD)
     expect(edges.first).to be_nxn
     expect(edges.first.device).to be(:Switcher_1)
     expect(edges.first.input).to be(1)
@@ -174,7 +174,7 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     exec(:route, :c, :Left_LCD)
     nodes, = result
-    expect(nodes.map(&:id)).to contain_exactly(:c, :SubSwitchA__1, :Left_LCD)
+    expect(nodes).to contain_exactly(:c, :SubSwitchA__1, :Left_LCD)
 
     expect { exec(:route, :e, :Left_LCD) }.to \
         raise_error('no route from e to Left_LCD')

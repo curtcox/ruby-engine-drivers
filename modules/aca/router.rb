@@ -180,12 +180,12 @@ class Aca::Router
 
         nodes = []
         edges = []
-        node = signal_graph[source]
+        node = source
         until node.nil?
             nodes.unshift node
-            predecessor = path.predecessor[node.id]
-            edges << predecessor.edges[node.id] unless predecessor.nil?
-            node = predecessor
+            prev = path.predecessor[node]
+            edges << signal_graph[prev].edges[node] unless prev.nil?
+            node = prev
         end
 
         logger.debug { edges.map(&:to_s).join ' then ' }
@@ -457,7 +457,7 @@ class Aca::Router::SignalGraph
     end
 
     def successors(id)
-        nodes[id].edges.keys.map { |x| nodes[x] }
+        nodes[id].edges.keys
     end
 
     def sources
@@ -492,16 +492,16 @@ class Aca::Router::SignalGraph
         predecessor = {}
 
         distance_to[id] = 0
-        active.push nodes[id], distance_to[id]
+        active.push id, distance_to[id]
 
         until active.empty?
             u = active.pop
-            successors(u.id).each do |v|
-                alt = distance_to[u.id] + 1
-                next unless alt < distance_to[v.id]
-                distance_to[v.id] = alt
-                predecessor[v.id] = u
-                active.push v, distance_to[v.id]
+            successors(u).each do |v|
+                alt = distance_to[u] + 1
+                next unless alt < distance_to[v]
+                distance_to[v] = alt
+                predecessor[v] = u
+                active.push v, distance_to[v]
             end
         end
 
