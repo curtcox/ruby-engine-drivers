@@ -83,13 +83,13 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
     normalised_map = SignalGraph.normalise(signal_map)
     expect(normalised_map).to eq(
         'Display_1 as Left_LCD' => {
-            'hdmi'  => 'Switcher_1__1',
-            'hdmi2' => 'SubSwitchA__1'
+            hdmi: 'Switcher_1__1',
+            hdmi2: 'SubSwitchA__1'
         },
         'Display_2 as Right_LCD' => {
-            'hdmi'  => 'Switcher_1__2',
-            'hdmi2' => 'SubSwitchB__2',
-            'display_port' => 'g'
+            hdmi: 'Switcher_1__2',
+            hdmi2: 'SubSwitchB__2',
+            display_port: 'g'
         },
         'Switcher_1' => {
             1 => 'a',
@@ -107,31 +107,31 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     mods = SignalGraph.extract_mods!(normalised_map)
     expect(mods).to eq(
-        'Left_LCD'   => :Display_1,
-        'Right_LCD'  => :Display_2,
-        'Switcher_1' => :Switcher_1,
-        'SubSwitchA' => :Switcher_2,
-        'SubSwitchB' => :Switcher_2
+        Left_LCD:   :Display_1,
+        Right_LCD:  :Display_2,
+        Switcher_1: :Switcher_1,
+        SubSwitchA: :Switcher_2,
+        SubSwitchB: :Switcher_2
     )
     expect(normalised_map).to eq(
-        'Left_LCD' => {
-            'hdmi'  => 'Switcher_1__1',
-            'hdmi2' => 'SubSwitchA__1'
+        Left_LCD: {
+            hdmi: 'Switcher_1__1',
+            hdmi2: 'SubSwitchA__1'
         },
-        'Right_LCD' => {
-            'hdmi'  => 'Switcher_1__2',
-            'hdmi2' => 'SubSwitchB__2',
-            'display_port' => 'g'
+        Right_LCD: {
+            hdmi: 'Switcher_1__2',
+            hdmi2: 'SubSwitchB__2',
+            display_port: 'g'
         },
-        'Switcher_1' => {
+        Switcher_1: {
             1 => 'a',
             2 => 'b'
         },
-        'SubSwitchA' => {
+        SubSwitchA: {
             1 => 'c',
             2 => 'd'
         },
-        'SubSwitchB' => {
+        SubSwitchB: {
             3 => 'e',
             4 => 'f'
         }

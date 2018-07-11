@@ -154,7 +154,7 @@ class Aca::Router
     end
 
     def paths
-        @path_cache ||= HashWithIndifferentAccess.new do |hash, node|
+        @path_cache ||= Hash.new do |hash, node|
             hash[node] = signal_graph.dijkstra node
         end
     end
@@ -323,8 +323,8 @@ class Aca::Router::SignalGraph
         Meta = Struct.new(:device, :input, :output)
 
         def initialize(source, target, &blk)
-            @source = source
-            @target = target
+            @source = source.to_sym
+            @target = target.to_sym
 
             meta = Meta.new.tap(&blk)
             normalise_io = lambda do |x|
@@ -359,13 +359,13 @@ class Aca::Router::SignalGraph
 
         def initialize(id)
             @id = id.to_sym
-            @edges = HashWithIndifferentAccess.new do |_, other_id|
+            @edges = Hash.new do |_, other_id|
                 raise ArgumentError, "No edge from \"#{id}\" to \"#{other_id}\""
             end
         end
 
         def join(other_id, datum)
-            edges[other_id] = datum
+            edges[other_id.to_sym] = datum
             self
         end
 
@@ -387,7 +387,7 @@ class Aca::Router::SignalGraph
     attr_reader :nodes
 
     def initialize
-        @nodes = HashWithIndifferentAccess.new do |_, id|
+        @nodes = Hash.new do |_, id|
             raise ArgumentError, "\"#{id}\" does not exist"
         end
     end
@@ -397,7 +397,8 @@ class Aca::Router::SignalGraph
     end
 
     def insert(id)
-        nodes[id] = Node.new id unless nodes.key? id
+        id = id.to_sym
+        nodes[id] = Node.new id unless nodes.include? id
         self
     end
 
@@ -414,6 +415,8 @@ class Aca::Router::SignalGraph
     end
 
     def join(source, target, &block)
+        source = source.to_sym
+        target = target.to_sym
         datum = Edge.new(source, target, &block)
         nodes[source].join target, datum
         self
@@ -459,7 +462,7 @@ class Aca::Router::SignalGraph
 
     def dijkstra(id)
         active = Containers::PriorityQueue.new { |x, y| (x <=> y) == -1 }
-        distance_to = HashWithIndifferentAccess.new { 1.0 / 0.0 }
+        distance_to = Hash.new { 1.0 / 0.0 }
         predecessor = {}
 
         distance_to[id] = 0
@@ -499,13 +502,13 @@ class Aca::Router::SignalGraph
     #     { device: { input: source } }
     #
     def self.normalise(map)
-        map.with_indifferent_access.transform_values! do |inputs|
+        map.transform_values do |inputs|
             case inputs
             when Array
                 (1..inputs.size).zip(inputs).to_h
             when Hash
                 inputs.transform_keys do |key|
-                    key.to_s[/^\d+$/]&.to_i || key
+                    key.to_s[/^\d+$/]&.to_i || key.to_sym
                 end
             else
                 raise ArgumentError, 'inputs must be a Hash or Array'
@@ -519,12 +522,12 @@ class Aca::Router::SignalGraph
     # `device as output` to simply `output` and return a Hash of the structure
     # `{ output: device }`.
     def self.extract_mods!(map)
-        mods = HashWithIndifferentAccess.new
+        mods = {}
 
         map.transform_keys! do |key|
-            mod, node = key.to_s.split ' as '
+            mod, node = key.to_s.split(' as ').map(&:to_sym)
             node ||= mod
-            mods[node] = mod.to_sym
+            mods[node] = mod
             node
         end
 
@@ -588,6 +591,7 @@ class Aca::Router::SignalGraph
                 upstream_device, output = source.to_s.split '__'
                 next if output.nil?
 
+                upstream_device = upstream_device.to_sym
                 matrix_nodes |= [upstream_device]
 
                 # Push in nodes and edges to each matrix input
