@@ -198,6 +198,9 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
     exec(:input_for, :a, on: :Left_LCD)
     expect(result).to be(:hdmi)
 
-    exec(:upstream, :g)
-    expect(result).to be(:Right_LCD)
+    exec(:device_for, :g)
+    expect(result).to be(:Display_2)
+
+    exec(:devices_between, :c, :Left_LCD)
+    expect(result).to contain_exactly(:Switcher_2, :Display_1)
 end

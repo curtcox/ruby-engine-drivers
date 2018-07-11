@@ -104,38 +104,25 @@ class Aca::Router
         edges.last.input
     end
 
-    # Get the node immediately upstream of an input node.
+    # Find the device that input node is attached to.
     #
-    # Depending on the device API, this may be of use for determining signal
-    # presence.
-    def upstream(source, sink = nil)
-        if sink.nil?
-            edges = signal_graph.incoming_edges source
-            raise "no outputs from #{source}" if edges.empty?
-            raise "multiple outputs from #{source}, please specify a sink" \
-                if edges.size > 1
-        else
-            _, edges = route source, sink
-        end
-
-        edges.first.source
+    # Efficiently queries the graph for the device that an signal input connects
+    # to for checking signal properties revealed by the device state.
+    def device_for(source)
+        edges = signal_graph.incoming_edges source
+        raise "no outputs from #{source}" if edges.empty?
+        raise "#{source} is not an input node" if edges.size > 1
+        edges.first.device
     end
 
-    # Get the node immediately downstream of an output node.
+    # Get a list of devices that a signal passes through for a specific route.
     #
-    # This may be used walking back up the signal graph to find a decoder for
-    # an output device.
-    def downstream(sink, source = nil)
-        if source.nil?
-            edges = signal_graph.outgoing_edges sink
-            raise "no inputs to #{sink}" if edges.empty?
-            raise "multiple inputs to #{sink}, please specify a source" \
-                if edges.size > 1
-        else
-            _, edges = route source, sink
-        end
-
-        edges.last.target
+    # This may be used to walk up or down a path to find encoders, decoders or
+    # other devices that may provide some interesting state, or require
+    # additional interactions (signal presence monitoring etc).
+    def devices_between(source, sink)
+        _, edges = route source, sink
+        edges.map(&:device)
     end
 
 
