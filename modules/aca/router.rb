@@ -62,7 +62,7 @@ class Aca::Router
 
         # Reduce the edge map to a set of edges
         edges_to_connect = edge_map.reduce(Set.new) do |s, (_, routes)|
-            s | routes.values.reduce(&:|)
+            s | routes.values.flatten
         end
 
         switch = activate_all edges_to_connect, atomic: atomic, force: force
