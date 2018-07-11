@@ -69,7 +69,7 @@ class Aca::Router
 
         switch.then do |success, failed|
             if failed.empty?
-                logger.debug 'signal map fully activated'
+                logger.debug 'signal map activated'
                 edge_map.transform_values(&:keys)
 
             elsif success.empty?
@@ -228,7 +228,7 @@ class Aca::Router
                     # note `route` may also throw an exception (e.g. when there
                     # is an invalid source / sink or unroutable path)
                     raise if atomic
-                    logger.warn e.message
+                    logger.error e.message
                 end
             end
 
