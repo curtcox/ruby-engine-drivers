@@ -224,7 +224,7 @@ class Aca::Router
 
                     source_nodes |= nodes
                     edge_map[source][sink] = edges
-                rescue e
+                rescue => e
                     # note `route` may also throw an exception (e.g. when there
                     # is an invalid source / sink or unroutable path)
                     raise if atomic
