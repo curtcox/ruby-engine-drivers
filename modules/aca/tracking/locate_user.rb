@@ -33,6 +33,7 @@ class Aca::Tracking::LocateUser
 
     def on_load
         @looking_up = {}
+        on_update
     end
 
     def on_update
