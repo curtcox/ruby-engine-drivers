@@ -41,7 +41,10 @@ class TvOne::CorioMaster
     # Main API
 
     def preset(id)
-        set('Preset.Take', id).finally { sync_state }
+        set('Preset.Take', id).then do |result|
+            sync_state
+            result
+        end
     end
     alias switch_to preset
 
