@@ -161,7 +161,7 @@ class Lightware::Switcher::LightwareProtocol
     def received(data, resolve, command)
         logger.debug { "Matrix sent #{data}" }
 
-        if data[0..2] == 'ERR'.freeze
+        if data[0..2] == 'ERR'
             logger.debug {
                 err = String.new("Matrix sent error #{data}: ")
                 err << (RespErrors[data[3..-1].to_i] || 'unknown error code')
@@ -217,13 +217,13 @@ class Lightware::Switcher::LightwareProtocol
             outputs = data.split(' ')
             outputs.shift
             outputs.each_index do |out|
-                self["video#{out}_muted"] = outputs[out] == '1'.freeze
+                self["video#{out}_muted"] = outputs[out] == '1'
             end
-        when '1', '0'.freeze
+        when '1', '0'
             # Probably the mute response
             # Returns 1MT01, 0MT13
-            if data[1] == 'M'.freeze
-                self["video#{data[3..-1]}_muted"] = data[0] == '1'.freeze
+            if data[1] == 'M'
+                self["video#{data[3..-1]}_muted"] = data[0] == '1'
             end
         when 'L'
             # Probably Load Preset response

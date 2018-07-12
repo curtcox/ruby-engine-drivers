@@ -1,3 +1,6 @@
+# encoding: ASCII-8BIT
+# frozen_string_literal: true
+
 module Epiphan; end
 
 class Epiphan::Pearl2
@@ -62,7 +65,7 @@ class Epiphan::Pearl2
     protected
 
     def time_stamp
-        time = (Time.now.to_f * 1000).to_i
+        (Time.now.to_f * 1000).to_i
     end
 
     def exec(cmd, channel)

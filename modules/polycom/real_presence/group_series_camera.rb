@@ -210,9 +210,9 @@ class Polycom::RealPresence::GroupSeriesCamera
         logger.debug { "Polycom sent #{response}" }
 
         # Ignore the echo
-        #if command && command[:wait_count] == 0
+        # if command && command[:wait_count] == 0
         #    return :ignore
-        #end
+        # end
 
         # Break up the message
         parts = response.split(/\s|:\s*/)
