@@ -26,7 +26,8 @@ class Aca::Tracking::LocateUser
         cmx_pass: 'learning',
         ignore_vendors: {
             # https://en.wikipedia.org/wiki/MAC_address#Address_details
-            "Good Way Docking Stations" => "0050b6"
+            "Good Way Docking Stations" => "0050b6",
+            "BizLink Docking Stations" => "9cebe8"
         }
     })
 
