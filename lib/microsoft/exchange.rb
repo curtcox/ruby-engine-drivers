@@ -282,8 +282,8 @@ class Microsoft::Exchange
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
 
         # Add the current user passed in as an attendee
-        mailbox = { email_address: current_user[:email] }
-        mailbox[:name] = current_user[:name] if current_user.key?('name')
+        mailbox = { email_address: current_user.email }
+        mailbox[:name] = current_user.name if current_user.name
         booking[:required_attendees] = [{
             attendee: { mailbox:  mailbox }
         }]
@@ -309,7 +309,7 @@ class Microsoft::Exchange
         STDERR.flush
 
         if mailbox_location == 'user'
-            mailbox = current_user[:email]
+            mailbox = current_user.email
         elsif mailbox_location == 'room'
             mailbox = room_email
         end
