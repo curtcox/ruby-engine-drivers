@@ -246,7 +246,7 @@ class Microsoft::Exchange
 	end
     end
 
-    def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney', permission: 'impersonation')
+    def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, timezone:'Sydney', permission: 'impersonation', mailbox_location: 'user')
         STDERR.puts "CREATING NEW BOOKING IN LIBRARY"
         STDERR.puts "room_email is #{room_email}"
         STDERR.puts "start_param is #{start_param}"
@@ -307,13 +307,19 @@ class Microsoft::Exchange
         STDERR.puts booking
         STDERR.flush
 
+        if mailbox_location == 'user'
+            mailbox = current_user[:email]
+        elsif mailbox_location == 'room'
+            mailbox = room_email
+        end
+
         # Determine whether to use delegation, impersonation or neither
         if permission == 'delegation'
-            folder = @ews_client.get_folder(:calendar, { act_as: room_email })
+            folder = @ews_client.get_folder(:calendar, { act_as: mailbox })
         elsif permission == 'impersonation'
-            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], current_user[:email])
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], mailbox)
             folder = @ews_client.get_folder(:calendar)
-        elsif permission == 'none' || !permission
+        elsif permission == 'none' || permission.nil?
             folder = @ews_client.get_folder(:calendar)
         end
 
