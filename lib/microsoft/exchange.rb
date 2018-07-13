@@ -216,6 +216,7 @@ class Microsoft::Exchange
             booking = {}
             booking[:subject] = event.subject
             booking[:title] = event.subject
+            booking[:id] = event.id
             # booking[:start_date] = event.start.utc.iso8601
             # booking[:end_date] = event.end.utc.iso8601
             booking[:start_date] = event.start.to_i * 1000
@@ -319,7 +320,7 @@ class Microsoft::Exchange
         elsif permission == 'impersonation'
             @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], mailbox)
             folder = @ews_client.get_folder(:calendar)
-        elsif permission == 'none' || permission.nil?
+        elsif permission == 'none' || permission.nil?   
             folder = @ews_client.get_folder(:calendar)
         end
 
