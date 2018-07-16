@@ -341,13 +341,14 @@ class Microsoft::Exchange
 
         event = @ews_client.get_item(booking_id)
         booking = {}
-        
+
         # Add attendees if passed in
         attendees = Array(attendees)
         attendees.each do |attendee|
             if attendee.class != String
                 attendee = attendee['email']
             end
+            booking[:required_attendees] ||= []
             booking[:required_attendees].push({
                 attendee: { mailbox: { email_address: attendee}}
             })
