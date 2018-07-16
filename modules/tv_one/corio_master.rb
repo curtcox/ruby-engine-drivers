@@ -42,8 +42,30 @@ class TvOne::CorioMaster
 
     def preset(id)
         set('Preset.Take', id).then do |result|
-            sync_state
-            result
+            self[:preset] = id
+
+            # The full query of window params can take up to ~15 seconds. To
+            # speed things up a little for other modules that depend on this
+            # state, cache window info against preset ID's. These are then used
+            # to provide instant status updates.
+            #
+            # As the device only supports a single connection the only time the
+            # cache will contain stale data is following editing of presets, in
+            # which case window state will update silently in the background.
+            @window_cache ||= {}
+
+            update_cache = deep_query('Windows').then do |windows|
+                @window_cache[id] = windows
+            end
+
+            update_status = ->() { self[:windows] = @window_cache[id] }
+
+            if @window_cache.include? id
+                update_status.call
+                result
+            else
+                update_cache.then(&update_status).then { result }
+            end
         end
     end
     alias switch_to preset
