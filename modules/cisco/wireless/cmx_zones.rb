@@ -4,6 +4,32 @@
 module Cisco; end
 module Cisco::Wireless; end
 
+# This expects the debug flag turned on in the Zone Count Register API under configuration service /api/config/v1/zoneCountParams/1.
+# Details here: https://communities.cisco.com/message/267538#267538
+
+=begin
+
+Example response:
+{
+   "MacAddress": [
+        "00:00:2a:01:00:41",
+        "00:00:2a:01:00:50",
+        "00:00:2a:01:00:3f",
+        "00:00:2a:01:00:46",
+        "00:00:2a:01:00:48",
+        "00:00:2a:01:00:49",
+        "00:00:2a:01:00:4c",
+        "00:00:2a:01:00:4a"
+    ],
+    "Duration ": {
+        "start": "2017/08/30 10:12:08",
+        "end": "2017/08/30 10:22:08"
+    },
+    "Count ": 8
+}
+
+=end
+
 class Cisco::Wireless::CmxZones
     include ::Orchestrator::Constants
 
