@@ -79,7 +79,8 @@ class Lg::Lcd::ModelLs5
         wol: 'w',
         no_signal_off: 'g',
         auto_off: 'n',
-        dpm: 'j'
+        dpm: 'j',
+        aspect_ratio: 'c'
     }
     Lookup = Command.invert
 
@@ -108,9 +109,12 @@ class Lg::Lcd::ModelLs5
     # NOTE:: We are currently only supporting the PC values here
     Inputs = {
         dvi: 112,
-        hdmi: 160,
-        hdmi2: 161,
-        display_port: 208 
+        hdmi: 0xA0,
+        hdmi_dtv: 0x90,
+        hdmi2: 0xA1,
+        hdmi2_dtv: 0x91,
+        display_port: 0xD0,
+        display_port_dtv: 0xC0
     }
     Inputs.merge!(Inputs.invert)
     def switch_to(source)
@@ -158,6 +162,19 @@ class Lg::Lcd::ModelLs5
         mute_display(false)
     end
 
+    # Set Aspect Ratio
+    Ratios = {
+        square: 0x01,
+        wide: 0x02,
+        zoom: 0x04,
+        scan: 0x09,
+        program: 0x06
+    }
+    Ratios.merge!(Ratios.invert)
+    def aspect_ratio(ratio)
+        val = Ratios[ratio.to_sym]
+        do_send(Command[:aspect_ratio], val, name: :aspect_ratio, delay_on_receive: 1000)
+    end
 
     # Status values we are interested in polling
     def do_poll
@@ -218,7 +235,7 @@ class Lg::Lcd::ModelLs5
         # 5 == 3m
         # 6 == 5m
         # 7 == 10m
-        do_send(Command[:dpm], 4, :f, name: :disable_dpm)
+        do_send(Command[:dpm], time_out.to_i, :f, name: :disable_dpm)
 
         # The action DPM takes needs to be configured using a remote
         # The action should be set to: screen off always
@@ -289,6 +306,8 @@ class Lg::Lcd::ModelLs5
             else
                 switch_to(self[:input_target])
             end
+        when :aspect_ratio
+            self[:aspect_ratio] = Ratios[resp_value] || :unknown
         when :screen_mute
             # This indicates power status as hard off we are disconnected
             self[:power] = resp_value != 1
