@@ -365,6 +365,16 @@ class Microsoft::Exchange
         booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop if start_param
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop if end_param
 
+        if mailbox_location == 'user'
+            mailbox = current_user.email
+        elsif mailbox_location == 'room'
+            mailbox = room_email
+        end
+
+        if permission == 'impersonation'
+            @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], mailbox)
+        end
+        
         new_booking = event.update_item!(booking)
 
 
