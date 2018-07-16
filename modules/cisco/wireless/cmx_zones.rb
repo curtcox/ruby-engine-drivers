@@ -10,6 +10,7 @@ class Cisco::Wireless::CmxZones
     descriptive_name 'Cisco CMX Zone Management'
     generic_name :FloorManagement
     implements :service
+    keepalive false
 
     default_settings({
         levels: {
@@ -33,9 +34,9 @@ class Cisco::Wireless::CmxZones
 
     def on_update
         @api_version = setting(:api_version) || 3
-        @levels = settings(:levels) || {}
+        @levels = setting(:levels) || {}
 
-        config({
+        defaults({
             headers: {
                 authorization: [setting(:username), setting(:password)]
             }
