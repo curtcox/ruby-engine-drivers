@@ -337,7 +337,7 @@ class Microsoft::Exchange
         }
     end
 
-    def update_booking(id:, room_email:nil, start_param:nil, end_param:nil, subject:nil, description:nil, current_user:nil, attendees: nil, timezone:'Sydney', permission: 'impersonation', mailbox_location: 'user')
+    def update_booking(booking_id:, room_email:nil, start_param:nil, end_param:nil, subject:nil, description:nil, current_user:nil, attendees: nil, timezone:'Sydney', permission: 'impersonation', mailbox_location: 'user')
 
         booking = @ews_client.get_item(id)
 
