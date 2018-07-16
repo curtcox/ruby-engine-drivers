@@ -340,7 +340,8 @@ class Microsoft::Exchange
     def update_booking(booking_id:, room_email:nil, start_param:nil, end_param:nil, subject:nil, description:nil, current_user:nil, attendees: nil, timezone:'Sydney', permission: 'impersonation', mailbox_location: 'user')
 
         event = @ews_client.get_item(booking_id)
-
+        booking = {}
+        
         # Add attendees if passed in
         attendees = Array(attendees)
         attendees.each do |attendee|
