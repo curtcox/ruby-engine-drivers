@@ -267,6 +267,8 @@ class Microsoft::Exchange
         # Allow for naming of subject or title
         booking[:subject] = subject
         booking[:title] = subject
+        booking[:location] = Orchestrator::ControlSystem.find_by_email(room_email).name
+
 
         # Set the room email as a resource
         booking[:resources] = [{
@@ -333,6 +335,11 @@ class Microsoft::Exchange
             attendees: attendees,
             subject: subject
         }
+    end
+
+    def delete_booking(id)
+        booking = ews_client.get_item(id)
+        booking.delete!(:recycle, send_meeting_cancellations: "SendOnlyToAll")
     end
 
     # Takes a date of any kind (epoch, string, time object) and returns a time object
