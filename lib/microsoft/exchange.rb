@@ -339,7 +339,7 @@ class Microsoft::Exchange
 
     def update_booking(booking_id:, room_email:nil, start_param:nil, end_param:nil, subject:nil, description:nil, current_user:nil, attendees: nil, timezone:'Sydney', permission: 'impersonation', mailbox_location: 'user')
 
-        booking = @ews_client.get_item(booking_id)
+        event = @ews_client.get_item(booking_id)
 
         # Add attendees if passed in
         attendees = Array(attendees)
@@ -363,7 +363,7 @@ class Microsoft::Exchange
         booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop if start_param
         booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop if end_param
 
-        new_booking = booking.update_item!(booking)
+        new_booking = event.update_item!(booking)
 
 
         {
