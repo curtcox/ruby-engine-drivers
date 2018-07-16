@@ -52,7 +52,8 @@ class Cisco::Wireless::CmxZones
             if response.status == 200
                 begin
                     data = JSON.parse(response.body)
-                    self[zone_id.to_s] = data['Count']
+                    # CMX bug on count key with the trailing space
+                    self[zone_id.to_s] = data['Count '] || data['Count']
                 rescue => e
                     :abort
                 end
