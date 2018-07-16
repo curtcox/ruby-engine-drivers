@@ -337,8 +337,46 @@ class Microsoft::Exchange
         }
     end
 
+    def update_booking(id:, room_email:nil, start_param:nil, end_param:nil, subject:nil, description:nil, current_user:nil, attendees: nil, timezone:'Sydney', permission: 'impersonation', mailbox_location: 'user')
+
+        booking = @ews_client.get_item(id)
+
+        # Add attendees if passed in
+        attendees = Array(attendees)
+        attendees.each do |attendee|
+            if attendee.class != String
+                attendee = attendee['email']
+            end
+            booking[:required_attendees].push({
+                attendee: { mailbox: { email_address: attendee}}
+            })
+        end if attendees && !attendees.empty?
+
+        # Add subject or title
+        booking[:subject] = subject if subject
+        booking[:title] = subject if subject
+
+        # Add location
+        booking[:location] = Orchestrator::ControlSystem.find_by_email(room_email).name if email
+
+        # Add new times if passed
+        booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop if start_param
+        booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop if end_param
+
+        new_booking = booking.update_item!(booking)
+
+
+        {
+            id: new_booking.id,
+            start: new_booking.start,
+            end: new_booking.end,
+            attendees: new_booking.required_attendees,
+            subject: new_booking.subject
+        }
+    end
+
     def delete_booking(id)
-        booking = ews_client.get_item(id)
+        booking = @ews_client.get_item(id)
         booking.delete!(:recycle, send_meeting_cancellations: "SendOnlyToAll")
     end
 
