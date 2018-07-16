@@ -49,10 +49,10 @@ class Cisco::Cmx
         locations.select! { |loc| @ssid.include?(loc[:ssId]) } if @ssid
         return nil if locations.length == 0
 
-        if @api_version == 3
-            map = locations[0][:locationMapHierarchy].split('>')
+        map = if @api_version == 3
+            locations[0][:locationMapHierarchy].split('>')
         else
-            map = locations[0][:mapInfo][:mapHierarchyString].split('>')
+            locations[0][:mapInfo][:mapHierarchyString].split('>')
         end
         campus = @floor_mappings[map[0]]
         building = @floor_mappings[map[1]]

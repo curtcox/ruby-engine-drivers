@@ -81,7 +81,7 @@ class Cisco::Wireless::CmxZones
                     data = JSON.parse(response.body)
                     # CMX bug on count key with the trailing space
                     self[zone_id.to_s] = data['Count '] || data['Count']
-                rescue => e
+                rescue
                     :abort
                 end
             elsif response.status == 401
@@ -96,17 +96,17 @@ class Cisco::Wireless::CmxZones
 
     def login
         post("/api/common/v#{@api_version}/login", name: :login) do |response|
-            if (200..299).include? response.status
+            if (200..299).cover? response.status
                 :success
             else
-                logger.error "CMX login error. Please check username and password."
+                logger.error 'CMX login error. Please check username and password.'
                 :abort
             end
         end
     end
 
     def build_zone_list
-        @levels.each do |name, level|
+        @levels.each_value do |level|
             zone_id = level[:id]
             values = {}
 
