@@ -261,15 +261,16 @@ class Microsoft::Office
         check_response(bookings_response)
         bookings = JSON.parse(bookings_response.body)['value']
         if bookings.nil?
-            return recurring_bookings
+            all_bookings = recurring_bookings
         else
             bookings.concat recurring_bookings
-            bookings.each do |booking|
-                booking['Start'] = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc.iso8601
-                booking['End'] = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime']).utc.iso8601
-            end
-            bookings
+            all_bookings = bookings
         end
+        all_bookings.each do |booking|
+            booking['Start'] = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc.iso8601
+            booking['End'] = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime']).utc.iso8601
+        end
+        all_bookings
     end
 
     def get_recurring_bookings_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
