@@ -24,7 +24,8 @@ class Microsoft::Office
             service_account_email:,
             service_account_password:,
             internet_proxy:nil,
-            delegated:false,
+            permission: 'impersonation',
+            mailbox_location: 'user',
             logger: Rails.logger
         )
         @client_id = client_id
@@ -36,7 +37,8 @@ class Microsoft::Office
         @service_account_email = service_account_email
         @service_account_password = service_account_password
         @internet_proxy = internet_proxy
-        @delegated = delegated
+        @permission = permission
+        @mailbox_location = mailbox_location
         oauth_options = { site: @app_site,  token_url: @app_token_url }
         oauth_options[:connection_opts] = { proxy: @internet_proxy } if @internet_proxy
         @graph_client ||= OAuth2::Client.new(
@@ -298,8 +300,11 @@ class Microsoft::Office
         # Get our room
         room = Orchestrator::ControlSystem.find(room_id)
 
-        # Set our endpoint with the email
-        endpoint = "/v1.0/users/#{room.email}/events"
+        if mailbox_location == 'room'
+            endpoint = "/v1.0/users/#{room.email}/events"
+        elsif mailbox_location == 'user'
+            endpoint = "/v1.0/users/#{current_user.email}/events"
+        end
 
         # Ensure our start and end params are Ruby dates and format them in Graph format
         start_object = ensure_ruby_date(start_param).in_time_zone(timezone)
