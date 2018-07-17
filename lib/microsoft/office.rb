@@ -264,6 +264,11 @@ class Microsoft::Office
             return recurring_bookings
         else
             bookings.concat recurring_bookings
+            bookings.each do |booking|
+                booking['Start'] = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc.iso8601
+                booking['End'] = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime']).utc.iso8601
+            end
+            bookings
         end
     end
 
