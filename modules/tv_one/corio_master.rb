@@ -41,9 +41,7 @@ class TvOne::CorioMaster
     # Main API
 
     def preset(id)
-        set('Preset.Take', id).then do |result|
-            self[:preset] = id
-
+        set('Preset.Take', id).then do
             # The full query of window params can take up to ~15 seconds. To
             # speed things up a little for other modules that depend on this
             # state, cache window info against preset ID's. These are then used
@@ -55,16 +53,21 @@ class TvOne::CorioMaster
             @window_cache ||= {}
 
             update_cache = deep_query('Windows').then do |windows|
+                logger.debug "window cache for preset #{id} updated"
                 @window_cache[id] = windows
             end
 
-            update_status = ->() { self[:windows] = @window_cache[id] }
+            update_state = lambda do
+                self[:windows] = @window_cache[id]
+                self[:preset]  = id
+            end
 
             if @window_cache.include? id
-                update_status.call
-                result
+                logger.debug 'loading cached window state'
+                update_state.call
             else
-                update_cache.then(&update_status).then { result }
+                logger.debug "no cached window state available for preset #{id}"
+                update_cache.then(&update_state)
             end
         end
     end
