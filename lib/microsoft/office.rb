@@ -277,7 +277,7 @@ class Microsoft::Office
             booking['room_name'] = booking['subject']
             booking['attendees'].each do |attendee|
                 if attendee['type'] == 'resource'
-                    booking['room_id'] = attendee['emailAddress']['address']
+                    booking['room_id'] = attendee['emailAddress']['address'].downcase
                 end
             end
             if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
