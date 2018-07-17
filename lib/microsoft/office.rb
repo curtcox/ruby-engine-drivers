@@ -271,8 +271,8 @@ class Microsoft::Office
             end_object = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
             booking['Start'] = start_object.utc.iso8601
             booking['End'] = end_object.utc.iso8601
-            booking['start'] = start_object.to_i
-            booking['end'] = end_object.to_i
+            booking['start_epoch'] = start_object.to_i
+            booking['end_epoch'] = end_object.to_i
         end
         all_bookings
     end
