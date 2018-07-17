@@ -274,6 +274,10 @@ class Microsoft::Office
             booking['start_epoch'] = start_object.to_i
             booking['end_epoch'] = end_object.to_i
             booking['title'] = booking['subject']
+            booking['room_name'] = booking['subject']
+            if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
+                booking['room_name'] = booking['location']['displayName']
+            end
         end
         all_bookings
     end
