@@ -275,6 +275,11 @@ class Microsoft::Office
             booking['end_epoch'] = end_object.to_i
             booking['title'] = booking['subject']
             booking['room_name'] = booking['subject']
+            booking['attendees'].each do |attendee|
+                if attendee['type'] == 'resource'
+                    booking['room_id'] = attendee['emailAddress']['address']
+                end
+            end
             if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
                 booking['room_name'] = booking['location']['displayName']
             end
