@@ -57,14 +57,14 @@ class TvOne::CorioMaster
                 @window_cache[id] = windows
             end
 
-            update_state = lambda do
-                self[:windows] = @window_cache[id]
+            update_state = lambda do |windows|
+                self[:windows] = windows
                 self[:preset]  = id
             end
 
             if @window_cache.include? id
                 logger.debug 'loading cached window state'
-                update_state.call
+                update_state.call @window_cache[id]
             else
                 logger.debug "no cached window state available for preset #{id}"
                 update_cache.then(&update_state)
