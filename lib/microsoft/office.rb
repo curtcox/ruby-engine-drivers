@@ -134,7 +134,7 @@ class Microsoft::Office
     end
 
     def get_users(q: nil, limit: nil)
-        if q.include?(" ")
+        if q && q.include?(" ")
             queries = q.split(" ")
             filter_params = []
             queries.each do |q|
