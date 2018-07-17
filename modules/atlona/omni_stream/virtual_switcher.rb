@@ -42,6 +42,7 @@ class Atlona::OmniStream::VirtualSwitcher
                         audio_port = 1200
                     end
                 else
+                    # disable video if there is no audio or video input
                     enable = enable_override.nil? ? true : enable_override
 
                     input, session = inputs[inp]
@@ -101,12 +102,13 @@ class Atlona::OmniStream::VirtualSwitcher
         switch(map, switch_video: false)
     end
 
-    def mute_video(outputs)
-        switch_video({'0' => outputs})
+    def mute_video(outputs, state = false)
+        state = is_affirmative?(state)
+        switch_video({'0' => outputs}, enable_override: state)
     end
 
     def unmute_video(outputs)
-        switch_video({'0' => outputs}, enable_override: true)
+        mute_video(outputs, true)
     end
 
     def mute_audio(outputs, mute = true)
