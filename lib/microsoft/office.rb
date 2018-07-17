@@ -267,8 +267,12 @@ class Microsoft::Office
             all_bookings = bookings
         end
         all_bookings.each do |booking|
-            booking['Start'] = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc.iso8601
-            booking['End'] = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime']).utc.iso8601
+            start_object = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
+            end_object = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
+            booking['Start'] = start_object.utc.iso8601
+            booking['End'] = end_object.utc.iso8601
+            booking['start'] = start_object.to_i
+            booking['end'] = end_object.to_i
         end
         all_bookings
     end
