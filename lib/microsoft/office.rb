@@ -273,6 +273,7 @@ class Microsoft::Office
             booking['End'] = end_object.utc.iso8601
             booking['start_epoch'] = start_object.to_i
             booking['end_epoch'] = end_object.to_i
+            booking['title'] = booking['subject']
         end
         all_bookings
     end
