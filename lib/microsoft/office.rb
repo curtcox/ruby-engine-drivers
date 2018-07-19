@@ -287,7 +287,12 @@ class Microsoft::Office
                 end
             end
             booking['attendees'] = new_attendees
-            if !booking.key?('location') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
+            STDERR.puts !booking.key?('location')
+            STDERR.puts booking['locations']
+            STDERR.puts !booking['locations'].empty?
+            STDERR.puts booking['locations'][0]['uniqueId']
+            STDERR.flush
+            if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
                 booking['room_id'] = booking['locations'][0]['uniqueId'].downcase 
             end
             if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
