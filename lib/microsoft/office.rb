@@ -39,6 +39,7 @@ class Microsoft::Office
         @internet_proxy = internet_proxy
         @permission = permission
         @mailbox_location = mailbox_location
+        @delegated = false
         oauth_options = { site: @app_site,  token_url: @app_token_url }
         oauth_options[:connection_opts] = { proxy: @internet_proxy } if @internet_proxy
         @graph_client ||= OAuth2::Client.new(
@@ -231,9 +232,8 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
-    def delete_booking(room_id:, booking_id:)
-        room = Orchestrator::ControlSystem.find(room_id)
-        endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
+    def delete_booking(booking_id:)
+        endpoint = "/v1.0/users/#{current_user.email}/events/#{booking_id}"
         request = graph_request(request_method: 'delete', endpoint: endpoint, password: @delegated)
         check_response(request)
         response = JSON.parse(request.body)
