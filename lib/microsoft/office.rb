@@ -286,6 +286,7 @@ class Microsoft::Office
                 end
             end
             booking['old_attendees'] = booking['attendees']
+            booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
             booking['attendees'] = new_attendees
             STDERR.puts !booking.key?('location')
             STDERR.puts booking['locations']
