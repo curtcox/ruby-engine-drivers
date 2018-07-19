@@ -274,7 +274,6 @@ class Microsoft::Office
             booking['start_epoch'] = start_object.to_i
             booking['end_epoch'] = end_object.to_i
             booking['title'] = booking['subject']
-            booking['room_name'] = booking['subject']
             new_attendees = []
             booking['attendees'].each do |attendee|
                 if attendee['type'] == 'resource'
@@ -286,6 +285,7 @@ class Microsoft::Office
                     })
                 end
             end
+            booking['old_attendees'] = booking['attendees']
             booking['attendees'] = new_attendees
             STDERR.puts !booking.key?('location')
             STDERR.puts booking['locations']
