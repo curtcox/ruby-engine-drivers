@@ -236,7 +236,7 @@ class Microsoft::Office
         endpoint = "/v1.0/users/#{current_user.email}/events/#{booking_id}"
         request = graph_request(request_method: 'delete', endpoint: endpoint, password: @delegated)
         check_response(request)
-        response = JSON.parse(request.body)
+        200
     end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week))
