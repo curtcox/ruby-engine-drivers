@@ -312,13 +312,13 @@ class Microsoft::Office
                 bookings[i] = extract_booking_data(booking, start_param, end_param)
                 is_available = bookings[i]['free']
             end
-            recurring_bookings[user_id] = is_available
+            recurring_bookings[user_id] = {available: is_available, bookings: bookings}
         end
 
         if bulk
             return recurring_bookings
         else
-            return recurring_bookings[user_id]
+            return recurring_bookings[user_id][:bookings]
         end
     end
 
