@@ -139,6 +139,7 @@ class Echo360::DeviceCapture
                 yield Hash.from_xml(response.body)
                 :success
             rescue => e
+                logger.print_error e, 'error processing response'
                 defer.reject e if defer
                 :abort
             end
@@ -159,7 +160,7 @@ class Echo360::DeviceCapture
                 value = nil if value.empty?
             end
 
-            if CHECK.include?(key) && value.length < 2 && value['schedule'] == "\n"
+            if value && CHECK.include?(key) && value['schedule'].is_a?(String) && value['schedule'].strip.empty?
                 self[key] = nil
             elsif key[-1] == 's' && value.is_a?(Hash)
                 inner = value[key[0..-2]]
