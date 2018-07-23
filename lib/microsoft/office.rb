@@ -247,26 +247,6 @@ class Microsoft::Office
         # Array of all bookings within our period
         recurring_bookings = get_recurring_bookings_by_user(user_id, start_param, end_param)
 
-        # endpoint = "/v1.0/users/#{user_id}/events"
-        
-        # query_hash = {}
-        # query_hash['$top'] = "200"
-
-        # # Build our query to only get bookings within our datetimes
-        # if not start_param.nil?
-        #     query_hash['$filter'.to_sym] = "(Start/DateTime le '#{start_param}' and End/DateTime ge '#{start_param}') or (Start/DateTime ge '#{start_param}' and Start/DateTime le '#{end_param}')"
-        # end
-
-        # bookings_response = graph_request(request_method: 'get', endpoint: endpoint, query: query_hash, password: @delegated)
-        # check_response(bookings_response)
-        # bookings = JSON.parse(bookings_response.body)['value']
-        # if bookings.nil?
-        #     all_bookings = recurring_bookings
-        # else
-        #     bookings.concat recurring_bookings
-        #     all_bookings = bookings
-        # end
-
         recurring_bookings.each do |booking|
             start_object = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
             end_object = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
@@ -275,6 +255,7 @@ class Microsoft::Office
             booking['start_epoch'] = start_object.to_i
             booking['end_epoch'] = end_object.to_i
             booking['title'] = booking['subject']
+            booking['booking_id'] = booking['id']
             new_attendees = []
             booking['attendees'].each do |attendee|
                 if attendee['type'] == 'resource'
