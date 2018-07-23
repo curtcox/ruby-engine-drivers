@@ -288,9 +288,9 @@ class Microsoft::Office
         200
     end
 
-    def get_bookings_by_user(user_ids:, start_param:Time.now, end_param:(Time.now + 1.week), bulk: false)
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), bulk: false)
         # The user_ids param can be passed in as a string or array but is always worked on as an array
-        user_ids = Array(user_ids)
+        user_id = Array(user_id)
 
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).utc.iso8601.split("+")[0]
@@ -298,9 +298,9 @@ class Microsoft::Office
 
         # Array of all bookings within our period
         if bulk
-            recurring_bookings = bookings_request_by_users(user_ids, start_param, end_param)
+            recurring_bookings = bookings_request_by_users(user_id, start_param, end_param)
         else
-            recurring_bookings = bookings_request_by_user(user_ids, start_param, end_param)
+            recurring_bookings = bookings_request_by_user(user_id, start_param, end_param)
         end
 
         recurring_bookings.each do |user_id, bookings|
