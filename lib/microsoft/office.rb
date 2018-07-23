@@ -306,13 +306,13 @@ class Microsoft::Office
             recurring_bookings = bookings_request_by_user(user_id, start_param, end_param)
         end
 
-        recurring_bookings.each do |user_id, bookings|
+        recurring_bookings.each do |u_id, bookings|
             is_available = true
             bookings.each_with_index do |booking, i|
                 bookings[i] = extract_booking_data(booking, start_param, end_param)
                 is_available = bookings[i]['free']
             end
-            recurring_bookings[user_id] = {available: is_available, bookings: bookings}
+            recurring_bookings[u_id] = {available: is_available, bookings: bookings}
         end
 
         if bulk
