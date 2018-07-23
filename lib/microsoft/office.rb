@@ -289,11 +289,6 @@ class Microsoft::Office
             booking['old_attendees'] = booking['attendees']
             booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
             booking['attendees'] = new_attendees
-            STDERR.puts !booking.key?('location')
-            STDERR.puts booking['locations']
-            STDERR.puts !booking['locations'].empty?
-            STDERR.puts booking['locations'][0]['uniqueId']
-            STDERR.flush
             if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
                 booking['room_id'] = booking['locations'][0]['uniqueId'].downcase 
             end
