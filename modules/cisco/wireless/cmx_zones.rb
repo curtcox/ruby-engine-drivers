@@ -4,6 +4,32 @@
 module Cisco; end
 module Cisco::Wireless; end
 
+# This expects the debug flag turned on in the Zone Count Register API under configuration service /api/config/v1/zoneCountParams/1.
+# Details here: https://communities.cisco.com/message/267538#267538
+
+=begin
+
+Example response:
+{
+   "MacAddress": [
+        "00:00:2a:01:00:41",
+        "00:00:2a:01:00:50",
+        "00:00:2a:01:00:3f",
+        "00:00:2a:01:00:46",
+        "00:00:2a:01:00:48",
+        "00:00:2a:01:00:49",
+        "00:00:2a:01:00:4c",
+        "00:00:2a:01:00:4a"
+    ],
+    "Duration ": {
+        "start": "2017/08/30 10:12:08",
+        "end": "2017/08/30 10:22:08"
+    },
+    "Count ": 8
+}
+
+=end
+
 class Cisco::Wireless::CmxZones
     include ::Orchestrator::Constants
 
@@ -55,7 +81,7 @@ class Cisco::Wireless::CmxZones
                     data = JSON.parse(response.body)
                     # CMX bug on count key with the trailing space
                     self[zone_id.to_s] = data['Count '] || data['Count']
-                rescue => e
+                rescue
                     :abort
                 end
             elsif response.status == 401
@@ -70,17 +96,17 @@ class Cisco::Wireless::CmxZones
 
     def login
         post("/api/common/v#{@api_version}/login", name: :login) do |response|
-            if (200..299).include? response.status
+            if (200..299).cover? response.status
                 :success
             else
-                logger.error "CMX login error. Please check username and password."
+                logger.error 'CMX login error. Please check username and password.'
                 :abort
             end
         end
     end
 
     def build_zone_list
-        @levels.each do |name, level|
+        @levels.each_value do |level|
             zone_id = level[:id]
             values = {}
 

@@ -61,10 +61,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def on_update
-        settings = setting(:snmp_options).to_h.symbolize_keys
-        settings[:proxy] = Protocols::Snmp.new(self)
-        @client = NETSNMP::Client.new(settings)
-        @community = settings[:community]
+        new_client if @resolved_ip
         @remote_address = remote_address.downcase
 
         self[:name] = @switch_name = setting(:switch_name)
@@ -75,24 +72,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @reserve_time = setting(:reserve_time) || 0
     end
 
-    def connected
-        schedule.clear
-
-        # Grab the initial state
-        next_tick { query_connected_devices }
-
-        # Connected device polling (in case a trap was dropped by the network)
-        # Also expires any desk reservations
-        schedule.every('1m') do
-            query_connected_devices
-            check_reservations if @reserve_time > 0
-        end
-
-        # There is a possibility that these will change on switch reboot
-        schedule.every('10m') { query_index_mappings }
-    end
-
     def on_unload
+        @transport&.close
+        @transport = nil
+
         td = ::Aca::TrapDispatcher.instance
         td.ignore(@resolved_ip) if @resolved_ip
     end
@@ -104,6 +87,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         logger.debug { "Registering for trap notifications from #{ip}" }
         td.register(thread, logger, ip) { |pdu| check_link_state(pdu) }
+
+        new_client
     end
 
     def check_link_state(pdu)
@@ -215,66 +200,51 @@ class Cisco::Switch::SnoopingCatalystSNMP
     # http://www.oidview.com/mibs/9/CISCO-DHCP-SNOOPING-MIB.html
     # http://www.snmplink.org/OnLineMIB/Cisco/index.html#1634
     def query_snooping_bindings
+        return 'device not ready' unless @transport
         return @processing if check_processing(:query_snooping_bindings)
-        @processing = :query_snooping_bindings
 
-        logger.debug 'extracting snooping table'
+        begin
+            @processing = :query_snooping_bindings
 
-        # Walking cdsBindingsTable
-        entries = {}
-        @client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
-            part, entry_id = oid_code[28..-1].split('.', 2)
-            next if entry_id.nil?
+            logger.debug 'extracting snooping table'
 
-            entry = entries[entry_id] || SnoopingEntry.new
-            entry.id = entry_id
-            entry.__send__("#{EntryParts[part]}=", value)
-            entries[entry_id] = entry
-        end
+            # Walking cdsBindingsTable
+            entries = {}
+            @client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
+                part, entry_id = oid_code[28..-1].split('.', 2)
+                next if entry_id.nil?
 
-        # Process the bindings
-        entries = entries.values
-        logger.debug { "found #{entries.length} snooping entries" }
+                entry = entries[entry_id] || SnoopingEntry.new
+                entry.id = entry_id
+                entry.__send__("#{EntryParts[part]}=", value)
+                entries[entry_id] = entry
+            end
 
-        # Newest lease first
-        entries.sort! { |a, b| b.leased_time <=> a.leased_time }
+            # Process the bindings
+            entries = entries.values
+            logger.debug { "found #{entries.length} snooping entries" }
 
-        checked = Set.new
-        entries.each do |entry|
-            interface = @if_mappings[entry.interface]
-            next unless @check_interface.include?(interface)
-            next if checked.include?(interface)
-            checked << interface
+            # Newest lease first
+            entries.sort! { |a, b| b.leased_time <=> a.leased_time }
 
-            mac = entry.mac
-            ip = entry.ip
-            next unless ::IPAddress.valid?(ip)
+            checked = Set.new
+            entries.each do |entry|
+                interface = @if_mappings[entry.interface]
+                next unless @check_interface.include?(interface)
+                next if checked.include?(interface)
+                checked << interface
 
-            # NOTE:: Same as snooping_catalyst.rb
-            iface = self[interface] || ::Aca::Tracking::StaticDetails.new
+                mac = entry.mac
+                ip = entry.ip
+                next unless ::IPAddress.valid?(ip)
 
-            if iface.ip != ip || iface.mac != mac
-                logger.debug { "New connection on #{interface} with #{ip}: #{mac}" }
+                # NOTE:: Same as snooping_catalyst.rb
+                iface = self[interface] || ::Aca::Tracking::StaticDetails.new
 
-                # NOTE:: Same as username found
-                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
-                details.connected(mac, @reserve_time, {
-                    device_ip: ip,
-                    switch_ip: @remote_address,
-                    hostname: @hostname,
-                    switch_name: @switch_name,
-                    interface: interface
-                })
+                if iface.ip != ip || iface.mac != mac
+                    logger.debug { "New connection on #{interface} with #{ip}: #{mac}" }
 
-                # ip, mac, reserved?, clash?
-                self[interface] = details.details
-
-            elsif iface.username.nil?
-                username = ::Aca::Tracking::SwitchPort.bucket.get("macuser-#{mac}", quiet: true)
-                if username
-                    logger.debug { "Found #{username} at #{ip}: #{mac}" }
-
-                    # NOTE:: Same as new connection
+                    # NOTE:: Same as username found
                     details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
                     details.connected(mac, @reserve_time, {
                         device_ip: ip,
@@ -286,77 +256,104 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
                     # ip, mac, reserved?, clash?
                     self[interface] = details.details
+
+                elsif iface.username.nil?
+                    username = ::Aca::Tracking::SwitchPort.bucket.get("macuser-#{mac}", quiet: true)
+                    if username
+                        logger.debug { "Found #{username} at #{ip}: #{mac}" }
+
+                        # NOTE:: Same as new connection
+                        details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                        details.connected(mac, @reserve_time, {
+                            device_ip: ip,
+                            switch_ip: @remote_address,
+                            hostname: @hostname,
+                            switch_name: @switch_name,
+                            interface: interface
+                        })
+
+                        # ip, mac, reserved?, clash?
+                        self[interface] = details.details
+                    end
+
+                elsif !iface.reserved
+                    # We don't know the user who is at this desk...
+                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
+                    reserved = details.check_for_user(@reserve_time)
+                    self[interface] = details.details if reserved
+
+                elsif iface.clash
+                    # There was a reservation clash - is there still a clash?
+                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
+                    details.check_for_user(@reserve_time)
+                    self[interface] = details.details unless details.clash?
                 end
-
-            elsif !iface.reserved
-                # We don't know the user who is at this desk...
-                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
-                reserved = details.check_for_user(@reserve_time)
-                self[interface] = details.details if reserved
-
-            elsif iface.clash
-                # There was a reservation clash - is there still a clash?
-                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
-                details.check_for_user(@reserve_time)
-                self[interface] = details.details unless details.clash?
             end
+        ensure
+            process_next
         end
-    ensure
-        process_next
     end
 
     # Index short name lookup
     # ifName: 1.3.6.1.2.1.31.1.1.1.1.xx  (where xx is the ifIndex)
     def query_index_mappings
+        return 'device not ready' unless @transport
         return @processing if check_processing(:query_index_mappings)
-        @processing = :query_index_mappings
 
-        logger.debug 'mapping ifIndex to port names'
+        begin
+            @processing = :query_index_mappings
 
-        mappings = {}
-        @client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
-            oid_code = oid_code[23..-1]
-            mappings[oid_code.to_i] = value.downcase
+            logger.debug 'mapping ifIndex to port names'
+
+            mappings = {}
+            @client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
+                oid_code = oid_code[23..-1]
+                mappings[oid_code.to_i] = value.downcase
+            end
+
+            logger.debug { "found #{mappings.length} ports" }
+
+            @if_mappings = mappings
+        ensure
+            process_next
         end
-
-        logger.debug { "found #{mappings.length} ports" }
-
-        @if_mappings = mappings
-    ensure
-        process_next
     end
 
     # ifOperStatus: 1.3.6.1.2.1.2.2.1.8.xx == up(1), down(2), testing(3)
     def query_interface_status
+        return 'device not ready' unless @transport
         return @processing if check_processing(:query_interface_status)
-        @processing = :query_interface_status
 
-        logger.debug 'querying interface status'
+        begin
+            @processing = :query_interface_status
 
-        @client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
-            oid_code = oid_code[20..-1]
-            interface = @if_mappings[oid_code.to_i]
+            logger.debug 'querying interface status'
 
-            next unless interface
+            @client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
+                oid_code = oid_code[20..-1]
+                interface = @if_mappings[oid_code.to_i]
 
-            case value
-            when 1 # up
-                next if @check_interface.include?(interface)
-                logger.debug { "Interface Up: #{interface}" }
-                remove_reserved(interface)
-                @check_interface << interface
-            when 2 # down
-                next unless @check_interface.include?(interface)
-                logger.debug { "Interface Down: #{interface}" }
-                remove_lookup(interface)
-            else
-                next
+                next unless interface
+
+                case value
+                when 1 # up
+                    next if @check_interface.include?(interface)
+                    logger.debug { "Interface Up: #{interface}" }
+                    remove_reserved(interface)
+                    @check_interface << interface
+                when 2 # down
+                    next unless @check_interface.include?(interface)
+                    logger.debug { "Interface Down: #{interface}" }
+                    remove_lookup(interface)
+                else
+                    next
+                end
             end
-        end
 
-        self[:interfaces] = @check_interface.to_a
-    ensure
-        process_next
+            self[:interfaces] = @check_interface.to_a
+        ensure
+            process_next
+        end
     end
 
     def query_connected_devices
@@ -374,9 +371,33 @@ class Cisco::Switch::SnoopingCatalystSNMP
     protected
 
 
+    def new_client
+        schedule.clear
+
+        settings = setting(:snmp_options).to_h.symbolize_keys
+        @transport&.close
+        @transport = settings[:proxy] = Protocols::Snmp.new(self)
+        @transport.register(@resolved_ip, remote_port)
+        @client = NETSNMP::Client.new(settings)
+        @community = settings[:community]
+
+        # Grab the initial state
+        next_tick { query_connected_devices }
+
+        # Connected device polling (in case a trap was dropped by the network)
+        # Also expires any desk reservations
+        schedule.every('1m') do
+            query_connected_devices
+            check_reservations if @reserve_time > 0
+        end
+
+        # There is a possibility that these will change on switch reboot
+        schedule.every('10m') { query_index_mappings }
+    end
+
     def received(data, resolve, command)
-        logger.debug { "Switch sent #{data}" }
-        data
+        logger.error "unexpected response:\n#{data.inspect}"
+        :abort
     end
 
     # Ensures fair scheduling of work
@@ -385,15 +406,20 @@ class Cisco::Switch::SnoopingCatalystSNMP
             # Allow the next request to occur
             @processing = nil
         else
+            @processing = :waiting
+
             # Next tick schedule will be killed when the module is stopped
             # i.e. this prevents infinite loops if requests take a long time
             # and the queue is never empty.
             next_tick do
+                # pause for 1s
+                thread.sleep 1000
+
                 # Allow the next request to occur
                 @processing = nil
 
                 # Perform the next request
-                __send__(@process_queue.shift)
+                __send__(@process_queue.shift) unless @process_queue.empty?
             end
         end
         nil
@@ -401,6 +427,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     def check_processing(process)
         return false unless @processing
+        return true if @processing == :waiting
+
         # Don't queue if currently being processed
         if @processing != process
             @process_queue << process

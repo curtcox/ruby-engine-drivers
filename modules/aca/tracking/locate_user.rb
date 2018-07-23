@@ -26,12 +26,14 @@ class Aca::Tracking::LocateUser
         cmx_pass: 'learning',
         ignore_vendors: {
             # https://en.wikipedia.org/wiki/MAC_address#Address_details
-            "Good Way Docking Stations" => "0050b6"
+            'Good Way Docking Stations' => '0050b6',
+            'BizLink Docking Stations' => '9cebe8'
         }
     })
 
     def on_load
         @looking_up = {}
+        on_update
     end
 
     def on_update
@@ -63,14 +65,12 @@ class Aca::Tracking::LocateUser
 
     protect_method :clear_warnings, :warnings, :clean_up
 
-    def clear_warnings
-        @warnings = {}
-    end
-
     # Provides a list of users and the black listed mac addresses
     # This allows one to update configuration of these machines
-    def warnings
-        @warnings
+    attr_reader :warnings
+
+    def clear_warnings
+        @warnings = {}
     end
 
     # Removes all the references to a particular vendors mac addresses
@@ -79,11 +79,11 @@ class Aca::Tracking::LocateUser
 
         view = Aca::Tracking::UserDevices.by_macs
         view.stream do |devs|
-            macs = devs.macs.select {|m| m.start_with?(vendor_mac) }
+            macs = devs.macs.select { |mac| mac.start_with?(vendor_mac) }
             next if macs.empty?
-            macs.each do |m|
+            macs.each do |mac|
                 count += 1
-                devs.remove(m)
+                devs.remove(mac)
             end
         end
 

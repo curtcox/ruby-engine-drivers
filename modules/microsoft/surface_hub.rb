@@ -1,3 +1,6 @@
+# encoding: ASCII-8BIT
+# frozen_string_literal: true
+
 module Microsoft; end
 
 # Documentation: https://docs.microsoft.com/en-us/surface-hub/use-room-control-system-with-surface-hub
@@ -15,17 +18,13 @@ class Microsoft::SurfaceHub
 
     def on_load
         self[:power_stable] = true
-        on_update
-    end
-    
-    def on_update
     end
 
     def connected
         power?
         input?
         schedule.every('50s') do
-            logger.debug "-- Polling Display"
+            logger.debug '-- Polling Display'
             power?
             input?
         end

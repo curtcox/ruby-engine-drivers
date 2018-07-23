@@ -222,7 +222,7 @@ class Polycom::RealPresence::GroupSeries
 
     GetOnlyCMDs.each do |key, cmd|
         define_method "#{key}?" do
-            send "#{value} get\r"
+            send "#{cmd} get\r"
         end
     end
 
@@ -269,7 +269,7 @@ class Polycom::RealPresence::GroupSeries
     # mute|volume+|volume-|info
     # camera|delete|directory|home|keyboard|menu|period|pip|preset
     def button_press(*keys)
-        keys = keys.map { |k| k.downcase }
+        keys = keys.map(&:downcase)
         keys.each { |key| send "button #{key}\r", delay: 400 }
     end
 

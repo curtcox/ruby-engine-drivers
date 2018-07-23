@@ -148,3 +148,39 @@ class Aca::TrapDispatcher
         end
     end
 end
+
+class Aca::SNMPClient
+    include Singleton
+
+    def initialize
+        @mappings = {}
+
+        # Bind to the UDP port (161)
+        @reactor = Libuv::Reactor.default
+        @reactor.schedule { configure_server }
+    end
+
+    def register(thread, ip, &callback)
+        @reactor.schedule { @mappings[ip] = [thread, callback] }
+        nil
+    end
+
+    def ignore(ip)
+        @reactor.schedule { @mappings.delete(ip) }
+        nil
+    end
+
+    def send(ip, port, data)
+        @reactor.schedule { @server.send(ip, port, data) }
+        nil
+    end
+
+    protected
+
+    def configure_server
+        @server = @reactor.udp { |data, ip, port|
+            thread, callback = @mappings[ip]
+            thread&.schedule { callback.call(data, ip, port) }
+        }.bind('0.0.0.0', 161).start_read
+    end
+end
