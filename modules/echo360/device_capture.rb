@@ -154,6 +154,11 @@ class Echo360::DeviceCapture
     # Keys ending in 's' are typically an array of the inner element
     def process_status(data)
         data['status'].each do |key, value|
+            if value.is_a?(String)
+                value.strip
+                value = nil if value.empty?
+            end
+
             if CHECK.include?(key) && value.length < 2 && value['schedule'] == "\n"
                 self[key] = nil
             elsif key[-1] == 's' && value.is_a?(Hash)
