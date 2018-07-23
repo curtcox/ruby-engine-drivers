@@ -171,6 +171,9 @@ class Microsoft::Office
         when 200, 201, 204
             return
         when 400
+            STDERR.puts "GOT ERROR"
+            STDERR.puts response.inspect
+            STDERR.flush
             if response['error']['code'] == 'ErrorInvalidIdMalformed'
                 raise Microsoft::Error::ErrorInvalidIdMalformed.new(response.body)
             else
