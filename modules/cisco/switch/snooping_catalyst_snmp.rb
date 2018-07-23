@@ -376,8 +376,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         settings = setting(:snmp_options).to_h.symbolize_keys
         @transport.close if @transport
-        @transport = settings[:proxy] = Protocols::Snmp.new(logger, schedule)
-        @transport.register(thread, @resolved_ip, remote_port)
+        @transport = settings[:proxy] = Protocols::Snmp.new(self)
+        @transport.register(@resolved_ip, remote_port)
         @client = NETSNMP::Client.new(settings)
         @community = settings[:community]
 

@@ -2,28 +2,29 @@
 # frozen_string_literal: true
 
 require 'netsnmp'
+require 'aca/trap_dispatcher'
 
 module Protocols; end
 
 # A simple proxy object for netsnmp
 # See https://github.com/swisscom/ruby-netsnmp
 class Protocols::Snmp
-    def initialize(logger, scheduler, timeout = 2000)
-        @logger = logger
+    def initialize(mod, timeout = 2000)
+        @logger = mod.logger
+        @thread = mod.thread
         @timeout = timeout
-        @scheduler = scheduler
+        @scheduler = mod.schedule
         @client = Aca::SNMPClient.instance
         @request_queue = []
     end
 
-    def register(thread, ip, port)
+    def register(ip, port)
         close
 
         @ip = ip
         @port = port
-        @thread = thread
 
-        @client.register(thread, ip) do |data, ip, port|
+        @client.register(@thread, ip) do |data, ip, port|
             defer = @request_queue.shift
             defer.resolve(data) if defer
         end
