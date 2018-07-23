@@ -155,7 +155,7 @@ class Echo360::DeviceCapture
     def process_status(data)
         data['status'].each do |key, value|
             if value.is_a?(String)
-                value.strip
+                value = value.strip
                 value = nil if value.empty?
             end
 
