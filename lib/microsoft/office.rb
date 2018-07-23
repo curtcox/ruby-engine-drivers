@@ -326,7 +326,7 @@ class Microsoft::Office
     end
 
     def get_bookings_by_room(room_id:, start_param:Time.now, end_param:(Time.now + 1.week))
-        return get_bookings_by_user(room_id: room_id, start_param: start_param, end_param: end_param)
+        return get_bookings_by_user(user_id: room_id, start_param: start_param, end_param: end_param)
     end
 
 
