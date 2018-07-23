@@ -124,7 +124,7 @@ class Microsoft::Office
         request_array = []
         endpoints.each_with_index do |endpoint, i|
             request_array.push({
-                id: i + 1,
+                id: i,
                 method: request_method.upcase,
                 url: "#{endpoint}#{query_string}"
             })
@@ -318,7 +318,7 @@ class Microsoft::Office
         if bulk
             return recurring_bookings
         else
-            return recurring_bookings[user_id][:bookings]
+            return recurring_bookings[user_id[0]][:bookings]
         end
     end
 
