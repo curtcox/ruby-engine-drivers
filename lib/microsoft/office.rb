@@ -307,9 +307,12 @@ class Microsoft::Office
         end
 
         recurring_bookings.each do |user_id, bookings|
+            is_available = true
             bookings.each_with_index do |booking, i|
-                bookings[i] = extract_booking_data(booking)
+                bookings[i] = extract_booking_data(booking, start_param, end_param)
+                is_available = bookings[i]['free']
             end
+            recurring_bookings[user_id] = is_available
         end
 
         if bulk
@@ -319,10 +322,20 @@ class Microsoft::Office
         end
     end
 
-    def extract_booking_data(booking)
+    def extract_booking_data(booking, start_param, end_param)
         # Create time objects of the start and end for easier use
         start_object = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
         end_object = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
+
+        # Check if this means the room is unavailable
+        booking_overlaps_start = start_object < start_param && end_object > end_param
+        booking_in_between = start_object >= start_param && end_object <= end_param
+        booking_overlaps_end = start_object < end_param && end_object > end_param
+        if booking_overlaps_start || booking_in_between || booking_overlaps_end
+            booking['free'] = false
+        else
+            booking['free'] = true
+        end
 
         # Grab the start and end in the right format for the frontend
         booking['Start'] = start_object.utc.iso8601
