@@ -302,7 +302,6 @@ class Microsoft::Office
             end
 
         end
-        all_bookings
     end
 
     def get_recurring_bookings_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
