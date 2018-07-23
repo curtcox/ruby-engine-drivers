@@ -103,6 +103,55 @@ class Microsoft::Office
         return response_value
     end
 
+
+    def bulk_graph_request(request_method:, endpoints:, data:nil, query:nil, headers:nil, password:false)
+        query = Hash(query)
+        headers = Hash(headers)
+
+        if password
+            headers['Authorization'] = "Bearer #{password_graph_token}"
+        else
+            headers['Authorization'] = "Bearer #{graph_token}"
+        end
+
+        # Set our unchanging headers
+        headers['Content-Type'] = ENV['GRAPH_CONTENT_TYPE'] || "application/json"
+        headers['Prefer'] = ENV['GRAPH_PREFER'] || 'outlook.timezone="Australia/Sydney"'
+
+        graph_path = "#{@graph_domain}/v1.0/$batch"
+        query_string = "?#{query.map { |k,v| "#{k}=#{v}" }.join('&')}"
+
+        request_array = []
+        endpoints.each_with_index do |endpoint, i|
+            request_array.push({
+                id: i + 1,
+                method: request_method.upcase,
+                url: "#{endpoint}#{query_string}"
+            })
+        end
+        bulk_data = {
+            requests: request_array
+        }.to_json
+
+        graph_api_options = {inactivity_timeout: 25000, keepalive: false}
+
+        if @internet_proxy
+            proxy = URI.parse(@internet_proxy)
+            graph_api_options[:proxy] = { host: proxy.host, port: proxy.port }
+        end
+
+        graph_api = UV::HttpEndpoint.new(@graph_domain, graph_api_options)
+        response = graph_api.__send__('post', path: graph_path, headers: headers, body: bulk_data)
+
+        start_timing = Time.now.to_i
+        response_value = response.value
+        end_timing = Time.now.to_i
+        STDERR.puts "Bulk Graph request took #{end_timing - start_timing} seconds"
+        STDERR.flush
+        return response_value
+    end
+
+
     def log_graph_request(request_method, data, query, headers, graph_path, password)
         STDERR.puts "--------------NEW GRAPH REQUEST------------"
         STDERR.puts "#{request_method} to #{graph_path}"
@@ -239,48 +288,77 @@ class Microsoft::Office
         200
     end
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week))
+    def get_bookings_by_user(user_ids:, start_param:Time.now, end_param:(Time.now + 1.week), bulk: false)
+        # The user_ids param can be passed in as a string or array but is always worked on as an array
+        user_ids = Array(user_ids)
+
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).utc.iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).utc.iso8601.split("+")[0]
 
         # Array of all bookings within our period
-        recurring_bookings = get_recurring_bookings_by_user(user_id, start_param, end_param)
+        if bulk
+            recurring_bookings = bookings_request_by_users(user_ids, start_param, end_param)
+        else
+            recurring_bookings = bookings_request_by_user(user_ids, start_param, end_param)
+        end
 
-        recurring_bookings.each do |booking|
-            start_object = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
-            end_object = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
-            booking['Start'] = start_object.utc.iso8601
-            booking['End'] = end_object.utc.iso8601
-            booking['start_epoch'] = start_object.to_i
-            booking['end_epoch'] = end_object.to_i
-            booking['title'] = booking['subject']
-            booking['booking_id'] = booking['id']
-            new_attendees = []
-            booking['attendees'].each do |attendee|
-                if attendee['type'] == 'resource'
-                    booking['room_id'] = attendee['emailAddress']['address'].downcase
-                else
-                    new_attendees.push({
-                        email: attendee['emailAddress']['address'],
-                        name: attendee['emailAddress']['name']
-                    })
-                end
+        recurring_bookings.each do |user_id, bookings|
+            bookings.each_with_index do |booking, i|
+                bookings[i] = extract_booking_data(booking)
             end
-            booking['old_attendees'] = booking['attendees']
-            booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
-            booking['attendees'] = new_attendees
-            if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
-                booking['room_id'] = booking['locations'][0]['uniqueId'].downcase 
-            end
-            if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
-                booking['room_name'] = booking['location']['displayName']
-            end
+        end
 
+        if bulk
+            return recurring_bookings
+        else
+            return recurring_bookings[user_id]
         end
     end
 
-    def get_recurring_bookings_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
+    def extract_booking_data(booking)
+        # Create time objects of the start and end for easier use
+        start_object = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
+        end_object = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
+
+        # Grab the start and end in the right format for the frontend
+        booking['Start'] = start_object.utc.iso8601
+        booking['End'] = end_object.utc.iso8601
+        booking['start_epoch'] = start_object.to_i
+        booking['end_epoch'] = end_object.to_i
+
+        # Get some data about the booking
+        booking['title'] = booking['subject']
+        booking['booking_id'] = booking['id']
+
+        # Format the attendees and save the old format
+        new_attendees = []
+        booking['attendees'].each do |attendee|
+            if attendee['type'] == 'resource'
+                booking['room_id'] = attendee['emailAddress']['address'].downcase
+            else
+                new_attendees.push({
+                    email: attendee['emailAddress']['address'],
+                    name: attendee['emailAddress']['name']
+                })
+            end
+        end
+        booking['old_attendees'] = booking['attendees']
+        booking['attendees'] = new_attendees
+
+        # Get the organiser and location data
+        booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
+        if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
+            booking['room_id'] = booking['locations'][0]['uniqueId'].downcase 
+        end
+        if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
+            booking['room_name'] = booking['location']['displayName']
+        end
+
+        booking
+    end
+
+    def bookings_request_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
@@ -298,7 +376,33 @@ class Microsoft::Office
 
         recurring_response = graph_request(request_method: 'get', endpoint: recurring_endpoint, query: query_hash, password: @delegated)
         check_response(recurring_response)
-        recurring_bookings = JSON.parse(recurring_response.body)['value']
+        recurring_bookings = {}
+        recurring_booking[user_id] = JSON.parse(recurring_response.body)['value']
+        recurring_bookings
+    end
+
+    def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week))
+        # Allow passing in epoch, time string or ruby Time class
+        start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
+        end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
+
+        endpoints = user_ids.map do |email|
+            "/users/#{email}/calendarView"
+        end
+        query = {
+            '$top': 200,
+            startDateTime: start_param,
+            endDateTime: end_param,
+        }
+        bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
+
+        check_response(bulk_response)
+        responses = JSON.parse(recurring_response.body)['responses']
+        recurring_bookings = {}
+        responses.each_with_index do |res, i|
+            recurring_bookings[user_ids[res['id'].to_i]] = res['body']['value']
+        end
+        recurring_bookings
     end
 
     def get_bookings_by_room(room_id:, start_param:Time.now, end_param:(Time.now + 1.week))
