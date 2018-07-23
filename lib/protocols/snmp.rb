@@ -26,12 +26,12 @@ class Protocols::Snmp
 
         @client.register(@thread, ip) do |data, ip, port|
             defer = @request_queue.shift
-            defer.resolve(data) if defer
+            defer&.resolve(data)
         end
     end
 
     def close
-        @client.ignore(@ip) if @ip
+        @client&.ignore(@ip)
     end
 
     def send(payload)

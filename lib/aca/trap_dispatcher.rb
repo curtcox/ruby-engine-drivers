@@ -180,8 +180,7 @@ class Aca::SNMPClient
     def configure_server
         @server = @reactor.udp { |data, ip, port|
             thread, callback = @mappings[ip]
-            return unless thread
-            thread.schedule { callback.call(data, ip, port) }
+            thread&.schedule { callback.call(data, ip, port) }
         }.bind('0.0.0.0', 161).start_read
     end
 end

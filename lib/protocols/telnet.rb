@@ -101,58 +101,60 @@ class Protocols::Telnet
             [#{OPT_BINARY}-#{OPT_NEW_ENVIRON}#{OPT_EXOPL}]|
             #{SB}[^#{IAC}]*#{IAC}#{SE}
         )/xno) do
-            if IAC == $1  # handle escaped IAC characters
+            last_match = Regexp.last_match(1)
+
+            if IAC == last_match  # handle escaped IAC characters
                 IAC
-            elsif AYT == $1  # respond to "IAC AYT" (are you there)
-                @write.call("nobody here but us pigeons" + EOL)
+            elsif AYT == last_match  # respond to "IAC AYT" (are you there)
+                @write.call('nobody here but us pigeons' + EOL)
                 ''
-            elsif DO[0] == $1[0]  # respond to "IAC DO x"
-                if OPT_BINARY[0] == $1[1]
+            elsif DO[0] == last_match[0]  # respond to "IAC DO x"
+                if OPT_BINARY[0] == last_match[1]
                 @binary_mode = true
                 @write.call(IAC + WILL + OPT_BINARY)
                 else
-                @write.call(IAC + WONT + $1[1..1])
+                @write.call(IAC + WONT + last_match[1..1])
                 end
                 ''
-            elsif DONT[0] == $1[0]  # respond to "IAC DON'T x" with "IAC WON'T x"
-                @write.call(IAC + WONT + $1[1..1])
+            elsif DONT[0] == last_match[0]  # respond to "IAC DON'T x" with "IAC WON'T x"
+                @write.call(IAC + WONT + last_match[1..1])
                 ''
-            elsif WILL[0] == $1[0]  # respond to "IAC WILL x"
-                if OPT_BINARY[0] == $1[1]
+            elsif WILL[0] == last_match[0]  # respond to "IAC WILL x"
+                if OPT_BINARY[0] == last_match[1]
                     @write.call(IAC + DO + OPT_BINARY)
-                elsif OPT_ECHO[0] == $1[1]
+                elsif OPT_ECHO[0] == last_match[1]
                     @write.call(IAC + DO + OPT_ECHO)
-                elsif OPT_SGA[0]  == $1[1]
+                elsif OPT_SGA[0]  == last_match[1]
                     @suppress_go_ahead = true
                     @write.call(IAC + DO + OPT_SGA)
                 else
-                    @write.call(IAC + DONT + $1[1..1])
+                    @write.call(IAC + DONT + last_match[1..1])
                 end
                 ''
-            elsif WONT[0] == $1[0]  # respond to "IAC WON'T x"
-                if OPT_ECHO[0] == $1[1]
+            elsif WONT[0] == last_match[0]  # respond to "IAC WON'T x"
+                if OPT_ECHO[0] == last_match[1]
                     @write.call(IAC + DONT + OPT_ECHO)
-                elsif OPT_SGA[0]  == $1[1]
+                elsif OPT_SGA[0] == last_match[1]
                     @suppress_go_ahead = false
                     @write.call(IAC + DONT + OPT_SGA)
                 else
-                    @write.call(IAC + DONT + $1[1..1])
+                    @write.call(IAC + DONT + last_match[1..1])
                 end
                 ''
             else
                 ''
             end
         end
-    end # preprocess
+    end
 
     def buffer(data)
         data = @buffer + data
         if Integer(data.rindex(/#{IAC}#{SE}/no) || 0) < Integer(data.rindex(/#{IAC}#{SB}/no) || 0)
-            msg = preprocess(data[0 ... data.rindex(/#{IAC}#{SB}/no)])
-            @buffer = data[data.rindex(/#{IAC}#{SB}/no) .. -1]
-        elsif pt = data.rindex(/#{IAC}[^#{IAC}#{AO}#{AYT}#{DM}#{IP}#{NOP}]?\z/no) || data.rindex(/\r\z/no)
-            msg = preprocess(data[0 ... pt])
-            @buffer = data[pt .. -1]
+            msg = preprocess(data[0...data.rindex(/#{IAC}#{SB}/no)])
+            @buffer = data[data.rindex(/#{IAC}#{SB}/no)..-1]
+        elsif (pt = data.rindex(/#{IAC}[^#{IAC}#{AO}#{AYT}#{DM}#{IP}#{NOP}]?\z/no) || data.rindex(/\r\z/no))
+            msg = preprocess(data[0...pt])
+            @buffer = data[pt..-1]
         else
             msg = preprocess(data)
             @buffer = String.new
@@ -162,7 +164,7 @@ class Protocols::Telnet
     end
 
     def prepare(command)
-        if @binary_mode and @suppress_go_ahead
+        if @binary_mode && @suppress_go_ahead
             # IAC WILL SGA IAC DO BIN send EOL --> CR
             "#{command}#{CR}"
         elsif @suppress_go_ahead

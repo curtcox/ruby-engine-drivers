@@ -55,19 +55,17 @@ class Protocols::Websocket
     end
 
     def parse(data)
-        begin
-            @driver.parse data
-        rescue Exception => e
-            @mod.__send__(:disconnect)
-            raise e
-        end
+        @driver.parse data
+    rescue Exception => e
+        @mod.__send__(:disconnect)
+        raise e
     end
 
     # Write some text to the websocket connection
     #
     # @param string [String] a string of data to be sent to the far end
     def text(string)
-        raise "websocket not ready!" unless @ready
+        raise 'websocket not ready!' unless @ready
         @driver.text(string.to_s)
     end
 
@@ -75,7 +73,7 @@ class Protocols::Websocket
     #
     # @param array [Array] an array of bytes to be sent to the far end
     def binary(array)
-        raise "websocket not ready!" unless @ready
+        raise 'websocket not ready!' unless @ready
         @driver.binary(array.to_a)
     end
 end

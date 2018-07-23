@@ -73,7 +73,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def on_unload
-        @transport.close if @transport
+        @transport&.close
         @transport = nil
 
         td = ::Aca::TrapDispatcher.instance
@@ -375,7 +375,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         schedule.clear
 
         settings = setting(:snmp_options).to_h.symbolize_keys
-        @transport.close if @transport
+        @transport&.close
         @transport = settings[:proxy] = Protocols::Snmp.new(self)
         @transport.register(@resolved_ip, remote_port)
         @client = NETSNMP::Client.new(settings)
