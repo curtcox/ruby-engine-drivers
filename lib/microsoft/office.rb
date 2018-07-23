@@ -400,7 +400,7 @@ class Microsoft::Office
         bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
 
         check_response(bulk_response)
-        responses = JSON.parse(recurring_response.body)['responses']
+        responses = JSON.parse(bulk_response.body)['responses']
         recurring_bookings = {}
         responses.each_with_index do |res, i|
             recurring_bookings[user_ids[res['id'].to_i]] = res['body']['value']
