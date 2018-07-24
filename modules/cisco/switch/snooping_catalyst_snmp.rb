@@ -227,7 +227,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             logger.debug { "found #{entries.length} snooping entries" }
 
             # Newest lease first
-            entries.reject! { |e| e.leased_time.nil? }.sort! { |a, b| b.leased_time <=> a.leased_time }
+            entries = entries.reject { |e| e.leased_time.nil? }.sort { |a, b| b.leased_time <=> a.leased_time }
 
             checked = Set.new
             entries.each do |entry|
