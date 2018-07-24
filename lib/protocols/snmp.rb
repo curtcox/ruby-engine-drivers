@@ -55,7 +55,7 @@ class Protocols::Snmp
 
         # Create timeout
         timeout = @scheduler.in(@timeout) do
-            defer.reject(::Timeout::Error.new("Timeout after #{@timeout}"))
+            @request.reject(::Timeout::Error.new("Timeout after #{@timeout}"))
             @logger.debug 'SNMP timeout occurred'
             @request = nil
         end
