@@ -19,6 +19,8 @@ class Protocols::Snmp
         @client = Aca::SNMPClient.instance
     end
 
+    attr_reader :request
+
     def register(ip, port)
         close
 
