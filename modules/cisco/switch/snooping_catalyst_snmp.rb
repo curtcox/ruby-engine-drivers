@@ -375,7 +375,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     def new_client
         schedule.clear
-        @processing = nil if @processing == :waiting
 
         settings = setting(:snmp_options).to_h.symbolize_keys
         @transport&.close
@@ -385,7 +384,11 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @community = settings[:community]
 
         # Grab the initial state
-        next_tick { query_connected_devices }
+        next_tick do
+            @processing = nil
+            @process_queue = []
+            query_connected_devices
+        end
 
         # Connected device polling (in case a trap was dropped by the network)
         # Also expires any desk reservations
@@ -405,6 +408,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     # Ensures fair scheduling of work
     def process_next
+        logger.debug { "!Finished #{@processing} - processing next #{@process_queue.length}!" }
+
         if @process_queue.empty?
             # Allow the next request to occur
             @processing = nil
@@ -414,15 +419,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
             # Next tick schedule will be killed when the module is stopped
             # i.e. this prevents infinite loops if requests take a long time
             # and the queue is never empty.
-            next_tick do
-                # pause for 1s
-                thread.sleep 1000
-
+            schedule.in(rand(1000)) do
                 # Allow the next request to occur
-                @processing = nil
+                if @processing == :waiting
+                    @processing = nil
 
-                # Perform the next request
-                __send__(@process_queue.shift) unless @process_queue.empty?
+                    # Perform the next request
+                    __send__(@process_queue.shift) unless @process_queue.empty?
+                end
             end
         end
         nil
