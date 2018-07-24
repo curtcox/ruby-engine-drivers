@@ -299,6 +299,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         return :currently_processing if @transport.request
 
         logger.debug 'mapping ifIndex to port names'
+        @scheduled_if_query = false
 
         mappings = {}
         @client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
@@ -344,7 +345,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     def query_connected_devices
         logger.debug 'Querying for connected devices'
-        query_index_mappings if @if_mappings.empty?
+        query_index_mappings if @if_mappings.empty? || @scheduled_if_query
         query_interface_status
         query_snooping_bindings
     end
@@ -373,14 +374,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
         end
 
         # Connected device polling (in case a trap was dropped by the network)
-        # Also expires any desk reservations
-        schedule.every('1m') do
+        # Also expires any desk reservations every 1min
+        schedule.every(57000 + rand(5000)) do
             query_connected_devices
             check_reservations if @reserve_time > 0
         end
 
         # There is a possibility that these will change on switch reboot
-        schedule.every('10m') { query_index_mappings }
+        schedule.every('10m') { @scheduled_if_query = true }
     end
 
     def received(data, resolve, command)
