@@ -412,7 +412,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         if @process_queue.empty?
             # Allow the next request to occur
-            @processing = nil
+            @processing = nil unless @processing == :waiting
         else
             @processing = :waiting
 
@@ -421,12 +421,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
             # and the queue is never empty.
             schedule.in(rand(1000)) do
                 # Allow the next request to occur
-                if @processing == :waiting
-                    @processing = nil
+                @processing = nil
 
-                    # Perform the next request
-                    __send__(@process_queue.shift) unless @process_queue.empty?
-                end
+                # Perform the next request
+                __send__(@process_queue.shift) unless @process_queue.empty?
             end
         end
         nil
