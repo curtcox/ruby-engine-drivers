@@ -80,6 +80,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
         td.ignore(@resolved_ip) if @resolved_ip
     end
 
+    def is_processing?
+        "IP resolved to #{@resolved_ip}\ntransport online #{!!@transport}\nprocessing #{!!@transport&.request}"
+    end
+
     def hostname_resolution(ip)
         td = ::Aca::TrapDispatcher.instance
         td.ignore(@resolved_ip) if @resolved_ip
