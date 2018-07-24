@@ -21,7 +21,11 @@ class Aca::Tracking::DeskManagement
         checkin: {
             level_id: []
         },
-        timezone: 'Singapore' # used for manual desk checkin
+        timezone: 'Singapore', # used for manual desk checkin
+        desk_hold_time: 5.minutes.to_i,
+        desk_reserve_time: 2.hours.to_i,
+        manual_reserve_time: 2.hours.to_i,
+        user_identifier: :login_name  # in user model
     })
 
     def on_load
