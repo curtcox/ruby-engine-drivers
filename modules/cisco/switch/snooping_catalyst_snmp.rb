@@ -227,7 +227,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             logger.debug { "found #{entries.length} snooping entries" }
 
             # Newest lease first
-            entries.sort! { |a, b| b.leased_time <=> a.leased_time }
+            entries.reject! { |e| e.leased_time.nil? }.sort! { |a, b| b.leased_time <=> a.leased_time }
 
             checked = Set.new
             entries.each do |entry|
@@ -430,7 +430,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     def check_processing(process)
         return false unless @processing
-        return true if @processing == :waiting
 
         # Don't queue if currently being processed
         if @processing != process

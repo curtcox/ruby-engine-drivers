@@ -10,7 +10,6 @@ module Protocols; end
 # See https://github.com/swisscom/ruby-netsnmp
 class Protocols::Snmp
     def initialize(mod, timeout = 2000)
-        @logger = mod.logger
         @thread = mod.thread
         @timeout = timeout
 
