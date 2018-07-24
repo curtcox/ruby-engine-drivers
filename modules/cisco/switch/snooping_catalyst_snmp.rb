@@ -27,7 +27,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
         snmp_options: {
             version: 1,
             community: 'public'
-        }
+        },
+        # Snooping takes ages on large switches
+        response_timeout: 60000
     })
 
     def on_load
@@ -373,10 +375,11 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     def new_client
         schedule.clear
+        @processing = nil if @processing == :waiting
 
         settings = setting(:snmp_options).to_h.symbolize_keys
         @transport&.close
-        @transport = settings[:proxy] = Protocols::Snmp.new(self)
+        @transport = settings[:proxy] = Protocols::Snmp.new(self, setting(:response_timeout) || 60000)
         @transport.register(@resolved_ip, remote_port)
         @client = NETSNMP::Client.new(settings)
         @community = settings[:community]

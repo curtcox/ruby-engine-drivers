@@ -13,7 +13,9 @@ class Protocols::Snmp
         @logger = mod.logger
         @thread = mod.thread
         @timeout = timeout
-        @scheduler = mod.schedule
+
+        # Less overhead with the thread scheduler
+        @scheduler = @thread.scheduler
         @client = Aca::SNMPClient.instance
         @request_queue = []
     end
@@ -32,6 +34,10 @@ class Protocols::Snmp
 
     def close
         @client&.ignore(@ip)
+        error = StandardError.new "client closed"
+        @request_queue.each { |defer| defer.reject(error) }
+        @request_queue.clear
+        nil
     end
 
     def send(payload)
