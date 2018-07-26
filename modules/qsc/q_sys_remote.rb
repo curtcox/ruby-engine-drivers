@@ -443,12 +443,10 @@ class Qsc::QSysRemote
                     end
                 elsif val.is_a?(String)
                     self["#{name}#{component}"] = val
+                elsif @integer_faders
+                    self["fader#{name}#{component}"] = (val * 10).to_i
                 else
-                    if @integer_faders
-                        self["fader#{name}#{component}"] = (val * 10).to_i
-                    else
-                        self["fader#{name}#{component}"] = val
-                    end
+                    self["fader#{name}#{component}"] = val
                 end
             end
         end
