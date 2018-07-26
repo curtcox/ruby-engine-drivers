@@ -3,6 +3,8 @@
 
 module Qsc; end
 
+# Documentation: https://aca.im/driver_docs/QSC/QRCDocumentation.pdf
+
 class Qsc::QSysRemote
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
@@ -321,8 +323,8 @@ class Qsc::QSysRemote
         end
     end
 
-    def faders(ids:, level:, component: nil, type: :fader, **_)
-        fader(ids, level, component, type)
+    def faders(ids:, level:, index: nil, type: :fader, **_)
+        fader(ids, level, index, type)
     end
 
     def mute(fader_id, value = true, component = nil, type = :fader)
@@ -330,8 +332,8 @@ class Qsc::QSysRemote
         fader(fader_id, val, component, type, use_value: true)
     end
 
-    def mutes(ids:, muted: true, component: nil, type: :fader, **_)
-        mute(ids, muted, component, type)
+    def mutes(ids:, muted: true, index: nil, type: :fader, **_)
+        mute(ids, muted, index, type)
     end
 
     def unmute(fader_id, component = nil, type = :fader)
@@ -348,7 +350,7 @@ class Qsc::QSysRemote
         end
     end
 
-    def query_faders(ids:, component: nil, type: :fader, **_)
+    def query_faders(ids:, index: nil, type: :fader, **_)
         query_fader(ids, component, type)
     end
 
@@ -356,7 +358,7 @@ class Qsc::QSysRemote
         query_fader(fader_id, component, type)
     end
 
-    def query_mutes(ids:, component: nil, type: :fader, **_)
+    def query_mutes(ids:, index: nil, type: :fader, **_)
         query_fader(ids, component, type)
     end
 
