@@ -21,7 +21,7 @@ class Qsc::QSysCamera
     end
 
     def power(state)
-        powered = is_affirmative?(state)
+        state = is_affirmative?(state)
         camera.mute('toggle_privacy', state, @component)
     end
 
