@@ -29,12 +29,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
             community: 'public'
         },
         # Snooping takes ages on large switches
-        response_timeout: 5000
+        response_timeout: 7000,
+        ignore_connected_state: ['port1/2/3']
     })
 
     def on_load
         # flag to indicate if processing is occuring
         @if_mappings = {}
+        @scheduled_status_query = true
 
         @check_interface = ::Set.new
         @reserved_interface = ::Set.new
@@ -70,6 +72,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
         self[:level] = setting(:level)
 
         @reserve_time = setting(:reserve_time) || 0
+
+        # Docks that keep the interface online
+        @ignore_connected_state = ::Set.new(setting(:ignore_connected_state) || [])
     end
 
     def on_unload
@@ -181,9 +186,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
             AddressType[self.addr_type]
         end
 
-        # ignore the first .
         def mac
-            self.id.split('.')[1..-1].map { |i| i.to_i.to_s(16).rjust(2, '0') }.join('')
+            self.mac_address || self.extract_vlan_and_mac.mac_address
+        end
+
+        def get_vlan
+            self.vlan || self.extract_vlan_and_mac.vlan
         end
 
         def ip
@@ -197,6 +205,13 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 # IPAddr will present the IPv6 address in it's short form
                 IPAddr.new(self.ip_address.gsub(' ', '').scan(/..../).join(':')).to_s
             end
+        end
+
+        def extract_vlan_and_mac
+            parts = self.id.split('.')
+            self.vlan = parts[0].to_i
+            self.mac_address = parts[1..-1].map { |i| i.to_i.to_s(16).rjust(2, '0') }.join('')
+            self
         end
     end
 
@@ -346,7 +361,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
     def query_connected_devices
         logger.debug 'Querying for connected devices'
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
-        query_interface_status
+        query_interface_status if @scheduled_status_query
         query_snooping_bindings
     end
 
@@ -363,7 +378,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         settings = setting(:snmp_options).to_h.symbolize_keys
         @transport&.close
-        @transport = settings[:proxy] = Protocols::Snmp.new(self, setting(:response_timeout) || 5000)
+        @transport = settings[:proxy] = Protocols::Snmp.new(self, setting(:response_timeout) || 7000)
         @transport.register(@resolved_ip, remote_port)
         @client = NETSNMP::Client.new(settings)
         @community = settings[:community]
@@ -380,8 +395,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
             check_reservations if @reserve_time > 0
         end
 
+        schedule.every('10m') { @scheduled_status_query = true }
+
         # There is a possibility that these will change on switch reboot
-        schedule.every('10m') { @scheduled_if_query = true }
+        schedule.every('15m') { @scheduled_if_query = true }
     end
 
     def received(data, resolve, command)
