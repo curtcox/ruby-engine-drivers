@@ -29,8 +29,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             community: 'public'
         },
         # Snooping takes ages on large switches
-        response_timeout: 7000,
-        ignore_connected_state: ['port1/2/3']
+        response_timeout: 7000
     })
 
     def on_load
@@ -38,7 +37,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @if_mappings = {}
         @scheduled_status_query = true
 
+        # Interfaces that indicate they have a device connected
         @check_interface = ::Set.new
+
+        # Interfaces that we know are connected to the network
+        @connected_interfaces = ::Set.new
+
         @reserved_interface = ::Set.new
         self[:interfaces] = [] # This will be updated via query
 
@@ -53,12 +57,13 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
             if details.connected
                 @check_interface << interface
+                @connected_interfaces << interface
             elsif details.reserved
                 @reserved_interface << interface
             end
         end
 
-        self[:interfaces] = @check_interface.to_a
+        self[:interfaces] = @connected_interfaces.to_a
         self[:reserved] = @reserved_interface.to_a
     end
 
@@ -72,9 +77,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
         self[:level] = setting(:level)
 
         @reserve_time = setting(:reserve_time) || 0
-
-        # Docks that keep the interface online
-        @ignore_connected_state = ::Set.new(setting(:ignore_connected_state) || [])
     end
 
     def on_unload
@@ -141,12 +143,13 @@ class Cisco::Switch::SnoopingCatalystSNMP
             logger.debug { "Notify Up: #{interface}" }
             remove_reserved(interface)
             @check_interface << interface
+            @connected_interfaces << interface
         when :down
             logger.debug { "Notify Down: #{interface}" }
             remove_lookup(interface)
         end
 
-        self[:interfaces] = @check_interface.to_a
+        self[:interfaces] = @connected_interfaces.to_a
     end
 
     AddressType = {
@@ -248,11 +251,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
             interface = @if_mappings[entry.interface]
             next unless @check_interface.include?(interface)
             next if checked.include?(interface)
-            checked << interface
 
             mac = entry.mac
             ip = entry.ip
             next unless ::IPAddress.valid?(ip)
+
+            checked << interface
 
             # NOTE:: Same as snooping_catalyst.rb
             iface = self[interface] || ::Aca::Tracking::StaticDetails.new
@@ -305,6 +309,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 self[interface] = details.details unless details.clash?
             end
         end
+
+        @connected_interfaces = checked
+        self[:interfaces] = checked.to_a
+        nil
     end
 
     # Index short name lookup
@@ -344,8 +352,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
             when 1 # up
                 next if @check_interface.include?(interface)
                 logger.debug { "Interface Up: #{interface}" }
-                remove_reserved(interface)
-                @check_interface << interface
+                if !@check_interface.include?(interface)
+                    remove_reserved(interface)
+                    @check_interface << interface
+                end
             when 2 # down
                 next unless @check_interface.include?(interface)
                 logger.debug { "Interface Down: #{interface}" }
@@ -354,8 +364,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 next
             end
         end
-
-        self[:interfaces] = @check_interface.to_a
     end
 
     def query_connected_devices
