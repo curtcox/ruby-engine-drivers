@@ -29,7 +29,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
             community: 'public'
         },
         # Snooping takes ages on large switches
-        response_timeout: 7000
+        response_timeout: 7000,
+        ignore_macs: {
+            "Cisco Phone Dock": "7001b5"
+        }
     })
 
     def on_load
@@ -70,6 +73,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
     def on_update
         new_client if @resolved_ip
         @remote_address = remote_address.downcase
+        @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
 
         self[:name] = @switch_name = setting(:switch_name)
         self[:ip_address] = @remote_address
@@ -257,6 +261,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             mac = entry.mac
             ip = entry.ip
             next unless ::IPAddress.valid?(ip)
+            next if @ignore_macs.include?(mac[0..5])
 
             checked << interface
 
