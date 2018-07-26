@@ -9,7 +9,7 @@ module Cisco::Wireless; end
 
 =begin
 
-Example response:
+get_count example response:
 {
    "MacAddress": [
         "00:00:2a:01:00:41",
@@ -26,6 +26,26 @@ Example response:
         "end": "2017/08/30 10:22:08"
     },
     "Count ": 8
+}
+
+get_zones example response:
+{
+  "ZoneCounts": {
+    "zoneCountList": [
+      {
+        "zoneId": 645,
+        "hierarchy": "System Campus/Level 1/West",
+        "zoneName": "West",
+        "zoneCount": 0
+      },
+      { ... }
+    ],
+    "totalZones": 14,
+    "duration": {
+      "start": "2018/07/24 17:37:53",
+      "end": "2018/07/24 17:47:53"
+    }
+  }
 }
 
 =end
@@ -92,6 +112,26 @@ class Cisco::Wireless::CmxZones
         end
     end
 
+    def get_zones
+        get("/api/location/v#{@api_version}/clients/count/byzone", name: :all_zones) do |response|
+            if response.status == 200
+                begin
+                    data = JSON.parse(response.body)
+                    zones = {}
+                    data['ZoneCounts']['zoneCountList'].each { |zone| zones[zone['zoneId']] = zone }
+                    self[:zone_counts] = zones
+                    zones
+                rescue
+                    :abort
+                end
+            elsif response.status == 401
+                login.then { get_zones }
+            else
+                :abort
+            end
+        end
+    end
+
     protected
 
     def login
@@ -106,22 +146,19 @@ class Cisco::Wireless::CmxZones
     end
 
     def build_zone_list
-        @levels.each_value do |level|
-            zone_id = level[:id]
-            values = {}
+        get_zones.then do |zones|
+            @levels.each_value do |level|
+                values = {}
 
-            # Grab all the counts
-            counts = level[:zones].collect do |zone|
-                get_count(zone[:cmx_id]).then do |count|
+                level[:zones].each do |zone|
                     values[zone[:map_id]] = {
                         capacity: zone[:capacity],
-                        people_count: count
+                        people_count: zones[zone[:cmx_id]]['zoneCount']
                     }
                 end
-            end
 
-            # Wait for all the requests to complete
-            thread.all(*counts).finally { self[zone_id] = values }
+                self[level[:id]] = values
+            end
         end
     end
 end

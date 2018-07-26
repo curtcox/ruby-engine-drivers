@@ -13,10 +13,13 @@ class Protocols::Snmp
         @logger = mod.logger
         @thread = mod.thread
         @timeout = timeout
-        @scheduler = mod.schedule
+
+        # Less overhead with the thread scheduler
+        @scheduler = @thread.scheduler
         @client = Aca::SNMPClient.instance
-        @request_queue = []
     end
+
+    attr_reader :request
 
     def register(ip, port)
         close
@@ -25,35 +28,39 @@ class Protocols::Snmp
         @port = port
 
         @client.register(@thread, ip) do |data, ip, port|
-            defer = @request_queue.shift
-            defer&.resolve(data)
+            if @request
+                @request.resolve(data)
+                @request = nil
+            else
+                @logger.debug 'SNMP received data with no request waiting'
+            end
         end
     end
 
     def close
         @client&.ignore(@ip)
+        if @request
+            @request.reject StandardError.new('client closed')
+            @request = nil
+        end
     end
 
     def send(payload)
         # Send the request
-        if @request_queue.empty?
-            @client.send(@ip, @port, payload)
-        else
-            @request_queue[-1].promise.finally do
-                @client.send(@ip, @port, payload)
-            end
-        end
+        raise 'SNMP request already waiting resonse. Overlapping IO not permitted' if @request
 
         # Track response
-        defer = @thread.defer
-        @request_queue << defer
+        @request = @thread.defer
+        @client.send(@ip, @port, payload)
 
         # Create timeout
-        timeout = @scheduler.in(@timeout) { defer.reject(::Timeout::Error.new("Timeout after #{@timeout}")) }
-        promise = defer.promise
-
-        # Cancel timeout
-        promise.finally { |data| timeout.cancel }
+        timeout = @scheduler.in(@timeout) do
+            @request.reject(::Timeout::Error.new("Timeout after #{@timeout}"))
+            @logger.debug 'SNMP timeout occurred'
+            @request = nil
+        end
+        promise = @request.promise
+        promise.finally { timeout.cancel }
 
         # Wait for IO response
         promise.value
