@@ -146,6 +146,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
             @connected_interfaces << interface
         when :down
             logger.debug { "Notify Down: #{interface}" }
+            # We are no longer interested in this interface
+            @check_interface.delete(interface)
             remove_lookup(interface)
         end
 
@@ -312,6 +314,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         @connected_interfaces = checked
         self[:interfaces] = checked.to_a
+        (@check_interface - checked).each { |iface| remove_lookup(iface) }
+
         nil
     end
 
@@ -359,6 +363,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
             when 2 # down
                 next unless @check_interface.include?(interface)
                 logger.debug { "Interface Down: #{interface}" }
+                # We are no longer interested in this interface
+                @check_interface.delete(interface)
                 remove_lookup(interface)
             else
                 next
@@ -415,9 +421,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def remove_lookup(interface)
-        # We are no longer interested in this interface
-        @check_interface.delete(interface)
-
         # Update the status of the switch port
         model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
         if model
