@@ -16,31 +16,36 @@ class Protocols::Snmp
 
         # Less overhead with the thread scheduler
         @scheduler = @thread.scheduler
-        @client = Aca::SNMPClient.instance
     end
 
     attr_reader :request
 
-    def register(ip, port)
-        close
+    def start_server
+        @server = @thread.udp { |data, ip, port|
+            if ip == @ip
+                if @request
+                    @request.resolve(data)
+                    @request = nil
+                else
+                    @logger.debug 'SNMP received data with no request waiting'
+                end
+            end
+        }.bind('0.0.0.0', 0).start_read
+    end
 
+    def register(ip, port)
+        start_server unless @server
         @ip = ip
         @port = port
-
-        @client.register(@thread, ip) do |data, ip, port|
-            if @request
-                @request.resolve(data)
-                @request = nil
-            else
-                @logger.debug 'SNMP received data with no request waiting'
-            end
-        end
     end
 
     def close
-        @client&.ignore(@ip)
+        @server.close
+        @server = nil
+        @ip = nil
+        @port = nil
         if @request
-            @request.reject StandardError.new('client closed')
+            @request.reject StandardError.new('connection closed')
             @request = nil
         end
     end
@@ -51,7 +56,7 @@ class Protocols::Snmp
 
         # Track response
         @request = @thread.defer
-        @client.send(@ip, @port, payload)
+        @server.send(@ip, @port, payload)
 
         # Create timeout
         timeout = @scheduler.in(@timeout) do
