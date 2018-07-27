@@ -175,8 +175,7 @@ class Aca::OfficeBooking
                 graph_domain: ENV['GRAPH_DOMAIN'] || "https://graph.microsoft.com",
                 service_account_email: @office_user_password || ENV['OFFICE_ACCOUNT_EMAIL'],
                 service_account_password: @office_user_password || ENV['OFFICE_ACCOUNT_PASSWORD'],
-                internet_proxy: @internet_proxy || ENV['INTERNET_PROXY'],
-                delegated: @office_delegated || false
+                internet_proxy: @internet_proxy || ENV['INTERNET_PROXY']
             })
         else
             logger.warn "oauth2 gem not available" if setting(:office_creds)
