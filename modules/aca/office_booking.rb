@@ -636,10 +636,10 @@ class Aca::OfficeBooking
 
             if office_organiser_location == 'attendees'
                 # Grab the first attendee
-                organizer = booking['attendees'][0]['emailAddress']['name']
+                organizer = booking['attendees'][0]['name']
             else
                 # Grab the organiser
-                organizer = booking['organizer']['emailAddress']['name']
+                organizer = booking['organizer']['name']
             end
 
             results.push({
