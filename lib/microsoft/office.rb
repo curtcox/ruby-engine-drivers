@@ -375,6 +375,9 @@ class Microsoft::Office
     end
 
     def bookings_request_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
+        if user_id.class == Array
+            user_id = user_id[0]
+        end
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
