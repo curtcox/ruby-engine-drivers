@@ -359,8 +359,9 @@ class Aca::ExchangeBooking
     # ======================================
     def fetch_bookings(first=false)
         logger.debug { "looking up todays emails for #{@ews_room}" }
+        skype_exists = system.exists?(:Skype)
         task {
-            todays_bookings(first)
+            todays_bookings(first, skype_exists)
         }.then(proc { |bookings|
             self[:today] = bookings
             if @check_meeting_ending
@@ -683,7 +684,7 @@ class Aca::ExchangeBooking
         count
     end
 
-    def todays_bookings(first=false)
+    def todays_bookings(first=false, skype_exists=false)
         now = Time.now
         if @timezone
             start  = now.in_time_zone(@timezone).midnight
@@ -707,7 +708,7 @@ class Aca::ExchangeBooking
             items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
         end
 
-        skype_exists = set_skype_url = system.exists?(:Skype)
+        set_skype_url = skype_exists
         set_skype_url = true if @force_skype_extract
         now_int = now.to_i
 
