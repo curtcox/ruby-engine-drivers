@@ -396,7 +396,7 @@ class Microsoft::Office
         recurring_response = graph_request(request_method: 'get', endpoint: recurring_endpoint, query: query_hash, password: @delegated)
         check_response(recurring_response)
         recurring_bookings = {}
-        recurring_booking[user_id] = JSON.parse(recurring_response.body)['value']
+        recurring_bookings[user_id] = JSON.parse(recurring_response.body)['value']
         recurring_bookings
     end
 
