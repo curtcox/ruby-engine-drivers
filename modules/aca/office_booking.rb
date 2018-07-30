@@ -118,6 +118,8 @@ class Aca::OfficeBooking
         self[:booking_hide_user] = setting(:booking_hide_user)
         self[:booking_hide_description] = setting(:booking_hide_description)
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
+        self[:booking_endable] = setting(:booking_endable)
+        self[:timeout] = setting(:timeout)
 
         # Skype join button available 2min before the start of a meeting
         @skype_start_offset = setting(:skype_start_offset) || 120
