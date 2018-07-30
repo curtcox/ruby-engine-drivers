@@ -157,6 +157,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             # We are no longer interested in this interface
             @check_interface.delete(interface)
             remove_lookup(interface)
+            self[:reserved] = @reserved_interface.to_a
         end
 
         self[:interfaces] = @connected_interfaces.to_a
@@ -380,6 +381,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 next
             end
         end
+
+        self[:reserved] = @reserved_interface.to_a
     end
 
     def query_connected_devices
