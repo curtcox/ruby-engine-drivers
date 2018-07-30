@@ -580,9 +580,10 @@ class Aca::OfficeBooking
 
         # response = office_api.post(path: "#{domain}#{endpoint}", body: booking_data, headers: headers).value
         response = @client.create_booking(room_id: system.id, start_param: start_time, end_param: end_time, subject: subject, current_user: nil)
-        logger.debug response.body
-        logger.debug response.to_json
-        logger.debug response['id']
+        STDERR.puts "BOOKING SIP CREATE RESPONSE:"
+        STDERR.puts response.inspect
+        STDERR.puts response['id']
+        STDERR.flush
 
         id = response['id']
 
