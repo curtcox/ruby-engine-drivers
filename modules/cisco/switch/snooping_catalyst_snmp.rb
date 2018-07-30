@@ -324,6 +324,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @connected_interfaces = checked
         self[:interfaces] = checked.to_a
         (@check_interface - checked).each { |iface| remove_lookup(iface) }
+        self[:reserved] = @reserved_interface.to_a
 
         nil
     end
