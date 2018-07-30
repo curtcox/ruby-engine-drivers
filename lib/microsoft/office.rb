@@ -292,6 +292,7 @@ class Microsoft::Office
         200
     end
 
+
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), bulk: false)
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
@@ -319,7 +320,7 @@ class Microsoft::Office
         if bulk
             return recurring_bookings
         else
-            return recurring_bookings[user_id[0]][:bookings]
+            return recurring_bookings[user_id[0]]
         end
     end
 
