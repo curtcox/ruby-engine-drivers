@@ -440,7 +440,7 @@ class Microsoft::Office
         if @mailbox_location == 'room'
             endpoint = "/v1.0/users/#{room.email}/events"
         elsif @mailbox_location == 'user'
-            endpoint = "/v1.0/users/#{current_user.email}/events"
+            endpoint = "/v1.0/users/#{current_user[:email]}/events"
         end
 
         # Ensure our start and end params are Ruby dates and format them in Graph format
