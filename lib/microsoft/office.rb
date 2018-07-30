@@ -326,13 +326,13 @@ class Microsoft::Office
 
     def extract_booking_data(booking, start_param, end_param)
         # Create time objects of the start and end for easier use
-        start_object = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
-        end_object = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
+        booking_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
+        booking_end = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
 
         # Check if this means the room is unavailable
-        booking_overlaps_start = start_object < start_param && end_object > end_param
-        booking_in_between = start_object >= start_param && end_object <= end_param
-        booking_overlaps_end = start_object < end_param && end_object > end_param
+        booking_overlaps_start = booking_start < start_param && booking_end > start_param
+        booking_in_between = booking_start >= start_param && booking_end <= end_param
+        booking_overlaps_end = booking_start < end_param && booking_end > end_param
         if booking_overlaps_start || booking_in_between || booking_overlaps_end
             booking['free'] = false
         else
@@ -340,10 +340,10 @@ class Microsoft::Office
         end
 
         # Grab the start and end in the right format for the frontend
-        booking['Start'] = start_object.utc.iso8601
-        booking['End'] = end_object.utc.iso8601
-        booking['start_epoch'] = start_object.to_i
-        booking['end_epoch'] = end_object.to_i
+        booking['Start'] = booking_start.utc.iso8601
+        booking['End'] = booking_end.utc.iso8601
+        booking['start_epoch'] = booking_start.to_i
+        booking['end_epoch'] = booking_end.to_i
 
         # Get some data about the booking
         booking['title'] = booking['subject']
