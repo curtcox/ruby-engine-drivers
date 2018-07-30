@@ -49,21 +49,25 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @reserved_interface = ::Set.new
         self[:interfaces] = [] # This will be updated via query
 
-        on_update
+        begin
+            on_update
 
-        # Load the current state of the switch from the database
-        query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(@remote_address)
-        query.each do |detail|
-            details = detail.details
-            interface = detail.interface
-            self[interface] = details
+            # Load the current state of the switch from the database
+            query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(@remote_address)
+            query.each do |detail|
+                details = detail.details
+                interface = detail.interface
+                self[interface] = details
 
-            if details.connected
-                @check_interface << interface
-                @connected_interfaces << interface
-            elsif details.reserved
-                @reserved_interface << interface
+                if details.connected
+                    @check_interface << interface
+                    @connected_interfaces << interface
+                elsif details.reserved
+                    @reserved_interface << interface
+                end
             end
+        rescue => error
+            logger.print_error error, 'loading persisted details'
         end
 
         self[:interfaces] = @connected_interfaces.to_a
