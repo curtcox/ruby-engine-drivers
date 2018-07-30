@@ -349,7 +349,13 @@ class Aca::OfficeBooking
 
     def cancel_meeting(start_time)
         task {
-            delete_ews_booking (start_time / 1000).to_i
+            if start_time.class == Integer
+                delete_ews_booking (start_time / 1000).to_i
+            else
+                # Converts to time object regardless of start_time being string or time object
+                start_time = Time.parse(start_time.to_s)
+                delete_ews_booking start_time.to_i
+            end
         }.then(proc { |count|
             logger.debug { "successfully removed #{count} bookings" }
 
@@ -585,40 +591,49 @@ class Aca::OfficeBooking
     end
 
     def delete_ews_booking(delete_at)
-        now = Time.now
-        if @timezone
-            start  = now.in_time_zone(@timezone).midnight
-            ending = now.in_time_zone(@timezone).tomorrow.midnight
-        else
-            start  = now.midnight
-            ending = now.tomorrow.midnight
-        end
+        # now = Time.now
+        # if @timezone
+        #     start  = now.in_time_zone(@timezone).midnight
+        #     ending = now.in_time_zone(@timezone).tomorrow.midnight
+        # else
+        #     start  = now.midnight
+        #     ending = now.tomorrow.midnight
+        # end
 
         count = 0
 
-        cli = Viewpoint::EWSClient.new(*@ews_creds)
+        # cli = Viewpoint::EWSClient.new(*@ews_creds)
 
-        if @use_act_as
-            # TODO:: think this line can be removed??
-            delete_at = Time.parse(delete_at.to_s).to_i
+        # if @use_act_as
+        #     # TODO:: think this line can be removed??
+        #     delete_at = Time.parse(delete_at.to_s).to_i
 
-            opts = {}
-            opts[:act_as] = @ews_room if @ews_room
+        #     opts = {}
+        #     opts[:act_as] = @ews_room if @ews_room
 
-            folder = cli.get_folder(:calendar, opts)
-            items = folder.items({:calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
-        else
-            cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
-            items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
-        end
+        #     folder = cli.get_folder(:calendar, opts)
+        #     items = folder.items({:calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
+        # else
+        #     cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
+        #     items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
+        # end
 
-        items.each do |meeting|
-            meeting_time = Time.parse(meeting.ews_item[:start][:text])
+        # items.each do |meeting|
+        #     meeting_time = Time.parse(meeting.ews_item[:start][:text])
 
-            # Remove any meetings that match the start time provided
-            if meeting_time.to_i == delete_at
-                meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
-                count += 1
+        #     # Remove any meetings that match the start time provided
+        #     if meeting_time.to_i == delete_at
+        #         meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
+        #         count += 1
+        #     end
+        # end
+        delete_at_object = Time.at(delete_at).utc.iso8601
+        if self[:today]
+            self[:today].each do |booking|
+                if delete_at_object == booking[:Start]
+                    response = @client.delete_booking(booking_id: booking[:id], current_user: system)
+                    count += 1 if response == 200
+                end
             end
         end
 
@@ -648,6 +663,7 @@ class Aca::OfficeBooking
                 :Start => start_time,
                 :End => end_time,
                 :Subject => booking['subject'],
+                :id => booking['id'],
                 :owner => organizer
             })
         }
