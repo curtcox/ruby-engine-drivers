@@ -243,7 +243,7 @@ class Microsoft::Office
         end_ruby_param = ensure_ruby_date((end_param || (now + 1.hour)))
         duration_string = "PT#{end_ruby_param.to_i-start_ruby_param.to_i}S"
         start_param = start_ruby_param.utc.iso8601.split("+")[0]
-        end_param = (end_ruby_param + 30.minutes).utc.iso8601.split("+")[0]
+        end_param = end_ruby_param.utc.iso8601.split("+")[0]
 
         # Add the attendees
         rooms.map!{|room|
