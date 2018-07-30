@@ -437,7 +437,7 @@ class Microsoft::Office
         # Get our room
         room = Orchestrator::ControlSystem.find(room_id)
 
-        if @mailbox_location == 'room'
+        if @mailbox_location == 'room' || current_user.nil?
             endpoint = "/v1.0/users/#{room.email}/events"
         elsif @mailbox_location == 'user'
             endpoint = "/v1.0/users/#{current_user[:email]}/events"
