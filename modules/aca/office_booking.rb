@@ -326,12 +326,7 @@ class Aca::OfficeBooking
     def fetch_bookings(*args)
         # Make the request
         response = @client.get_bookings_by_user(user_id: @office_room, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)
-
-        task {
-            todays_bookings(response, @office_organiser_location)
-        }.then(proc { |bookings|
-            self[:today] = bookings
-        }, proc { |e| logger.print_error(e, 'error fetching bookings') })
+        self[:today] = todays_bookings(response, @office_organiser_location)
     end
 
 
@@ -348,24 +343,17 @@ class Aca::OfficeBooking
     end
 
     def cancel_meeting(start_time)
-        task {
-            if start_time.class == Integer
-                delete_ews_booking (start_time / 1000).to_i
-            else
-                # Converts to time object regardless of start_time being string or time object
-                start_time = Time.parse(start_time.to_s)
-                delete_ews_booking start_time.to_i
-            end
-        }.then(proc { |count|
-            logger.debug { "successfully removed #{count} bookings" }
-
-            self[:last_meeting_started] = start_time
-            self[:meeting_pending] = start_time
-            self[:meeting_ending] = false
-            self[:meeting_pending_notice] = false
-        }, proc { |error|
-            logger.print_error error, 'removing ews booking'
-        })
+        if start_time.class == Integer
+            delete_ews_booking (start_time / 1000).to_i
+        else
+            # Converts to time object regardless of start_time being string or time object
+            start_time = Time.parse(start_time.to_s)
+            delete_ews_booking start_time.to_i
+        end
+        self[:last_meeting_started] = start_time
+        self[:meeting_pending] = start_time
+        self[:meeting_ending] = false
+        self[:meeting_pending_notice] = false
     end
 
     # If last meeting started !== meeting pending then
