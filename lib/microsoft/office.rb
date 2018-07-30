@@ -274,7 +274,8 @@ class Microsoft::Office
             timeConstraint: time_constraint,
             maxCandidates: 1000,
             returnSuggestionReasons: true,
-            meetingDuration: duration_string
+            meetingDuration: duration_string,
+            isOrganizerOptional: true
 
 
         }.to_json
