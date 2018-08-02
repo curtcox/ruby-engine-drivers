@@ -12,12 +12,12 @@ module Cisco::Switch; end
 ::Orchestrator::DependencyManager.load('Aca::Tracking::SwitchPort', :model, :force)
 ::Aca::Tracking::SwitchPort.ensure_design_document!
 
-class Cisco::Switch::SnoopingCatalystSNMP
+class Cisco::Switch::MerakiSNMP
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
 
-    descriptive_name 'Cisco Catalyst SNMP IP Snooping'
+    descriptive_name 'Cisco Meraki SNMP'
     generic_name :Snooping
     udp_port 161
 
@@ -237,18 +237,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
         return :currently_processing if @transport.request
 
         logger.debug 'extracting snooping table'
-
-        # Walking cdsBindingsTable
         entries = {}
-        @client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
-            part, entry_id = oid_code[28..-1].split('.', 2)
-            next if entry_id.nil?
 
-            entry = entries[entry_id] || SnoopingEntry.new
-            entry.id = entry_id
-            entry.__send__("#{EntryParts[part]}=", value)
-            entries[entry_id] = entry
-        end
+        # TODO:: Query for IP Addresses
 
         # Process the bindings
         entries = entries.values
@@ -321,6 +312,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 self[interface] = details.details unless details.clash?
             end
         end
+
+        # TODO:: remove the line below once snooping occuring
+        checked = @check_interface
 
         @connected_interfaces = checked
         self[:interfaces] = checked.to_a

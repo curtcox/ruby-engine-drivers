@@ -421,7 +421,7 @@ class Aca::Tracking::DeskManagement
 
         # Grab port information
         interfaces = switch[:interfaces]
-        reservations = switch[:reserved]
+        reservations = Array(switch[:reserved])
 
         # Build lookup structures
         building = switch[:building]
