@@ -211,7 +211,7 @@ class Microsoft::Office
 
     def get_user(user_id:)
         endpoint = "/v1.0/users/#{user_id}"
-        request = graph_request('get', endpoint)
+        request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
         check_response(request)
         JSON.parse(request.body)
     end
