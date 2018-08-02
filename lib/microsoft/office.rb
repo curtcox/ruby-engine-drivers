@@ -216,6 +216,16 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
+    def has_user(user_id:)
+        endpoint = "/v1.0/users/#{user_id}"
+        request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
+        if [200, 201, 204].include?(request.status)
+            return true
+        else
+            return false
+        end
+    end
+
     def get_rooms(q: nil, limit: nil)
         filter_param = "startswith(name,'#{q}') or startswith(address,'#{q}')" if q
         query_params = {
