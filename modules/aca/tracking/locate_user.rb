@@ -28,7 +28,8 @@ class Aca::Tracking::LocateUser
             # https://en.wikipedia.org/wiki/MAC_address#Address_details
             'Good Way Docking Stations' => '0050b6',
             'BizLink Docking Stations' => '9cebe8'
-        }
+        },
+        ignore_hostnames: {}
     })
 
     def on_load
@@ -60,6 +61,7 @@ class Aca::Tracking::LocateUser
         end
 
         @blacklist = Set.new((setting(:ignore_vendors) || {}).values)
+        @ignore_hosts = Set.new((setting(:ignore_hostnames) || {}).values)
         @warnings ||= {}
     end
 
@@ -134,7 +136,7 @@ class Aca::Tracking::LocateUser
 
 
     def perform_lookup(ip, login, domain, hostname, ttl)
-        if hostname && self[hostname] != login
+        if hostname && !@ignore_hosts.include?(hostname) && self[hostname] != login
             save_hostname_mapping(domain, login, hostname)
         end
 
