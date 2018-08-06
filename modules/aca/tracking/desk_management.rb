@@ -97,14 +97,19 @@ class Aca::Tracking::DeskManagement
     # Grab the ownership details of the desk
     #
     # @param desk_id [String] the unique id that represents a desk
-    def desk_details(desk_id)
-        switch_ip, port = @desk_mappings[desk_id]
-        if switch_ip
-            ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.details
-        else # Check for manual checkin
-            username = @manual_usage[desk_id]
-            return nil unless username
-            self[username]
+    def desk_details(*desk_ids)
+        desk_ids.map do |desk_id|
+            switch_ip, port = @desk_mappings[desk_id]
+            if switch_ip
+                ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.details
+            else # Check for manual checkin
+                username = @manual_usage[desk_id]
+                if username
+                    self[username]
+                else
+                    nil
+                end
+            end
         end
     end
 
