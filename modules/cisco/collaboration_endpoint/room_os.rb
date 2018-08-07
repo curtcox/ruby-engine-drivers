@@ -373,6 +373,8 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Bind arbitary device feedback to a status variable.
     def bind_feedback(path, status_key)
         register_feedback path do |value|
+            value = self[status_key].deep_merge value \
+                if self[status_key].is_a?(Hash) && value.is_a?(Hash)
             self[status_key] = value
         end
     end
