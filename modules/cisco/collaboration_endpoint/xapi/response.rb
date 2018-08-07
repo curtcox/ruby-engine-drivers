@@ -37,7 +37,11 @@ module Cisco::CollaborationEndpoint::Xapi::Response
                 fragment.transform_values { |item| compress item }
             end
         when Array
-            fragment.map { |item| compress item }
+            fragment.each_with_object({}) do |item, h|
+                id = item.delete(:id)
+                id = id.is_a?(String) && id[/^\d+$/]&.to_i || id
+                h[id] = compress item
+            end
         else
             fragment
         end
