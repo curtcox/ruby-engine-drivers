@@ -78,7 +78,9 @@ class Aca::Router
             else
                 logger.warn 'signal map partially activated'
                 edge_map.transform_values do |routes|
-                    routes.select { |_, edges| success.superset? edges }.keys
+                    routes.each_with_object([]) do |(output, edges), completed|
+                        completed << output if success.superset? Set.new(edges)
+                    end
                 end
             end
         end
