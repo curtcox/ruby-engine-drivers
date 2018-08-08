@@ -251,7 +251,6 @@ class Cisco::Switch::SnoopingCatalystSNMP
         logger.debug '==> extracting snooping table <=='
 
         # Walking cdsBindingsTable
-
         client = @client
         @processing = task do
             entries = {}
@@ -388,6 +387,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         return :currently_processing if @processing
 
         logger.debug '==> querying interface status <=='
+        @scheduled_status_query = false
 
         client = @client
         if_mappings = @if_mappings
