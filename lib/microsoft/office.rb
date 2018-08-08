@@ -303,7 +303,7 @@ class Microsoft::Office
     end
 
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), bulk: false, availability: true)
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true)
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
 
@@ -321,7 +321,7 @@ class Microsoft::Office
         recurring_bookings.each do |u_id, bookings|
             is_available = true
             bookings.each_with_index do |booking, i|
-                bookings[i] = extract_booking_data(booking, start_param, end_param)
+                bookings[i] = extract_booking_data(booking, available_from, available_to)
                 is_available = bookings[i]['free']
             end
             recurring_bookings[u_id] = {available: is_available, bookings: bookings}
