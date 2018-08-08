@@ -441,7 +441,7 @@ class Microsoft::Office
     end
 
 
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, timezone:'Sydney')
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney')
         description = String(description)
         attendees = Array(attendees)
 
@@ -539,6 +539,10 @@ class Microsoft::Office
                     startDate: start_object.strftime("%F")
                 }
             }
+        end
+
+        if is_private
+            event[:sensitivity] = 'private'
         end
 
         event = event.to_json
