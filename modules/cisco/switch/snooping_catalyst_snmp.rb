@@ -261,10 +261,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
         checked_interfaces = Set.new
         entries.each do |entry|
             interface = @if_mappings[entry.interface]
-            checked_interfaces << interface
 
             next unless @check_interface.include?(interface)
             next if checked_interfaces.include?(interface)
+            checked_interfaces << interface
 
             mac = entry.mac
             ip = entry.ip
