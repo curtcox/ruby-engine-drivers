@@ -138,19 +138,6 @@ class Cisco::Wireless::CmxZones
         end
     end
 
-    protected
-
-    def login
-        post("/api/common/v#{@api_version}/login", name: :login) do |response|
-            if (200..299).cover? response.status
-                :success
-            else
-                logger.error 'CMX login error. Please check username and password.'
-                :abort
-            end
-        end
-    end
-
     def build_zone_list
         get_zones.then do |zones|
             @levels.each do |level_name, level|
@@ -165,6 +152,19 @@ class Cisco::Wireless::CmxZones
                 end
 
                 self[level[:id]] = values
+            end
+        end
+    end
+
+    protected
+
+    def login
+        post("/api/common/v#{@api_version}/login", name: :login) do |response|
+            if (200..299).cover? response.status
+                :success
+            else
+                logger.error 'CMX login error. Please check username and password.'
+                :abort
             end
         end
     end
