@@ -302,8 +302,8 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
-    def delete_booking(booking_id:, current_user:)
-        endpoint = "/v1.0/users/#{current_user.email}/events/#{booking_id}"
+    def delete_booking(booking_id:, mailbox:)
+        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
         request = graph_request(request_method: 'delete', endpoint: endpoint, password: @delegated)
         check_response(request)
         200
