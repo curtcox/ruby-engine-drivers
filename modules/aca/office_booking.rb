@@ -619,7 +619,8 @@ class Aca::OfficeBooking
         delete_at_object = Time.at(delete_at).utc.iso8601
         if self[:today]
             self[:today].each_with_index do |booking, i|
-                if delete_at_object.to_i == booking[:Start].to_i
+                booking_start_object = Time.parse(booking[:Start])
+                if delete_at_object.to_i == booking_start_object.to_i
                     response = @client.delete_booking(booking_id: booking[:id], current_user: system)
                     if response == 200
                         count += 1
