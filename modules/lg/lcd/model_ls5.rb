@@ -45,6 +45,7 @@ class Lg::Lcd::ModelLs5
     end
 
     def on_update
+        @rs232 = setting(:rs232_control) || false
         @id_num = setting(:display_id) || 1
         @autoswitch = setting(:autoswitch) || false
         @id = @id_num.to_s.rjust(2, '0')
@@ -88,15 +89,19 @@ class Lg::Lcd::ModelLs5
     def power(state, broadcast = @last_broadcast)
         power_on = is_affirmative?(state)
 
-        # This allows polling 
+        # This allows polling
         @last_broadcast = broadcast if broadcast
         self[:power_target] = power_on
         self[:power_stable] = false
 
-        if self[:connected]
-            mute_display !power_on
+        if power_on
+            if @rs232
+                do_send(Command[:power], 1, name: :power, priority: 99)
+            else
+                wake(broadcast)
+            end
         end
-        wake(broadcast) if power_on
+        mute_display !power_on if self[:connected]
     end
 
     def hard_off
@@ -240,7 +245,7 @@ class Lg::Lcd::ModelLs5
         # The action DPM takes needs to be configured using a remote
         # The action should be set to: screen off always
     end
-    
+
     def no_signal_off(enable = false)
         val = is_affirmative?(enable) ? 1 : 0
         do_send(Command[:no_signal_off], val, :f, name: :disable_no_sig_off)
@@ -261,7 +266,7 @@ class Lg::Lcd::ModelLs5
         if mac
             # config is the database model representing this device
             wake_device(mac, broadcast)
-            logger.debug { 
+            logger.debug {
                 info = "Wake on Lan for MAC #{mac}"
                 info << " directed to VLAN #{broadcast}" if broadcast
                 info
@@ -351,4 +356,3 @@ class Lg::Lcd::ModelLs5
 
 
 end
-
