@@ -14,9 +14,9 @@ class Helvar::Net
     descriptive_name 'Helvar Net Lighting Gateway'
     generic_name :Lighting
 
-    # Communication settings
-    tokenize delimiter: '#'
-    default_settings version: 2
+    # Communication settings (limit required for gateways)
+    tokenize delimiter: '#', size_limit: 1024
+    default_settings version: 2, ignore_blocks: true, poll_group: nil
 
     def on_load
         on_update
@@ -26,12 +26,18 @@ class Helvar::Net
 
     def on_update
         @version = setting(:version)
+        @ignore_blocks = setting(:ignore_blocks) || true
+        @poll_group = setting(:poll_group)
     end
 
     def connected
         schedule.every('40s') do
             logger.debug '-- Polling Helvar'
-            query_software_version
+            if @poll_group
+                get_current_preset @poll_group
+            else
+                query_software_version
+            end
         end
     end
 
@@ -157,6 +163,13 @@ class Helvar::Net
     def received(data, resolve, command)
         logger.debug { "Helvar sent #{data}" }
 
+        # Remove junk data (when whitelisting gateway is in place)
+        start_of_message = data.index(/[\?\>\!]V:/i)
+        if start_of_message != 0
+            logger.warn { "Lighting error response: #{data[0...start_of_message]}" }
+            data = data[start_of_message..-1]
+        end
+
         # remove connectors from multi-part responses
         data.delete!('$')
 
@@ -185,10 +198,10 @@ class Helvar::Net
 
             cmd = Commands[params[:cmd]]
             case cmd
-            when :query_last_scene
-                blk = params[:block]
-                if blk
-                    self[:"area#{params[:group]}_block#{blk}"] = value.to_i
+            when :query_last_scene, :group_scene
+                block = params[:block]
+                if block && !@ignore_blocks
+                    self[:"area#{params[:group]}_block#{block}"] = value.to_i
                 else
                     self[:"area#{params[:group]}"] = value.to_i
                 end
