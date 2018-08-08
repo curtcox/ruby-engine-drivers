@@ -183,7 +183,16 @@ class Lg::Lcd::ModelLs5
 
     # Status values we are interested in polling
     def do_poll
-        if self[:connected]
+        if @rs232
+            power?.then do
+                if self[power]
+                    screen_mute?
+                    input?
+                    volume_mute?
+                    volume?
+                end
+            end
+        elsif self[:connected]
             screen_mute?
 
             if @id_num == 1
@@ -302,7 +311,8 @@ class Lg::Lcd::ModelLs5
 
         case Lookup[cmd]
         when :power
-            self[:power] = resp_value == 1
+            self[:hard_power] = resp_value == 1
+            self[:power] = false if self[:hard_power] == false
         when :input
             self[:input] = Inputs[resp_value] || :unknown
             self[:input_target] = self[:input] if self[:input_target].nil?
