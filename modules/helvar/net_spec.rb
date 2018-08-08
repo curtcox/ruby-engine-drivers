@@ -17,4 +17,7 @@ Orchestrator::Testing.mock_device 'Helvar::Net' do
         .should_send('>V:2,C:109,G:20#')
         .responds('!V:2,C:109,G:20=1#')
     expect(status[:last_error]).to eq('error Invalid group index parameter for !V:2,C:109,G:20=1')
+
+    transmit('>V:2,C:11,G:2001,B:1,S:1,F:100#')
+    expect(status[:area2001).to be(1)
 end
