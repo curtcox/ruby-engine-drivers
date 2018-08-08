@@ -185,7 +185,7 @@ class Lg::Lcd::ModelLs5
     def do_poll
         if @rs232
             power?.then do
-                if self[power]
+                if self[:hard_power]
                     screen_mute?
                     input?
                     volume_mute?
