@@ -619,7 +619,7 @@ class Aca::OfficeBooking
         #         count += 1
         #     end
         # end
-        delete_at_object = Time.at(delete_at).utc.iso8601
+        delete_at_object = Time.at(delete_at)
         if self[:today]
             self[:today].each_with_index do |booking, i|
                 booking_start_object = Time.parse(booking[:Start])
@@ -627,8 +627,8 @@ class Aca::OfficeBooking
                 log("DELETE AT OBJECT TO INT IS")
                 log(delete_at_object.to_i)
                 log("BOOKING START OBJECT TO INT IS")
-                log("---- ------------------ ----")
                 log(booking_start_object.to_i)
+                log("---- ------------------ ----")
                 if delete_at_object.to_i == booking_start_object.to_i
                     log("MATCHED AND NOW DELETING")
                     response = @client.delete_booking(booking_id: booking[:id], current_user: system)
