@@ -118,7 +118,13 @@ class Cisco::Wireless::CmxZones
                 begin
                     data = JSON.parse(response.body)
                     zones = {}
-                    data['ZoneCounts']['zoneCountList'].each { |zone| zones[zone['zoneId']] = zone }
+                    data['ZoneCounts']['zoneCountList'].each do |zone|
+                        hierarchy = zone['hierarchy'].split('/')
+                        zone_name = hierarchy[-1]
+                        level = hierarchy[-2]
+                        zones[level] ||= {}
+                        zones[level][zone_name] = zone
+                    end
                     self[:zone_counts] = zones
                     zones
                 rescue
@@ -147,14 +153,15 @@ class Cisco::Wireless::CmxZones
 
     def build_zone_list
         get_zones.then do |zones|
-            @levels.each_value do |level|
+            @levels.each do |level_name, level|
                 values = {}
 
                 level[:zones].each do |zone|
+                    data = zones[level_name][zone[:name]]
                     values[zone[:map_id]] = {
                         capacity: zone[:capacity],
-                        people_count: zones[zone[:cmx_id]]['zoneCount']
-                    }
+                        people_count: data['zoneCount']
+                    } if data
                 end
 
                 self[level[:id]] = values
