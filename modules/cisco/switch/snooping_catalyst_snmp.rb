@@ -248,13 +248,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
         return :not_ready unless @client
         return :currently_processing if @processing
 
-        logger.debug 'extracting snooping table'
+        logger.debug '==> extracting snooping table <=='
 
         # Walking cdsBindingsTable
-        entries = {}
+
         client = @client
         @processing = task do
-            @client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
+            entries = {}
+            client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
                 part, entry_id = oid_code[28..-1].split('.', 2)
                 next if entry_id.nil?
 
@@ -263,15 +264,15 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 entry.__send__("#{EntryParts[part]}=", value)
                 entries[entry_id] = entry
             end
+            entries
         end
         @processing.finally {
             @processing = nil
             client.close if client != @client
         }
-        @processing.value
 
         # Process the bindings
-        entries = entries.values
+        entries = @processing.value.values
         logger.debug { "found #{entries.length} snooping entries" }
 
         # Newest lease first
@@ -359,7 +360,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         return :not_ready unless @client
         return :currently_processing if @processing
 
-        logger.debug 'mapping ifIndex to port names'
+        logger.debug '==> mapping ifIndex to port names <=='
         @scheduled_if_query = false
 
         client = @client
@@ -371,13 +372,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
             end
             mappings
         end
-        @processing.then { |mappings|
-            logger.debug { "found #{mappings.length} ports" }
-            @if_mappings = mappings
-        }.finally {
+        @processing.finally {
             @processing = nil
             client.close if client != @client
         }
+        @processing.then { |mappings|
+            logger.debug { "<== found #{mappings.length} ports ==>" }
+            @if_mappings = mappings
+        }.value
     end
 
     # ifOperStatus: 1.3.6.1.2.1.2.2.1.8.xx == up(1), down(2), testing(3)
@@ -385,12 +387,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
         return :not_ready unless @client
         return :currently_processing if @processing
 
-        logger.debug 'querying interface status'
+        logger.debug '==> querying interface status <=='
 
         client = @client
         if_mappings = @if_mappings
-        remove_interfaces = []
         @processing = task do
+            remove_interfaces = []
             client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
                 oid_code = oid_code[20..-1]
                 interface = if_mappings[oid_code.to_i]
@@ -415,17 +417,24 @@ class Cisco::Switch::SnoopingCatalystSNMP
                     next
                 end
             end
+            remove_interfaces
         end
-        @processing.then {
-            remove_interfaces.each { |iface| remove_reserved(iface) }
-            self[:reserved] = @reserved_interface.to_a
-        }.finally {
+        @processing.finally {
             @processing = nil
             client.close if client != @client
         }
+        @processing.then { |remove_interfaces|
+            logger.debug '<== finished querying interfaces ==>'
+            remove_interfaces.each { |iface| remove_reserved(iface) }
+            self[:reserved] = @reserved_interface.to_a
+        }.value
     end
 
     def query_connected_devices
+        if @processing
+            logger.debug 'Skipping device query... busy processing'
+            return
+        end
         logger.debug 'Querying for connected devices'
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
         query_interface_status if @scheduled_status_query
@@ -444,6 +453,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         schedule.clear
 
         @snmp_settings = setting(:snmp_options).to_h.symbolize_keys
+        @snmp_settings[:host] = @resolved_ip
         @community = @snmp_settings[:community]
         @client = NETSNMP::Client.new(@snmp_settings)
 
