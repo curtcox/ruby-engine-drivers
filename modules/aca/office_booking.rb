@@ -580,6 +580,9 @@ class Aca::OfficeBooking
     end
 
     def delete_ews_booking(delete_at)
+        log("DELETE AT IS")
+        log(delete_at)
+        log(delete_at.class)
         # now = Time.now
         # if @timezone
         #     start  = now.in_time_zone(@timezone).midnight
@@ -616,7 +619,7 @@ class Aca::OfficeBooking
         #         count += 1
         #     end
         # end
-        delete_at_object = Time.parse(delete_at).utc.iso8601
+        delete_at_object = Time.at(delete_at).utc.iso8601
         if self[:today]
             self[:today].each_with_index do |booking, i|
                 booking_start_object = Time.parse(booking[:Start])
