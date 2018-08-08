@@ -580,57 +580,12 @@ class Aca::OfficeBooking
     end
 
     def delete_ews_booking(delete_at)
-        log("DELETE AT IS")
-        log(delete_at)
-        log(delete_at.class)
-        # now = Time.now
-        # if @timezone
-        #     start  = now.in_time_zone(@timezone).midnight
-        #     ending = now.in_time_zone(@timezone).tomorrow.midnight
-        # else
-        #     start  = now.midnight
-        #     ending = now.tomorrow.midnight
-        # end
-
         count = 0
-
-        # cli = Viewpoint::EWSClient.new(*@ews_creds)
-
-        # if @use_act_as
-        #     # TODO:: think this line can be removed??
-        #     delete_at = Time.parse(delete_at.to_s).to_i
-
-        #     opts = {}
-        #     opts[:act_as] = @ews_room if @ews_room
-
-        #     folder = cli.get_folder(:calendar, opts)
-        #     items = folder.items({:calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
-        # else
-        #     cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
-        #     items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
-        # end
-
-        # items.each do |meeting|
-        #     meeting_time = Time.parse(meeting.ews_item[:start][:text])
-
-        #     # Remove any meetings that match the start time provided
-        #     if meeting_time.to_i == delete_at
-        #         meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
-        #         count += 1
-        #     end
-        # end
         delete_at_object = Time.at(delete_at)
         if self[:today]
             self[:today].each_with_index do |booking, i|
                 booking_start_object = Time.parse(booking[:Start])
-                log("---- DELETING A BOOKING ----")
-                log("DELETE AT OBJECT TO INT IS")
-                log(delete_at_object.to_i)
-                log("BOOKING START OBJECT TO INT IS")
-                log(booking_start_object.to_i)
-                log("---- ------------------ ----")
                 if delete_at_object.to_i == booking_start_object.to_i
-                    log("MATCHED AND NOW DELETING")
                     response = @client.delete_booking(booking_id: booking[:id], current_user: system)
                     if response == 200
                         count += 1
