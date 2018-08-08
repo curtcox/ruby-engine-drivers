@@ -645,7 +645,11 @@ class Aca::OfficeBooking
 
             if office_organiser_location == 'attendees'
                 # Grab the first attendee
-                organizer = booking['attendees'][0]['name']
+                if booking.key?('attendees') && !booking['attendees'].empty?
+                    organizer = booking['attendees'][0]['name']
+                else
+                    organizer = ""
+                end
             else
                 # Grab the organiser
                 organizer = booking['organizer']['name']
