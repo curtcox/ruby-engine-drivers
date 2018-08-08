@@ -620,11 +620,17 @@ class Aca::OfficeBooking
                 # Grab the organiser
                 organizer = booking['organizer']['name']
             end
+            
+            subject = booking['subject']
+            if booking.key?('sensitivity') && ['private','confidential'].include?(booking['sensitivity'])
+                organizer = ""
+                subject = ""
+            end
 
             results.push({
                 :Start => start_time,
                 :End => end_time,
-                :Subject => booking['subject'],
+                :Subject => subject,
                 :id => booking['id'],
                 :owner => organizer
             })
