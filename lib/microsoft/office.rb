@@ -569,7 +569,7 @@ class Microsoft::Office
 
     def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, timezone:'Sydney')
         # We will always need a room and endpoint passed in
-        room = Orchestrator::ControlSystem.find(room_id)
+        room = Orchestrator::ControlSystem.find_by_email(room_id)
         endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
         STDERR.puts "ENDPOINT IS"
         STDERR.puts endpoint
