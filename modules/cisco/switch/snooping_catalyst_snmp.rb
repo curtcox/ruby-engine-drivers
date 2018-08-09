@@ -167,6 +167,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         when :down
             logger.debug { "Notify Down: #{interface}" }
             # We are no longer interested in this interface
+            @connected_interfaces.delete(interface)
             @check_interface.delete(interface)
             remove_lookup(interface)
             self[:reserved] = @reserved_interface.to_a
