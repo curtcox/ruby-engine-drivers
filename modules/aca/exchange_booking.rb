@@ -379,8 +379,8 @@ class Aca::ExchangeBooking
         }.then(proc { |count|
             logger.debug { "successfully removed #{count} bookings" }
 
-            self[:last_meeting_started] = start_time
-            self[:meeting_pending] = start_time
+            self[:last_meeting_started] = 0
+            self[:meeting_pending] = 0
             self[:meeting_ending] = false
             self[:meeting_pending_notice] = false
 
