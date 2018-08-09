@@ -567,20 +567,27 @@ class Microsoft::Office
         response = JSON.parse(request.body)
     end
 
-    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, timezone:'Sydney')
+    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Sydney')
         # We will always need a room and endpoint passed in
         room = Orchestrator::ControlSystem.find_by_email(room_id)
-        endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
+
+
+        if @mailbox_location == 'room' || current_user.nil?
+            endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
+        elsif @mailbox_location == 'user'
+            endpoint = "/v1.0/users/#{current_user[:email]}/events/#{booking_id}"
+        end
+
         STDERR.puts "ENDPOINT IS"
         STDERR.puts endpoint
         STDERR.flush
 
-        
+
         start_object = ensure_ruby_date(start_param).in_time_zone(timezone)
         end_object = ensure_ruby_date(end_param).in_time_zone(timezone)
         start_param = ensure_ruby_date(start_param).in_time_zone(timezone).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).in_time_zone(timezone).iso8601.split("+")[0]
-        
+
         event = {}
         event[:subject] = subject if subject
 
