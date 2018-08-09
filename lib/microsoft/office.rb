@@ -608,11 +608,22 @@ class Microsoft::Office
 
         # Let's assume that the request has the current user and room as an attendee already
         event[:attendees] = attendees.map{|a|
-            { emailAddress: {
+            {
+                emailAddress: {
                     address: a[:email],
                     name: a[:name]
-            }   }
+                },
+                type: 'required'
+            }
         } if attendees
+
+        event[:attendees].push({
+            emailAddress: {
+                address: room.email,
+                name: room.name
+            },
+            type: 'resource'
+        })
 
         request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: @delegated)
         check_response(request)
