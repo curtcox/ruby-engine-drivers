@@ -252,8 +252,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         # Walking cdsBindingsTable
         client = @client
+        entries = {}
         @processing = task do
-            entries = {}
             client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
                 part, entry_id = oid_code[28..-1].split('.', 2)
                 next if entry_id.nil?
@@ -263,15 +263,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 entry.__send__("#{EntryParts[part]}=", value)
                 entries[entry_id] = entry
             end
-            entries
         end
         @processing.finally {
             @processing = nil
             client.close if client != @client
-        }
+        }.value
 
         # Process the bindings
-        entries = @processing.value.values
+        entries = entries.values
         logger.debug { "found #{entries.length} snooping entries" }
 
         # Newest lease first
@@ -363,19 +362,18 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @scheduled_if_query = false
 
         client = @client
+        mappings = {}
         @processing = task do
-            mappings = {}
             client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
                 oid_code = oid_code[23..-1]
                 mappings[oid_code.to_i] = value.downcase
             end
-            mappings
         end
         @processing.finally {
             @processing = nil
             client.close if client != @client
         }
-        @processing.then { |mappings|
+        @processing.then {
             logger.debug { "<== found #{mappings.length} ports ==>" }
             @if_mappings = mappings
         }.value
@@ -391,8 +389,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         client = @client
         if_mappings = @if_mappings
+        remove_interfaces = []
         @processing = task do
-            remove_interfaces = []
             client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
                 oid_code = oid_code[20..-1]
                 interface = if_mappings[oid_code.to_i]
@@ -417,13 +415,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
                     next
                 end
             end
-            remove_interfaces
         end
         @processing.finally {
             @processing = nil
             client.close if client != @client
         }
-        @processing.then { |remove_interfaces|
+        @processing.then {
             logger.debug '<== finished querying interfaces ==>'
             remove_interfaces.each { |iface| remove_reserved(iface) }
             self[:reserved] = @reserved_interface.to_a
