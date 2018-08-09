@@ -608,12 +608,19 @@ class Microsoft::Office
 
         # Let's assume that the request has the current user and room as an attendee already
         event[:attendees] = attendees.map{|a|
+            @item.property = params[:property] ? true : false
+            if a[:optional]
+                attendee_type = 'optional'
+            else
+                attendee_type = 'required'
+            end
+            attendee_type = a[:option]
             {
                 emailAddress: {
                     address: a[:email],
                     name: a[:name]
                 },
-                type: 'required'
+                type: attendee_type
             }
         } if attendees
 
