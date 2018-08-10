@@ -105,6 +105,7 @@ class Microsoft::Exchange
                     output['name'] = user[:resolution][:elems][0][:mailbox][:elems][0][:name][:text]
                 end
                 output['email'] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
+                output['id'] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
                 users.push(output)
             rescue => e
                 STDERR.puts "GOT USER WITHOUT EMAIL"
