@@ -363,8 +363,8 @@ class Microsoft::Office
         end
 
         # Grab the start and end in the right format for the frontend
-        booking['Start'] = booking_start.utc.iso8601
-        booking['End'] = booking_end.utc.iso8601
+        # booking['Start'] = booking_start.utc.iso8601
+        # booking['End'] = booking_end.utc.iso8601
         booking['start_epoch'] = booking_start.to_i
         booking['end_epoch'] = booking_end.to_i
 
