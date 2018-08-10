@@ -280,8 +280,8 @@ class Microsoft::Exchange
         }]
 
         # Add start and end times
-        booking[:start] = Time.at(start_param.to_i / 1000).utc.iso8601.chop
-        booking[:end] = Time.at(end_param.to_i / 1000).utc.iso8601.chop
+        booking[:start] = Time.at(start_param.to_i).utc.iso8601.chop
+        booking[:end] = Time.at(end_param.to_i).utc.iso8601.chop
 
         # Add the current user passed in as an attendee
         mailbox = { email_address: current_user.email }
