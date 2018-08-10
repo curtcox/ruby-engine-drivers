@@ -105,7 +105,6 @@ class Microsoft::Exchange
                     output['name'] = user[:resolution][:elems][0][:mailbox][:elems][0][:name][:text]
                 end
                 output['email'] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
-                output['id'] = user[:resolution][:elems][0][:mailbox][:elems][1][:email_address][:text]
                 users.push(output)
             rescue => e
                 STDERR.puts "GOT USER WITHOUT EMAIL"
@@ -232,12 +231,13 @@ class Microsoft::Exchange
             booking[:attendees] = event.required_attendees.map {|attendee|
                 if room_emails.include?(attendee.email)
                     booking[:room_id] = attendee.email
+                    next
                 end
                 {
                     name: attendee.name,
                     email: attendee.email
                 }
-            } if event.required_attendees
+            }.compact if event.required_attendees
             if @hide_all_day_bookings
                 STDERR.puts "SKIPPING #{event.subject}"
                 STDERR.flush
