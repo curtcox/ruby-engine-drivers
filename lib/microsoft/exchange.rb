@@ -217,12 +217,10 @@ class Microsoft::Exchange
             booking[:subject] = event.subject
             booking[:title] = event.subject
             booking[:id] = event.id
+            # booking[:start_date] = event.start.utc.iso8601
+            # booking[:end_date] = event.end.utc.iso8601
             booking[:start_date] = event.start.to_i * 1000
             booking[:end_date] = event.end.to_i * 1000
-            booking[:start_epoch] = event.start.to_i 
-            booking[:end_epoch] = event.end.to_i 
-            booking[:Start] = event.start.utc.iso8601
-            booking[:End] = event.end.utc.iso8601
             booking[:body] = event.body
             booking[:organiser] = {
                 name: event.organizer.name,
