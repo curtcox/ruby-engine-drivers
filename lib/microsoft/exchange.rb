@@ -195,6 +195,8 @@ class Microsoft::Exchange
 
     def get_bookings(email:, start_param:DateTime.now.midnight, end_param:(DateTime.now.midnight + 2.days), use_act_as: false)
 	begin
+        # Get all the room emails
+        room_emails = Orchestrator::ControlSystem.all.to_a.map { |sys| sys.email }
         if [Integer, String].include?(start_param.class)
             start_param = DateTime.parse(Time.at(start_param.to_i / 1000).to_s)
             end_param = DateTime.parse(Time.at(end_param.to_i / 1000).to_s)
@@ -226,7 +228,10 @@ class Microsoft::Exchange
                 name: event.organizer.name,
                 email: event.organizer.email
             }
-            booking[:attendees] = event.required_attendees.map {|attendee| 
+            booking[:attendees] = event.required_attendees.map {|attendee|
+                if room_emails.include?(attendee.email)
+                    booking[:room_id] = attendee.email
+                end
                 {
                     name: attendee.name,
                     email: attendee.email
