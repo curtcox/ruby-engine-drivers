@@ -74,12 +74,12 @@ class Wolfvision::Eye14
     end
 
     # set autofocus to on
-    def autofocus(state)
-        send_cmd("\x31\x01\01", name: :autofocus_cmd)
+    def autofocus()
+        send_cmd("\x31\x01\x01", name: :autofocus_cmd)
     end
 
     def autofocus?
-        send_inq("\x31\00", priority: 0, name: :autofocus_inq)
+        send_inq("\x31\x00", priority: 0, name: :autofocus_inq)
     end
 
     def iris(position)
@@ -123,6 +123,8 @@ class Wolfvision::Eye14
                 self[:zoom] = self[:zoom_target] if byte_to_hex(data) == "2000"
             when :iris_cmd
                 self[:iris] = self[:iris_target] if byte_to_hex(data) == "2200"
+            when :autofocus_cmd
+                self[:autofocus] = true if byte_to_hex(data) == "3100"
             when :power_inq
                 # -1 index for array refers to the last element in Ruby
                 self[:power] = bytes[-1] == 1
