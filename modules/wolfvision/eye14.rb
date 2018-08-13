@@ -23,7 +23,7 @@ class Wolfvision::Eye14
     end
 
     def on_update
-        power?
+        #power?
     end
 
     def on_unload
@@ -142,16 +142,18 @@ class Wolfvision::Eye14
                 return :ignore if byte_to_hex(data) == "2200"
                 hex = byte_to_hex(data[-2..-1])
                 self[:iris] = hex.to_i(16)
+            else
+                return :ignore
             end
+            return :success
         end
 
-        return :success
     end
 
     def check_length(byte_str)
         response = str_to_array(byte_str)
 
-        return false if response.length <= 2 # header is 2 bytes
+        return false if response.length <= 1 # header is 2 bytes
 
         len = response[1] + 2 # (data length + header)
 
