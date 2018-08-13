@@ -442,7 +442,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
         query_interface_status if @scheduled_status_query
         query_snooping_bindings
+        rebuild_client
     rescue => e
+        rebuild_client
         @scheduled_status_query = true
         raise e
     end
@@ -461,8 +463,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @snmp_settings = setting(:snmp_options).to_h.symbolize_keys
         @snmp_settings[:host] = @resolved_ip
         @community = @snmp_settings[:community]
-        @client.close if @client && @processing.nil?
-        @client = NETSNMP::Client.new(@snmp_settings)
+        rebuild_client
 
         # Grab the initial state
         next_tick do
@@ -480,6 +481,11 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         # There is a possibility that these will change on switch reboot
         schedule.every('15m') { @scheduled_if_query = true }
+    end
+
+    def rebuild_client
+        @client.close if @client && @processing.nil?
+        @client = NETSNMP::Client.new(@snmp_settings)
     end
 
     def received(data, resolve, command)
