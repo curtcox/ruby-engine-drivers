@@ -377,7 +377,11 @@ class Cisco::Switch::SnoopingCatalystSNMP
         }
         @processing.then {
             logger.debug { "<== found #{mappings.length} ports ==>" }
-            @if_mappings = mappings
+            if mappings.empty?
+                @scheduled_if_query = true
+            else
+                @if_mappings = mappings
+            end
         }.value
     end
 
