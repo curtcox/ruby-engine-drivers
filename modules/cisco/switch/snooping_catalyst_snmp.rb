@@ -347,6 +347,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         @connected_interfaces = checked
         self[:interfaces] = checked.to_a
+        @scheduled_status_query = checked.empty?
         (@check_interface - checked).each { |iface| remove_lookup(iface) }
         self[:reserved] = @reserved_interface.to_a
 
@@ -437,6 +438,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
         query_interface_status if @scheduled_status_query
         query_snooping_bindings
+    rescue => e
+        @scheduled_status_query = true
+        raise e
     end
 
     def update_reservations
@@ -453,6 +457,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @snmp_settings = setting(:snmp_options).to_h.symbolize_keys
         @snmp_settings[:host] = @resolved_ip
         @community = @snmp_settings[:community]
+        @client.close if @client && @processing.nil?
         @client = NETSNMP::Client.new(@snmp_settings)
 
         # Grab the initial state
