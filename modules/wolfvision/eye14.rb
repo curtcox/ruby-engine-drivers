@@ -23,7 +23,6 @@ class Wolfvision::Eye14
     end
 
     def on_update
-        #power?
     end
 
     def on_unload
@@ -111,7 +110,7 @@ class Wolfvision::Eye14
     end
 
     def received(data, deferrable, command)
-        logger.debug { "Received 0x#{byte_to_hex(data)}\n#{command}" }
+        logger.debug { "Received 0x#{byte_to_hex(data)}\n" }
 
         bytes = str_to_array(data)
 
