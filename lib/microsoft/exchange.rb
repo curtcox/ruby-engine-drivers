@@ -393,7 +393,8 @@ class Microsoft::Exchange
         }
     end
 
-    def delete_booking(id)
+    def delete_booking(booking_id:, mailbox:)
+        @ews_client.set_impersonation(Viewpoint::EWS::ConnectingSID[:SMTP], mailbox)  
         booking = @ews_client.get_item(id)
         booking.delete!(:recycle, send_meeting_cancellations: "SendOnlyToAll")
         200
