@@ -4,7 +4,10 @@ module Lg::Lcd; end
 # Documentation: https://aca.im/driver_docs/LG/LS5_models.pdf
 #  also https://aca.im/driver_docs/LG/SM_models.pdf
 #
-# There is a secret menu that allows you to disable power management
+# To ensure that the display does not go network offline when told to power off, this setting needs to be set:
+# General>Power>PM mode:Screen off always
+#
+# For older displays, the same setting is in a secret menu that is accessed via the IR remote:
 # 1. Press and hold the 'Setting' button on the remote for 7 seconds
 # 2. Press: 0 0 0 0 OK (Press Zero four times and then OK)
 # 3. From the signage setup, turn off DPM
