@@ -396,6 +396,7 @@ class Microsoft::Exchange
     def delete_booking(id)
         booking = @ews_client.get_item(id)
         booking.delete!(:recycle, send_meeting_cancellations: "SendOnlyToAll")
+        200
     end
 
     # Takes a date of any kind (epoch, string, time object) and returns a time object
