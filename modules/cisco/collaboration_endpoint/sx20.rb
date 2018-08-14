@@ -44,11 +44,6 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
     status 'Video Output' => :video_output
     status 'Standby State' => :standby
 
-    def set_selfview(state)
-        state = is_affirmative?(state) ? 'On' : 'Off'
-        send_xcommand 'Video Selfview Set', Mode: state
-    end
-
     command 'Audio Microphones Mute' => :mic_mute_on
     command 'Audio Microphones Unmute' => :mic_mute_off
     command 'Audio Microphones ToggleMute' => :mic_mute_toggle
@@ -72,12 +67,14 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             CallRate_: (64..6000),
             CallType_: [:Audio, :Video]
 
-    command 'Camera Preset Activate Preset' => camera_preset,
-            PresetId: (1..15)
-
-    command 'Camera Preset Store' => camera_store_preset,
-            CameraId: (1..7),
-            PresetId: (1..15)
+    command 'Camera Preset Activate' => :camera_preset,
+            PresetId: (1..35)
+    command 'Camera Preset Store' => :camera_store_preset,
+            CameraId: (1..1),
+            PresetId_: (1..35), # Optional - codec will auto-assign if omitted
+            Name_: String,
+            TakeSnapshot_: Boolean,
+            DefaultPosition_: Boolean
 
     command 'Camera PositionReset' => :camera_position_reset,
             CameraId: (1..2),
@@ -91,6 +88,18 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             Zoom_: [:In, :Out, :Stop],
             ZoomSpeed_: (1..15),
             Focus_: [:Far, :Near, :Stop]
+
+    command 'Video Input SetMainVideoSource' => :camera_select,
+            ConnectorId_: (1..3),       # Source can either be specified as the
+            Layout_: [:Equal, :PIP],    # physical connector...
+            SourceId_: (1..3)           # ...or the logical source ID
+
+    command 'Video Selfview Set' => :selfview,
+            Mode_: [:On, :Off],
+            FullScreenMode_: [:On, :Off],
+            PIPPosition_: [:CenterLeft, :CenterRight, :LowerLeft, :LowerRight,
+                           :UpperCenter, :UpperLeft, :UpperRight],
+            OnMonitorRole_: [:First, :Second, :Third, :Fourth]
 
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
