@@ -59,6 +59,7 @@ class Lg::Lcd::ModelLs5
         no_signal_off(false)
         auto_off(false)
         local_button_lock(true)
+        pm_mode(3)
         do_poll
     end
 
@@ -84,7 +85,8 @@ class Lg::Lcd::ModelLs5
         no_signal_off: 'g',
         auto_off: 'n',
         dpm: 'j',
-        local_button_lock: 'o'
+        local_button_lock: 'o',
+        pm_mode: 'n'
     }
     Lookup = Command.invert
 
@@ -229,6 +231,10 @@ class Lg::Lcd::ModelLs5
         # The action should be set to: screen off always
     end
 
+    def pm_mode(mode = 3)
+        do_send(Command[:pm_mode], mode, :s, name: :pm_mode)
+    end
+    
     def local_button_lock(enable = true)
         #0=off,  1=lock all except Power buttons, 2=lock all buttons. Default to 2 as power off from local button results in network offline
         val = is_affirmative?(enable) ? 2 : 0
