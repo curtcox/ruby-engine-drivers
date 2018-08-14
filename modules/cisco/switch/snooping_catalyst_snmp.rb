@@ -26,10 +26,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
         reserve_time: 5.minutes.to_i,
         snmp_options: {
             version: 1,
-            community: 'public'
+            community: 'public',
+            timeout: 4
         },
         # Snooping takes ages on large switches
-        response_timeout: 7000,
         ignore_macs: {
             "Cisco Phone Dock": "7001b5"
         }
