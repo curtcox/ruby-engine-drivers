@@ -72,6 +72,13 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             CallRate_: (64..6000),
             CallType_: [:Audio, :Video]
 
+    command 'Camera Preset Activate Preset' => camera_preset,
+            PresetId: (1..15)
+
+    command 'Camera Preset Store' => camera_store_preset,
+            CameraId: (1..7),
+            PresetId: (1..15)
+
     command 'Camera PositionReset' => :camera_position_reset,
             CameraId: (1..7),
             Axis_: [:All, :Focus, :PanTilt, :Zoom]
@@ -84,6 +91,15 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             Zoom_: [:In, :Out, :Stop],
             ZoomSpeed_: (1..15),
             Focus_: [:Far, :Near, :Stop]
+
+    def camera_select(camera_id)
+        send_xcommand 'Video Input SetMainVideoSource', ConnectorId: camera_id
+    end
+
+    def set_selfview(state)
+        state = is_affirmative?(state) ? 'On' : 'Off'
+        send_xcommand 'Video Selfview Set', Mode: state
+    end
 
     command! 'Cameras AutoFocus Diagnostics Start' => \
              :autofocus_diagnostics_start,

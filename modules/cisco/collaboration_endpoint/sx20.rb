@@ -44,6 +44,11 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
     status 'Video Output' => :video_output
     status 'Standby State' => :standby
 
+    def set_selfview(state)
+        state = is_affirmative?(state) ? 'On' : 'Off'
+        send_xcommand 'Video Selfview Set', Mode: state
+    end
+
     command 'Audio Microphones Mute' => :mic_mute_on
     command 'Audio Microphones Unmute' => :mic_mute_off
     command 'Audio Microphones ToggleMute' => :mic_mute_toggle
@@ -66,6 +71,13 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             Protocol_: [:H320, :H323, :Sip, :Spark],
             CallRate_: (64..6000),
             CallType_: [:Audio, :Video]
+
+    command 'Camera Preset Activate Preset' => camera_preset,
+            PresetId: (1..15)
+
+    command 'Camera Preset Store' => camera_store_preset,
+            CameraId: (1..7),
+            PresetId: (1..15)
 
     command 'Camera PositionReset' => :camera_position_reset,
             CameraId: (1..2),
