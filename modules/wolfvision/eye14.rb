@@ -1,3 +1,6 @@
+# encoding: ASCII-8BIT
+# frozen_string_literal: true
+
 module Wolfvision; end
 
 # Documentation: https://www.wolfvision.com/wolf/protocol_command_wolfvision/protocol/commands_eye-14.pdf
@@ -63,7 +66,7 @@ class Wolfvision::Eye14
     def zoom(position)
         val = in_range(position, self[:zoom_max], self[:zoom_min])
         self[:zoom_target] = val
-        val = sprintf("%04X", val)
+        val = format("%04X", val)
         logger.debug { "position in decimal is #{position} and hex is #{val}" }
         send_cmd("\x20\x02#{hex_to_byte(val)}", name: :zoom_cmd)
     end
@@ -73,7 +76,7 @@ class Wolfvision::Eye14
     end
 
     # set autofocus to on
-    def autofocus()
+    def autofocus
         send_cmd("\x31\x01\x01", name: :autofocus_cmd)
     end
 
@@ -84,7 +87,7 @@ class Wolfvision::Eye14
     def iris(position)
         val = in_range(position, self[:iris_max], self[:iris_min])
         self[:iris_target] = val
-        val = sprintf("%04X", val)
+        val = format("%04X", val)
         logger.debug { "position in decimal is #{position} and hex is #{val}" }
         send_cmd("\x22\x02#{hex_to_byte(val)}", name: :iris_cmd)
     end
@@ -93,7 +96,7 @@ class Wolfvision::Eye14
         send_inq("\x22\x00", priority: 0, name: :iris_inq)
     end
 
-    def power?()
+    def power?
         send_inq("\x30\x00", priority: 0, name: :power_inq)
     end
 
@@ -114,41 +117,35 @@ class Wolfvision::Eye14
 
         bytes = str_to_array(data)
 
-        if command && !command[:name].nil?
-            case command[:name]
-            when :power_cmd
-                self[:power] = self[:power_target] if byte_to_hex(data) == "3000"
-            when :zoom_cmd
-                self[:zoom] = self[:zoom_target] if byte_to_hex(data) == "2000"
-            when :iris_cmd
-                self[:iris] = self[:iris_target] if byte_to_hex(data) == "2200"
-            when :autofocus_cmd
-                self[:autofocus] = true if byte_to_hex(data) == "3100"
-            when :power_inq
-                # -1 index for array refers to the last element in Ruby
-                self[:power] = bytes[-1] == 1
-            when :zoom_inq
-=begin
-        for some reason the after changing the zoom position
-        the first zoom inquiry sends "2000" regardless of the actaul zoom value
-        consecutive zoom inquiries will then return the correct zoom value
-=end
-                return :ignore if byte_to_hex(data) == "2000"
-                hex = byte_to_hex(data[-2..-1])
-                self[:zoom] = hex.to_i(16)
-            when :autofocus_inq
-                self[:autofocus] = bytes[-1] == 1
-            when :iris_inq
-                # same thing as zoom inq happens here
-                return :ignore if byte_to_hex(data) == "2200"
-                hex = byte_to_hex(data[-2..-1])
-                self[:iris] = hex.to_i(16)
-            else
-                return :ignore
-            end
-            return :success
+        return :success if command.nil? || command[:name].nil?
+        case command[:name]
+        when :power_cmd
+            self[:power] = self[:power_target] if byte_to_hex(data) == "3000"
+        when :zoom_cmd
+            self[:zoom] = self[:zoom_target] if byte_to_hex(data) == "2000"
+        when :iris_cmd
+            self[:iris] = self[:iris_target] if byte_to_hex(data) == "2200"
+        when :autofocus_cmd
+            self[:autofocus] = true if byte_to_hex(data) == "3100"
+        when :power_inq
+            # -1 index for array refers to the last element in Ruby
+            self[:power] = bytes[-1] == 1
+        when :zoom_inq
+            # for some reason the after changing the zoom position
+            # the first zoom inquiry sends "2000" regardless of the actaul zoom value
+            # consecutive zoom inquiries will then return the correct zoom value
+            return :ignore if byte_to_hex(data) == "2000"
+            hex = byte_to_hex(data[-2..-1])
+            self[:zoom] = hex.to_i(16)
+        when :autofocus_inq
+            self[:autofocus] = bytes[-1] == 1
+        when :iris_inq
+            # same thing as zoom inq happens here
+            return :ignore if byte_to_hex(data) == "2200"
+            hex = byte_to_hex(data[-2..-1])
+            self[:iris] = hex.to_i(16)
         end
-
+        return :success
     end
 
     def check_length(byte_str)
