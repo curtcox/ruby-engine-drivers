@@ -56,9 +56,9 @@ class Wolfvision::Eye14
         # Execute command
         logger.debug { "Target = #{target} and self[:power] = #{self[:power]}" }
         if target == On && self[:power] != On
-            send_cmd("\x30\x01\x01", name: :power_cmd)
+            send_cmd("300101", name: :power_cmd)
         elsif target == Off && self[:power] != Off
-            send_cmd("\x30\x01\x00", name: :power_cmd)
+            send_cmd("300100", name: :power_cmd)
         end
     end
 
@@ -66,49 +66,51 @@ class Wolfvision::Eye14
     def zoom(position)
         val = in_range(position, self[:zoom_max], self[:zoom_min])
         self[:zoom_target] = val
-        val = format("%04X", val)
-        logger.debug { "position in decimal is #{position} and hex is #{val}" }
-        send_cmd("\x20\x02#{hex_to_byte(val)}", name: :zoom_cmd)
+        logger.debug { "position in decimal is #{val}" }
+        logger.debug { "hex is #{val.to_s(16).rjust(4, '0')}" }
+        send_cmd("2002#{val.to_s(16).rjust(4, '0')}", name: :zoom_cmd)
     end
 
     def zoom?
-        send_inq("\x20\x00", priority: 0, name: :zoom_inq)
+        send_inq("2000", priority: 0, name: :zoom_inq)
     end
 
     # set autofocus to on
     def autofocus
-        send_cmd("\x31\x01\x01", name: :autofocus_cmd)
+        send_cmd("310101", name: :autofocus_cmd)
     end
 
     def autofocus?
-        send_inq("\x31\x00", priority: 0, name: :autofocus_inq)
+        send_inq("3100", priority: 0, name: :autofocus_inq)
     end
 
     def iris(position)
         val = in_range(position, self[:iris_max], self[:iris_min])
         self[:iris_target] = val
-        val = format("%04X", val)
-        logger.debug { "position in decimal is #{position} and hex is #{val}" }
-        send_cmd("\x22\x02#{hex_to_byte(val)}", name: :iris_cmd)
+        logger.debug { "position in decimal is #{val}" }
+        logger.debug { "hex is #{val.to_s(16).rjust(4, '0')}" }
+        send_cmd("2202#{val.to_s(16).rjust(4, '0')}", name: :iris_cmd)
     end
 
     def iris?
-        send_inq("\x22\x00", priority: 0, name: :iris_inq)
+        send_inq("2200", priority: 0, name: :iris_inq)
     end
 
     def power?
-        send_inq("\x30\x00", priority: 0, name: :power_inq)
+        send_inq("3000", priority: 0, name: :power_inq)
     end
 
     def send_cmd(cmd, options = {})
-        req = "\x01#{cmd}"
-        logger.debug { "tell -- 0x#{byte_to_hex(req)} -- #{options[:name]}" }
+        req = "01#{cmd}"
+        logger.debug { "tell -- 0x#{req} -- #{options[:name]}" }
+        options[:hex_string] = true
         send(req, options)
     end
 
     def send_inq(inq, options = {})
-        req = "\x00#{inq}"
-        logger.debug { "ask -- 0x#{byte_to_hex(req)} -- #{options[:name]}" }
+        req = "00#{inq}"
+        logger.debug { "ask -- 0x#{inq} -- #{options[:name]}" }
+        options[:hex_string] = true
         send(req, options)
     end
 
