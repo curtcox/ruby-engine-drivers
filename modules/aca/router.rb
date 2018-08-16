@@ -280,7 +280,7 @@ class Aca::Router
             if mod.nil? && single_source
 
         fail_with['already on correct input'] \
-            if edge.nx1? && mod[:input] == edge.input && !force
+            if edge.nx1? && mod && mod[:input] == edge.input && !force
 
         fail_with['has an incompatible api, but only a single input defined'] \
             if edge.nx1? && !mod.respond_to?(:switch_to) && single_source
