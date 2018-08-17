@@ -126,7 +126,7 @@ class Microsoft::Exchange
         start_time = nil
         elems.each do |item|
             if item[time]
-                start_time = ActionController::TimeZone.new("UTC").parse(item[time][:text])
+                start_time = ActiveSupport::TimeZone.new("UTC").parse(item[time][:text])
                 break
             end
         end
