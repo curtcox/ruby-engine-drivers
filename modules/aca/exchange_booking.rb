@@ -674,8 +674,10 @@ class Aca::ExchangeBooking
             meeting_time = Time.parse(meeting.ews_item[:start][:text])
 
             # Remove any meetings that match the start time provided
-            if meeting_time.to_i == delete_at
-                meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
+            if meeting_time.to_i == delete_at                
+                new_booking = meeting.update_item!({ end: Time.now.utc.iso8601.chop })
+
+                # meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
                 count += 1
             end
         end
