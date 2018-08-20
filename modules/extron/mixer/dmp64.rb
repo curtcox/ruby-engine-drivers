@@ -19,7 +19,7 @@ class Extron::Mixer::Dmp64 < Extron::Base
 
     def on_load
         super
-        
+
         #
         # Setup constants
         #
@@ -37,6 +37,7 @@ class Extron::Mixer::Dmp64 < Extron::Base
         # Response: Rpr#{number}
     end
     alias_method :preset, :call_preset
+    alias_method :trigger, :call_preset
 
     #
     # Input control
@@ -93,14 +94,14 @@ class Extron::Mixer::Dmp64 < Extron::Base
         faders.each do |fad|
             do_send("\eD#{fad}*#{value}GRPM", group_type: :volume, wait: true)
         end
-        
+
         # Response: GrpmD#{group}*#{value}*GRPM
     end
     # Named params version
     def faders(ids:, level:, **_)
         fader(ids, level)
     end
-    
+
     def fader_status(group, type)
         do_send("\eD#{group}GRPM", group_type: type, wait: true)
     end
@@ -127,7 +128,7 @@ class Extron::Mixer::Dmp64 < Extron::Base
     end
 
 
-    
+
     def fader_relative(group, value)    # \e == 0x1B == ESC key
         if value < 0
             value = -value
@@ -205,4 +206,3 @@ class Extron::Mixer::Dmp64 < Extron::Base
         28 => 'Bad filename or file not found'
     }
 end
-
