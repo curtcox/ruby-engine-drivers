@@ -26,10 +26,10 @@ class Cisco::Switch::SnoopingCatalystSNMP
         reserve_time: 5.minutes.to_i,
         snmp_options: {
             version: 1,
-            community: 'public'
+            community: 'public',
+            timeout: 4
         },
         # Snooping takes ages on large switches
-        response_timeout: 7000,
         ignore_macs: {
             "Cisco Phone Dock": "7001b5"
         }
@@ -347,6 +347,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         @connected_interfaces = checked
         self[:interfaces] = checked.to_a
+        @scheduled_status_query = checked.empty?
         (@check_interface - checked).each { |iface| remove_lookup(iface) }
         self[:reserved] = @reserved_interface.to_a
 
@@ -376,7 +377,11 @@ class Cisco::Switch::SnoopingCatalystSNMP
         }
         @processing.then {
             logger.debug { "<== found #{mappings.length} ports ==>" }
-            @if_mappings = mappings
+            if mappings.empty?
+                @scheduled_if_query = true
+            else
+                @if_mappings = mappings
+            end
         }.value
     end
 
@@ -437,6 +442,11 @@ class Cisco::Switch::SnoopingCatalystSNMP
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
         query_interface_status if @scheduled_status_query
         query_snooping_bindings
+        rebuild_client
+    rescue => e
+        rebuild_client
+        @scheduled_status_query = true
+        raise e
     end
 
     def update_reservations
@@ -453,7 +463,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @snmp_settings = setting(:snmp_options).to_h.symbolize_keys
         @snmp_settings[:host] = @resolved_ip
         @community = @snmp_settings[:community]
-        @client = NETSNMP::Client.new(@snmp_settings)
+        rebuild_client
 
         # Grab the initial state
         next_tick do
@@ -471,6 +481,11 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         # There is a possibility that these will change on switch reboot
         schedule.every('15m') { @scheduled_if_query = true }
+    end
+
+    def rebuild_client
+        @client.close if @client && @processing.nil?
+        @client = NETSNMP::Client.new(@snmp_settings)
     end
 
     def received(data, resolve, command)

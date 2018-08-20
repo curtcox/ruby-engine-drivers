@@ -30,23 +30,23 @@ class Biamp::Tesira
         password: 'default'
     })
 
-    
+
     def on_load
         # Implement the Telnet protocol
         defaults timeout: 15000
         new_telnet_client
         config before_buffering: proc { |data|
             @telnet.buffer data
-        }
+        }, wait_ready_timeout: 15000
     end
-    
+
     def on_unload
     end
-    
+
     def on_update
     end
-    
-    
+
+
     def connected
         # Echo off
         echo_off = Protocols::Telnet::IAC + Protocols::Telnet::DONT + Protocols::Telnet::OPT_ECHO
@@ -57,20 +57,20 @@ class Biamp::Tesira
             do_send setting(:password), wait: false, delay: 200, priority: 97
         end
         do_send "SESSION set verbose false", priority: 96
-        
+
         schedule.every('60s') do
             do_send "DEVICE get serialNumber", priority: 0
         end
     end
-    
+
     def disconnected
         # Ensures the buffer is cleared
         new_telnet_client
 
         schedule.clear
     end
-    
-    
+
+
     def preset(number_or_name)
         if number_or_name.is_a? Integer
             do_send "DEVICE recallPreset #{number_or_name}"
@@ -141,7 +141,7 @@ class Biamp::Tesira
     def faders(ids:, level:, index: 1, type: :fader, **_)
         fader(ids, level, index, type)
     end
-    
+
     MUTES = {
         fader: :mute,
         matrix_in: :inputMute,
@@ -164,7 +164,7 @@ class Biamp::Tesira
     def mutes(ids:, muted: true, index: 1, type: :fader, **_)
         mute(ids, muted, index, type)
     end
-    
+
     def unmute(fader_id, index = 1, type = :fader)
         mute(fader_id, false, index, type)
     end
@@ -183,15 +183,15 @@ class Biamp::Tesira
     def query_mute(fader_id, index = 1, type = :fader)
         type = type.to_sym
         mute_type = MUTES[type] || type
-        
+
         do_send build(Array(fader_id)[0], :get, mute_type, Array(index)[0]), type: :mute
     end
     # Named params version
     def query_mutes(ids:, index: 1, type: :fader, **_)
         query_mute(ids, index, type)
     end
-    
-    
+
+
     def received(data, resolve, command)
         if data[0] == '-'
             if command
@@ -201,7 +201,7 @@ class Biamp::Tesira
             end
             return :abort
         end
-        
+
         logger.debug { "Tesira responded #{data}" }
         result = Shellwords.split data
 
@@ -241,11 +241,11 @@ class Biamp::Tesira
                 self["#{type}#{request[0]}_#{request[3]}_mute"] = value
             end
         end
-        
+
         return :success
     end
-    
-    
+
+
     protected
 
 
@@ -272,10 +272,9 @@ class Biamp::Tesira
         end
         cmd
     end
-    
+
     def do_send(command, options = {})
         logger.debug { "requesting #{command}" }
         send @telnet.prepare(command), options
     end
 end
-
