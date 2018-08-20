@@ -127,7 +127,12 @@ class GlobalCache::Gc100
 
         when :endlistdevices
             self[:num_relays] = @config[:relay].length unless @config[:relay].nil?
-            self[:num_relays] = @config[:relaysensor].length unless @config[:relaysensor].nil?
+            if @config[:relaysensor]
+                @config[:relaysensor][1] = "1:2"
+                @config[:relaysensor][2] = "1:3"
+                @config[:relaysensor][3] = "1:4"
+                self[:num_relays] = @config[:relaysensor].length
+            end
             self[:num_ir] = @config[:ir].length unless @config[:ir].nil?
             self[:config] = @config
             @config = nil
