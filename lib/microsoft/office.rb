@@ -226,6 +226,51 @@ class Microsoft::Office
         end
     end
 
+    def get_contacts(owner_email:, q:nil, limit:nil)
+        query_params = { '$top': (limit || 1000) }
+        query_params['$filter'] = "startswith(displayName, #{q}) or startswith(givenName, #{q}) or startswith(surname, #{q}) or emailAddresses/any(a:a/address eq  #{q})" if q
+        endpoint = "/v1.0/users/#{owner_email}/contacts"
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
+        check_response(request)
+        JSON.parse(request.body)
+    end
+
+    def get_contact(owner_email:, contact_email:)
+        endpoint = "/v1.0/users/#{owner_email}/contacts"
+        query_params = {
+            '$top': 1,
+            '$search': contact_email
+        }
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
+        check_response(request)
+        JSON.parse(request.body)
+    end
+
+    def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, company:nil, other:{})
+        # This data is required so add it unconditionally
+        contact_data = {
+            givenName: first_name,
+            surname: last_name,
+            emailAddresses: [{
+                address: email,
+                name: "#{first_name} #{last_name}"
+            }]
+        }
+
+        # Only add these fields if passed in
+        contact_data[:businessPhones] = [ phone ] if phone
+        contact_data[:companyName] = company if company
+        other.each do |field, value|
+            contact_data[field.to_sym] = value
+        end
+
+
+        endpoint = "/v1.0/users/#{owner_email}"
+        request = graph_request(request_method: 'post', endpoint: endpoint, data: contact_data, password: @delegated)
+        check_response(request)
+        JSON.parse(request.body)
+    end
+
     def get_rooms(q: nil, limit: nil)
         filter_param = "startswith(name,'#{q}') or startswith(address,'#{q}')" if q
         query_params = {
