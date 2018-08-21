@@ -5,7 +5,6 @@ module GlobalCache; end
 class GlobalCache::Gc100
     include ::Orchestrator::Constants
 
-
     # Discovery Information
     tcp_port 4998
     descriptive_name 'GlobalCache IO Gateway'
@@ -14,15 +13,14 @@ class GlobalCache::Gc100
     # Communication settings
     tokenize delimiter: "\x0D"
 
-
     def on_load
         self[:num_relays] = 0
         self[:num_ir] = 0
     end
-    
+
     def on_update
     end
-    
+
     #
     # Config maps the GC100 into a linear set of ir and relays so models can be swapped in and out
     #  config => {:relay => {0 => '2:1',1 => '2:2',2 => '2:3',3 => '3:1'}} etc
@@ -31,41 +29,39 @@ class GlobalCache::Gc100
         @config = nil
         self[:config_indexed] = false
         getdevices
-        
+
         schedule.every('10s') do
             logger.debug "-- Polling GC100"
             getdevices unless self[:config_indexed]
-            
+
             do_send("get_NET,0:1", :priority => 0)    # Low priority sent to maintain the connection
         end
     end
-    
+
     def disconnected
         schedule.clear
     end
 
-
     def getdevices
         do_send('getdevices', :max_waits => 100)
     end
-    
-    
-    
+
     def relay(index, state, options = {})
         if index < self[:num_relays]
-            connector = self[:config][:relay][index]
+            relays = self[:config][:relay] || self[:config][:relaysensor]
+            connector = relays[index]
             if is_affirmative?(state)
                 state = 1
             else
                 state = 0
             end
-            
+
             do_send("setstate,#{connector},#{state}", options)
         else
             logger.warn "Attempted to set relay on GlobalCache that does not exist: #{index}"
         end
     end
-    
+
     def ir(index, command, options = {})
         do_send("sendir,1:#{index},#{command}", options)
     end
@@ -78,8 +74,8 @@ class GlobalCache::Gc100
             logger.warn "Attempted to set IR mode on GlobalCache that does not exist: #{index}"
         end
     end
-    
-    
+
+
     def relay_status?(index, options = {}, &block)
         if index < self[:num_relays]
             connector = self[:config][:relay][index]
@@ -89,7 +85,7 @@ class GlobalCache::Gc100
             logger.warn "Attempted to check IO on GlobalCache that does not exist: #{index}"
         end
     end
-    
+
     def io_status?(index, options = {}, &block)
         if index < self[:num_ir]
             connector = self[:config][:ir][index]
@@ -99,13 +95,11 @@ class GlobalCache::Gc100
             logger.warn "Attempted to check IO on GlobalCache that does not exist: #{index}"
         end
     end
-    
-    
-    
+
     def received(data, resolve, command)
         logger.debug "GlobalCache sent #{data}"
         data = data.split(',')
-        
+
         case data[0].to_sym
         when :state, :statechange
             type, index = self[:config][data[1]]
@@ -113,14 +107,14 @@ class GlobalCache::Gc100
         when :device
             address = data[1]
             number, type = data[2].split(' ')        # The response was "device,2,3 RELAY"
-            
+
             type = type.downcase.to_sym
-            
+
             value = @config || {}
             value[type] ||= {}
             current = value[type].length
-            
-            dev_index = 1                
+
+            dev_index = 1
             (current..(current + number.to_i - 1)).each do |index|
                 port = "#{address}:#{dev_index}"
                 value[type][index] = port
@@ -130,18 +124,24 @@ class GlobalCache::Gc100
             @config = value
 
             return :ignore
-            
+
         when :endlistdevices
             self[:num_relays] = @config[:relay].length unless @config[:relay].nil?
+            if @config[:relaysensor]
+                @config[:relaysensor][1] = "1:2"
+                @config[:relaysensor][2] = "1:3"
+                @config[:relaysensor][3] = "1:4"
+                self[:num_relays] = @config[:relaysensor].length
+            end
             self[:num_ir] = @config[:ir].length unless @config[:ir].nil?
             self[:config] = @config
             @config = nil
             self[:config_indexed] = true
-            
+
             return :success
         end
-        
-        
+
+
         if data.length == 1
             error = case data[0].split(' ')[1].to_i
                 when 1 then 'Command was missing the carriage return delimiter'
@@ -168,19 +168,17 @@ class GlobalCache::Gc100
             logger.warn "For command: #{command[:data]}" if command
             return :failed
         end
-        
+
         return :success
     end
-    
-    
+
     protected
-    
-    
+
     def do_send(command, options = {})
         #logger.debug "-- GlobalCache, sending: #{command}"
-        
+
         command << 0x0D
-        
+
         send(command, options).catch do |err|
             # Speed up disconnect
             disconnect
@@ -188,4 +186,3 @@ class GlobalCache::Gc100
         end
     end
 end
-

@@ -270,7 +270,7 @@ class Polycom::RealPresence::GroupSeries
     # camera|delete|directory|home|keyboard|menu|period|pip|preset
     def button_press(*keys)
         keys = keys.map(&:downcase)
-        keys.each { |key| send "button #{key}\r", delay: 400 }
+        keys.each { |key| send "button #{key}\r", delay: 1000 }
     end
 
     def send_DTMF(char)

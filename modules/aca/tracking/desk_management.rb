@@ -31,34 +31,41 @@ class Aca::Tracking::DeskManagement
     })
 
     def on_load
-        on_update
+        system.load_complete do
+            begin
+                on_update
 
-        # Load any manual check-in data
-        @manual_checkin.each_key do |level|
-            logger.debug { "Loading manual desk check-in details for level #{level}" }
+                # Load any manual check-in data
+                @manual_checkin.each_key do |level|
+                    logger.debug { "Loading manual desk check-in details for level #{level}" }
 
-            query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(level)
-            query.each do |detail|
-                details = detail.details
-                details[:level] = detail.level
-                details[:manual_desk] = true
-                details[:clash] = false
+                    query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(level)
+                    query.each do |detail|
+                        details = detail.details
+                        details[:level] = detail.level
+                        details[:manual_desk] = true
+                        details[:clash] = false
 
-                username = details.username
-                self[username] = details
-                @manual_usage[detail.desk_id] = username
-                @manual_users << username
+                        username = details.username
+                        self[username] = details
+                        @manual_usage[detail.desk_id] = username
+                        @manual_users << username
+                    end
+                end
+
+                # Manual checkout times don't need to be checked very often
+                cleanup_manual_checkins
+            rescue => e
+                logger.print_error e
+            ensure
+                schedule.every('2m') do
+                    cleanup_manual_checkins
+                end
+
+                # Should only call once
+                get_usage
             end
         end
-
-        # Manual checkout times don't need to be checked very often
-        cleanup_manual_checkins
-        schedule.every('2m') do
-            cleanup_manual_checkins
-        end
-
-        # Should only call once
-        get_usage
     end
 
     def on_update
@@ -353,6 +360,9 @@ class Aca::Tracking::DeskManagement
                 self[details.reserved_by] = details if details.reserved_by
             end
         end
+    rescue => e
+        logger.print_error e, 'subscribing to unplug events'
+        schedule.in('5s') { subscribe_disconnect }
     end
 
     # Schedules periodic desk usage statistics gathering
