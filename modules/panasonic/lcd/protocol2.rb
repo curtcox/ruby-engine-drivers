@@ -1,3 +1,6 @@
+# encoding: ASCII-8BIT
+# frozen_string_literal: true
+
 require 'digest/md5'
 
 module Panasonic; end
@@ -43,8 +46,8 @@ class Panasonic::LCD::Protocol2
     end
 
     def on_update
-        @username = setting(:username) || 'admin1'
-        @password = setting(:password) || 'panasonic'
+        @username = setting(:username) || 'dispadmin'
+        @password = setting(:password) || '@Panasonic'
     end
 
     def connected
@@ -54,12 +57,12 @@ class Panasonic::LCD::Protocol2
     end
 
     COMMANDS = {
-        power_on: :PON,
-        power_off: :POF,
-        power_query: :QPW,
-        input: :IMS,
-        volume: :AVL,
-        audio_mute: :AMT
+        power_on: 'PON',
+        power_off: 'POF',
+        power_query: 'QPW',
+        input: 'IMS',
+        volume: 'AVL',
+        audio_mute: 'AMT'
     }
     COMMANDS.merge!(COMMANDS.invert)
 
@@ -91,10 +94,11 @@ class Panasonic::LCD::Protocol2
     # Input selection
     #
     INPUTS = {
-        hdmi: :HM1,
-        hdmi2: :HM2,
-        vga: :PC1,
-        dvi: :DV1
+        hdmi1: 'HM1',
+        hdmi: 'HM1',
+        hdmi2: 'HM2',
+        vga: 'PC1',
+        dvi: 'DV1'
     }
     INPUTS.merge!(INPUTS.invert)
 
@@ -129,7 +133,7 @@ class Panasonic::LCD::Protocol2
     end
 
     def volume(level)
-        do_send(:volume, level)
+        do_send(:volume, level.to_s.rjust(3, '0'))
     end
 
     def volume?
@@ -160,41 +164,45 @@ class Panasonic::LCD::Protocol2
 
             # Ignore this as it is not a response
             return :ignore
-        else
-            # Error Response
-            if data[0] == 'E'
-                error = data.to_sym
-                self[:last_error] = ERRORS[error]
+        end
 
-                # Check for busy or timeout
-                if error == :ERR3 || error == :ERR4
-                    logger.warn "Proj busy: #{self[:last_error]}"
-                    return :retry
-                else
-                    logger.error "Proj error: #{self[:last_error]}"
-                    return :abort
-                end
+        # remove the leading 00
+        data = data[2..-1]
+
+        # Error Response (00ER401)
+        if data.start_with?('ER')
+            error = data.to_sym
+            self[:last_error] = ERRORS[error]
+
+            # Check for busy or timeout
+            if error == :ERR3 || error == :ERR4
+                logger.warn "Proj busy: #{self[:last_error]}"
+                return :retry
+            else
+                logger.error "Proj error: #{self[:last_error]}"
+                return :abort
             end
+        end
 
-            data = data[2..-1]
-            resp = data.split(':')
-            cmd = COMMANDS[resp[0].to_sym]
-            val = resp[1]
+        cmd = COMMANDS[data]
+        case cmd
+        when :power_on
+            self[:power] = true
+        when :power_off
+            self[:power] = false
+        end
 
-            case cmd
-            when :power_on
-                self[:power] = true
-            when :power_off
-                self[:power] = false
-            when :power_query
-                self[:power] = val.to_i == 1
-            when :audio_mute
-                self[:audio_mute] = val.to_i == 1
-            when :volume
-                self[:volume] = val.to_i
-            when :input
-                self[:input] = INPUTS[val.to_sym]
-            end
+        return :success unless command
+
+        case command[:name]
+        when :power_query
+            self[:power] = data.to_i == 1
+        when :audio_mute
+            self[:audio_mute] = data.to_i == 1
+        when :volume
+            self[:volume] = data.to_i
+        when :input
+            self[:input] = INPUTS[data]
         end
 
         :success
