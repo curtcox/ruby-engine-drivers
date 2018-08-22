@@ -315,11 +315,11 @@ class Qsc::QSysRemote
                 fads = faders.map { |fad| {Name: fad, Position: level} }
             end
             component_set(component, fads, name: "level_#{faders[0]}").then do
-                component_get(component, faders)
+                component_get(component, faders, priority: 10)
             end
         else
-            reqs = faders.collect { |fad| control_set(fad, level) }
-            reqs.last.then { control_get(faders) }
+            reqs = faders.collect { |fad| control_set(fad, level, name: "level_#{fad}") }
+            reqs.last.then { control_get(faders, priority: 10) }
         end
     end
 
