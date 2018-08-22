@@ -293,6 +293,13 @@ class Aca::Tracking::DeskManagement
         self[username] = details
     end
 
+    def early_cancel_reservation(desk_id)
+        switch_ip, port = @desk_mappings[desk_id]
+        ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.update_reservation(0)
+    rescue => e
+        logger.print_error e, 'removing previous reservation'
+    end
+
     # If people reserve a desk then they may forget to checkout
     #   This cleans up manual reservations when their timeout is expired
     def cleanup_manual_checkins
@@ -387,18 +394,44 @@ class Aca::Tracking::DeskManagement
             level_data
         }.then { |levels|
             manual_desk_ids = @manual_usage.keys
+            updated_users = Set.new
 
             # Apply the settings on thread for performance reasons
             levels.each do |level, desks|
                 desks.users.each do |user|
                     username = user.username
                     manual_checkout(self[username]) if @manual_users.include?(username)
-                    self[username] = user
-                    self[user.reserved_by] = user if user.clash
+
+                    # The user might have multiple machines
+                    if updated_users.include? username
+                        self[user.reserved_by] = user if user.clash
+                    else
+                        self[username] = user
+                        self[user.reserved_by] = user if user.clash
+                        updated_users << username
+                    end
                 end
 
                 desks.reserved_users.each do |user|
-                    self[user.reserved_by] = user
+                    username = user.reserved_by
+
+                    # Check for existing reservations that might need to be cancelled
+                    if updated_users.include? username
+                        details = self[username]
+
+                        # This user is already at a desk so this reservation is not required
+                        if details && (details.connected || details.unplug_time >= user.unplug_time)
+                            early_cancel_reservation(user.desk_id)
+                        elsif details && !details.connected # details.unplug_time < user.unplug_time
+                            early_cancel_reservation(details.desk_id)
+                            self[username] = user
+                        else
+                            self[username] = user
+                        end
+                    else
+                        self[username] = user
+                        updated_users << username
+                    end
                 end
 
                 # Map the used manually checked-in desks
