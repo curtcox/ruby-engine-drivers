@@ -292,7 +292,7 @@ class Aca::Tracking::DeskManagement
     end
 
     def early_cancel_reservation(desk_id)
-        switch_ip, port = @desk_mappings[location]
+        switch_ip, port = @desk_mappings[desk_id]
         ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.update_reservation(0)
     rescue => e
         logger.print_error e, 'removing previous reservation'
