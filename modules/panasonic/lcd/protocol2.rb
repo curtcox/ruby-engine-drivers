@@ -28,7 +28,7 @@ class Panasonic::LCD::Protocol2
     def on_load
         @check_scheduled = false
         self[:power] = false
-        self[:stable_state] = true  # Stable by default (allows manual on and off)
+        self[:power_stable] = true  # Stable by default (allows manual on and off)
 
         # Meta data for inquiring interfaces
         self[:type] = :lcd
@@ -37,7 +37,7 @@ class Panasonic::LCD::Protocol2
         schedule.every('60s') do
             if self[:connected]
                 power?(priority: 0).then do
-                    volume? if self[:power]
+                    muted? if self[:power]
                 end
             end
         end
@@ -70,7 +70,7 @@ class Panasonic::LCD::Protocol2
     # Power commands
     #
     def power(state, opt = nil)
-        self[:stable_state] = false
+        self[:power_stable] = false
         if is_affirmative?(state)
             self[:power_target] = On
             do_send(:power_on, retries: 10, name: :power, delay_on_receive: 8000)
@@ -78,10 +78,9 @@ class Panasonic::LCD::Protocol2
             do_send(:power_query)
         else
             self[:power_target] = Off
-            do_send(:power_off, retries: 10, name: :power, delay_on_receive: 8000).then do
-                schedule.in('10s') { do_send(:power_query) }
-            end
+            do_send(:power_off, retries: 10, name: :power, delay_on_receive: 8000)
             logger.debug "requested to power off"
+            do_send(:power_query)
         end
     end
 
@@ -109,35 +108,43 @@ class Panasonic::LCD::Protocol2
         # Projector doesn't automatically unmute
         unmute if self[:mute]
 
-        do_send(:input, INPUTS[input], retries: 10, delay_on_receive: 2000)
-        logger.debug "requested to switch to: #{input}"
+        logger.debug { "requested to switch to: #{input}" }
+        do_send(:input, INPUTS[input], retries: 10, delay_on_receive: 2000).then do
+            # Can't query current input
+            self[:input] = input
+        end
+    end
 
-        self[:input] = input    # for a responsive UI
+    def input?
+        self[:input]
     end
 
     #
     # Mute Audio
     #
-    def mute(val = true)
+    def mute_audio(val = true)
         actual = val ? 1 : 0
         logger.debug "requested to mute #{val}"
         do_send(:audio_mute, actual)    # Audio + Video
     end
+    alias_method :mute, :mute_audio
 
-    def unmute
+    def unmute_audio
         mute false
     end
+    alias_method :unmute, :unmute_audio
 
     def muted?
         do_send(:audio_mute)
     end
 
     def volume(level)
-        do_send(:volume, level.to_s.rjust(3, '0'))
+        # Unable to query current volume
+        do_send(:volume, level.to_s.rjust(3, '0')).then { self[:volume] = level.to_i }
     end
 
     def volume?
-        do_send(:volume)
+        self[:volume]
     end
 
     ERRORS = {
@@ -188,8 +195,10 @@ class Panasonic::LCD::Protocol2
         case cmd
         when :power_on
             self[:power] = true
+            ensure_power_state
         when :power_off
             self[:power] = false
+            ensure_power_state
         end
 
         return :success unless command
@@ -197,12 +206,9 @@ class Panasonic::LCD::Protocol2
         case command[:name]
         when :power_query
             self[:power] = data.to_i == 1
+            ensure_power_state
         when :audio_mute
             self[:audio_mute] = data.to_i == 1
-        when :volume
-            self[:volume] = data.to_i
-        when :input
-            self[:input] = INPUTS[data]
         end
 
         :success
@@ -211,6 +217,14 @@ class Panasonic::LCD::Protocol2
 
     protected
 
+
+    def ensure_power_state
+        if !self[:power_stable] && self[:power] != self[:power_target]
+            power(self[:power_target])
+        else
+            self[:power_stable] = true
+        end
+    end
 
     def do_send(command, param = nil, **options)
         if param.is_a? Hash
@@ -227,7 +241,8 @@ class Panasonic::LCD::Protocol2
             cmd = "00#{COMMANDS[command]}:#{param}\r"
         end
 
-        send(cmd, options)
+        # Will only accept a single request at a time.
+        send(cmd, options).finally { disconnect }
     end
 
     # Apply the password hash to the command if a password is required
