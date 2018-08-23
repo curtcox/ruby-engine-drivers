@@ -271,6 +271,20 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
+    def get_organisations(owner_email:)
+        query_params = {
+            '$top': 1000
+        }
+        endpoint = "/v1.0/users/#{owner_email}/contacts"
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
+        check_response(request)
+        contacts = JSON.parse(request.body)['value']
+        orgs = []
+        contacts.each do |cont| orgs.push(cont['companyName']) if !cont['companyName'].nil? && !cont['companyName'].empty? end
+        orgs
+    end
+
+
     def get_rooms(q: nil, limit: nil)
         filter_param = "startswith(name,'#{q}') or startswith(address,'#{q}')" if q
         query_params = {
@@ -521,10 +535,17 @@ class Microsoft::Office
 
         # Add the attendees
         attendees.map!{|a|
+            if a[:optional]
+                attendee_type = 'optional'
+            else
+                attendee_type = 'required'
+            end
             { emailAddress: {
                     address: a[:email],
                     name: a[:name]
-            }   }
+            },
+                type: attendee_type
+            }
         }
 
         # Add the room as an attendee
@@ -653,18 +674,11 @@ class Microsoft::Office
 
         # Let's assume that the request has the current user and room as an attendee already
         event[:attendees] = attendees.map{|a|
-            if a[:optional]
-                attendee_type = 'optional'
-            else
-                attendee_type = 'required'
-            end
-            attendee_type = a[:option]
             {
                 emailAddress: {
                     address: a[:email],
                     name: a[:name]
-                },
-                type: attendee_type
+                }
             }
         } if attendees
 
