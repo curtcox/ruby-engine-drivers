@@ -281,7 +281,7 @@ class Microsoft::Office
         contacts = JSON.parse(request.body)['value']
         orgs = []
         contacts.each do |cont| orgs.push(cont['companyName']) if !cont['companyName'].nil? && !cont['companyName'].empty? end
-        orgs
+        orgs.uniq.compact
     end
 
 
