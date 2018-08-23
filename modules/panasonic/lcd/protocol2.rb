@@ -6,6 +6,10 @@ require 'digest/md5'
 module Panasonic; end
 module Panasonic::LCD; end
 
+# Documentation:
+# * Protocol: https://aca.im/driver_docs/Panasonic/lcd_protocol2.pdf
+# * Commands: https://aca.im/driver_docs/Panasonic/panasonic_commands.pdf
+
 class Panasonic::LCD::Protocol2
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
@@ -33,10 +37,7 @@ class Panasonic::LCD::Protocol2
         self[:type] = :lcd
 
         # The projector drops the connection when there is no activity
-        schedule.every('60s') do
-            do_poll if self[:connected]
-        end
-
+        schedule.every('60s') { do_poll if self[:connected] }
         on_update
     end
 
@@ -57,6 +58,7 @@ class Panasonic::LCD::Protocol2
         power_query: 'QPW',
         input: 'IMS',
         volume: 'AVL',
+        volume_query: 'QAV',
         audio_mute: 'AMT'
     }
     COMMANDS.merge!(COMMANDS.invert)
@@ -139,12 +141,15 @@ class Panasonic::LCD::Protocol2
     end
 
     def volume?
-        self[:volume]
+        do_send :volume_query
     end
 
     def do_poll
         power?(priority: 0).then do
-            muted? if self[:power]
+            if self[:power]
+                muted?
+                volume?
+            end
         end
     end
 
@@ -172,7 +177,10 @@ class Panasonic::LCD::Protocol2
 
             # We're actually handling the connection check performed by makebreak
             # This ensure that the connection is closed
-            return :abort unless command
+            if command.nil?
+                disconnect
+                return :success
+            end
 
             # Ignore this as it is not a response, we can now make a request
             return :ignore
@@ -211,6 +219,8 @@ class Panasonic::LCD::Protocol2
                 ensure_power_state
             when :audio_mute
                 self[:audio_mute] = data.to_i == 1
+            when :volume_query
+                self[:volume] = data.to_i
             end
         end
 
