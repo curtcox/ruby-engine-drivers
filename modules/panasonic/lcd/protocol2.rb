@@ -26,7 +26,6 @@ class Panasonic::LCD::Protocol2
     wait_response timeout: 5000, retries: 3
 
     def on_load
-        @check_scheduled = false
         self[:power] = false
         self[:power_stable] = true  # Stable by default (allows manual on and off)
 
@@ -35,11 +34,7 @@ class Panasonic::LCD::Protocol2
 
         # The projector drops the connection when there is no activity
         schedule.every('60s') do
-            if self[:connected]
-                power?(priority: 0).then do
-                    muted? if self[:power]
-                end
-            end
+            do_poll if self[:connected]
         end
 
         on_update
@@ -147,6 +142,12 @@ class Panasonic::LCD::Protocol2
         self[:volume]
     end
 
+    def do_poll
+        power?(priority: 0).then do
+            muted? if self[:power]
+        end
+    end
+
     ERRORS = {
         ERR1: '1: Undefined control command',
         ERR2: '2: Out of parameter range',
@@ -169,7 +170,11 @@ class Panasonic::LCD::Protocol2
                 @pass = Digest::MD5.hexdigest(@pass)
             end
 
-            # Ignore this as it is not a response
+            # We're actually handling the connection check performed by makebreak
+            # This ensure that the connection is closed
+            return :abort unless command
+
+            # Ignore this as it is not a response, we can now make a request
             return :ignore
         end
 
@@ -199,16 +204,14 @@ class Panasonic::LCD::Protocol2
         when :power_off
             self[:power] = false
             ensure_power_state
-        end
-
-        return :success unless command
-
-        case command[:name]
-        when :power_query
-            self[:power] = data.to_i == 1
-            ensure_power_state
-        when :audio_mute
-            self[:audio_mute] = data.to_i == 1
+        else
+            case command[:name]
+            when :power_query
+                self[:power] = data.to_i == 1
+                ensure_power_state
+            when :audio_mute
+                self[:audio_mute] = data.to_i == 1
+            end
         end
 
         :success
@@ -234,6 +237,7 @@ class Panasonic::LCD::Protocol2
 
         # Default to the command name if name isn't set
         options[:name] = command unless options[:name]
+        options[:disconnect] = true
 
         if param.nil?
             cmd = "00#{COMMANDS[command]}\r"
@@ -242,7 +246,7 @@ class Panasonic::LCD::Protocol2
         end
 
         # Will only accept a single request at a time.
-        send(cmd, options).finally { disconnect }
+        send(cmd, options)
     end
 
     # Apply the password hash to the command if a password is required
