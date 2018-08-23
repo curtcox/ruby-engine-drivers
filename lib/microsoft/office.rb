@@ -653,7 +653,6 @@ class Microsoft::Office
 
         # Let's assume that the request has the current user and room as an attendee already
         event[:attendees] = attendees.map{|a|
-            @item.property = params[:property] ? true : false
             if a[:optional]
                 attendee_type = 'optional'
             else
