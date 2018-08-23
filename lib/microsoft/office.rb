@@ -265,7 +265,7 @@ class Microsoft::Office
         end
 
 
-        endpoint = "/v1.0/users/#{owner_email}"
+        endpoint = "/v1.0/users/#{owner_email}/contacts"
         request = graph_request(request_method: 'post', endpoint: endpoint, data: contact_data, password: @delegated)
         check_response(request)
         JSON.parse(request.body)
