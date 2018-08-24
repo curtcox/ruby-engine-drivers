@@ -193,12 +193,13 @@ class Microsoft::Office
             queries = q.split(" ")
             filter_params = []
             queries.each do |q|
-                filter_params.push("(startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))")
+                filter_params.push("(accountEnabled eq true) and (startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))")
             end
             filter_param = filter_params.join(" or ")
         else
-            filter_param = "startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}')" if q
+            filter_param = "(accountEnabled eq true) and (startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))" if q
         end
+        filter_param = "accountEnabled eq true" if q.nil?
         query_params = {
             '$filter': filter_param,
             '$top': limit
@@ -239,6 +240,7 @@ class Microsoft::Office
         output_contacts = []
         contacts.each do |contact| 
             output_format = {}
+            output_format[:id] = contact['id']
             output_format[:first_name] = contact['givenName']
             output_format[:last_name] = contact['surname']
             output_format[:phone] = contact['businessPhones'][0]
