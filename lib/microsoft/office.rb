@@ -263,7 +263,7 @@ class Microsoft::Office
 
         # Only add these fields if passed in
         contact_data[:businessPhones] = [ phone ] if phone
-        contact_data[:organisationName] = organisation if organisation
+        contact_data[:companyName] = organisation if organisation
         other.each do |field, value|
             contact_data[field.to_sym] = value
         end
