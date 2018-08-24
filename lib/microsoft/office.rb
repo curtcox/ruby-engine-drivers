@@ -236,7 +236,7 @@ class Microsoft::Office
     end
 
     def format_contacts(contacts)
-        output_contacts = {}
+        output_contacts = []
         contacts.each do |contact| 
             output_format = {}
             output_format[:first_name] = contact['givenName']
