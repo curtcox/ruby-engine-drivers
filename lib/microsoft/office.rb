@@ -239,7 +239,7 @@ class Microsoft::Office
         endpoint = "/v1.0/users/#{owner_email}/contacts"
         query_params = {
             '$top': 1,
-            '$filter': "emailAddresses/any(a:a/address eq  #{contact_email})"
+            '$filter': "emailAddresses/any(a:a/address eq  '#{contact_email}')"
         }
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
