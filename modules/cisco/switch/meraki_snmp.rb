@@ -186,13 +186,21 @@ class Cisco::Switch::MerakiSNMP
 
         # The snooping table TODO:: need to limit this to 5 API requests a second
         # See: https://dashboard.meraki.com/api_docs#clients
-        client = UV::HttpEndpoint.new("https://api.meraki.com", {
+        http_options = {
             headers: {
                 'X-Cisco-Meraki-API-Key' => @api_key,
                 'Content-Type' => 'application/json'
             }
-        })
-        resp = client.get(path: "/api/v0/devices/#{@serial}/clients?timespan=60").value
+        }
+        client = UV::HttpEndpoint.new("https://api.meraki.com", http_options)
+        resp = client.get(path: "/api/v0/devices/#{@serial}/clients?timespan=150").value
+
+        # TODO:: save the domain here for further requests and expire it every 10min
+        if resp.status == 302
+            loc = resp[:Location]
+            client = UV::HttpEndpoint.new(loc, http_options)
+            resp = client.get(path: "/#{loc.split('/', 4)[-1]}").value
+        end
         raise "error requesting client list #{resp.status}" unless resp.status == 200
         entries = JSON.parse(resp.body, symbolize_names: true)
         logger.debug { "found #{entries.length} snooping entries" }
