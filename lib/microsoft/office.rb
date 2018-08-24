@@ -232,7 +232,21 @@ class Microsoft::Office
         endpoint = "/v1.0/users/#{owner_email}/contacts"
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
-        JSON.parse(request.body)['value']
+        return format_contacts(JSON.parse(request.body)['value'])
+    end
+
+    def format_contacts(contacts)
+        output_contacts = {}
+        contacts.each do |contact| 
+            output_format = {}
+            output_format[:first_name] = contact['givenName']
+            output_format[:last_name] = contact['surname']
+            output_format[:phone] = contact['businessPhones'][0]
+            output_format[:organisation] = contact['companyName']
+            output_format[:email] = contact['emailAddresses'][0]['address']
+            output_contacts.push(output_format)
+        end
+        output_contacts
     end
 
     def get_contact(owner_email:, contact_email:)
