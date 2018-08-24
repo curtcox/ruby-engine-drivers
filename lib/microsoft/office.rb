@@ -246,6 +246,10 @@ class Microsoft::Office
         JSON.parse(request.body)['value']
     end
 
+    def has_contact(owner_email:, contact_email:)
+        return get_contact(owner_email: owner_email, contact_email: contact_email).length > 0
+    end
+
     def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, company:nil, other:{})
         # This data is required so add it unconditionally
         contact_data = {
