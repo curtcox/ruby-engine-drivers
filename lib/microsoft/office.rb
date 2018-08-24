@@ -250,7 +250,7 @@ class Microsoft::Office
         return get_contact(owner_email: owner_email, contact_email: contact_email).length > 0
     end
 
-    def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, company:nil, other:{})
+    def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, organisation:nil, other:{})
         # This data is required so add it unconditionally
         contact_data = {
             givenName: first_name,
@@ -263,7 +263,7 @@ class Microsoft::Office
 
         # Only add these fields if passed in
         contact_data[:businessPhones] = [ phone ] if phone
-        contact_data[:companyName] = company if company
+        contact_data[:organisationName] = organisation if organisation
         other.each do |field, value|
             contact_data[field.to_sym] = value
         end
