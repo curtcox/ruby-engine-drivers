@@ -232,7 +232,7 @@ class Microsoft::Office
         endpoint = "/v1.0/users/#{owner_email}/contacts"
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
-        JSON.parse(request.body)
+        JSON.parse(request.body)['value']
     end
 
     def get_contact(owner_email:, contact_email:)
@@ -243,7 +243,7 @@ class Microsoft::Office
         }
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
-        JSON.parse(request.body)
+        JSON.parse(request.body)['value']
     end
 
     def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, company:nil, other:{})
