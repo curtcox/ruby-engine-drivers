@@ -9,6 +9,9 @@ require 'aca/trap_dispatcher'
 module Cisco; end
 module Cisco::Switch; end
 
+# The request rate limiter
+load File.join(__dir__, '../meraki_dashboard.rb')
+
 ::Orchestrator::DependencyManager.load('Aca::Tracking::SwitchPort', :model, :force)
 ::Aca::Tracking::SwitchPort.ensure_design_document!
 
@@ -80,7 +83,9 @@ class Cisco::Switch::MerakiSNMP
         @remote_address = remote_address.downcase
         @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
 
+        @meraki_api = ::Cisco::MerakiDashboard.instance
         @api_key = setting(:meraki_api_key)
+
         self[:name] = @switch_name = setting(:switch_name)
         self[:ip_address] = @remote_address
         self[:building] = setting(:building)
@@ -184,17 +189,8 @@ class Cisco::Switch::MerakiSNMP
 
         logger.debug '==> extracting snooping table <=='
 
-        # The snooping table TODO:: need to limit this to 5 API requests a second
         # See: https://dashboard.meraki.com/api_docs#clients
-        client = UV::HttpEndpoint.new("https://api.meraki.com", {
-            headers: {
-                'X-Cisco-Meraki-API-Key' => @api_key,
-                'Content-Type' => 'application/json'
-            }
-        })
-        resp = client.get(path: "/api/v0/devices/#{@serial}/clients?timespan=60").value
-        raise "error requesting client list #{resp.status}" unless resp.status == 200
-        entries = JSON.parse(resp.body, symbolize_names: true)
+        entries = @meraki_api.new_request(@api_key, "https://api.meraki.com/api/v0/devices/#{@serial}/clients?timespan=150")
         logger.debug { "found #{entries.length} snooping entries" }
 
         checked = Set.new
