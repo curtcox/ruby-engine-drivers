@@ -262,6 +262,13 @@ class Microsoft::Office
         JSON.parse(request.body)['value']
     end
 
+    def get_contact_by_id(owner_email:, contact_id:)
+        endpoint = "/v1.0/users/#{owner_email}/contacts/#{contact_id}"
+        request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
+        check_response(request)
+        JSON.parse(request.body)['value']
+    end
+
     def has_contact(owner_email:, contact_email:)
         return get_contact(owner_email: owner_email, contact_email: contact_email).length > 0
     end
