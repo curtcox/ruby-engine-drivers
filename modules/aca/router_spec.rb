@@ -61,7 +61,8 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
         {
             "Display_1 as Left_LCD": {
                 "hdmi": "Switcher_1__1",
-                "hdmi2": "SubSwitchA__1"
+                "hdmi2": "SubSwitchA__1",
+                "hdmi3": "Receiver_1"
             },
             "Display_2 as Right_LCD": {
                 "hdmi": "Switcher_1__2",
@@ -76,6 +77,12 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
             "Switcher_2 as SubSwitchB": {
                 "3": "e",
                 "4": "f"
+            },
+            "Receiver_1": {
+                "hdbaset": "Transmitter_1"
+            },
+            "Transmitter_1": {
+                "hdmi": "h"
             }
         }
     JSON
@@ -84,7 +91,8 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
     expect(normalised_map).to eq(
         'Display_1 as Left_LCD' => {
             hdmi: 'Switcher_1__1',
-            hdmi2: 'SubSwitchA__1'
+            hdmi2: 'SubSwitchA__1',
+            hdmi3: 'Receiver_1'
         },
         'Display_2 as Right_LCD' => {
             hdmi: 'Switcher_1__2',
@@ -102,21 +110,30 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
         'Switcher_2 as SubSwitchB' => {
             3 => 'e',
             4 => 'f'
+        },
+        'Receiver_1' => {
+            hdbaset: 'Transmitter_1'
+        },
+        'Transmitter_1' => {
+            hdmi: 'h'
         }
     )
 
     mods = SignalGraph.extract_mods!(normalised_map)
     expect(mods).to eq(
-        'Left_LCD'   => 'Display_1',
-        'Right_LCD'  => 'Display_2',
-        'Switcher_1' => 'Switcher_1',
-        'SubSwitchA' => 'Switcher_2',
-        'SubSwitchB' => 'Switcher_2'
+        'Left_LCD'      => 'Display_1',
+        'Right_LCD'     => 'Display_2',
+        'Switcher_1'    => 'Switcher_1',
+        'SubSwitchA'    => 'Switcher_2',
+        'SubSwitchB'    => 'Switcher_2',
+        'Receiver_1'    => 'Receiver_1',
+        'Transmitter_1' => 'Transmitter_1'
     )
     expect(normalised_map).to eq(
         Left_LCD: {
             hdmi: 'Switcher_1__1',
-            hdmi2: 'SubSwitchA__1'
+            hdmi2: 'SubSwitchA__1',
+            hdmi3: 'Receiver_1'
         },
         Right_LCD: {
             hdmi: 'Switcher_1__2',
@@ -134,6 +151,12 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
         SubSwitchB: {
             3 => 'e',
             4 => 'f'
+        },
+        Receiver_1: {
+            hdbaset: 'Transmitter_1'
+        },
+        Transmitter_1: {
+            hdmi: 'h'
         }
     )
 
@@ -141,7 +164,7 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     expect(graph.sources).to contain_exactly(:Left_LCD, :Right_LCD)
 
-    expect(graph.sinks).to contain_exactly(*(:a..:g).to_a)
+    expect(graph.sinks).to contain_exactly(*(:a..:h).to_a)
 
     routes = graph.sources.map { |id| [id, graph.dijkstra(id)] }.to_h
     expect(routes[:Left_LCD].distance_to[:a]).to be(2)
@@ -203,4 +226,10 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
 
     exec(:devices_between, :c, :Left_LCD)
     expect(result).to contain_exactly(:Switcher_2, :Display_1)
+
+    exec(:upstream_devices_of, :Left_LCD, on_input: :hdmi3)
+    expect(result).to contain_exactly(:Receiver_1, :Transmitter_1)
+
+    exec(:upstream_devices_of, :Left_LCD)
+    expect(result).to be_empty
 end
