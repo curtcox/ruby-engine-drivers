@@ -152,11 +152,11 @@ class Aca::Router
         end
 
         # Then walk the graph and accumulate devices until we reach a branch
-        edges = signal_graph[initial.target].edges
-        until edges.empty? || edges.size > 1
-            _, edge = edges.first
-            device_chain << edge.device
-            edges = signal_graph[edge.target].edges
+        successors = [initial.target]
+        while successors.size == 1
+            node = successors.first
+            device_chain << node
+            successors = signal_graph.successors node
         end
 
         device_chain

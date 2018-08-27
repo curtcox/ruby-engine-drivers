@@ -228,7 +228,7 @@ Orchestrator::Testing.mock_device 'Aca::Router' do
     expect(result).to contain_exactly(:Switcher_2, :Display_1)
 
     exec(:upstream_devices_of, :Left_LCD, on_input: :hdmi3)
-    expect(result).to contain_exactly(:Receiver_1, :Transmitter_1)
+    expect(result).to contain_exactly(:Receiver_1, :Transmitter_1, :h)
 
     exec(:upstream_devices_of, :Left_LCD)
     expect(result).to be_empty
