@@ -485,7 +485,8 @@ class Aca::Router::SignalGraph
     end
 
     def outdegree(id)
-        outgoing_edges(id).size
+        id = id.to_sym
+        nodes[id].edges.size
     end
 
     def dijkstra(id)
