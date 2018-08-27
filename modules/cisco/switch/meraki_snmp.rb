@@ -9,6 +9,9 @@ require 'aca/trap_dispatcher'
 module Cisco; end
 module Cisco::Switch; end
 
+# The request rate limiter
+load File.join(__dir__, '../meraki_dashboard.rb')
+
 ::Orchestrator::DependencyManager.load('Aca::Tracking::SwitchPort', :model, :force)
 ::Aca::Tracking::SwitchPort.ensure_design_document!
 
@@ -17,26 +20,37 @@ class Cisco::Switch::MerakiSNMP
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
 
-    descriptive_name 'Cisco Meraki SNMP'
+    descriptive_name 'Cisco Meraki IP Snooping'
     generic_name :Snooping
     udp_port 161
 
     default_settings({
+        meraki_api_key: '5ec63c3058acd56b4a4',
         building: 'building_code',
         reserve_time: 5.minutes.to_i,
         snmp_options: {
-            version: "v2c",
+            version: 'v2c',
             community: 'public',
             timeout: 4
+        },
+        # Snooping takes ages on large switches
+        ignore_macs: {
+            "Cisco Phone Dock": "7001b5"
         }
     })
 
     def on_load
         # flag to indicate if processing is occuring
         @if_mappings = {}
+        @scheduled_status_query = true
+
+        # Interfaces that indicate they have a device connected
+        @check_interface = ::Set.new
 
         # Interfaces that we know are connected to the network
         @connected_interfaces = ::Set.new
+
+        @reserved_interface = ::Set.new
         self[:interfaces] = [] # This will be updated via query
 
         begin
@@ -50,7 +64,10 @@ class Cisco::Switch::MerakiSNMP
                 self[interface] = details
 
                 if details.connected
+                    @check_interface << interface
                     @connected_interfaces << interface
+                elsif details.reserved
+                    @reserved_interface << interface
                 end
             end
         rescue => error
@@ -58,17 +75,23 @@ class Cisco::Switch::MerakiSNMP
         end
 
         self[:interfaces] = @connected_interfaces.to_a
-        self[:reserved] = []
+        self[:reserved] = @reserved_interface.to_a
     end
 
     def on_update
         new_client if @resolved_ip
         @remote_address = remote_address.downcase
+        @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
+
+        @meraki_api = ::Cisco::MerakiDashboard.instance
+        @api_key = setting(:meraki_api_key)
 
         self[:name] = @switch_name = setting(:switch_name)
         self[:ip_address] = @remote_address
         self[:building] = setting(:building)
         self[:level] = setting(:level)
+
+        @reserve_time = setting(:reserve_time) || 0
     end
 
     def on_unload
@@ -145,15 +168,109 @@ class Cisco::Switch::MerakiSNMP
         case state
         when :up
             logger.debug { "Notify Up: #{interface}" }
+            remove_reserved(interface)
+            @check_interface << interface
             @connected_interfaces << interface
         when :down
             logger.debug { "Notify Down: #{interface}" }
             # We are no longer interested in this interface
             @connected_interfaces.delete(interface)
+            @check_interface.delete(interface)
             remove_lookup(interface)
+            self[:reserved] = @reserved_interface.to_a
         end
 
         self[:interfaces] = @connected_interfaces.to_a
+    end
+
+    def query_snooping_bindings
+        return :not_ready unless @client && @serial
+        return :currently_processing if @processing
+
+        logger.debug '==> extracting snooping table <=='
+
+        # See: https://dashboard.meraki.com/api_docs#clients
+        entries = @meraki_api.new_request(@api_key, "https://api.meraki.com/api/v0/devices/#{@serial}/clients?timespan=150")
+        logger.debug { "found #{entries.length} snooping entries" }
+
+        checked = Set.new
+        checked_interfaces = Set.new
+        entries.each do |entry|
+            interface = @if_mappings[entry[:switchport].to_i]
+
+            next unless @check_interface.include?(interface)
+            next if checked_interfaces.include?(interface)
+            checked_interfaces << interface
+
+            mac = entry[:mac]
+            ip = entry[:ip]
+            next unless mac && ip
+            mac = mac.gsub(':', '').downcase
+
+            next unless ::IPAddress.valid?(ip)
+            next if @ignore_macs.include?(mac[0..5])
+
+            checked << interface
+
+            # NOTE:: Same as snooping_catalyst.rb
+            iface = self[interface] || ::Aca::Tracking::StaticDetails.new
+
+            if iface.ip != ip || iface.mac != mac
+                logger.debug { "New connection on #{interface} with #{ip}: #{mac}" }
+
+                # NOTE:: Same as username found
+                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                details.connected(mac, @reserve_time, {
+                    device_ip: ip,
+                    switch_ip: @remote_address,
+                    hostname: @hostname,
+                    switch_name: @switch_name,
+                    interface: interface
+                })
+
+                # ip, mac, reserved?, clash?
+                self[interface] = details.details
+
+            elsif iface.username.nil?
+                username = ::Aca::Tracking::SwitchPort.bucket.get("macuser-#{mac}", quiet: true)
+                if username
+                    logger.debug { "Found #{username} at #{ip}: #{mac}" }
+
+                    # NOTE:: Same as new connection
+                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                    details.connected(mac, @reserve_time, {
+                        device_ip: ip,
+                        switch_ip: @remote_address,
+                        hostname: @hostname,
+                        switch_name: @switch_name,
+                        interface: interface
+                    })
+
+                    # ip, mac, reserved?, clash?
+                    self[interface] = details.details
+                end
+
+            elsif !iface.reserved
+                # We don't know the user who is at this desk...
+                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
+                reserved = details.check_for_user(@reserve_time)
+                self[interface] = details.details if reserved
+
+            elsif iface.clash
+                # There was a reservation clash - is there still a clash?
+                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
+                details.check_for_user(@reserve_time)
+                self[interface] = details.details unless details.clash?
+            end
+        end
+
+        @connected_interfaces = checked
+        self[:interfaces] = checked.to_a
+        @scheduled_status_query = checked.empty?
+        (@check_interface - checked).each { |iface| remove_lookup(iface) }
+        self[:reserved] = @reserved_interface.to_a
+
+        nil
     end
 
     # Index short name lookup
@@ -167,11 +284,16 @@ class Cisco::Switch::MerakiSNMP
 
         client = @client
         mappings = {}
+        serial = nil
         @processing = task do
             client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
                 oid_code = oid_code[23..-1]
-                mappings[oid_code.to_i] = value.downcase.gsub(' ', '')
+                mappings[oid_code.to_i] = value.downcase
             end
+
+            # Both 1.3.6.1.2.1.47.1.1.1.1.11.1 and 1.3.6.1.2.1.47.1.1.1.1.11.2000
+            # Seem to hold the serial number
+            serial = client.get(oid: '1.3.6.1.2.1.47.1.1.1.1.11.1').strip
         end
         @processing.finally {
             @processing = nil
@@ -179,6 +301,7 @@ class Cisco::Switch::MerakiSNMP
         }
         @processing.then {
             logger.debug { "<== found #{mappings.length} ports ==>" }
+            @serial = self[:serial] = serial if serial
             if mappings.empty?
                 @scheduled_if_query = true
             else
@@ -193,6 +316,7 @@ class Cisco::Switch::MerakiSNMP
         return :currently_processing if @processing
 
         logger.debug '==> querying interface status <=='
+        @scheduled_status_query = false
 
         client = @client
         if_mappings = @if_mappings
@@ -206,29 +330,31 @@ class Cisco::Switch::MerakiSNMP
 
                 case value
                 when 1 # up
-                    next if @connected_interfaces.include?(interface)
+                    next if @check_interface.include?(interface)
                     logger.debug { "Interface Up: #{interface}" }
-                    if !@connected_interfaces.include?(interface)
-                        @connected_interfaces << interface
+                    if !@check_interface.include?(interface)
+                        remove_interfaces << interface
+                        @check_interface << interface
                     end
                 when 2 # down
-                    next unless @connected_interfaces.include?(interface)
+                    next unless @check_interface.include?(interface)
                     logger.debug { "Interface Down: #{interface}" }
                     # We are no longer interested in this interface
-                    @connected_interfaces.delete(interface)
+                    @check_interface.delete(interface)
+                    remove_interfaces << interface
                 else
                     next
                 end
             end
         end
         @processing.finally {
-            client.close if client != @client
             @processing = nil
+            client.close if client != @client
         }
         @processing.then {
             logger.debug '<== finished querying interfaces ==>'
-            remove_interfaces.each { |iface| remove_lookup(interface) }
-            self[:interfaces] = @connected_interfaces.to_a
+            remove_interfaces.each { |iface| remove_reserved(iface) }
+            self[:reserved] = @reserved_interface.to_a
         }.value
     end
 
@@ -239,9 +365,17 @@ class Cisco::Switch::MerakiSNMP
         end
         logger.debug 'Querying for connected devices'
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
-        query_interface_status
-    ensure
+        query_interface_status if @scheduled_status_query
+        query_snooping_bindings
         rebuild_client
+    rescue => e
+        rebuild_client
+        @scheduled_status_query = true
+        raise e
+    end
+
+    def update_reservations
+        check_reservations
     end
 
 
@@ -265,7 +399,10 @@ class Cisco::Switch::MerakiSNMP
         # Also expires any desk reservations every 1min
         schedule.every(57000 + rand(5000)) do
             query_connected_devices
+            check_reservations if @reserve_time > 0
         end
+
+        schedule.every('10m') { @scheduled_status_query = true }
 
         # There is a possibility that these will change on switch reboot
         schedule.every('15m') { @scheduled_if_query = true }
@@ -285,11 +422,40 @@ class Cisco::Switch::MerakiSNMP
         # Update the status of the switch port
         model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
         if model
-            model.disconnected
+            notify = model.disconnected
             details = model.details
             self[interface] = details
+
+            # notify user about reserving their desk
+            if notify
+                self[:disconnected] = details
+                @reserved_interface << interface
+            end
         else
             self[interface] = nil
         end
+    end
+
+    def remove_reserved(interface)
+        return unless @reserved_interface.include? interface
+        @reserved_interface.delete interface
+        self[:reserved] = @reserved_interface.to_a
+    end
+
+    def check_reservations
+        remove = []
+
+        # Check if the interfaces are still reserved
+        @reserved_interface.each do |interface|
+            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
+            remove << interface unless details.reserved?
+            self[interface] = details.details
+        end
+
+        # Remove them from the reserved list if not
+        return unless remove.present?
+
+        @reserved_interface -= remove
+        self[:reserved] = @reserved_interface.to_a
     end
 end
