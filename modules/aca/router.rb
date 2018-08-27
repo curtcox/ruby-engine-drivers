@@ -378,7 +378,7 @@ class Aca::Router::SignalGraph
         def initialize(id)
             @id = id.to_sym
             @edges = Hash.new do |_, other_id|
-                raise ArgumentError, "No edge from \"#{id}\" to \"#{other_id}\""
+                raise ArgumentError, "No edge from \"#{@id}\" to \"#{other_id}\""
             end
         end
 
