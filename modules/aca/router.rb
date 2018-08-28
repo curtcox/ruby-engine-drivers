@@ -55,6 +55,10 @@ class Aca::Router
     # Multiple sources can be specified simultaneously, or if connecting a
     # single source to a single destination, Ruby's implicit hash syntax can be
     # used to let you express it neatly as `connect source => sink`.
+    #
+    # A promise is returned that will resolve when all device interactions have
+    # completed. This will be fullfilled with the applied signal map and a
+    # boolean - true if this was a complete recall, or false if partial.
     def connect(signal_map, atomic: false, force: false)
         # Convert the signal map to a nested hash of routes
         # { source => { dest => [edges] } }
@@ -70,18 +74,20 @@ class Aca::Router
         switch.then do |success, failed|
             if failed.empty?
                 logger.debug 'signal map activated'
-                edge_map.transform_values(&:keys)
+                recalled_map = edge_map.transform_values(&:keys)
+                [recalled_map, true]
 
             elsif success.empty?
                 thread.reject 'failed to activate, devices untouched'
 
             else
                 logger.warn 'signal map partially activated'
-                edge_map.transform_values do |routes|
+                recalled_map = edge_map.transform_values do |routes|
                     routes.each_with_object([]) do |(output, edges), completed|
                         completed << output if success.superset? Set.new(edges)
                     end
                 end
+                [recalled_map, false]
             end
         end
     end
