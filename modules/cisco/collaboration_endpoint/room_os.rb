@@ -159,10 +159,14 @@ class Cisco::CollaborationEndpoint::RoomOs
     def send_xcommand(command, args = {})
         request = Action.xcommand command, args
 
-        # FIXME: commands are currently unnamed. Need to add a way of tagging
-        # related commands for better queue management.
+        # Multi-arg commands (external source registration, UI interaction etc)
+        # all need to be properly queued and sent without be overriden. In
+        # these cases, leave the outgoing commands unnamed.
+        opts = {}
+        opts[:name] = command if args.empty?
+        opts[:name] = "#{command} #{args.keys.first}" if args.size == 1
 
-        do_send request do |response|
+        do_send request, **opts do |response|
             # The result keys are a little odd: they're a concatenation of the
             # last two command elements and 'Result', unless the command
             # failed in which case it's just 'Result'.
