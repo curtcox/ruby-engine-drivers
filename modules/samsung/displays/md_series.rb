@@ -85,7 +85,14 @@ DESC
         :hard_off => 0x11,      # Completely powers off
         :panel_mute => 0xF9,    # Screen blanking / visual mute
         :volume => 0x12,
+        :contrast => 0x24,
         :brightness => 0x25,
+        :sharpness => 0x26,
+        :colour => 0x27,
+        :tint => 0x28,
+        :red_gain => 0x29,
+        :green_gain => 0x2A,
+        :blue_gain => 0x2B,
         :input => 0x14,
         :mode => 0x18,
         :size => 0x19,
@@ -209,12 +216,6 @@ DESC
         do_send(:volume, vol, options)
     end
 
-    def brightness(val, options = {})
-        val = in_range(val.to_i, 100)
-        do_send(:brightness, val, options)
-    end
-
-
     #
     # Emulate mute
     def mute_audio(val = true)
@@ -292,13 +293,40 @@ DESC
     end
 
 
+    #
+    # Colour control
+    [
+        :contrast,
+        :brightness,
+        :sharpness,
+        :colour,
+        :tint,
+        :red_gain,
+        :green_gain,
+        :blue_gain
+    ].each do |command|
+        define_method command do |val, **options|
+            val = in_range(val.to_i, 100)
+            do_send(command, val, options)
+        end
+    end
+
+
     protected
 
 
     DEVICE_SETTINGS = [
         :network_standby,
         :auto_off_timer,
-        :auto_power
+        :auto_power,
+        :contrast,
+        :brightness,
+        :sharpness,
+        :colour,
+        :tint,
+        :red_gain,
+        :green_gain,
+        :blue_gain
     ]
     #
     # Push any configured device settings
