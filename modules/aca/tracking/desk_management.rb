@@ -400,8 +400,16 @@ class Aca::Tracking::DeskManagement
                     username = user.username
                     manual_checkout(self[username]) if @manual_users.include?(username)
 
-                    # The user might have multiple machines
+                    # The user might have multiple machines or an existing reservation
                     if updated_users.include? username
+                        details = self[username]
+                        if !details.connected || details.username != username
+                            early_cancel_reservation(details.desk_id)
+                            self[username] = user
+                        elsif user.connected_at > details.connected_at
+                            # Display the latest connection as the user is most likely at this location
+                            self[username] = user
+                        end
                         self[user.reserved_by] = user if user.clash
                     else
                         self[username] = user
@@ -418,12 +426,10 @@ class Aca::Tracking::DeskManagement
                         details = self[username]
 
                         # This user is already at a desk so this reservation is not required
-                        if details && (details.connected || details.unplug_time >= user.unplug_time)
+                        if details && ((details.connected && details.username == username) || (details.unplug_time >= user.unplug_time))
                             early_cancel_reservation(user.desk_id)
-                        elsif details && !details.connected # details.unplug_time < user.unplug_time
+                        else # details.unplug_time < user.unplug_time
                             early_cancel_reservation(details.desk_id)
-                            self[username] = user
-                        else
                             self[username] = user
                         end
                     else
