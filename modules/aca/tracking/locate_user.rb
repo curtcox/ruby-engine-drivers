@@ -63,7 +63,7 @@ class Aca::Tracking::LocateUser
 
         @blacklist = Set.new((setting(:ignore_vendors) || {}).values)
         @ignore_hosts = Set.new((setting(:ignore_hostnames) || {}).values)
-        @accept_hosts = Set.new((setting(:accept_hosts) || {}).values)
+        @accept_hosts = Set.new((setting(:accept_hostnames) || {}).values)
         @warnings ||= {}
     end
 
