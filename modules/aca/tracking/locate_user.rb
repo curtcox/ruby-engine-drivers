@@ -157,7 +157,10 @@ class Aca::Tracking::LocateUser
                 end
             end
 
-            return if ignore_host
+            if ignore_host
+                logger.debug { "ignoring hostname #{hostname} due to filter" }
+                return
+            end
             save_hostname_mapping(domain, login, hostname) if self[hostname] != login
         end
 
