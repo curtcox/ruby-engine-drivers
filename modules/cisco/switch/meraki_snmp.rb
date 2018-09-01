@@ -33,7 +33,6 @@ class Cisco::Switch::MerakiSNMP
             community: 'public',
             timeout: 4
         },
-        # Snooping takes ages on large switches
         ignore_macs: {
             "Cisco Phone Dock": "7001b5"
         }
