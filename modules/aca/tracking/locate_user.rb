@@ -29,7 +29,8 @@ class Aca::Tracking::LocateUser
             'Good Way Docking Stations' => '0050b6',
             'BizLink Docking Stations' => '9cebe8'
         },
-        ignore_hostnames: {}
+        ignore_hostnames: {},
+        accept_hostnames: {}
     })
 
     def on_load
@@ -62,6 +63,7 @@ class Aca::Tracking::LocateUser
 
         @blacklist = Set.new((setting(:ignore_vendors) || {}).values)
         @ignore_hosts = Set.new((setting(:ignore_hostnames) || {}).values)
+        @accept_hosts = Set.new((setting(:accept_hostnames) || {}).values)
         @warnings ||= {}
     end
 
@@ -136,8 +138,30 @@ class Aca::Tracking::LocateUser
 
 
     def perform_lookup(ip, login, domain, hostname, ttl)
-        if hostname && !@ignore_hosts.include?(hostname) && self[hostname] != login
-            save_hostname_mapping(domain, login, hostname)
+        if hostname
+            # Default to true if accept hosts filter is present
+            ignore_host = !@accept_hosts.empty?
+            check = hostname.downcase
+
+            @accept_hosts.each do |host|
+                if check.start_with? host
+                    ignore_host = false
+                    break
+                end
+            end
+
+            @ignore_hosts.each do |host|
+                if check.start_with? host
+                    ignore_host = true
+                    break
+                end
+            end
+
+            if ignore_host
+                logger.debug { "ignoring hostname #{hostname} due to filter" }
+                return
+            end
+            save_hostname_mapping(domain, login, hostname) if self[hostname] != login
         end
 
         # prevents concurrent and repeat lookups for the one IP and user
