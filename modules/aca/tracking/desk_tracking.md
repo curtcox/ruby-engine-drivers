@@ -2,11 +2,11 @@
 
 ## Drivers:
 
-# `cisco/switch/*` switches are queried for port usage and DHCP snooping tables
+1. `cisco/switch/*` switches are queried for port usage and DHCP snooping tables
   * Snooping tables contain IP address to port mapping information
-# `aca/tracking/locate_user.rb` holds the [web hook](https://drive.google.com/open?id=14XIJbnvJBg23Qc_oc3JN5Ub0geETTSmTWr8Sd8YryLM) for ingesting IP to Username mappings
+2. `aca/tracking/locate_user.rb` holds the [web hook](https://drive.google.com/open?id=14XIJbnvJBg23Qc_oc3JN5Ub0geETTSmTWr8Sd8YryLM) for ingesting IP to Username mappings
   * Described in backoffice as *IP and Username to MAC lookup*
-# `tracking/desk_management.rb` periodically scans through the switches mapping out desk usage
+3. `tracking/desk_management.rb` periodically scans through the switches mapping out desk usage
   * There are two parts to this, desk usage and desk mapping (assigning a person to the usage)
   * It also manages reservations, ensuring no more than one desk per person.
 
