@@ -80,7 +80,7 @@ class Aca::Tracking::DeskManagement
         @desk_mappings = {}
         @switch_mappings.each do |switch_ip, ports|
             if ports[:multiple_levels]
-                mappings.each_value do |desk_mapping|
+                ports.each_value do |desk_mapping|
                     # ignore the multiple_levels flag
                     next if desk_mapping == true
                     desk_mapping.each do |port, desk_id|
