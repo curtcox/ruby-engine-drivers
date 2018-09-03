@@ -396,10 +396,10 @@ class Aca::Tracking::DeskManagement
                 elsif map[:multiple_levels]
                     map.each do |level_id, desk_mapping|
                         next if desk_mapping == true
-                        apply_mappings(level_data, level_id, switch, desk_mapping)
+                        apply_mappings(level_data, level_id, switch, switch_ip, desk_mapping)
                     end
                 else
-                    apply_mappings(level_data, switch[:level], switch, map)
+                    apply_mappings(level_data, switch[:level], switch, switch_ip, map)
                 end
             end
 
@@ -477,7 +477,7 @@ class Aca::Tracking::DeskManagement
     PortUsage = Struct.new(:inuse, :clash, :reserved, :users, :reserved_users, :manual)
 
     # Performs the desk usage statistics gathering
-    def apply_mappings(level_data, level, switch, map)
+    def apply_mappings(level_data, level, switch, switch_ip, map)
         # Grab port information
         reservations = Array(switch[:reserved])
 
