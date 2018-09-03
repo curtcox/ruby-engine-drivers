@@ -77,8 +77,18 @@ class Aca::Tracking::DeskManagement
         @switch_mappings = setting(:mappings) || {}
         @desk_mappings = {}
         @switch_mappings.each do |switch_ip, ports|
-            ports.each do |port, desk_id|
-                @desk_mappings[desk_id] = [switch_ip, port]
+            if ports[:multiple_levels]
+                mappings.each_value do |desk_mapping|
+                    # ignore the multiple_levels flag
+                    next if desk_mapping == true
+                    desk_mapping.each do |port, desk_id|
+                        @desk_mappings[desk_id] = [switch_ip, port]
+                    end
+                end
+            else
+                ports.each do |port, desk_id|
+                    @desk_mappings[desk_id] = [switch_ip, port]
+                end
             end
         end
 
@@ -333,10 +343,20 @@ class Aca::Tracking::DeskManagement
             mappings = @switch_mappings[ip]
             next unless mappings
 
-            level = switch[:level]
-            ids = desk_ids[level] || []
-            ids.concat(mappings.values)
-            desk_ids[level] = ids
+            if mappings[:multiple_levels]
+                mappings.each do |level, desk_mapping|
+                    # ignore the multiple_levels flag
+                    next if desk_mapping == true
+                    ids = desk_ids[level] || []
+                    ids.concat(desk_mapping.values)
+                    desk_ids[level] = ids
+                end
+            else
+                level = switch[:level]
+                ids = desk_ids[level] || []
+                ids.concat(mappings.values)
+                desk_ids[level] = ids
+            end
         end
 
         # Add any manual checkin desks to the data
@@ -393,6 +413,7 @@ class Aca::Tracking::DeskManagement
                     next
                 elsif map[:multiple_levels]
                     map.each do |level_id, desk_mapping|
+                        # ignore the multiple_levels flag
                         next if desk_mapping == true
                         apply_mappings(level_data, level_id, switch, switch_ip, desk_mapping)
                     end
