@@ -388,7 +388,19 @@ class Aca::Tracking::DeskManagement
 
             # Find the desks in use
             all_switches.each do |switch|
-                apply_mappings(level_data, switch, mappings)
+                switch_ip = switch[:ip_address]
+                map = mappings[switch_ip]
+                if map.nil?
+                    logger.warn "no mappings for switch #{switch_ip}"
+                    next
+                elsif map[:multiple_levels]
+                    map.each do |level_id, desk_mapping|
+                        next if desk_mapping == true
+                        apply_mappings(level_data, level_id, switch, desk_mapping)
+                    end
+                else
+                    apply_mappings(level_data, switch[:level], switch, map)
+                end
             end
 
             level_data
@@ -465,21 +477,12 @@ class Aca::Tracking::DeskManagement
     PortUsage = Struct.new(:inuse, :clash, :reserved, :users, :reserved_users, :manual)
 
     # Performs the desk usage statistics gathering
-    def apply_mappings(level_data, switch, mappings)
-        switch_ip = switch[:ip_address]
-        map = mappings[switch_ip]
-        if map.nil?
-            logger.warn "no mappings for switch #{switch_ip}"
-            return
-        end
-
+    def apply_mappings(level_data, level, switch, map)
         # Grab port information
-        interfaces = switch[:interfaces]
         reservations = Array(switch[:reserved])
 
         # Build lookup structures
         building = switch[:building]
-        level = switch[:level]
         port_usage = level_data[level] ||= PortUsage.new([], [], [], [], [])
 
         # Prevent needless lookups
@@ -490,41 +493,29 @@ class Aca::Tracking::DeskManagement
         reserved_users = port_usage.reserved_users
 
         # Map the ports to desk IDs
-        interfaces.each do |port|
-            desk_id = map[port]
-            if desk_id
-                details = switch[port]
-                next unless details
+        map.each do |port, desk_id|
+            details = switch[port]
+            next unless details
 
-                # Configure desk id if not known
-                if details.desk_id != desk_id
-                    details.desk_id = desk_id
-                    ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
-                        doc.dict_upsert(:level, level)
-                        doc.dict_upsert(:desk_id, desk_id)
-                        doc.dict_upsert(:building, building)
-                    end
+            # Configure desk id if not known
+            if details.desk_id != desk_id
+                details.desk_id = desk_id
+                ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
+                    doc.dict_upsert(:level, level)
+                    doc.dict_upsert(:desk_id, desk_id)
+                    doc.dict_upsert(:building, building)
                 end
-
-                inuse << desk_id
-                clash << desk_id if details.clash
-
-                # set the user details
-                users << details if details.username
-            else
-                logger.debug { "Unknown port #{port} - no desk mapping found" }
             end
-        end
 
-        reservations.each do |port|
-            desk_id = map[port]
-            if desk_id
+            inuse << desk_id
+            clash << desk_id if details.clash
+            users << details if details.username
+
+            if reservations.include?(port)
                 reserved << desk_id
 
                 # set the user details (reserved_by must exist to be here)
-                reserved_users << switch[port]
-            else
-                logger.debug { "Unknown port #{port} - no desk mapping found" }
+                reserved_users << details
             end
         end
 
