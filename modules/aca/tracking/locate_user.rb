@@ -110,7 +110,12 @@ class Aca::Tracking::LocateUser
                 # Don't overwrite domain controller discoveries
                 # This differentiates BYOD from business devices
                 if username.nil? || username.start_with?('byod_')
-                    user = ::Aca::Tracking::UserDevices.for_user("byod_#{login}")
+                    parts = username.split('\')
+                    # ' <== fix text editor parsing issue.
+                    username = parts[-1]
+                    domain = parts[0]
+
+                    user = ::Aca::Tracking::UserDevices.for_user("byod_#{login}", domain)
                     user.add(mac)
                 end
             rescue => e
