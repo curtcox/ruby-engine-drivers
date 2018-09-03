@@ -244,3 +244,16 @@ namespace :import do
 end
 
 ```
+
+
+## Miscellaneous
+
+### Reset all data
+
+A lot of data is cached to avoid processing when it isn't required.
+You can reset all of this by doing the following:
+
+* `Aca::Tracking::SwitchPort.by_switch_ip.each(&:destroy)`
+* `Aca::Tracking::UserDevices.by_domain.each(&:destroy)`
+
+this will all automatically be regenerated
