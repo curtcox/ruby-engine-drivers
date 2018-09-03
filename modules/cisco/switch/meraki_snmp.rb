@@ -270,8 +270,6 @@ class Cisco::Switch::MerakiSNMP
         self[:reserved] = @reserved_interface.to_a
 
         nil
-    rescue => error
-        logger.print_error error, 'querying snooping table'
     end
 
     # Index short name lookup

@@ -33,7 +33,8 @@ class Cisco::MerakiDashboard
             end
 
             # rate limit the requests to 5 per-second
-            sleep 0.2
+            # I believe this includes redirects
+            sleep 0.4
         end
     end
 
@@ -45,6 +46,7 @@ class Cisco::MerakiDashboard
         request['X-Cisco-Meraki-API-Key'] = api_key
         request['Content-Type'] = 'application/json'
         http = Net::HTTP.new(uri.hostname, uri.port)
+        http.open_timeout = 2
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         http.use_ssl = true
         response = http.request(request)
@@ -57,6 +59,14 @@ class Cisco::MerakiDashboard
             fetch(api_key, location, limit - 1)
         else
             raise "error performing Meraki Dashboard request: #{response.status}"
+        end
+    rescue Net::OpenTimeout => e
+        limit = limit - 1
+        if limit > 0
+            sleep 0.1
+            retry
+        else
+            raise e
         end
     end
 end
