@@ -163,6 +163,9 @@ class Helvar::Net
     def received(data, resolve, command)
         logger.debug { "Helvar sent #{data}" }
 
+        # Group level changed: ?V:2,C:109,G:12706=13 (query scene response)
+        # Update pushed >V:2,C:11,G:25007,B:1,S:13,F:100 (current scene level)
+
         # Remove junk data (when whitelisting gateway is in place)
         start_of_message = data.index(/[\?\>\!]V:/i)
         if start_of_message != 0
@@ -198,12 +201,18 @@ class Helvar::Net
 
             cmd = Commands[params[:cmd]]
             case cmd
-            when :query_last_scene, :group_scene
+            when :query_last_scene
+                self[:"area#{params[:group]}"] = value.to_i
+            when :group_scene
                 block = params[:block]
-                if block && !@ignore_blocks
-                    self[:"area#{params[:group]}_block#{block}"] = value.to_i
+                if block
+                    if @ignore_blocks
+                        self[:"area#{params[:group]}"] = value.to_i = params[:scene].to_i
+                    else
+                        self[:"area#{params[:group]}_block#{block}"] = params[:scene].to_i
+                    end
                 else
-                    self[:"area#{params[:group]}"] = value.to_i
+
                 end
             else
                 logger.debug { "unknown response value\n#{cmd} = #{value}" }
