@@ -135,6 +135,15 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             Timeout_: (1..1440)
     command 'Conference DoNotDisturb Deactivate' => :do_not_disturb_deactivate
 
+    command 'Presentation Start' => :presentation_start,
+            PresentationSource_: (1..4),
+            SendingMode_: [:LocalRemote, :LocalOnly],
+            ConnectorId_: (1..2),
+            Instance_: [:New, *(1..6)]
+    command 'Presentation Stop' => :presentation_stop,
+            Instance_: (1..6),
+            PresentationSource_: (1..4)
+
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby

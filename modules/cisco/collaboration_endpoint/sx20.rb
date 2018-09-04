@@ -101,6 +101,15 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
                            :UpperCenter, :UpperLeft, :UpperRight],
             OnMonitorRole_: [:First, :Second, :Third, :Fourth]
 
+    command 'Presentation Start' => :presentation_start,
+            PresentationSource_: (1..2),
+            SendingMode_: [:LocalRemote, :LocalOnly],
+            ConnectorId_: (1..2),
+            Instance_: [:New, *(1..6)]
+    command 'Presentation Stop' => :presentation_stop,
+            Instance_: (1..6),
+            PresentationSource_: (1..4)
+
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby

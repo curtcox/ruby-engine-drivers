@@ -125,6 +125,15 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
         send_xconfiguration 'Cameras SpeakerTrack', :Mode, mode
     end
 
+    command 'Presentation Start' => :presentation_start,
+            PresentationSource_: (1..2),
+            SendingMode_: [:LocalRemote, :LocalOnly],
+            ConnectorId_: (1..2),
+            Instance_: [:New, *(1..6)]
+    command 'Presentation Stop' => :presentation_stop,
+            Instance_: (1..6),
+            PresentationSource_: (1..2)
+
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby
