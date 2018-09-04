@@ -222,15 +222,18 @@ class Cisco::Switch::SnoopingCatalystSNMP
         end
 
         def ip
+            ip_addr = self.ip_address
+            return nil unless ip_addr
+
             case self.address_type
             when :ipv4
                 # DISPLAY-HINT "1d.1d.1d.1d"
                 # Example response: "0A B2 C4 45"
-                self.ip_address.split(' ').map { |i| i.to_i(16).to_s }.join('.')
+                ip_addr.split(' ').map { |i| i.to_i(16).to_s }.join('.')
             when :ipv6
                 # DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
                 # IPAddr will present the IPv6 address in it's short form
-                IPAddr.new(self.ip_address.gsub(' ', '').scan(/..../).join(':')).to_s
+                IPAddr.new(ip_addr.gsub(' ', '').scan(/..../).join(':')).to_s
             end
         end
 
