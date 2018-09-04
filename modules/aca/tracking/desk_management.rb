@@ -498,6 +498,7 @@ class Aca::Tracking::DeskManagement
     # Performs the desk usage statistics gathering
     def apply_mappings(level_data, level, switch, switch_ip, map)
         # Grab port information
+        interfaces = switch[:interfaces]
         reservations = Array(switch[:reserved])
 
         # Build lookup structures
@@ -512,7 +513,9 @@ class Aca::Tracking::DeskManagement
         reserved_users = port_usage.reserved_users
 
         # Map the ports to desk IDs
-        map.each do |port, desk_id|
+        interfaces.each do |port|
+            desk_id = map[port]
+            next unless desk_id
             details = switch[port]
             next unless details
 
@@ -529,6 +532,11 @@ class Aca::Tracking::DeskManagement
             inuse << desk_id
             clash << desk_id if details.clash
             users << details if details.username
+        end
+
+        reservations.each do |port|
+            desk_id = map[port]
+            next unless desk_id
 
             if reservations.include?(port)
                 reserved << desk_id

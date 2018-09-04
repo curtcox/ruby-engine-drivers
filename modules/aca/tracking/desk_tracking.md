@@ -191,7 +191,7 @@ namespace :import do
             end
 
             if desk_saved.include? desk_id
-                puts "duplicate desk id: #{row}"
+                puts "duplicate desk id: #{desk_id}"
                 next
             end
 
@@ -227,6 +227,33 @@ namespace :import do
             desk_saved << desk_id
         end
 
+=begin
+        # If desks cross floors then we need to structure mappings to indicate this.
+        floors = {
+            'table-m' => 'zone-bguHsjKcVB',
+            'table-g' => 'zone-bguG7XtJp4'
+        }
+
+        new_mappings = {}
+        mappings.each do |switch, port_map|
+            floor_mapping = {}
+            port_map.each do |port, desk_id|
+                floor = floors[desk_id[0..6]]
+                floor_mapping[floor] ||= {}
+                floor_mapping[floor][port] = desk_id
+            end
+
+            if floor_mapping.size > 1
+                floor_mapping['multiple_levels'] = true
+                puts "note: switch #{switch} spans #{floor_mapping.size - 1} floors"
+                new_mappings[switch] = floor_mapping
+            else
+                new_mappings[switch] = port_map
+            end
+        end
+        mappings = new_mappings
+=end
+
         # Save the system settings
         cs = ::Orchestrator::ControlSystem.find(systemId)
         cs.settings_will_change!
@@ -253,6 +280,7 @@ end
 A lot of data is cached to avoid processing when it isn't required.
 You can reset all of this by doing the following:
 
+* `require 'aca/tracking/switch_port'`
 * `Aca::Tracking::SwitchPort.by_switch_ip.each(&:destroy)`
 * `Aca::Tracking::UserDevices.by_domain.each(&:destroy)`
 
