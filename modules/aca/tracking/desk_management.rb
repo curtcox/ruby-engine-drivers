@@ -542,6 +542,7 @@ class Aca::Tracking::DeskManagement
                 reserved << desk_id
 
                 # set the user details (reserved_by must exist to be here)
+                details = switch[port]
                 reserved_users << details
             end
         end
