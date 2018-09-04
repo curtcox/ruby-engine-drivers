@@ -207,12 +207,12 @@ class Helvar::Net
                 block = params[:block]
                 if block
                     if @ignore_blocks
-                        self[:"area#{params[:group]}"] = value.to_i = params[:scene].to_i
+                        self[:"area#{params[:group]}"] = params[:scene].to_i
                     else
                         self[:"area#{params[:group]}_block#{block}"] = params[:scene].to_i
                     end
                 else
-
+                    self[:"area#{params[:group]}"] = params[:scene].to_i
                 end
             else
                 logger.debug { "unknown response value\n#{cmd} = #{value}" }
