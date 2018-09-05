@@ -138,11 +138,20 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..4),
             SendingMode_: [:LocalRemote, :LocalOnly],
-            ConnectorId_: (1..2),
+            ConnectorId_: (1..5),
             Instance_: [:New, *(1..6)]
     command 'Presentation Stop' => :presentation_stop,
             Instance_: (1..6),
             PresentationSource_: (1..4)
+
+    # Provide compatabilty with the router module for activating presentation.
+    def switch_to(input)
+        if [0, nil, :none, 'none', :blank, 'blank'].include? input
+            presentation_stop
+        else
+            presentation_start presentation_source: input
+        end
+    end
 
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake

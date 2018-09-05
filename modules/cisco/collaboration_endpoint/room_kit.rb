@@ -134,6 +134,15 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
             Instance_: (1..6),
             PresentationSource_: (1..2)
 
+    # Provide compatabilty with the router module for activating presentation.
+    def switch_to(input)
+        if [0, nil, :none, 'none', :blank, 'blank'].include? input
+            presentation_stop
+        else
+            presentation_start presentation_source: input
+        end
+    end
+
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
     command 'Standby Activate' => :standby
