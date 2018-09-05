@@ -197,12 +197,12 @@ class Microsoft::Office
             filter_params = []
             # For each word, create a filtering statement
             queries.each do |q|
-                filter_params.push("(startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))")
+                filter_params.push("(startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}'))")
             end
             # Join these filtering statements using 'or' and add accountEnabled filter
             filter_param = "(accountEnabled eq true) and #{filter_params.join(" or ")}"
         else
-            filter_param = "(accountEnabled eq true) and (startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))" if q
+            filter_param = "(accountEnabled eq true) and (startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}'))" if q
         end
         filter_param = "accountEnabled eq true" if q.nil?
         query_params = {
