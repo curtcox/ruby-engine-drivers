@@ -284,9 +284,16 @@ class Microsoft::Exchange
             }
         }]
 
+        # start_object = Time.at(start_param.to_i)
+        # end_object = Time.at(end_param.to_i)
+
+        start_object = ensure_ruby_date(start_param.to_i)
+        end_object = ensure_ruby_date(end_param.to_i)
+        
+
         # Add start and end times
-        booking[:start] = Time.at(start_param.to_i).utc.iso8601.chop
-        booking[:end] = Time.at(end_param.to_i).utc.iso8601.chop
+        booking[:start] = start_object.utc.iso8601.chop
+        booking[:end] = end_object.utc.iso8601.chop
 
         # Add the current user passed in as an attendee
         mailbox = { email_address: current_user.email }
