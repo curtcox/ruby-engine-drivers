@@ -200,7 +200,7 @@ class Microsoft::Office
                 filter_params.push("(startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}'))")
             end
             # Join these filtering statements using 'or' and add accountEnabled filter
-            filter_param = "(accountEnabled eq true) and #{filter_params.join(" or ")}"
+            filter_param = "(accountEnabled eq true) and #{filter_params.join(" and ")}"
         else
             filter_param = "(accountEnabled eq true) and (startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}'))" if q
         end
