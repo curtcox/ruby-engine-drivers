@@ -189,13 +189,18 @@ class Microsoft::Office
     end
 
     def get_users(q: nil, limit: nil)
+
+        # If we have a query and the query has at least one space
         if q && q.include?(" ")
+            # Split it into word tokens
             queries = q.split(" ")
             filter_params = []
+            # For each word, create a filtering statement
             queries.each do |q|
-                filter_params.push("(accountEnabled eq true) and (startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))")
+                filter_params.push("(startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))")
             end
-            filter_param = filter_params.join(" or ")
+            # Join these filtering statements using 'or' and add accountEnabled filter
+            filter_param = "(accountEnabled eq true) and #{filter_params.join(" or ")}"
         else
             filter_param = "(accountEnabled eq true) and (startswith(displayName,'#{q}') or startswith(givenName,'#{q}') or startswith(surname,'#{q}') or startswith(mail,'#{q}') or startswith(userPrincipalName,'#{q}'))" if q
         end
