@@ -55,6 +55,10 @@ class Aca::Router
     # Multiple sources can be specified simultaneously, or if connecting a
     # single source to a single destination, Ruby's implicit hash syntax can be
     # used to let you express it neatly as `connect source => sink`.
+    #
+    # A promise is returned that will resolve when all device interactions have
+    # completed. This will be fullfilled with the applied signal map and a
+    # boolean - true if this was a complete recall, or false if partial.
     def connect(signal_map, atomic: false, force: false)
         # Convert the signal map to a nested hash of routes
         # { source => { dest => [edges] } }
@@ -70,18 +74,20 @@ class Aca::Router
         switch.then do |success, failed|
             if failed.empty?
                 logger.debug 'signal map activated'
-                edge_map.transform_values(&:keys)
+                recalled_map = edge_map.transform_values(&:keys)
+                [recalled_map, true]
 
             elsif success.empty?
                 thread.reject 'failed to activate, devices untouched'
 
             else
                 logger.warn 'signal map partially activated'
-                edge_map.transform_values do |routes|
+                recalled_map = edge_map.transform_values do |routes|
                     routes.each_with_object([]) do |(output, edges), completed|
                         completed << output if success.superset? Set.new(edges)
                     end
                 end
+                [recalled_map, false]
             end
         end
     end
@@ -125,6 +131,41 @@ class Aca::Router
     def devices_between(source, sink)
         _, edges = route source, sink
         edges.map(&:device)
+    end
+
+    # Given a sink id, find the chain of devices that sit immediately upstream
+    # in the signal path. The returned list will include all devices which for
+    # a static, linear chain exists before any routing is possible
+    #
+    # This may be used to find devices that are installed for the use of this
+    # output only (decoders, image processors etc).
+    #
+    # If the sink itself has mutiple inputs, the input to retrieve the chain for
+    # may be specified with the `on_input` param.
+    def upstream_devices_of(sink, on_input: nil)
+        device_chain = []
+
+        # Bail out early if there's no linear signal path from the sink
+        return device_chain unless on_input || signal_graph.outdegree(sink) == 1
+
+        # Otherwise, grab the initial edge from the sink node
+        initial = signal_graph[sink].edges.values.find do |edge|
+            if on_input
+                edge.input == on_input.to_sym
+            else
+                true
+            end
+        end
+
+        # Then walk the graph and accumulate devices until we reach a branch
+        successors = [initial.target]
+        while successors.size == 1
+            node = successors.first
+            device_chain << node
+            successors = signal_graph.successors node
+        end
+
+        device_chain
     end
 
 
@@ -378,7 +419,7 @@ class Aca::Router::SignalGraph
         def initialize(id)
             @id = id.to_sym
             @edges = Hash.new do |_, other_id|
-                raise ArgumentError, "No edge from \"#{id}\" to \"#{other_id}\""
+                raise ArgumentError, "No edge from \"#{@id}\" to \"#{other_id}\""
             end
         end
 
@@ -485,7 +526,8 @@ class Aca::Router::SignalGraph
     end
 
     def outdegree(id)
-        outgoing_edges(id).size
+        id = id.to_sym
+        nodes[id].edges.size
     end
 
     def dijkstra(id)
