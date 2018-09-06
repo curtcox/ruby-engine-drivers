@@ -399,6 +399,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         client = @client
         if_mappings = @if_mappings
         remove_interfaces = []
+        add_interfaces = []
         @processing = task do
             client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
                 oid_code = oid_code[20..-1]
@@ -410,16 +411,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 when 1 # up
                     next if @check_interface.include?(interface)
                     logger.debug { "Interface Up: #{interface}" }
-                    if !@check_interface.include?(interface)
-                        remove_interfaces << interface
-                        @check_interface << interface
-                    end
+                    remove_interfaces << interface
+                    @check_interface << interface
                 when 2 # down
                     next unless @check_interface.include?(interface)
                     logger.debug { "Interface Down: #{interface}" }
                     # We are no longer interested in this interface
                     @check_interface.delete(interface)
-                    remove_interfaces << interface
+                    add_interfaces << interface
                 else
                     next
                 end
@@ -432,6 +431,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @processing.then {
             logger.debug '<== finished querying interfaces ==>'
             remove_interfaces.each { |iface| remove_reserved(iface) }
+            add_interfaces.each { |iface| remove_lookup(iface) }
             self[:reserved] = @reserved_interface.to_a
         }.value
     end
