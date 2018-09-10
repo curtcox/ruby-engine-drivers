@@ -88,8 +88,20 @@ class DigitalProjection::Evision7500
         send_cmd("errcode", name: :error, priority: 0)
     end
 
+    def freeze(state)
+        target = is_affirmative?(state)
+        self[:power_target] = target
+
+        logger.debug { "Target = #{target} and self[:freeze] = #{self[:freeze]}" }
+        if target == On && self[:freeze] != On
+            send_cmd("freeze = 1", name: :freeze)
+        elsif target == Off && self[:freeze] != Off
+            send_cmd("freeze = 0", name: :freeze)
+        end
+    end
+
     def freeze?
-        send_cmd("freeze", name: :freeze, priority: 0)
+        send_cmd("freeze ?", name: :freeze, priority: 0)
     end
 
     def send_cmd(cmd, options = {})
@@ -118,7 +130,8 @@ class DigitalProjection::Evision7500
             # return whatever number at the end of the string
             self[:laser] = data[/\d+\z/].to_i
         when :error
-
+        when :freeze
+            self[:freeze] = data[-1].to_i == 1
         end
         return :success
     end
