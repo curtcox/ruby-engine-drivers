@@ -1,8 +1,8 @@
-module Wolfvision; end
+module DigitalProjection; end
 
-# Documentation: https://www.wolfvision.com/wolf/protocol_command_wolfvision/protocol/commands_eye-14.pdf
+# Documentation: http://www.digitalprojection.co.uk/dpdownloads/Protocol/Simplified-Protocol-Guide-Rev-H.pdf
 
-class Wolfvision::Eye14
+class DigitalProjection::Evision7500
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
@@ -11,19 +11,35 @@ class Wolfvision::Eye14
     descriptive_name 'Digital Projection E-Vision Laser 7500'
     generic_name :Display
 
-    tokenize delimiter: "\r"
+    tokenize indicator: /ack|ACK/, delimiter: "\x0D"
 
-    INPUTS = {
-        :hdmi => 0,
-        :hdmi2 => 1,
-        :vga => 2,
-        :comp => 3,
-        :dvi => 4,
-        :displayport => 5,
-        :hdbaset => 6,
-        :sdi3g => 7
-    }
-    INPUTS.merge!(INPUTS.invert)
+    def on_load
+        on_update
+    end
+
+    def on_update
+
+    end
+
+    def connected
+        do_poll
+        schedule.every('60s') do
+            logger.debug "-- Polling Display"
+            do_poll
+        end
+    end
+
+    def disconnected
+        schedule.clear
+    end
+
+    def do_poll
+        power? do
+            if self[:power]
+                input?
+            end
+        end
+    end
 
     def power(state)
         target = is_affirmative?(state)
@@ -38,16 +54,27 @@ class Wolfvision::Eye14
     end
 
     def power?
-        send_cmd("power ?", name: :power)
+        send_cmd("power ?", name: :power, priority: 0)
     end
 
+    INPUTS = {
+        :hdmi => 0,
+        :hdmi2 => 1,
+        :vga => 2,
+        :comp => 3,
+        :dvi => 4,
+        :displayport => 5,
+        :hdbaset => 6,
+        :sdi3g => 7
+    }
+    INPUTS.merge!(INPUTS.invert)
     def switch_to(input)
         input = input.to_sym if input.class == String
         send_cmd("input = #{INPUTS[input]}", name: :input)
     end
 
     def input?
-        send_cmd("power ?", name: :input)
+        send_cmd("power ?", name: :input, priority: 0)
     end
 
     def send_cmd(cmd, options = {})
@@ -63,7 +90,8 @@ class Wolfvision::Eye14
         return :success if command.nil? || command[:name].nil?
 
         # \A is the beginning of the line
-        if(!data =~ /\Aack/) # if it doesn't return ack it's a failed response
+        if(data =~ /\ANAK|\Anack/) # syntax error or other
+            logger.debug { data }
             return :failed
         end
 
