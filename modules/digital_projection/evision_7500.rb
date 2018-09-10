@@ -8,17 +8,16 @@ class DigitalProjection::Evision7500
 
     # Discovery Information
     tcp_port 7000
-    descriptive_name 'Digital Projection E-Vision Laser 7500'
+    descriptive_name 'Digital Projection E-Vision Laser 4K'
     generic_name :Display
 
-    tokenize indicator: /ack|ACK/, delimiter: "\x0D"
+    tokenize delimiter: "\x0D"
 
     def on_load
         on_update
     end
 
     def on_update
-
     end
 
     def connected
@@ -58,14 +57,13 @@ class DigitalProjection::Evision7500
     end
 
     INPUTS = {
-        :hdmi => 0,
-        :hdmi2 => 1,
-        :vga => 2,
-        :comp => 3,
-        :dvi => 4,
-        :displayport => 5,
-        :hdbaset => 6,
-        :sdi3g => 7
+        :display_port => 0,
+        :hdmi => 1,
+        :hdmi2 => 2,
+        :hdbaset => 3,
+        :sdi3g => 4,
+        :hdmi3 => 5,
+        :hdmi4 => 6
     }
     INPUTS.merge!(INPUTS.invert)
     def switch_to(input)
@@ -74,34 +72,53 @@ class DigitalProjection::Evision7500
     end
 
     def input?
-        send_cmd("power ?", name: :input, priority: 0)
+        send_cmd("input ?", name: :input, priority: 0)
+    end
+
+    # this projector uses a laser instead of a lamp
+    def laser?
+        send_cmd("laser.hours ?", name: :laser_inq, priority: 0)
+    end
+
+    def laser_reset
+        send_cmd("laser.reset", name: :laser_reset)
+    end
+
+    def error?
+        send_cmd("errcode", name: :error, priority: 0)
+    end
+
+    def freeze?
+        send_cmd("freeze", name: :freeze, priority: 0)
     end
 
     def send_cmd(cmd, options = {})
         req = "*#{cmd}"
+        logger.debug { "Sending: #{req}" }
         req << 0x0D
-        logger.debug { "tell -- 0x#{byte_to_hex(req)} -- #{options[:name]}" }
         send(req, options)
     end
 
     def received(data, deferrable, command)
-        logger.debug { "Received 0x#{byte_to_hex(data)}" }
+        logger.debug { "Received: #{data}" }
 
         return :success if command.nil? || command[:name].nil?
 
         # \A is the beginning of the line
         if(data =~ /\ANAK|\Anack/) # syntax error or other
-            logger.debug { data }
             return :failed
         end
 
-        # regex match the value
-        data = data[-1].to_i
         case command[:name]
         when :power
-            self[:power] = data == 1
+            self[:power] = data[-1].to_i == 1
         when :input
-            self[:input] = INPUT[data]
+            self[:input] = INPUT[data[-1].to_i]
+        when :laser_inq
+            # return whatever number at the end of the string
+            self[:laser] = data[/\d+\z/].to_i
+        when :error
+
         end
         return :success
     end
