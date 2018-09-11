@@ -34,6 +34,7 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
 
     status 'Audio Microphones Mute' => :mic_mute
     status 'Audio Volume' => :volume
+    status 'Call' => :call_status
     status 'Cameras SpeakerTrack' => :speaker_track
     status 'RoomAnalytics PeoplePresence' => :presence_detected
     status 'RoomAnalytics PeopleCount Current' => :people_count
@@ -65,6 +66,8 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     command 'Audio Volume Set' => :volume,
             Level: (0..100)
 
+    command 'Call Accept' => :call_accept, CallId_: Integer
+    command 'Call Reject' => :call_reject, CallId_: Integer
     command 'Call Disconnect' => :hangup, CallId_: Integer
     command 'Dial' => :dial,
             Number:  String,

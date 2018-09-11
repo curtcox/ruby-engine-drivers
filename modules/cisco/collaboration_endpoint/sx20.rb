@@ -34,6 +34,7 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
 
     status 'Audio Microphones Mute' => :mic_mute
     status 'Audio Volume' => :volume
+    status 'Call' => :call_status
     status 'RoomAnalytics PeoplePresence' => :presence_detected
     status 'Conference DoNotDisturb' => :do_not_disturb
     status 'Conference Presentation Mode' => :presentation
@@ -60,6 +61,8 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
 
+    command 'Call Accept' => :call_accept, CallId_: Integer
+    command 'Call Reject' => :call_reject, CallId_: Integer
     command 'Call Disconnect' => :hangup, CallId_: Integer
     command 'Dial' => :dial,
             Number:  String,
