@@ -292,7 +292,7 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         device_subscriptions.insert path, &update_handler
 
-        result || thread.defer.resolve.promise(:success)
+        result || :success
     end
 
     def unregister_feedback(path)
