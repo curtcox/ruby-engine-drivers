@@ -125,9 +125,8 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
 
     command! 'Cameras PresenterTrack ClearPosition' => :presenter_track_clear
     command! 'Cameras PresenterTrack StorePosition' => :presenter_track_store
-    command! 'Cameras PresenterTrack Set' => :presenter_track,
-             Mode: [:Off, :Follow, :Diagnostic, :Background, :Setup,
-                    :Persistant]
+    command 'Cameras PresenterTrack Set' => :presenter_track,
+            Mode: [:Off, :Follow, :Diagnostic, :Background, :Setup, :Persistant]
 
     command! 'Cameras SpeakerTrack Diagnostics Start' => \
              :speaker_track_diagnostics_start
