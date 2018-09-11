@@ -30,18 +30,25 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
         register_feedback '/Event/PresentationPreviewStopped' do
             self[:local_presentation] = false
         end
+
+        register_feedback '/Status/Call' do |call|
+            current = self[:calls].is_a?(Hash) ? self[:calls] : {}
+            calls = current.deep_merge(call)
+            calls.reject! do |_, props|
+                props[:status] == :Idle
+            end
+            self[:calls] = calls
+        end
     end
 
     status 'Audio Microphones Mute' => :mic_mute
     status 'Audio Volume' => :volume
-    status 'Call' => :call_status
     status 'Cameras SpeakerTrack' => :speaker_track
     status 'RoomAnalytics PeoplePresence' => :presence_detected
     status 'RoomAnalytics PeopleCount Current' => :people_count
     status 'Conference DoNotDisturb' => :do_not_disturb
     status 'Conference Presentation Mode' => :presentation
     status 'Peripherals ConnectedDevice' => :peripherals
-    status 'SystemUnit State NumberOfActiveCalls' => :active_calls
     status 'Video SelfView Mode' => :selfview
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
