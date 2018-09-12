@@ -1,6 +1,6 @@
 module Shure::Mixer; end
 
-# Documentation: https://pubs.shure.com/guide/P300/en-US#c_c2b570b7-f7ef-444b-b01f-c1db82b064df
+# Documentation: http://www.shure.pl/dms/shure/products/mixer/user_guides/shure_intellimix_p300_command_strings/shure_intellimix_p300_command_strings.pdf
 
 class Shure::Mixer::P300
     include ::Orchestrator::Constants
@@ -11,7 +11,7 @@ class Shure::Mixer::P300
     descriptive_name 'Shure P300 IntelliMix Audio Conferencing Processor'
     generic_name :Mixer
 
-    tokenize indicator: /ack|ACK/, delimiter: "\x0D"
+    tokenize indicator: "< REP ", delimiter: " >"
 
     def on_load
         on_update
@@ -53,13 +53,13 @@ class Shure::Mixer::P300
         send_cmd("FLASH ON", name: :flash_cmd)
     end
 
-    def volume(group, value)
+    def gain(group, value)
         val = in_range(value, self[:zoom_max], self[:zoom_min])
 
         send_cmd("AUDIO_GAIN_HI_RES #{val.to_s.rjust(4, '0')}")
     end
 
-    def volume?(group)
+    def gain?(group)
     end
 
     def mute(group, value = true)
@@ -76,14 +76,28 @@ class Shure::Mixer::P300
         mute(group, false)
     end
 
+    def mute_all(value = true)
+        state = is_affirmative?(value) ? "ON" : "OFF"
+
+        send_cmd("DEVICE_AUDIO_MUTE #{state}", name: :mute)
+    end
+
+    def unmute_all
+        mute_all(false)
+    end
+
+    def error?
+        send_inq("LAST_ERROR_EVENT", name: :error)
+    end
+
     def send_inq(cmd, options = {})
-        req = "GET #{cmd}"
+        req = "< GET #{cmd} >"
         logger.debug { "Sending: #{req}" }
         send(req, options)
     end
 
     def send_cmd(cmd, options = {})
-        req = "SET #{cmd}"
+        req = "< SET #{cmd} >"
         logger.debug { "Sending: #{req}" }
         send(req, options)
     end
@@ -93,11 +107,22 @@ class Shure::Mixer::P300
 
         return :success if command.nil? || command[:name].nil?
 
-        case command[:name]
-        when :power
-            self[:power] = data == 1
-        when :input
-            self[:input] = INPUT[data]
+        data = data.split
+        cmd = data[-2].to_sym
+
+        case cmd
+        when :PRESET
+            self[:preset] = data[-1].to_i
+        when :DEVICE_AUDIO_MUTE
+            self[:mute] = data[-1] == "ON"
+        when :AUDIO_MUTE
+            self["input#{data[0]}_mute"] = data[-1] == "ON"
+        when :AUDIO_GAIN_HI_RES
+            self["input#{data[0]}_gain"] = data[-1].to_i
+        when :LAST_ERROR_EVENT
+            error = data[1..-1].join(" ")
+            logger.debug { "Last error is :" }
+            logger.debug { error }
         end
         return :success
     end
