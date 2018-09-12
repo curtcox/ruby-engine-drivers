@@ -123,15 +123,15 @@ class DigitalProjection::Evision7500
 
         case command[:name]
         when :power
-            self[:power] = data[-1].to_i == 1
+            self[:power] = data[-1] == "1"
         when :input
             self[:input] = INPUT[data[-1].to_i]
         when :laser_inq
-            # return whatever number at the end of the string
+            # return whatever number is at the end of the string
             self[:laser] = data[/\d+\z/].to_i
         when :error
         when :freeze
-            self[:freeze] = data[-1].to_i == 1
+            self[:freeze] = data[-1] == "1"
         end
         return :success
     end

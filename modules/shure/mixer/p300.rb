@@ -1,8 +1,8 @@
-module Elo; end
+module Shure::Mixer; end
 
 # Documentation: https://pubs.shure.com/guide/P300/en-US#c_c2b570b7-f7ef-444b-b01f-c1db82b064df
 
-class Elo::Display4202L
+class Shure::Mixer::P300
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
