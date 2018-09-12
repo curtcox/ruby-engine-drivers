@@ -16,8 +16,8 @@ class Shure::Mixer::P300
     def on_load
         on_update
 
-        self[:output_volume_max] = 1400
-        self[:output_volume_min] = 0
+        self[:output_gain_max] = 1400
+        self[:output_gain_min] = 0
     end
 
     def on_update
@@ -44,6 +44,7 @@ class Shure::Mixer::P300
     def preset(number)
         send_cmd("PRESET #{number}", name: :present_cmd)
     end
+    alias_method :trigger, :snapshot
 
     def preset?
         send_inq("PRESET", name: :preset_inq, priority: 0)
@@ -54,7 +55,7 @@ class Shure::Mixer::P300
     end
 
     def gain(group, value)
-        val = in_range(value, self[:zoom_max], self[:zoom_min])
+        val = in_range(value, self[:output_gain_max], self[:output_gain_min])
 
         send_cmd("AUDIO_GAIN_HI_RES #{val.to_s.rjust(4, '0')}")
     end
