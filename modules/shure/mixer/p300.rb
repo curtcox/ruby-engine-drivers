@@ -24,10 +24,6 @@ class Shure::Mixer::P300
     end
 
     def connected
-        do_poll
-        schedule.every('60s') do
-            do_poll
-        end
     end
 
     def disconnected
@@ -57,11 +53,22 @@ class Shure::Mixer::P300
     def gain(group, value)
         val = in_range(value, self[:output_gain_max], self[:output_gain_min])
 
-        send_cmd("AUDIO_GAIN_HI_RES #{val.to_s.rjust(4, '0')}")
+        faders = group.is_a?(Array) ? group : [group]
+
+        faders.each do |fad|
+            send_cmd("#{fad} AUDIO_GAIN_HI_RES #{val.to_s.rjust(4, '0')}", group_type: :fader_cmd, wait: true)
+        end
     end
+    alias_method :fader
 
     def gain?(group)
+        faders = group.is_a?(Array) ? group : [group]
+
+        faders.each do |fad|
+            send_inq("#{fad} AUDIO_GAIN_HI_RES", group_type: :fader_inq, wait: true, priority: 0)
+        end
     end
+    alias_method :fader?
 
     def mute(group, value = true)
         state = is_affirmative?(value) ? "ON" : "OFF"
@@ -69,7 +76,15 @@ class Shure::Mixer::P300
         faders = group.is_a?(Array) ? group : [group]
 
         faders.each do |fad|
-            send_cmd("#{fad} AUDIO_MUTE #{state}", group_type: :mute, wait: true)
+            send_cmd("#{fad} AUDIO_MUTE #{state}", group_type: :mute_cmd, wait: true)
+        end
+    end
+
+    def gain?(group)
+        faders = group.is_a?(Array) ? group : [group]
+
+        faders.each do |fad|
+            send_inq("#{fad} AUDIO_MUTE", group_type: :mute_inq, wait: true, priority: 0)
         end
     end
 
