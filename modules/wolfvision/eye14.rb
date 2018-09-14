@@ -100,6 +100,23 @@ class Wolfvision::Eye14
         send_inq("3000", priority: 0, name: :power_inq)
     end
 
+    def laser(state)
+        target = is_affirmative?(state)
+        self[:laser_target] = target
+
+        # Execute command
+        logger.debug { "Target = #{target} and self[:laser] = #{self[:laser]}" }
+        if target == On && self[:laser] != On
+            send_cmd("A70101", name: :laser_cmd)
+        elsif target == Off && self[:laser] != Off
+            send_cmd("A70100", name: :laser_cmd)
+        end
+    end
+
+    def laser?
+        send_inq("A700", priority: 0, name: :laser_inq)
+    end
+
     def send_cmd(cmd, options = {})
         req = "01#{cmd}"
         logger.debug { "tell -- 0x#{req} -- #{options[:name]}" }
@@ -146,6 +163,10 @@ class Wolfvision::Eye14
             return :ignore if byte_to_hex(data) == "2200"
             hex = byte_to_hex(data[-2..-1])
             self[:iris] = hex.to_i(16)
+        when :laser_cmd
+            self[:laser] = self[:laser_target] if byte_to_hex(data) == "a700"
+        when :laser_inq
+            self[:laser] = bytes[-1] == 1
         end
         return :success
     end

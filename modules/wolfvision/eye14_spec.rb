@@ -69,4 +69,18 @@ Orchestrator::Testing.mock_device 'Wolfvision::Eye14' do
         .should_send("\x01\x31\x01\x01")
         .transmit("\x01\x31\x00") # respond with success
         .expect(status[:autofocus]).to be(true)
+
+    wait(150)
+
+    exec(:laser, true)
+        .should_send("\x01\xA7\x01\x01")
+        .transmit("\x01\xA7\x00") # respond with success
+        .expect(status[:laser]).to be(true)
+
+    wait(150)
+
+    exec(:laser?)
+        .should_send("\x00\xA7\x00")
+        .transmit("\x01\xA7\x01\x00") # respond with off
+        .expect(status[:laser]).to be(false)
 end
