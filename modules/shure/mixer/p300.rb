@@ -40,7 +40,7 @@ class Shure::Mixer::P300
     def preset(number)
         send_cmd("PRESET #{number}", name: :present_cmd)
     end
-    alias_method :trigger, :snapshot
+    alias_method :trigger, :snapshot, :preset
 
     def preset?
         send_inq("PRESET", name: :preset_inq, priority: 0)
@@ -59,7 +59,7 @@ class Shure::Mixer::P300
             send_cmd("#{fad} AUDIO_GAIN_HI_RES #{val.to_s.rjust(4, '0')}", group_type: :fader_cmd, wait: true)
         end
     end
-    alias_method :fader
+    alias_method :fader, :gain
 
     def gain?(group)
         faders = group.is_a?(Array) ? group : [group]
@@ -68,7 +68,7 @@ class Shure::Mixer::P300
             send_inq("#{fad} AUDIO_GAIN_HI_RES", group_type: :fader_inq, wait: true, priority: 0)
         end
     end
-    alias_method :fader?
+    alias_method :fader?, :gain?
 
     def mute(group, value = true)
         state = is_affirmative?(value) ? "ON" : "OFF"
