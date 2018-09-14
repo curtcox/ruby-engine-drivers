@@ -40,7 +40,8 @@ class Shure::Mixer::P300
     def preset(number)
         send_cmd("PRESET #{number}", name: :present_cmd)
     end
-    alias_method :trigger, :snapshot, :preset
+    alias_method :trigger, :preset
+    alias_method :snapshot, :preset
 
     def preset?
         send_inq("PRESET", name: :preset_inq, priority: 0)
