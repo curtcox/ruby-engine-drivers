@@ -138,7 +138,7 @@ class Wolfvision::Eye14
         bytes = str_to_array(data)
 
         return :success if command.nil? || command[:name].nil?
-        
+
         ret_code = byte_to_hex(data)
         case command[:name]
         when :power_cmd
@@ -150,11 +150,10 @@ class Wolfvision::Eye14
         when :autofocus_cmd
             self[:autofocus] = true if ret_code == '3100'
         when :power_inq
-            # -1 index for array refers to the last element in Ruby
-            self[:power] = bytes[-1] == 1
+            self[:power] = bytes[-1] == 1 # -1 index for array refers to the last element in Ruby
         when :zoom_inq
             # for some reason the after changing the zoom position
-            # the first zoom inquiry sends "2000" regardless of the actaul zoom value
+            # the first zoom inquiry sends "2000" regardless of the actual zoom value
             # consecutive zoom inquiries will then return the correct zoom value
             return :ignore if ret_code == '2000'
             hex = byte_to_hex(data[-2..-1])
@@ -162,8 +161,7 @@ class Wolfvision::Eye14
         when :autofocus_inq
             self[:autofocus] = bytes[-1] == 1
         when :iris_inq
-            # same thing as zoom inq happens here
-            return :ignore if ret_code == '2200'
+            return :ignore if ret_code == '2200' # same thing as zoom inq happens here
             hex = byte_to_hex(data[-2..-1])
             self[:iris] = hex.to_i(16)
         when :laser_cmd
