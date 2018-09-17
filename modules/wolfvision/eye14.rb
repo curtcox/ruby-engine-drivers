@@ -103,12 +103,13 @@ class Wolfvision::Eye14
     def laser(state)
         target = is_affirmative?(state)
         self[:laser_target] = target
+        laser_status = self[:laser]
 
         # Execute command
-        logger.debug { "Target = #{target} and self[:laser] = #{self[:laser]}" }
-        if target == On && self[:laser] != On
+        logger.debug { "Target = #{target} and self[:laser] = #{laser_status}" }
+        if target == On && laser_status != On
             send_cmd('A70101', name: :laser_cmd)
-        elsif target == Off && self[:laser] != Off
+        elsif target == Off && laser_status != Off
             send_cmd('A70100', name: :laser_cmd)
         end
     end
@@ -137,15 +138,17 @@ class Wolfvision::Eye14
         bytes = str_to_array(data)
 
         return :success if command.nil? || command[:name].nil?
+        
+        ret_code = byte_to_hex(data)
         case command[:name]
         when :power_cmd
-            self[:power] = self[:power_target] if byte_to_hex(data) == '3000'
+            self[:power] = self[:power_target] if ret_code == '3000'
         when :zoom_cmd
-            self[:zoom] = self[:zoom_target] if byte_to_hex(data) == '2000'
+            self[:zoom] = self[:zoom_target] if ret_code == '2000'
         when :iris_cmd
-            self[:iris] = self[:iris_target] if byte_to_hex(data) == '2200'
+            self[:iris] = self[:iris_target] if ret_code == '2200'
         when :autofocus_cmd
-            self[:autofocus] = true if byte_to_hex(data) == '3100'
+            self[:autofocus] = true if ret_code == '3100'
         when :power_inq
             # -1 index for array refers to the last element in Ruby
             self[:power] = bytes[-1] == 1
@@ -153,18 +156,18 @@ class Wolfvision::Eye14
             # for some reason the after changing the zoom position
             # the first zoom inquiry sends "2000" regardless of the actaul zoom value
             # consecutive zoom inquiries will then return the correct zoom value
-            return :ignore if byte_to_hex(data) == '2000'
+            return :ignore if ret_code == '2000'
             hex = byte_to_hex(data[-2..-1])
             self[:zoom] = hex.to_i(16)
         when :autofocus_inq
             self[:autofocus] = bytes[-1] == 1
         when :iris_inq
             # same thing as zoom inq happens here
-            return :ignore if byte_to_hex(data) == '2200'
+            return :ignore if ret_code == '2200'
             hex = byte_to_hex(data[-2..-1])
             self[:iris] = hex.to_i(16)
         when :laser_cmd
-            self[:laser] = self[:laser_target] if byte_to_hex(data) == 'a700'
+            self[:laser] = self[:laser_target] if ret_code == 'a700'
         when :laser_inq
             self[:laser] = bytes[-1] == 1
         end
