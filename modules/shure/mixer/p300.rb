@@ -1,3 +1,4 @@
+module Shure; end
 module Shure::Mixer; end
 
 # Documentation: http://www.shure.pl/dms/shure/products/mixer/user_guides/shure_intellimix_p300_command_strings/shure_intellimix_p300_command_strings.pdf
@@ -41,11 +42,11 @@ class Shure::Mixer::P300
         send_cmd("PRESET #{number}", name: :present_cmd)
     end
     alias_method :trigger, :preset
-    alias_method :snapshot, :preset
 
     def preset?
         send_inq("PRESET", name: :preset_inq, priority: 0)
     end
+    alias_method :trigger?, :preset?
 
     def flash_leds
         send_cmd("FLASH ON", name: :flash_cmd)
@@ -57,7 +58,7 @@ class Shure::Mixer::P300
         faders = group.is_a?(Array) ? group : [group]
 
         faders.each do |fad|
-            send_cmd("#{fad} AUDIO_GAIN_HI_RES #{val.to_s.rjust(4, '0')}", group_type: :fader_cmd, wait: true)
+            send_cmd("#{fad.to_s.rjust(2, '0')} AUDIO_GAIN_HI_RES #{val.to_s.rjust(4, '0')}", group_type: :fader_cmd, wait: true)
         end
     end
     alias_method :fader, :gain
@@ -66,7 +67,7 @@ class Shure::Mixer::P300
         faders = group.is_a?(Array) ? group : [group]
 
         faders.each do |fad|
-            send_inq("#{fad} AUDIO_GAIN_HI_RES", group_type: :fader_inq, wait: true, priority: 0)
+            send_inq("#{fad.to_s.rjust(2, '0')} AUDIO_GAIN_HI_RES", group_type: :fader_inq, wait: true, priority: 0)
         end
     end
     alias_method :fader?, :gain?
@@ -77,15 +78,7 @@ class Shure::Mixer::P300
         faders = group.is_a?(Array) ? group : [group]
 
         faders.each do |fad|
-            send_cmd("#{fad} AUDIO_MUTE #{state}", group_type: :mute_cmd, wait: true)
-        end
-    end
-
-    def gain?(group)
-        faders = group.is_a?(Array) ? group : [group]
-
-        faders.each do |fad|
-            send_inq("#{fad} AUDIO_MUTE", group_type: :mute_inq, wait: true, priority: 0)
+            send_cmd("#{fad.to_s.rjust(2, '0')} AUDIO_MUTE #{state}", group_type: :mute_cmd, wait: true)
         end
     end
 
@@ -93,6 +86,15 @@ class Shure::Mixer::P300
         mute(group, false)
     end
 
+    def mute?(group)
+        faders = group.is_a?(Array) ? group : [group]
+
+        faders.each do |fad|
+            send_inq("#{fad.to_s.rjust(2, '0')} AUDIO_MUTE", group_type: :mute_inq, wait: true, priority: 0)
+        end
+    end
+
+    # not sure what the difference between this mute is
     def mute_all(value = true)
         state = is_affirmative?(value) ? "ON" : "OFF"
 
@@ -122,7 +124,9 @@ class Shure::Mixer::P300
     def received(data, deferrable, command)
         logger.debug { "Received: #{data}" }
 
-        return :success if command.nil? || command[:name].nil?
+        # Exit function early if command is nil or
+        # if command is not nil and both name and group_type are nil
+        return :success if command.nil? || (command[:name].nil? && command[:group_type].nil?)
 
         data = data.split
         cmd = data[-2].to_sym
@@ -133,9 +137,9 @@ class Shure::Mixer::P300
         when :DEVICE_AUDIO_MUTE
             self[:mute] = data[-1] == "ON"
         when :AUDIO_MUTE
-            self["input#{data[0]}_mute"] = data[-1] == "ON"
+            self["channel#{data[0].to_i}_mute"] = data[-1] == "ON"
         when :AUDIO_GAIN_HI_RES
-            self["input#{data[0]}_gain"] = data[-1].to_i
+            self["channel#{data[0].to_i}_gain"] = data[-1].to_i
         when :LAST_ERROR_EVENT
             error = data[1..-1].join(" ")
             logger.debug { "Last error is :" }
