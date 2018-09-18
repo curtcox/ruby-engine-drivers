@@ -129,7 +129,12 @@ class Shure::Mixer::P300
         return :success if command.nil? || (command[:name].nil? && command[:group_type].nil?)
 
         data = data.split
-        cmd = data[-2].to_sym
+
+        if command[:name] != :error
+            cmd = data[-2].to_sym
+        else
+            cmd = :LAST_ERROR_EVENT
+        end
 
         case cmd
         when :PRESET
@@ -142,8 +147,7 @@ class Shure::Mixer::P300
             self["channel#{data[0].to_i}_gain"] = data[-1].to_i
         when :LAST_ERROR_EVENT
             error = data[1..-1].join(" ")
-            logger.debug { "Last error is :" }
-            logger.debug { error }
+            self[:error] = error
         end
         return :success
     end

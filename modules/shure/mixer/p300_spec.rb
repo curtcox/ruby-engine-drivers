@@ -46,4 +46,9 @@ Orchestrator::Testing.mock_device 'Shure::Mixer::P300' do
         .responds("< REP 02 AUDIO_MUTE ON >")
         .should_send("< SET 03 AUDIO_MUTE ON >")
         .responds("< REP 03 AUDIO_MUTE ON >")
+
+    exec(:error?)
+        .should_send("< GET LAST_ERROR_EVENT >")
+        .responds("< REP LAST_ERROR_EVENT this is a sample error >")
+        .expect(status[:error]).to eq("this is a sample error")
 end

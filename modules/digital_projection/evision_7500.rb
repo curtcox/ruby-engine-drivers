@@ -2,7 +2,7 @@ module DigitalProjection; end
 
 # Documentation: http://www.digitalprojection.co.uk/dpdownloads/Protocol/Simplified-Protocol-Guide-Rev-H.pdf
 
-class DigitalProjection::Evision7500
+class DigitalProjection::Evision_7500
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
@@ -11,7 +11,7 @@ class DigitalProjection::Evision7500
     descriptive_name 'Digital Projection E-Vision Laser 4K'
     generic_name :Display
 
-    tokenize delimiter: "\x0D"
+    tokenize delimiter: "\r"
 
     def on_load
         on_update
@@ -20,24 +20,8 @@ class DigitalProjection::Evision7500
     def on_update
     end
 
-    def connected
-        do_poll
-        schedule.every('60s') do
-            logger.debug "-- Polling Display"
-            do_poll
-        end
-    end
-
     def disconnected
         schedule.clear
-    end
-
-    def do_poll
-        power? do
-            if self[:power]
-                input?
-            end
-        end
     end
 
     def power(state)
@@ -46,9 +30,9 @@ class DigitalProjection::Evision7500
 
         logger.debug { "Target = #{target} and self[:power] = #{self[:power]}" }
         if target == On && self[:power] != On
-            send_cmd("power = 1", name: :power, delay: 2000, timeout: 10000)
+            send_cmd("power = 1", name: :power)
         elsif target == Off && self[:power] != Off
-            send_cmd("power = 0", name: :power, timeout: 10000)
+            send_cmd("power = 0", name: :power)
         end
     end
 
@@ -105,9 +89,8 @@ class DigitalProjection::Evision7500
     end
 
     def send_cmd(cmd, options = {})
-        req = "*#{cmd}"
+        req = "*#{cmd}\r"
         logger.debug { "Sending: #{req}" }
-        req << 0x0D
         send(req, options)
     end
 
@@ -116,8 +99,9 @@ class DigitalProjection::Evision7500
 
         return :success if command.nil? || command[:name].nil?
 
-        # \A is the beginning of the line
-        if(data =~ /\ANAK|\Anack/) # syntax error or other
+        data = data.split
+
+        if(data[1] == "NAK" || data[1] == "nack") # syntax error or other
             return :failed
         end
 
@@ -125,16 +109,18 @@ class DigitalProjection::Evision7500
         when :power
             self[:power] = data[-1] == "1"
         when :input
-            self[:input] = INPUT[data[-1].to_i]
+            self[:input] = INPUTS[data[-1].to_i]
         when :laser_inq
-            # return whatever number is at the end of the string
-            self[:laser] = data[/\d+\z/].to_i
+            logger.debug { "Laser inquiry response" }
+            self[:laser] = data[-1].to_i
+        when :laser_reset
+            self[:laser] = 0
         when :error
+            error = data[3..-1].join(" ")
+            self[:error] = error
         when :freeze
             self[:freeze] = data[-1] == "1"
         end
         return :success
     end
-
-
 end
