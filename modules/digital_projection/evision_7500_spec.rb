@@ -46,5 +46,5 @@ Orchestrator::Testing.mock_device 'DigitalProjection::Evision_7500' do
     exec(:error?)
         .should_send("*errcode\r")
         .responds("ack errorcode = this is a sample error code\r")
-        .expect(status[:laser]).to be(0)
+        .expect(status[:error]).to eq("this is a sample error code")
 end

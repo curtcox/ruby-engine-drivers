@@ -50,5 +50,5 @@ Orchestrator::Testing.mock_device 'Shure::Mixer::P300' do
     exec(:error?)
         .should_send("< GET LAST_ERROR_EVENT >")
         .responds("< REP LAST_ERROR_EVENT this is a sample error >")
-        .expect(status[:channel10_mute]).to be(false)
+        .expect(status[:error]).to eq("this is a sample error")
 end

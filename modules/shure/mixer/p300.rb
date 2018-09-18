@@ -147,8 +147,7 @@ class Shure::Mixer::P300
             self["channel#{data[0].to_i}_gain"] = data[-1].to_i
         when :LAST_ERROR_EVENT
             error = data[1..-1].join(" ")
-            logger.debug { "Last error is :" }
-            logger.debug { error }
+            self[:error] = error
         end
         return :success
     end

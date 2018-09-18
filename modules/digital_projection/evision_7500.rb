@@ -121,8 +121,7 @@ class DigitalProjection::Evision_7500
             self[:laser] = 0
         when :error
             error = data[3..-1].join(" ")
-            logger.debug { "Last error is :" }
-            logger.debug { error }
+            self[:error] = error
         when :freeze
             self[:freeze] = data[-1] == "1"
         end
