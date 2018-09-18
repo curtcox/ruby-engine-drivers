@@ -1,7 +1,3 @@
-# encoding: ASCII-8BIT
-# frozen_string_literal: true
-
-
 module DigitalProjection; end
 
 # Documentation: http://www.digitalprojection.co.uk/dpdownloads/Protocol/Simplified-Protocol-Guide-Rev-H.pdf

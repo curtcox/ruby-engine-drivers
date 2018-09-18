@@ -1,7 +1,3 @@
-# encoding: ASCII-8BIT
-# frozen_string_literal: true
-
-
 Orchestrator::Testing.mock_device 'DigitalProjection::Evision_7500' do
     exec(:power?)
         .should_send("*power ?\r") # power query
