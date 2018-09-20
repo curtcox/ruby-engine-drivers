@@ -88,8 +88,8 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
             CameraId: (1..1),
             PresetId_: (1..35), # Optional - codec will auto-assign if omitted
             Name_: String,
-            TakeSnapshot_: Boolean,
-            DefaultPosition_: Boolean
+            TakeSnapshot_: [true, false],
+            DefaultPosition_: [true, false]
 
     command 'Camera PositionReset' => :camera_position_reset,
             CameraId: (1..1),
