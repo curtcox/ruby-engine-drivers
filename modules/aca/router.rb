@@ -168,6 +168,11 @@ class Aca::Router
         device_chain
     end
 
+    # Check if a source can be routed to a specific sink.
+    def path_exists_between?(source, sink)
+        paths[sink].distance_to[source].finite?
+    end
+
 
     # ------------------------------
     # Internals
