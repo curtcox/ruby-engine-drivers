@@ -245,25 +245,22 @@ class Cisco::CollaborationEndpoint::RoomOs
     def send_xstatus(path)
         request = Action.xstatus path
 
-        defer = thread.defer
-
         do_send request do |response|
             path_components = Action.tokenize path
             status_response = response.dig 'Status', *path_components
 
             if !status_response.nil?
-                yield status_response if block_given?
-                defer.resolve status_response
-                :success
+                if block_given?
+                    yield status_response
+                else
+                    status_response
+                end
             else
                 error = response.dig 'CommandResponse', 'Status'
                 logger.error "#{error['Reason']} (#{error['XPath']})"
-                defer.reject
                 :abort
             end
         end
-
-        defer.promise
     end
 
 
