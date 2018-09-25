@@ -29,7 +29,7 @@ module Cisco::CollaborationEndpoint::Xapi::Response
     def compress(fragment)
         case fragment
         when Hash
-            value, valuespaceref = fragment.values_at(:value, :valuespaceref)
+            value, valuespaceref = fragment.values_at(:Value, :valueSpaceRef)
             if value&.is_a? String
                 valuespace = valuespaceref&.split('/')&.last&.to_sym
                 convert value, valuespace
