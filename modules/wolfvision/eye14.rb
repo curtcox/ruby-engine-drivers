@@ -52,9 +52,6 @@ class Wolfvision::Eye14
     def power(state)
         target = is_affirmative?(state)
         self[:power_target] = target
-
-        # Execute command
-        logger.debug { "Target = #{target} and self[:power] = #{self[:power]}" }
         if target == On && self[:power] != On
             send_cmd('300101', name: :power_cmd)
         elsif target == Off && self[:power] != Off
@@ -103,10 +100,6 @@ class Wolfvision::Eye14
     def laser(state)
         target = is_affirmative?(state)
         self[:laser_target] = target
-        laser_status = self[:laser]
-
-        # Execute command
-        logger.debug { "Target = #{target} and self[:laser] = #{laser_status}" }
         if target == On && laser_status != On
             send_cmd('A70101', name: :laser_cmd)
         elsif target == Off && laser_status != Off
