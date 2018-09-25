@@ -7,9 +7,23 @@ module Loqit; end
 # lockers = Loqit::Lockers.new(
 #     username: 'xmltester',
 #     password: 'xmlPassword',
-#     wsdl: 'http://loqit.acgin.com.au/soap/server_wsdl.php?wsdl',
+#     wsdl: 'http://10.224.8.2/soap/server_wsdl.php?wsdl',
 #     serial: 'BE434080-7277-11E3-BC4D-94C69111930A'
-#     )
+# )
+# all_lockers = lockers.list_lockers_detailed
+
+# random_locker = all_lockers.sample
+# locker_number = random_locker['number']
+# locker_number = '31061'
+# locker_number = '31025'
+# locker_number = '30914'
+# random_locker_status = lockers.show_locker_status(locker_number)
+# random_locker_available = random_locker_status['LockerState']
+
+
+
+# open_status = lockers.open_locker(locker_number)
+
 # random_locker = lockers.list_lockers.sample['number']
 # random_status = lockers.show_status(random_locker)
 # random_open = lockers.open_locker(random_locker)
@@ -41,13 +55,70 @@ class Loqit::Lockers
             }
         }
     end
+
     def list_lockers
         response = @client.call(:list_lockers,
             message: {
                 unitSerial: @serial
             },
             soap_header: @header
-        )
+        ).body[:list_lockers_response][:return]
+        JSON.parse(response)
+    end
+
+    def list_lockers_detailed
+        all_lockers = self.list_lockers
+        all_lockers_detailed = []
+        all_lockers.each_with_index do |locker, ind|
+            puts "Working on #{ind} of #{all_lockers.length}"
+            all_lockers_detailed.push(self.show_locker_status(locker['number']))
+        end
+        all_lockers_detailed
+    end
+
+    def show_locker_status(locker_number)
+        response = @client.call(:show_locker_status,
+            message: {
+                lockerNumber: locker_number,
+                unitSerial:  @serial
+            },
+            soap_header: @header
+        ).body[:show_locker_status_response][:return]
+        JSON.parse(response)
+    end
+
+    def open_locker(locker_number)   
+        response = @client.call(:open_locker,
+            message: {
+                lockerNumber: locker_number
+            },
+            soap_header: @header
+        ).body[:locker_number_response][:return]
+        JSON.parse(response)
+    end
+
+    def store_credentials(locker_number, user_pin_code, user_card, test_if_free=false)   
+        response = @client.call(:store_credentials,
+            message: {
+                lockerNumber: locker_number,
+                userPincode: user_pin_code,
+                userCard: user_card,
+                testIfFree: test_if_free
+            },
+            soap_header: @header
+        ).body[:store_credentials][:return]
+        JSON.parse(response)
+    end
+
+    def customer_has_locker(user_card)   
+        response = @client.call(:customer_has_locker,
+            message: {
+                lockerNumber: locker_number,
+                unitSerial:  @serial
+            },
+            soap_header: @header
+        ).body[:customer_has_locker_response][:return]
+        JSON.parse(response)
     end
 
 end
