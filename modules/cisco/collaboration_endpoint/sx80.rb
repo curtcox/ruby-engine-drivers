@@ -73,6 +73,12 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     command 'Audio Volume Set' => :volume,
             Level: (0..100)
 
+    command 'Bookings List' => :bookings,
+            Days_: (1..365),
+            DayOffset_: (0..365),
+            Limit_: Integer,
+            Offset_: Integer
+
     command 'Call Accept' => :call_accept, CallId_: Integer
     command 'Call Reject' => :call_reject, CallId_: Integer
     command 'Call Disconnect' => :hangup, CallId_: Integer
