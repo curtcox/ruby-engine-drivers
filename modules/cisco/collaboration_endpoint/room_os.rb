@@ -183,7 +183,7 @@ class Cisco::CollaborationEndpoint::RoomOs
 
             if result
                 if result['status'] == 'OK'
-                    :success
+                    result
                 else
                     logger.error result['Reason']
                     :abort
@@ -332,7 +332,7 @@ class Cisco::CollaborationEndpoint::RoomOs
                 if block_given?
                     yield response
                 else
-                    :success
+                    response
                 end
             else
                 :ignore
