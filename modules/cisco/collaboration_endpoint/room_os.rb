@@ -234,14 +234,7 @@ class Cisco::CollaborationEndpoint::RoomOs
             send_xconfiguration path.join(' '), setting, value
         end
 
-        thread.finally(interactions).then do |results|
-            resolved = results.map(&:last)
-            if resolved.all?
-                :success
-            else
-                thread.defer.reject 'Failed to apply all settings.'
-            end
-        end
+        thread.all(*interactions).then { :success }
     end
 
     # Query the device's current status.
