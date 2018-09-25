@@ -70,12 +70,12 @@ class Panasonic::LCD::Protocol2
         self[:power_stable] = false
         if is_affirmative?(state)
             self[:power_target] = On
-            do_send(:power_on, retries: 10, name: :power, delay_on_receive: 8000)
+            do_send(:power_on, retries: 10, name: :power, delay: 10000, timeout: 15000)
             logger.debug "requested to power on"
             do_send(:power_query)
         else
             self[:power_target] = Off
-            do_send(:power_off, retries: 10, name: :power, delay_on_receive: 8000)
+            do_send(:power_off, retries: 10, name: :power, delay: 8000)
             logger.debug "requested to power off"
             do_send(:power_query)
         end
@@ -178,6 +178,7 @@ class Panasonic::LCD::Protocol2
             # We're actually handling the connection check performed by makebreak
             # This ensure that the connection is closed
             if command.nil?
+                logger.debug 'disconnecting as no command to process'
                 disconnect
                 return :success
             end

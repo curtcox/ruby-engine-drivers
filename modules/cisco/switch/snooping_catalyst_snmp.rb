@@ -222,15 +222,18 @@ class Cisco::Switch::SnoopingCatalystSNMP
         end
 
         def ip
+            ip_addr = self.ip_address
+            return nil unless ip_addr
+
             case self.address_type
             when :ipv4
                 # DISPLAY-HINT "1d.1d.1d.1d"
                 # Example response: "0A B2 C4 45"
-                self.ip_address.split(' ').map { |i| i.to_i(16).to_s }.join('.')
+                ip_addr.split(' ').map { |i| i.to_i(16).to_s }.join('.')
             when :ipv6
                 # DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
                 # IPAddr will present the IPv6 address in it's short form
-                IPAddr.new(self.ip_address.gsub(' ', '').scan(/..../).join(':')).to_s
+                IPAddr.new(ip_addr.gsub(' ', '').scan(/..../).join(':')).to_s
             end
         end
 
@@ -396,6 +399,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         client = @client
         if_mappings = @if_mappings
         remove_interfaces = []
+        add_interfaces = []
         @processing = task do
             client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
                 oid_code = oid_code[20..-1]
@@ -407,16 +411,14 @@ class Cisco::Switch::SnoopingCatalystSNMP
                 when 1 # up
                     next if @check_interface.include?(interface)
                     logger.debug { "Interface Up: #{interface}" }
-                    if !@check_interface.include?(interface)
-                        remove_interfaces << interface
-                        @check_interface << interface
-                    end
+                    remove_interfaces << interface
+                    @check_interface << interface
                 when 2 # down
                     next unless @check_interface.include?(interface)
                     logger.debug { "Interface Down: #{interface}" }
                     # We are no longer interested in this interface
                     @check_interface.delete(interface)
-                    remove_interfaces << interface
+                    add_interfaces << interface
                 else
                     next
                 end
@@ -429,6 +431,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @processing.then {
             logger.debug '<== finished querying interfaces ==>'
             remove_interfaces.each { |iface| remove_reserved(iface) }
+            add_interfaces.each { |iface| remove_lookup(iface) }
             self[:reserved] = @reserved_interface.to_a
         }.value
     end
