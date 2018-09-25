@@ -245,22 +245,25 @@ class Cisco::CollaborationEndpoint::RoomOs
     def send_xstatus(path)
         request = Action.xstatus path
 
-        do_send request do |response|
+        defer = thread.defer
+
+        interaction = do_send request do |response|
             path_components = Action.tokenize path
             status_response = response.dig 'Status', *path_components
 
             if !status_response.nil?
-                if block_given?
-                    yield status_response
-                else
-                    status_response
-                end
+                defer.resolve status_response
+                :success
             else
                 error = response.dig 'CommandResponse', 'Status'
                 logger.error "#{error['Reason']} (#{error['XPath']})"
                 :abort
             end
         end
+
+        interaction.catch { |e| defer.reject e }
+
+        defer.promise
     end
 
 
@@ -334,14 +337,9 @@ class Cisco::CollaborationEndpoint::RoomOs
                 if json['ResultId'] != request_id
                     :ignore
                 elsif block_given?
-                    # Dowstream parsing may return a value that conflicts with
-                    # special response values (e.g. false from an xstatus
-                    # query). Use the async resolution path to bypass this and
-                    # enable these results to be bubbled back to the caller.
-                    defer.resolve yield(json)
-                    :async
+                    yield json
                 else
-                    json
+                    :success
                 end
             end
         end
@@ -378,9 +376,7 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Bind device status to a module status variable.
     def bind_status(path, status_key)
         bind_feedback "/Status/#{path.tr ' ', '/'}", status_key
-        send_xstatus path do |value|
-            self[status_key] = value
-        end
+        self[status_key] = send_xstatus(path).value
     end
 
     def push_config
