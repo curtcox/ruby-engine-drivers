@@ -73,7 +73,7 @@ class Cisco::CollaborationEndpoint::RoomOs
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
-        do_parse = proc { Response.parse data, into: CaseInsensitiveHash }
+        do_parse = proc { Response.parse data, into: HashWithIndifferentAccess }
         response = data.length > 2048 ? task(&do_parse).value : do_parse.call
 
         if block_given?
