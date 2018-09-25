@@ -376,7 +376,9 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Bind device status to a module status variable.
     def bind_status(path, status_key)
         bind_feedback "/Status/#{path.tr ' ', '/'}", status_key
-        self[status_key] = send_xstatus(path).value
+        send_xstatus(path).then do |value|
+            self[status_key] = value
+        end
     end
 
     def push_config
