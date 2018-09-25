@@ -327,22 +327,23 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         request = "#{command} | resultId=\"#{request_id}\"\n"
 
-        handle_response = lambda do |response|
-            if response['ResultId'] == request_id
-                if block_given?
-                    yield response
-                else
-                    response
-                end
-            else
-                :ignore
-            end
-        end
-
         logger.debug { "-> #{request}" }
 
         send request, **options do |response, defer, cmd|
-            received response, defer, cmd, &handle_response
+            received response, defer, cmd do |json|
+                if json['ResultId'] != request_id
+                    :ignore
+                elsif block_given?
+                    # Dowstream parsing may return a value that conflicts with
+                    # special response values (e.g. false from an xstatus
+                    # query). Use the async resolution path to bypass this and
+                    # enable these results to be bubbled back to the caller.
+                    defer.resolve yield(json)
+                    :async
+                else
+                    json
+                end
+            end
         end
     end
 
