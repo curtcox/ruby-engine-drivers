@@ -49,7 +49,7 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     status 'Conference DoNotDisturb' => :do_not_disturb
     status 'Conference Presentation Mode' => :presentation
     status 'Peripherals ConnectedDevice' => :peripherals
-    status 'Video SelfView Mode' => :selfview
+    status 'Video Selfview Mode' => :selfview
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
     status 'Standby State' => :standby
