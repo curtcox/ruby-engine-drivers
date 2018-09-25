@@ -100,9 +100,9 @@ class Wolfvision::Eye14
     def laser(state)
         target = is_affirmative?(state)
         self[:laser_target] = target
-        if target == On && laser_status != On
+        if target == On && self[:laser] != On
             send_cmd('A70101', name: :laser_cmd)
-        elsif target == Off && laser_status != Off
+        elsif target == Off && self[:laser] != Off
             send_cmd('A70100', name: :laser_cmd)
         end
     end
