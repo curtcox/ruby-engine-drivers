@@ -69,10 +69,11 @@ class Loqit::Lockers
     def list_lockers_detailed
         all_lockers = self.list_lockers
         all_lockers_detailed = []
+        puts "STARTING LOCKER GET"
         all_lockers.each_with_index do |locker, ind|
-            puts "Working on #{ind} of #{all_lockers.length}"
             all_lockers_detailed.push(self.show_locker_status(locker['number']))
         end
+        puts "FINISHED LOCKER GET"
         all_lockers_detailed
     end
 
