@@ -30,6 +30,15 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
         register_feedback '/Event/PresentationPreviewStopped' do
             self[:local_presentation] = false
         end
+
+        register_feedback '/Status/Call' do |call|
+            current = self[:calls].is_a?(Hash) ? self[:calls] : {}
+            calls = current.deep_merge(call)
+            calls.reject! do |_, props|
+                props[:status] == :Idle || props.include?(:ghost)
+            end
+            self[:calls] = calls
+        end
     end
 
     status 'Audio Microphones Mute' => :mic_mute
@@ -38,8 +47,7 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
     status 'Conference DoNotDisturb' => :do_not_disturb
     status 'Conference Presentation Mode' => :presentation
     status 'Peripherals ConnectedDevice' => :peripherals
-    status 'SystemUnit State NumberOfActiveCalls' => :active_calls
-    status 'Video SelfView Mode' => :selfview
+    status 'Video Selfview Mode' => :selfview
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
     status 'Standby State' => :standby
@@ -60,12 +68,29 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             Loop_: [:Off, :On]
     command 'Audio Sound Stop' => :stop_sound
 
+    command 'Bookings List' => :bookings,
+            Days_: (1..365),
+            DayOffset_: (0..365),
+            Limit_: Integer,
+            Offset_: Integer
+
+    command 'Call Accept' => :call_accept, CallId_: Integer
+    command 'Call Reject' => :call_reject, CallId_: Integer
     command 'Call Disconnect' => :hangup, CallId_: Integer
     command 'Dial' => :dial,
             Number:  String,
             Protocol_: [:H320, :H323, :Sip, :Spark],
             CallRate_: (64..6000),
             CallType_: [:Audio, :Video]
+
+    command 'Camera Preset Activate' => :camera_preset,
+            PresetId: (1..35)
+    command 'Camera Preset Store' => :camera_store_preset,
+            CameraId: (1..1),
+            PresetId_: (1..35), # Optional - codec will auto-assign if omitted
+            Name_: String,
+            TakeSnapshot_: [true, false],
+            DefaultPosition_: [true, false]
 
     command 'Camera PositionReset' => :camera_position_reset,
             CameraId: (1..2),
@@ -79,6 +104,36 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             Zoom_: [:In, :Out, :Stop],
             ZoomSpeed_: (1..15),
             Focus_: [:Far, :Near, :Stop]
+
+    command 'Video Input SetMainVideoSource' => :camera_select,
+            ConnectorId_: (1..3),       # Source can either be specified as the
+            Layout_: [:Equal, :PIP],    # physical connector...
+            SourceId_: (1..3)           # ...or the logical source ID
+
+    command 'Video Selfview Set' => :selfview,
+            Mode_: [:On, :Off],
+            FullScreenMode_: [:On, :Off],
+            PIPPosition_: [:CenterLeft, :CenterRight, :LowerLeft, :LowerRight,
+                           :UpperCenter, :UpperLeft, :UpperRight],
+            OnMonitorRole_: [:First, :Second, :Third, :Fourth]
+
+    command 'Presentation Start' => :presentation_start,
+            PresentationSource_: (1..2),
+            SendingMode_: [:LocalRemote, :LocalOnly],
+            ConnectorId_: (1..2),
+            Instance_: [:New, *(1..6)]
+    command 'Presentation Stop' => :presentation_stop,
+            Instance_: (1..6),
+            PresentationSource_: (1..4)
+
+    # Provide compatabilty with the router module for activating presentation.
+    def switch_to(input)
+        if [0, nil, :none, 'none', :blank, 'blank'].include? input
+            presentation_stop
+        else
+            presentation_start presentation_source: input
+        end
+    end
 
     command 'Standby Deactivate' => :powerup
     command 'Standby HalfWake' => :half_wake
