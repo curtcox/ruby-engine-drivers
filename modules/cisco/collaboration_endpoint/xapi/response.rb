@@ -88,11 +88,14 @@ module Cisco::CollaborationEndpoint::Xapi::Response
 
     def truthy?(value)
         (::Orchestrator::Constants::On_vars + [
-            'Standby' # ensure standby state is properly mapped
+            'Standby', # ensure standby state is properly mapped
+            'Available'
         ]).include? value
     end
 
     def falsey?(value)
-        ::Orchestrator::Constants::Off_vars.include? value
+        (::Orchestrator::Constants::Off_vars + [
+            'Unavailable'
+        ]).include? value
     end
 end
