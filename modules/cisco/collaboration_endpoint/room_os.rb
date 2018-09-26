@@ -73,7 +73,8 @@ class Cisco::CollaborationEndpoint::RoomOs
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
-        response = Response.parse data, into: CaseInsensitiveHash
+        do_parse = proc { Response.parse data, into: HashWithIndifferentAccess }
+        response = data.length > 2048 ? task(&do_parse).value : do_parse.call
 
         if block_given?
             # Let any pending command response handlers have first pass...
@@ -159,10 +160,14 @@ class Cisco::CollaborationEndpoint::RoomOs
     def send_xcommand(command, args = {})
         request = Action.xcommand command, args
 
-        # FIXME: commands are currently unnamed. Need to add a way of tagging
-        # related commands for better queue management.
+        # Multi-arg commands (external source registration, UI interaction etc)
+        # all need to be properly queued and sent without be overriden. In
+        # these cases, leave the outgoing commands unnamed.
+        opts = {}
+        opts[:name] = command if args.empty?
+        opts[:name] = "#{command} #{args.keys.first}" if args.size == 1
 
-        do_send request do |response|
+        do_send request, **opts do |response|
             # The result keys are a little odd: they're a concatenation of the
             # last two command elements and 'Result', unless the command
             # failed in which case it's just 'Result'.
@@ -178,7 +183,7 @@ class Cisco::CollaborationEndpoint::RoomOs
 
             if result
                 if result['status'] == 'OK'
-                    :success
+                    result
                 else
                     logger.error result['Reason']
                     :abort
@@ -229,14 +234,7 @@ class Cisco::CollaborationEndpoint::RoomOs
             send_xconfiguration path.join(' '), setting, value
         end
 
-        thread.finally(interactions).then do |results|
-            resolved = results.map(&:last)
-            if resolved.all?
-                :success
-            else
-                thread.defer.reject 'Failed to apply all settings.'
-            end
-        end
+        thread.all(*interactions).then { :success }
     end
 
     # Query the device's current status.
@@ -249,21 +247,21 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         defer = thread.defer
 
-        do_send request do |response|
+        interaction = do_send request do |response|
             path_components = Action.tokenize path
             status_response = response.dig 'Status', *path_components
 
             if !status_response.nil?
-                yield status_response if block_given?
                 defer.resolve status_response
                 :success
             else
                 error = response.dig 'CommandResponse', 'Status'
                 logger.error "#{error['Reason']} (#{error['XPath']})"
-                defer.reject
                 :abort
             end
         end
+
+        interaction.catch { |e| defer.reject e }
 
         defer.promise
     end
@@ -287,7 +285,7 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         device_subscriptions.insert path, &update_handler
 
-        result || thread.defer.resolve(:success)
+        result || :success
     end
 
     def unregister_feedback(path)
@@ -332,22 +330,18 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         request = "#{command} | resultId=\"#{request_id}\"\n"
 
-        handle_response = lambda do |response|
-            if response['ResultId'] == request_id
-                if block_given?
-                    yield response
-                else
-                    :success
-                end
-            else
-                :ignore
-            end
-        end
-
         logger.debug { "-> #{request}" }
 
         send request, **options do |response, defer, cmd|
-            received response, defer, cmd, &handle_response
+            received response, defer, cmd do |json|
+                if json['ResultId'] != request_id
+                    :ignore
+                elsif block_given?
+                    yield json
+                else
+                    :success
+                end
+            end
         end
     end
 
@@ -368,12 +362,13 @@ class Cisco::CollaborationEndpoint::RoomOs
 
     def load_settings
         load_setting :peripheral_id, default: SecureRandom.uuid, persist: true
-        load_setting :version, default: Meta.version(self)
     end
 
     # Bind arbitary device feedback to a status variable.
     def bind_feedback(path, status_key)
         register_feedback path do |value|
+            value = self[status_key].deep_merge value \
+                if self[status_key].is_a?(Hash) && value.is_a?(Hash)
             self[status_key] = value
         end
     end
@@ -381,7 +376,7 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Bind device status to a module status variable.
     def bind_status(path, status_key)
         bind_feedback "/Status/#{path.tr ' ', '/'}", status_key
-        send_xstatus path do |value|
+        send_xstatus(path).then do |value|
             self[status_key] = value
         end
     end
@@ -404,7 +399,6 @@ class Cisco::CollaborationEndpoint::RoomOs
         send_xcommand 'Peripherals Connect',
                       ID: self[:peripheral_id],
                       Name: 'ACAEngine',
-                      SoftwareInfo: self[:version],
                       Type: :ControlSystem
     end
 
