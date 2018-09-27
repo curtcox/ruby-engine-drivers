@@ -384,8 +384,12 @@ DESC
                 self[:brightness] = value
             when :input
                 self[:input] = INPUTS[value]
-                self[:input_stable] = self[:input] == self[:input_target]
-                switch_to self[:input_target] unless self[:input_stable]
+                # The input feedback behaviour seems to go a little odd when
+                # screen split is active. Ignore any input forcing when on.
+                unless self[:screen_split]
+                    self[:input_stable] = self[:input] == self[:input_target]
+                    switch_to self[:input_target] unless self[:input_stable]
+                end
             when :speaker
                 self[:speaker] = Speaker_Modes[value]
             when :hard_off
