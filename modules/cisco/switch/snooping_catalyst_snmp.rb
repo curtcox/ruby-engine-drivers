@@ -366,9 +366,24 @@ class Cisco::Switch::SnoopingCatalystSNMP
             query_connected_devices
         end
 
+        # FIXME: move this concept into uv-rays to enable a scheduled action
+        # that reschedules at the tail end of the previous run, rather than
+        # static intervals.
+        repeat = lambda do |initial_delay: nil, interval:, &action|
+            repeat_action = proc do
+                begin
+                    action.call
+                rescue => e
+                    logger.print_error e, 'in repeat_action'
+                end
+                schedule.in(interval, &repeat_action)
+            end
+            schedule.in(initial_delay || interval, &repeat_action)
+        end
+
         # Connected device polling (in case a trap was dropped by the network)
         # Also expires any desk reservations every 1min
-        schedule.every(57000 + rand(5000)) do
+        repeat.call(initial_delay: rand(60000), interval: '60s') do
             query_connected_devices
             check_reservations if @reserve_time > 0
         end
