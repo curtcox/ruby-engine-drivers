@@ -54,10 +54,10 @@ class Aca::Slack
 
         if thread_id
             # Post to the slack channel using the thread ID
-            message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, username: "#{current_user.name} (#{current_user.email})", thread_ts: thread_id
+            message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, username: current_user.email, thread_ts: thread_id
 
         else
-            message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, username: "#{current_user.name} (#{current_user.email})"            
+            message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, username: current_user.email        
 	    # logger.debug "Message from frontend:"
 	    # logger.debug message.to_json
             # Store thread id
