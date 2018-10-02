@@ -153,6 +153,10 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             Timeout_: (1..1440)
     command 'Conference DoNotDisturb Deactivate' => :do_not_disturb_deactivate
 
+    command 'Phonebook Search' => :phonebook_search,
+            SearchString: String,
+            PhonebookType: [:Corporate, :Local]
+
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..4),
             SendingMode_: [:LocalRemote, :LocalOnly],
