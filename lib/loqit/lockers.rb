@@ -66,12 +66,18 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
-    def list_lockers_detailed
-        all_lockers = self.list_lockers
+    def list_lockers_detailed(start_number=nil, end_number=nil)
         all_lockers_detailed = []
         puts "STARTING LOCKER GET"
-        all_lockers.each_with_index do |locker, ind|
-            all_lockers_detailed.push(self.show_locker_status(locker['number']))
+        if start_number
+            (start_number.to_i..end_number.to_i).each do |num|
+                all_lockers_detailed.push(self.show_locker_status(num.to_s))
+            end
+        else
+            all_lockers = self.list_lockers
+            all_lockers.each_with_index do |locker, ind|
+                all_lockers_detailed.push(self.show_locker_status(locker['number']))
+            end
         end
         puts "FINISHED LOCKER GET"
         all_lockers_detailed
