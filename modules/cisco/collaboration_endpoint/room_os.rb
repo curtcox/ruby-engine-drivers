@@ -73,8 +73,8 @@ class Cisco::CollaborationEndpoint::RoomOs
     def received(data, deferrable, command)
         logger.debug { "<- #{data}" }
 
-        do_parse = proc { Response.parse data, into: HashWithIndifferentAccess }
-        response = data.length > 2048 ? task(&do_parse).value : do_parse.call
+        do_parse = proc { Response.parse data }
+        response = data.length > 1024 ? task(&do_parse).value : do_parse.call
 
         if block_given?
             # Let any pending command response handlers have first pass...

@@ -14,11 +14,10 @@ module Cisco::CollaborationEndpoint::Xapi::Response
     # Parse a raw device response.
     #
     # @param data [String] the raw device response to parse
-    # @param into [Class] the object class to parser into (subclass of Hash)
     # @return a nested structure containing the fully parsed response
     # @raise [ParserError] if data is invalid
-    def parse(data, into: Hash)
-        response = JSON.parse data, object_class: into
+    def parse(data)
+        response = JSON.parse data, symbolize_names: true
         compress response
     rescue JSON::ParserError => error
         raise ParserError, error
