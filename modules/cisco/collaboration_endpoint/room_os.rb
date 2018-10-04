@@ -293,7 +293,12 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         device_subscriptions.remove path
 
-        request = Action.xfeedback :deregister, path
+        request = if path == '/'
+                      Action.xfeedback :deregisterall
+                  else
+                      Action.xfeedback :deregister, path
+                  end
+
         do_send request
     end
 
