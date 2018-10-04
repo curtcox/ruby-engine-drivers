@@ -155,7 +155,9 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
 
     command 'Phonebook Search' => :phonebook_search,
             SearchString: String,
-            PhonebookType: [:Corporate, :Local]
+            PhonebookType_: [:Corporate, :Local],
+            Limit_: Integer,
+            Offset_: Integer
 
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..4),

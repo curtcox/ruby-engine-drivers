@@ -141,6 +141,12 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
         send_xconfiguration 'Cameras SpeakerTrack', :Mode, mode
     end
 
+    command 'Phonebook Search' => :phonebook_search,
+            SearchString: String,
+            PhonebookType_: [:Corporate, :Local],
+            Limit_: Integer,
+            Offset_: Integer
+
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..2),
             SendingMode_: [:LocalRemote, :LocalOnly],

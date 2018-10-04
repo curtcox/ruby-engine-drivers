@@ -117,6 +117,12 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
                            :UpperCenter, :UpperLeft, :UpperRight],
             OnMonitorRole_: [:First, :Second, :Third, :Fourth]
 
+    command 'Phonebook Search' => :phonebook_search,
+            SearchString: String,
+            PhonebookType_: [:Corporate, :Local],
+            Limit_: Integer,
+            Offset_: Integer
+
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..2),
             SendingMode_: [:LocalRemote, :LocalOnly],
