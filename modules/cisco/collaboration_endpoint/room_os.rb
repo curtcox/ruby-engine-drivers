@@ -176,16 +176,16 @@ class Cisco::CollaborationEndpoint::RoomOs
             # becomes:
             #   InputSetMainVideoSourceResult
             result_key = command.split(' ').last(2).join('') + 'Result'
-            command_result = response.dig 'CommandResponse', result_key
-            failure_result = response.dig 'CommandResponse', 'Result'
+            command_result = response.dig :CommandResponse, result_key.to_sym
+            failure_result = response.dig :CommandResponse, :Result
 
             result = command_result || failure_result
 
             if result
-                if result['status'] == 'OK'
+                if result[:status] == 'OK'
                     result
                 else
-                    logger.error result['Reason']
+                    logger.error result[:Reason]
                     :abort
                 end
             else
@@ -205,10 +205,10 @@ class Cisco::CollaborationEndpoint::RoomOs
         request = Action.xconfiguration path, setting, value
 
         do_send request, name: "#{path} #{setting}" do |response|
-            result = response.dig 'CommandResponse', 'Configuration'
+            result = response.dig :CommandResponse, :Configuration
 
-            if result&.[]('status') == 'Error'
-                logger.error "#{result['Reason']} (#{result['XPath']})"
+            if result&.[](:status) == 'Error'
+                logger.error "#{result[:Reason]} (#{result[:XPath]})"
                 :abort
             else
                 :success
@@ -249,14 +249,14 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         interaction = do_send request do |response|
             path_components = Action.tokenize path
-            status_response = response.dig 'Status', *path_components
+            status_response = response.dig :Status, *path_components.map(&:to_sym)
 
             if !status_response.nil?
                 defer.resolve status_response
                 :success
             else
-                error = response.dig 'CommandResponse', 'Status'
-                logger.error "#{error['Reason']} (#{error['XPath']})"
+                error = response.dig :CommandResponse, :Status
+                logger.error "#{error[:Reason]} (#{error[:XPath]})"
                 :abort
             end
         end
@@ -334,7 +334,7 @@ class Cisco::CollaborationEndpoint::RoomOs
 
         send request, **options do |response, defer, cmd|
             received response, defer, cmd do |json|
-                if json['ResultId'] != request_id
+                if json[:ResultId] != request_id
                     :ignore
                 elsif block_given?
                     yield json
