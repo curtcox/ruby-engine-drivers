@@ -134,11 +134,14 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     command! 'Cameras SpeakerTrack Diagnostics Stop' => \
              :speaker_track_diagnostics_stop
 
-    # The 'integrator' account can't active/deactive SpeakerTrack, but we can
-    # cut off access via a configuration setting.
+    command 'Cameras SpeakerTrack Activate' => :speaker_track_activate
+    command 'Cameras SpeakerTrack Deactivate' => :speaker_track_deactivate
     def speaker_track(state = On)
-        mode = is_affirmative?(state) ? :Auto : :Off
-        send_xconfiguration 'Cameras SpeakerTrack', :Mode, mode
+        if is_affirmative? state
+            speaker_track_activate
+        else
+            speaker_track_deactivate
+        end
     end
 
     command 'Phonebook Search' => :phonebook_search,
