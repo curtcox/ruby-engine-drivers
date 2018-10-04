@@ -8,7 +8,7 @@ module Cisco::CollaborationEndpoint::Xapi; end
 
 # Pure utility methods for building Cisco xAPI actions.
 module Cisco::CollaborationEndpoint::Xapi::Action
-    ACTION_TYPE ||= Set.new [
+    ACTION_TYPE = Set.new [
         :xConfiguration,
         :xCommand,
         :xStatus,
@@ -16,7 +16,7 @@ module Cisco::CollaborationEndpoint::Xapi::Action
         :xPreferences
     ]
 
-    FEEDBACK_ACTION ||= Set.new [
+    FEEDBACK_ACTION = Set.new [
         :register,
         :deregister,
         :deregisterall,
