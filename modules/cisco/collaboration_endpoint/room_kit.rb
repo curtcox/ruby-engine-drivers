@@ -31,9 +31,9 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
             self[:local_presentation] = false
         end
 
+        self[:calls] = {}
         register_feedback '/Status/Call' do |call|
-            current = self[:calls].is_a?(Hash) ? self[:calls] : {}
-            calls = current.deep_merge(call)
+            calls = self[:calls].deep_merge call
             calls.reject! do |_, props|
                 props[:status] == :Idle || props.include?(:ghost)
             end
