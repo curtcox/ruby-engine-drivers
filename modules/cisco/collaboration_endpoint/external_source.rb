@@ -13,7 +13,7 @@ module Cisco::CollaborationEndpoint::ExternalSource
             super
             register_feedback \
                 '/Event/UserInterface/Presentation/ExternalSource' do |action|
-                source = action.dig 'Selected', 'SourceIdentifier'
+                source = action.dig :Selected, :SourceIdentifier
                 unless source.nil?
                     self[:external_source] = source
                     signal_status(:external_source)
