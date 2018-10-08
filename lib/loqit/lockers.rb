@@ -66,7 +66,7 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
-    def list_lockers_detailed(start_number=nil, end_number=nil)
+    def list_lockers_detailed(start_number:nil, end_number:nil)
         all_lockers_detailed = []
         puts "STARTING LOCKER GET"
         if start_number
