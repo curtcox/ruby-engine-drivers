@@ -51,23 +51,21 @@ class Aca::SlackConcierge
             !((!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message')
         }
         logger.debug "Processing messages in get_threads"
-        messages.each_with_index{|message, i|            
-            if message['username'].include?('(')
-                messages[i]['name'] = message['username'].split(' (')[0] if message.key?('username')
-                messages[i]['email'] = message['username'].split(' (')[1][0..-2] if message.key?('username')
+        messages.each_with_index{|message, i|   
+            if message.key?('username')
                 authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
                 user = User.find_by_email(authority_id, messages[i]['email'])
-                if !user.nil?
-                    messages[i]['last_sent'] = user.last_message_sent
-                    messages[i]['last_read'] = user.last_message_read
-                else
-                    messages[i]['last_sent'] = nil
-                    messages[i]['last_read'] = nil
-                end
-                # update_last_message_read(messages[i]['email'])
-            else
-                messages[i]['name'] = message['username']
+                messages[i]['email'] = message['username'] 
+                messages[i]['name'] = user.name
             end
+            if !user.nil?
+                messages[i]['last_sent'] = user.last_message_sent
+                messages[i]['last_read'] = user.last_message_read
+            else
+                messages[i]['last_sent'] = nil
+                messages[i]['last_read'] = nil
+            end
+            # update_last_message_read(messages[i]['email'])
             messages[i]['replies'] = get_message(message['ts'])
         }
         logger.debug "Finished processing messages in get_threads"
