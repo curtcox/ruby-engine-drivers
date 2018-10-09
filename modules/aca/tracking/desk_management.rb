@@ -455,6 +455,7 @@ class Aca::Tracking::DeskManagement
 
                 desks.reserved_users.each do |user|
                     username = user.reserved_by
+                    next unless username
 
                     # Check for existing reservations that might need to be cancelled
                     if updated_users.include? username

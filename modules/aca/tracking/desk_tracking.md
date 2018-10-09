@@ -168,15 +168,13 @@ namespace :import do
         mappings = {}
         switch_ports = {}
 
-        rows = tsv.split("\n")
+        # ignore empty rows
+        rows = tsv.split("\n").reject { |r| r.strip.empty? }
         puts "importing #{rows.length - 1} desks"
 
         rows.each_with_index do |row, index|
             # ignore header
             next if index == 0
-            # ignore empty rows
-            next if row.strip.empty?
-
             columns = row.split("\t")
 
             # Grab the data
@@ -258,7 +256,7 @@ namespace :import do
         cs = ::Orchestrator::ControlSystem.find(systemId)
         cs.settings_will_change!
         cs.settings[:mappings] = mappings
-        cs.settings[:checkin] = checkins
+        # cs.settings[:checkin] = checkins (manual desks)
 
         puts "saving #{count} desks!"
 
