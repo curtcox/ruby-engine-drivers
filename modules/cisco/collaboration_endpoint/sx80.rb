@@ -31,9 +31,9 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             self[:local_presentation] = false
         end
 
+        self[:calls] = {}
         register_feedback '/Status/Call' do |call|
-            current = self[:calls].is_a?(Hash) ? self[:calls] : {}
-            calls = current.deep_merge(call)
+            calls = self[:calls].deep_merge call
             calls.reject! do |_, props|
                 props[:status] == :Idle || props.include?(:ghost)
             end
@@ -82,6 +82,11 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     command 'Call Accept' => :call_accept, CallId_: Integer
     command 'Call Reject' => :call_reject, CallId_: Integer
     command 'Call Disconnect' => :hangup, CallId_: Integer
+
+    command 'Call DTMFSend' => :dtmf_send,
+           CallId: (0..65534),
+           DTMFString: String
+    
     command 'Dial' => :dial,
             Number:  String,
             Protocol_: [:H320, :H323, :Sip, :Spark],
@@ -155,7 +160,9 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
 
     command 'Phonebook Search' => :phonebook_search,
             SearchString: String,
-            PhonebookType: [:Corporate, :Local]
+            PhonebookType_: [:Corporate, :Local],
+            Limit_: Integer,
+            Offset_: Integer
 
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..4),

@@ -31,9 +31,9 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
             self[:local_presentation] = false
         end
 
+        self[:calls] = {}
         register_feedback '/Status/Call' do |call|
-            current = self[:calls].is_a?(Hash) ? self[:calls] : {}
-            calls = current.deep_merge(call)
+            calls = self[:calls].deep_merge call
             calls.reject! do |_, props|
                 props[:status] == :Idle || props.include?(:ghost)
             end
@@ -134,12 +134,21 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     command! 'Cameras SpeakerTrack Diagnostics Stop' => \
              :speaker_track_diagnostics_stop
 
-    # The 'integrator' account can't active/deactive SpeakerTrack, but we can
-    # cut off access via a configuration setting.
+    command 'Cameras SpeakerTrack Activate' => :speaker_track_activate
+    command 'Cameras SpeakerTrack Deactivate' => :speaker_track_deactivate
     def speaker_track(state = On)
-        mode = is_affirmative?(state) ? :Auto : :Off
-        send_xconfiguration 'Cameras SpeakerTrack', :Mode, mode
+        if is_affirmative? state
+            speaker_track_activate
+        else
+            speaker_track_deactivate
+        end
     end
+
+    command 'Phonebook Search' => :phonebook_search,
+            SearchString: String,
+            PhonebookType_: [:Corporate, :Local],
+            Limit_: Integer,
+            Offset_: Integer
 
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..2),

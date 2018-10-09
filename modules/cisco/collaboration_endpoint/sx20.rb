@@ -31,9 +31,9 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             self[:local_presentation] = false
         end
 
+        self[:calls] = {}
         register_feedback '/Status/Call' do |call|
-            current = self[:calls].is_a?(Hash) ? self[:calls] : {}
-            calls = current.deep_merge(call)
+            calls = self[:calls].deep_merge call
             calls.reject! do |_, props|
                 props[:status] == :Idle || props.include?(:ghost)
             end
@@ -116,6 +116,12 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             PIPPosition_: [:CenterLeft, :CenterRight, :LowerLeft, :LowerRight,
                            :UpperCenter, :UpperLeft, :UpperRight],
             OnMonitorRole_: [:First, :Second, :Third, :Fourth]
+
+    command 'Phonebook Search' => :phonebook_search,
+            SearchString: String,
+            PhonebookType_: [:Corporate, :Local],
+            Limit_: Integer,
+            Offset_: Integer
 
     command 'Presentation Start' => :presentation_start,
             PresentationSource_: (1..2),

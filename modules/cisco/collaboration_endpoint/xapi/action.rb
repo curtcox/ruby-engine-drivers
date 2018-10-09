@@ -8,7 +8,7 @@ module Cisco::CollaborationEndpoint::Xapi; end
 
 # Pure utility methods for building Cisco xAPI actions.
 module Cisco::CollaborationEndpoint::Xapi::Action
-    ACTION_TYPE ||= Set.new [
+    ACTION_TYPE = Set.new [
         :xConfiguration,
         :xCommand,
         :xStatus,
@@ -16,9 +16,11 @@ module Cisco::CollaborationEndpoint::Xapi::Action
         :xPreferences
     ]
 
-    FEEDBACK_ACTION ||= Set.new [
+    FEEDBACK_ACTION = Set.new [
         :register,
-        :deregister
+        :deregister,
+        :deregisterall,
+        :list
     ]
 
     module_function
@@ -74,18 +76,21 @@ module Cisco::CollaborationEndpoint::Xapi::Action
 
     # Serialize a xFeedback subscription request.
     #
-    # @param action [:register, :deregister]
+    # @param action [:register, :deregister, :deregisterall, :list]
     # @param path [String, Array<String>] the feedback document path
     # @return [String]
-    def xfeedback(action, path)
+    def xfeedback(action, path = nil)
         unless FEEDBACK_ACTION.include? action
             raise ArgumentError,
                   "Invalid feedback action. Must be one of #{FEEDBACK_ACTION}."
         end
 
-        xpath = tokenize path if path.is_a? String
-
-        create_action :xFeedback, action, "/#{xpath.join '/'}"
+        if path
+            xpath = tokenize path if path.is_a? String
+            create_action :xFeedback, action, "/#{xpath.join '/'}"
+        else
+            create_action :xFeedback, action
+        end
     end
 
     def tokenize(path)

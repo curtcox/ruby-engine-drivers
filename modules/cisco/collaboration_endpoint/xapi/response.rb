@@ -14,11 +14,10 @@ module Cisco::CollaborationEndpoint::Xapi::Response
     # Parse a raw device response.
     #
     # @param data [String] the raw device response to parse
-    # @param into [Class] the object class to parser into (subclass of Hash)
     # @return a nested structure containing the fully parsed response
     # @raise [ParserError] if data is invalid
-    def parse(data, into: Hash)
-        response = JSON.parse data, object_class: into
+    def parse(data)
+        response = JSON.parse data, symbolize_names: true
         compress response
     rescue JSON::ParserError => error
         raise ParserError, error
@@ -88,11 +87,14 @@ module Cisco::CollaborationEndpoint::Xapi::Response
 
     def truthy?(value)
         (::Orchestrator::Constants::On_vars + [
-            'Standby' # ensure standby state is properly mapped
+            'Standby', # ensure standby state is properly mapped
+            'Available'
         ]).include? value
     end
 
     def falsey?(value)
-        ::Orchestrator::Constants::Off_vars.include? value
+        (::Orchestrator::Constants::Off_vars + [
+            'Unavailable'
+        ]).include? value
     end
 end
