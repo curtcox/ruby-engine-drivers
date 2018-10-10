@@ -87,11 +87,11 @@ class Panasonic::Projector::Rs232
     # Input selection
     #
     INPUTS = {
-        hdmi1: 'HM1',
-        hdmi: 'HM1',
-        hdmi2: 'HM2',
-        vga: 'PC1',
-        dvi: 'DV1',
+        hdmi1: 'HD1',
+        hdmi: 'HD1',
+        hdmi2: 'HD2',
+        vga: 'RG1',
+        dvi: 'RG2',
         hdbaset: 'DL1'
     }
     INPUTS.merge!(INPUTS.invert)
@@ -102,6 +102,7 @@ class Panasonic::Projector::Rs232
 
         # Projector doesn't automatically unmute
         unmute if self[:mute]
+        power(true) if (self[:power] == false)
 
         logger.debug { "requested to switch to: #{input}" }
         do_send(:input, INPUTS[input], retries: 10, delay_on_receive: 2000).then do
