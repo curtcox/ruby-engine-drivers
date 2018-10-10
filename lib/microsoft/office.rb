@@ -135,10 +135,12 @@ class Microsoft::Office
 
         graph_api_options = {inactivity_timeout: 25000, keepalive: false}
 
+
         if @internet_proxy
             proxy = URI.parse(@internet_proxy)
             graph_api_options[:proxy] = { host: proxy.host, port: proxy.port }
         end
+        log_graph_request(request_method, data, query, headers, graph_path, password, endpoints)
 
         graph_api = UV::HttpEndpoint.new(@graph_domain, graph_api_options)
         response = graph_api.__send__('post', path: graph_path, headers: headers, body: bulk_data)
@@ -152,7 +154,7 @@ class Microsoft::Office
     end
 
 
-    def log_graph_request(request_method, data, query, headers, graph_path, password)
+    def log_graph_request(request_method, data, query, headers, graph_path, password, endpoints=nil)
         STDERR.puts "--------------NEW GRAPH REQUEST------------"
         STDERR.puts "#{request_method} to #{graph_path}"
         STDERR.puts "Data:"
@@ -161,6 +163,8 @@ class Microsoft::Office
         STDERR.puts query if query
         STDERR.puts "Headers:"
         STDERR.puts headers if headers
+        STDERR.puts "Endpoints:"
+        STDERR.puts endpoints if endpoints
         STDERR.puts "Password auth is: #{password}"
         STDERR.puts '--------------------------------------------'
         STDERR.flush
