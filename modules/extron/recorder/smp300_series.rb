@@ -63,18 +63,15 @@ class Extron::Recorder::SMP300Series < Extron::Base
             return :success
         end
 
-        return :success unless command
-
-        case command[:name] || command[:command]
-        when :information
-            parts = data[1..-2].split('>*<')
+        if data[0] == '<'
+            parts = data[1..-3].split('>*<')
             self[:recording_channels] = parts[1]
             self[:recording_to] = parts[2]
             self[:time_remaining] = parts[-1]
             self[:recording_time] = parts[-2]
             self[:free_space] = parts[-3]
-        when :status
-            self[:channel1] = case data.to_i
+        elsif data.start_with? 'RcdrY'
+            self[:channel1] = case data[-1].to_i
             when 0; :idle
             when 1; :recording
             when 2; :paused
