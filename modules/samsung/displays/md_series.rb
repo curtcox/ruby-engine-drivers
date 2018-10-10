@@ -3,33 +3,32 @@
 module Samsung; end
 module Samsung::Displays; end
 
-# Documentation: https://aca.im/driver_docs/Samsung/MDC%20Protocol%202015%20v13.7c.pdf
+# Documentation: https://drive.google.com/a/room.tools/file/d/135yRevYnI6BbZvRWjV51Ur0yKU5bQ_a-/view?usp=sharing
+# Older Documentation: https://aca.im/driver_docs/Samsung/MDC%20Protocol%202015%20v13.7c.pdf
 
 class Samsung::Displays::MdSeries
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
-
     # Discovery Information
     tcp_port 1515
-    descriptive_name 'Samsung MD & DM Series LCD'
+    descriptive_name 'Samsung MD, DM & QM Series LCD'
     generic_name :Display
 
 # Markdown description
 description <<-DESC
 For DM displays configure the following options:
 
-1. Network Standby = OFF (reduces the chance of a display crashing)
+1. Network Standby = ON
 2. Set Auto Standby = OFF
 3. Set Eco Solution, Auto Off = OFF
 
-Hard Power off displays each night and wake on lan them in the morning.
+Hard Power off displays each night and hard power ON in the morning.
 DESC
 
     # Communication settings
     tokenize indicator: "\xAA", callback: :check_length
     default_settings display_id: 0
-
 
     #
     # Control system events
@@ -43,23 +42,23 @@ DESC
         # Meta data for inquiring interfaces
         self[:type] = :lcd
         self[:input_stable] = true
+        self[:input_target] ||= :hdmi
+        self[:power_stable] = true
     end
 
     def on_unload
     end
 
     def on_update
-        @id = setting(:display_id) || 0xFF
-        do_device_config if self[:connected]
+        @id = setting(:display_id) || 0
+        @rs232 = setting(:rs232_control) || false
+        @blank = setting(:blank)
     end
-
 
     #
     # network events
     def connected
-        do_device_config
-
-        do_poll
+        do_poll.then { do_device_config unless self[:hard_off] }
 
         schedule.every('30s') do
             logger.debug "-- Polling Display"
@@ -68,23 +67,25 @@ DESC
     end
 
     def disconnected
-        #
-        # Disconnected may be called without calling connected
-        #   Hence the check if timer is nil here
-        #
-        @disconnecting = false
-        self[:power] = false  # As we may need to use wake on lan
+        self[:power] = false unless @rs232
         schedule.clear
     end
-
 
     #
     # Command types
     COMMAND = {
+        :status => 0x00,
         :hard_off => 0x11,      # Completely powers off
         :panel_mute => 0xF9,    # Screen blanking / visual mute
         :volume => 0x12,
+        :contrast => 0x24,
         :brightness => 0x25,
+        :sharpness => 0x26,
+        :colour => 0x27,
+        :tint => 0x28,
+        :red_gain => 0x29,
+        :green_gain => 0x2A,
+        :blue_gain => 0x2B,
         :input => 0x14,
         :mode => 0x18,
         :size => 0x19,
@@ -97,7 +98,8 @@ DESC
         :speaker => 0x68,
         :net_standby => 0xB5,   # Keep NIC active in standby
         :eco_solution => 0xE6,  # Eco options (auto power off)
-        :auto_power => 0x33
+        :auto_power => 0x33,
+        :screen_split => 0xB2    # Tri / quad split (larger panels only)
     }
     COMMAND.merge!(COMMAND.invert)
 
@@ -105,31 +107,27 @@ DESC
     # power off the panel. This doesn't work in video walls
     # so if a nominal blank input is
     def power(power, broadcast = nil)
-        if is_negatory?(power)
-            # Blank the screen before turning off panel
-            #if self[:power]
-            #    blank = setting(:blank)
-            #    unless blank.nil?
-            #        switch_to blank
-            #    end
-            #end
+        power = self[:power_target] = is_affirmative?(power)
+        self[:power_stable] = false
+
+        if power == Off
+            # Blank the screen before turning off panel if required
+            # required by some video walls where screens are chained
+            switch_to(@blank) if @blank && self[:power]
             do_send(:panel_mute, 1)
-        elsif !self[:connected]
+        elsif !@rs232 && !self[:connected]
             wake(broadcast)
         else
+            # Power on
             do_send(:hard_off, 1)
             do_send(:panel_mute, 0)
         end
     end
 
     def hard_off
-        do_send(:hard_off, 0).finally do
-            # Actually takes awhile to shutdown!
-            @disconnecting = true
-            schedule.in('60s') do
-                disconnect
-            end
-        end
+        do_send(:panel_mute, 0) if self[:power]
+        do_send(:hard_off, 0)
+        do_poll
     end
 
     def power?(options = {}, &block)
@@ -147,7 +145,6 @@ DESC
         power(true)
     end
 
-
     INPUTS = {
         :vga => 0x14,       # pc in manual
         :dvi => 0x18,
@@ -158,6 +155,8 @@ DESC
         :hdmi2_pc => 0x24,
         :hdmi3 => 0x31,
         :hdmi3_pc => 0x32,
+        :hdmi4 => 0x33,
+        :hdmi4_pc => 0x34,
         :display_port => 0x25,
         :dtv => 0x40,
         :media => 0x60,
@@ -174,16 +173,35 @@ DESC
         do_send(:input, INPUTS[input], options)
     end
 
+    SCALE_MODE = {
+        fill: 0x09,
+        fit:  0x20
+    }.tap { |x| x.merge!(x.invert).freeze }
+
+    # Activite the internal compositor. Can either split 3 or 4 ways.
+    def split(inputs = [:hdmi, :hdmi2, :hdmi3], layout: 0, scale: :fit, **options)
+        main_source = inputs.shift
+
+        data = [
+            1,                  # enable
+            0,                  # sound from screen section 1
+            layout,             # layout mode (1..6)
+            SCALE_MODE[scale],  # scaling for main source
+            inputs.flat_map do |input|
+                input = input.to_sym if input.is_a? String
+                [INPUTS[input], SCALE_MODE[scale]]
+            end
+        ].flatten
+
+        switch_to(main_source, options).then do
+            do_send(:screen_split, data, options)
+        end
+    end
+
     def volume(vol, options = {})
         vol = in_range(vol.to_i, 100)
         do_send(:volume, vol, options)
     end
-
-    def brightness(val, options = {})
-        val = in_range(val.to_i, 100)
-        do_send(:brightness, val, options)
-    end
-
 
     #
     # Emulate mute
@@ -215,28 +233,13 @@ DESC
         do_send(:speaker, Speaker_Modes[mode.to_sym], options)
     end
 
-
     #
     # Maintain connection
     def do_poll
-        req = do_send(:hard_off, [], priority: 0)
-        req.then do
-            unless self[:hard_off]
-                power?(priority: 0) do
-                    if self[:power] == On
-                        do_send(:volume, [], priority: 0)
-                        do_send(:input,  [], priority: 0)
-                    end
-                end
-            end
+        do_send(:status, [], priority: 0).then do
+            power? unless self[:hard_off]
         end
-
-        # May have been powered off by the remote?
-        # Samsung requires you disconnect after a hard power off
-        # otherwise it will just ignore all requests
-        req.catch { disconnect unless @disconnecting || !self[:connected] }
     end
-
 
     #
     # Enable power on (without WOL)
@@ -245,7 +248,6 @@ DESC
         do_send(:net_standby, state, options)
     end
 
-
     #
     # Eco auto power off timer
     def auto_off_timer(enable, options = {})
@@ -253,12 +255,29 @@ DESC
         do_send(:eco_solution, [0x81, state], options)
     end
 
-
     #
     # Device auto power control (presumably signal based?)
     def auto_power(enable, options = {})
         state = is_affirmative?(enable) ? 1 : 0
         do_send(:auto_power, state, options)
+    end
+
+    #
+    # Colour control
+    [
+        :contrast,
+        :brightness,
+        :sharpness,
+        :colour,
+        :tint,
+        :red_gain,
+        :green_gain,
+        :blue_gain
+    ].each do |command|
+        define_method command do |val, **options|
+            val = in_range(val.to_i, 100)
+            do_send(command, val, options)
+        end
     end
 
 
@@ -268,7 +287,15 @@ DESC
     DEVICE_SETTINGS = [
         :network_standby,
         :auto_off_timer,
-        :auto_power
+        :auto_power,
+        :contrast,
+        :brightness,
+        :sharpness,
+        :colour,
+        :tint,
+        :red_gain,
+        :green_gain,
+        :blue_gain
     ]
     #
     # Push any configured device settings
@@ -280,76 +307,94 @@ DESC
         end
     end
 
-
     def wake(broadcast = nil)
         mac = setting(:mac_address)
         if mac
             # config is the database model representing this device
             wake_device(mac, broadcast)
             logger.debug {
-                info = "Wake on Lan for MAC #{mac}"
+                info = String.new("Wake on Lan for MAC #{mac}")
                 info << " directed to VLAN #{broadcast}" if broadcast
                 info
             }
         else
-            logger.debug { "No MAC address provided" }
+            logger.debug 'No MAC address provided'
         end
     end
+
+    RESPONSE_STATUS = {
+        ack: 0x41,
+        nak: 0x4e
+    }.tap { |x| x.merge!(x.invert).freeze }
 
     def received(response, resolve, command)
         logger.debug { "Samsung sent #{byte_to_hex(response)}" }
 
-        data = str_to_array(response)
-        if data[2] == 3     # Check for correct data length
-            status = data[3]
-            command = data[4]
-            value = data[5]
+        rx = str_to_array response
 
-            if status == 0x41 # 'A'
-                case COMMAND[command]
-                when :panel_mute
-                    self[:power] = value == 0
-                when :volume
-                    self[:volume] = value
-                    if self[:audio_mute] && value > 0
-                        self[:audio_mute] = false
-                    end
-                when :brightness
-                    self[:brightness] = value
-                when :input
-                    self[:input] = INPUTS[value]
-                    if not self[:input_stable]
-                        if self[:input_target] == self[:input]
-                            self[:input_stable] = true
-                        else
-                            switch_to(self[:input_target])
-                        end
-                    end
-                when :speaker
-                    self[:speaker] = Speaker_Modes[value]
-                when :hard_off
-                    self[:hard_off] = value == 0
+        unless rx.pop == (rx.reduce(:+) & 0xFF)
+            logger.error 'invalid checksum'
+            return :retry
+        end
+
+        _, _, _, status, command, *value = rx
+        value = value.first if value.length == 1
+
+        case RESPONSE_STATUS[status]
+        when :ack
+            case COMMAND[command]
+            when :status
+                self[:hard_off]     = value[0] == 0
+                self[:power]        = Off if self[:hard_off]
+                self[:volume]       = value[1]
+                self[:audio_mute]   = false if value[2] > 0
+                self[:input]        = INPUTS[value[3]]
+                check_power_state
+            when :panel_mute
+                self[:power] = value == 0
+                check_power_state
+            when :volume
+                self[:volume] = value
+                self[:audio_mute] = false if value > 0
+            when :brightness
+                self[:brightness] = value
+            when :input
+                self[:input] = INPUTS[value]
+                # The input feedback behaviour seems to go a little odd when
+                # screen split is active. Ignore any input forcing when on.
+                unless self[:screen_split]
+                    self[:input_stable] = self[:input] == self[:input_target]
+                    switch_to self[:input_target] unless self[:input_stable]
                 end
-
-                return :success
-            else
-                logger.debug "Samsung failed with: #{byte_to_hex(array_to_str(data))}"
-                return :failed  # Failed response
+            when :speaker
+                self[:speaker] = Speaker_Modes[value]
+            when :hard_off
+                was_off = self[:hard_off]
+                self[:hard_off] = value == 0
+                self[:power] = Off if self[:hard_off]
+            when :screen_split
+                state = value[0]
+                self[:screen_split] = state.positive?
             end
+            :success
+
+        when :nak
+            logger.debug "Samsung responded with NAK: #{value}"
+            :failed  # Failed response
+
         else
-            logger.debug "Samsung aborted with: #{byte_to_hex(array_to_str(data))}"
-            return :abort   # unknown result
+            logger.debug "Samsung aborted with: #{byte_to_hex(array_to_str(value))}"
+            :abort   # unknown result
         end
     end
 
-    # Currently not used. We could check it if we like :)
-    def check_checksum(byte_str)
-        response = str_to_array(byte_str)
-        check = 0
-        response[0..-2].each do |byte|
-            check = (check + byte) & 0xFF
+    def check_power_state
+        return if self[:power_stable]
+        if self[:power] == self[:power_target]
+            self[:power_stable] = true
+        else
+            power self[:power_target]
         end
-        response[-1] == check
     end
 
     # Called by the Abstract Tokenizer
@@ -366,15 +411,6 @@ DESC
         end
     end
 
-    # Called by do_send to create a checksum
-    def checksum(command)
-        check = 0
-        command.each do |byte|
-            check = (check + byte) & 0xFF
-        end
-        command << check
-    end
-
     def do_send(command, data = [], options = {})
         data = Array(data)
 
@@ -383,9 +419,12 @@ DESC
             command = COMMAND[command]
         end
 
-        data = [command, @id, data.length] + data    # Build request (0xFF is screen id)
-        checksum(data)                                # Add checksum
+        data = [command, @id, data.length] + data     # Build request
+        data << (data.reduce(:+) & 0xFF)              # Add checksum
         data = [0xAA] + data                          # Add header
+
+        logger.debug { "Sending to Samsung: #{array_to_str(data)}" }
+
         send(array_to_str(data), options)
     end
 end
