@@ -12,6 +12,9 @@ class Extron::Recorder::SMP300Series < Extron::Base
     generic_name :Recorder
     tcp_port 23
 
+    # This should consume the whole copyright message
+    tokenize delimiter: "\r\n", wait_ready: /Copyright.*/i
+
     # NOTE:: The channel arguments are here for compatibility with other recording devices
     def information(channel = 1)
         # Responds with "<ChA1*ChB3>*<stopped>*<internal>*<437342288>*<00:00:00>*<155:40:43>"
@@ -56,7 +59,8 @@ class Extron::Recorder::SMP300Series < Extron::Base
     protected
 
     def received(data, resolve, command)
-        logger.debug { "Extron Recorder sent #{data}" }
+        data = data.strip
+        logger.debug { "Extron Recorder sent #{data.inspect}" }
 
         if data =~ /Login/i
             device_ready
@@ -64,7 +68,7 @@ class Extron::Recorder::SMP300Series < Extron::Base
         end
 
         if data[0] == '<'
-            parts = data[1..-3].split('>*<')
+            parts = data[1..-2].split('>*<')
             self[:recording_channels] = parts[1]
             self[:recording_to] = parts[2]
             self[:time_remaining] = parts[-1]
