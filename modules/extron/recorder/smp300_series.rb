@@ -51,6 +51,10 @@ class Extron::Recorder::SMP300Series < Extron::Base
         information
     end
 
+    def recording_duration
+        send('35I', name: :duration)
+    end
+
     def do_poll
         information
         status
@@ -76,12 +80,30 @@ class Extron::Recorder::SMP300Series < Extron::Base
             self[:free_space] = parts[-3]
         elsif data.start_with? 'RcdrY'
             self[:channel1] = case data[-1].to_i
-            when 0; :idle
-            when 1; :recording
-            when 2; :paused
+            when 0
+                clear_recording_poller
+                :idle
+            when 1
+                if @recording.nil?
+                    @recording = schedule.every(1000) { recording_duration }
+                end
+                :recording
+            when 2
+                clear_recording_poller
+                :paused
             end
+        elsif data.start_with? 'Inf35'
+            self[:duration] = data.split('*')[1]
         end
 
         :success
+    end
+
+    def clear_recording_poller
+        if @recording
+            @recording.cancel
+            @recording = nil
+            self[:duration] = '00:00:00'
+        end
     end
 end
