@@ -37,7 +37,6 @@ DESC
 
         self[:volume_min] = 0
         self[:volume_max] = 100
-        self[:power] = false
 
         # Meta data for inquiring interfaces
         self[:type] = :lcd
