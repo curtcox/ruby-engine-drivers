@@ -112,6 +112,24 @@ Desk management is primary agent involved with mapping switch ports to desk ids.
         "switch.dns.name.lowercase.com": {
             "gi1/0/23": "table-1.001",
             "gi1/0/21": "table-1.002"
+        },
+
+        // Where a switch spans multiple levels
+        "192.168.7.13": {
+            "zone-bguG7XtJp4": {
+                "port 5": "table-g.1.02",
+                "port 6": "table-g.1.04",
+                "port 4": "table-g.1.14",
+                "port 3": "table-g.1.17",
+                "port 16": "table-g.3.10",
+                "port 21": "table-g.3.12",
+                "port 18": "table-g.4.05",
+                "port 17": "table-g.4.06"
+            },
+            "zone-bguHsjKcVB": {
+                "port 24": "table-mz.5.22"
+            },
+            "multiple_levels": true // this indicates a multi-level switch
         }
     }
 }
