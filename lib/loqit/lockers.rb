@@ -105,13 +105,14 @@ class Loqit::Lockers
     end
 
     def store_credentials(locker_number, user_pin_code, user_card, test_if_free=false)   
+        payload = {
+            lockerNumber: locker_number,
+            userPincode: user_pin_code,
+            testIfFree: test_if_free
+        }
+        payload[:userCard] = user_card if user_card
         response = @client.call(:store_credentials,
-            message: {
-                lockerNumber: locker_number,
-                userPincode: user_pin_code,
-                userCard: user_card,
-                testIfFree: test_if_free
-            },
+            message: payload,
             soap_header: @header
         ).body[:store_credentials_response][:return]
         JSON.parse(response)
@@ -129,4 +130,3 @@ class Loqit::Lockers
     end
 
 end
-
