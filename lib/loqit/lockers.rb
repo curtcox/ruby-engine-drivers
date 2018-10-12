@@ -113,7 +113,7 @@ class Loqit::Lockers
                 testIfFree: test_if_free
             },
             soap_header: @header
-        ).body[:store_credentials][:return]
+        ).body[:store_credentials_response][:return]
         JSON.parse(response)
     end
 
