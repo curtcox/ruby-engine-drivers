@@ -40,7 +40,9 @@ class Loqit::Lockers
             log_level: :debug
         )
         savon_config = {
-            :wsdl => wsdl
+            :wsdl => wsdl,
+            :log => log,
+            :log_level => log_level
         }
 
         @client = Savon.client savon_config
