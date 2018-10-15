@@ -3,7 +3,7 @@ require 'protocols/snmp'
 module Dell; end
 module Dell::Projector; end
 
-# Documentation: https://aca.im/driver_docs/Epson/ESCVP21_e_P.pdf
+# Documentation: https://aca.im/driver_docs/Dell/dell-s718ql-snmp.pdf
 
 class Dell::Projector::S718ql
     include ::Orchestrator::Constants
