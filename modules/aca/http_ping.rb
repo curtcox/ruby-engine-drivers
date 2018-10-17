@@ -24,9 +24,10 @@ class Aca::HttpPing
 
     def check_status
         get(@path, name: :check_status) { |data|
+            logger.debug { "request status was #{data.status.inspect}" }
             set_connected_state(data.status == @result)
-        }.catch do
-            set_connected_state(false)
-        end
+            :success
+        }
+        nil
     end
 end
