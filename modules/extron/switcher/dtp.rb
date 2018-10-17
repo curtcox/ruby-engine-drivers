@@ -24,7 +24,7 @@ module Extron::Switcher; end
 #
 # audio1 => input
 # audio1_muted => true
-# 
+#
 #
 # (Settings)
 # password
@@ -56,8 +56,8 @@ class Extron::Switcher::Dtp < Extron::Base
         map.each do |input, outputs|
             input = input.to_s if input.is_a?(Symbol)
             input = input.to_i if input.is_a?(String)
-            
-            
+
+
             outputs = Array(outputs)
             command = ''
             outputs.each do |output|
@@ -71,7 +71,7 @@ class Extron::Switcher::Dtp < Extron::Base
         map.each do |input, outputs|
             input = input.to_s if input.is_a?(Symbol)
             input = input.to_i if input.is_a?(String)
-            
+
             outputs = Array(outputs)
             command = ''
             outputs.each do |output|
@@ -169,7 +169,7 @@ class Extron::Switcher::Dtp < Extron::Base
     #
     # Output control
     #
-    def mute_audio(group, value = true, index = nil)
+    def mute(group, value = true, index = nil)
         group = index if index
         val = is_affirmative?(value) ? 1 : 0
 
@@ -179,14 +179,12 @@ class Extron::Switcher::Dtp < Extron::Base
         end
         # Response:  GrpmD#{group}*+00001
     end
-    alias mute mute_audio
 
-    def unmute_audio(group, index = nil)
+    def unmute(group, index = nil)
         mute_audio(group, false, index)
         #do_send("\eD#{group}*0GRPM", :group_type => :mute)
         # Response:  GrpmD#{group}*+00000
     end
-    alias unmute unmute_audio
 
     def mutes(ids:, muted: true, **_)
         mute(ids, muted)
@@ -343,4 +341,3 @@ class Extron::Switcher::Dtp < Extron::Base
         28 => 'Bad filename or file not found'
     }
 end
-
