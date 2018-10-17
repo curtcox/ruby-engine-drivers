@@ -214,6 +214,11 @@ class Aca::GoogleRefreshBooking
             end
         end
 
+        @google_client  = ::Google::Admin.new({
+            admin_email: ENV['GOOGLE_ADMIN_EMAIL'],
+            domain: ENV['GOOGLE_DOMAIN']
+        })
+
         fetch_bookings
         schedule.clear
         schedule.every(setting(:update_every) || '5m') { fetch_bookings }
@@ -523,54 +528,24 @@ class Aca::GoogleRefreshBooking
     # EWS Requests to occur in a worker thread
     # =======================================
     def make_google_booking(user_email: nil, subject: 'On the spot booking', room_email:, start_time:, end_time:, organizer:)
-
-        booking_data = {
-            subject: subject,
-            start: { dateTime: start_time, timeZone: "UTC" },
-            end: { dateTime: end_time, timeZone: "UTC" },
-            location: { displayName: @google_room, locationEmailAddress: @google_room },
-            attendees: [ emailAddress: { address: organizer, name: "User"}]
-        }.to_json
-
-        logger.debug "Creating booking:"
-        logger.debug booking_data
-
-        client = OAuth2::Client.new(@google_client_id, @google_secret, {site: @google_site, token_url: @google_token_url})
-
-        begin
-            access_token = client.client_credentials.get_token({
-                :scope => @google_scope
-                # :client_secret => ENV["GOOGLE_APP_CLIENT_SECRET"],
-                # :client_id => ENV["GOOGLE_APP_CLIENT_ID"]
-            }).token
-        rescue Exception => e
-            logger.debug e.message
-            logger.debug e.backtrace.inspect
-            raise e
+        if start_time > 1500000000000
+            start_time = (start_time.to_i / 1000).to_i
+            end_time = (end_time.to_i / 1000).to_i
+        else
+            start_time = start_time
+            end_time = end_time
         end
 
-
-        # Set out domain, endpoint and content type
-        domain = 'https://graph.microsoft.com'
-        host = 'graph.microsoft.com'
-        endpoint = "/v1.0/users/#{@google_room}/events"
-        content_type = 'application/json;odata.metadata=minimal;odata.streaming=true'
-
-        # Create the request URI and config
-        google_api = UV::HttpEndpoint.new(domain, tls_options: {host_name: host})
-        headers = {
-            'Authorization' => "Bearer #{access_token}",
-            'Content-Type' => content_type
-        }
-
-        # Make the request
-        response = google_api.post(path: "#{domain}#{endpoint}", body: booking_data, headers: headers).value
-
-        logger.debug response.body
-        logger.debug response.to_json
-        logger.debug JSON.parse(response.body)['id']
-
-        id = JSON.parse(response.body)['id']
+        results = @google.create_booking({
+                room_email: room_email,
+                start_param: start_time,
+                end_param: end_time,
+                subject: subject,
+                current_user: (organizer || nil)
+                timezone: ENV['TIMEZONE'] || 'Sydney'
+            })
+        
+        id = results['id']
 
         # Return the booking IDs
         id
