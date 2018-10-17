@@ -51,7 +51,7 @@ class Panasonic::Projector::Rs232
         power_on: 'PON',
         power_off: 'POF',
         power_query: 'QPW',
-        input: 'IMS',
+        input: 'IIS',
         volume: 'AVL',
         volume_query: 'QAV',
         audio_mute: 'AMT',
