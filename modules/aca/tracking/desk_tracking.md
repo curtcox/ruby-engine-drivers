@@ -104,6 +104,9 @@ Desk management is primary agent involved with mapping switch ports to desk ids.
     "desk_reserve_time": 0,
     "desk_hold_time": 0,
     "user_identifier": "username",
+    "checkin": {
+        "level_id": ["desk_id1", "desk_id2"]
+    },
     "mappings": {
         "10.104.144.8": {
             "gi1/0/23": "table-G.001",
@@ -135,6 +138,12 @@ Desk management is primary agent involved with mapping switch ports to desk ids.
 }
 
 ```
+
+* `user_identifier` the function to call on the User model to obtain a username
+* `desk_hold_time` exposed as status and should match the switches `reserve_time` - not used internally, for informing interfaces
+* `desk_reserve_time` if a user wants to reserve their "on hold" desk, this is the maximum reserve time
+* `manual_reserve_time` the max time a manual desk can be reserved for
+* `checkin` the list of manual checkin desks for each level
 
 The `"mappings"` are the only requirement and are typically ingested by creating an import script as there can be thousands.
 
