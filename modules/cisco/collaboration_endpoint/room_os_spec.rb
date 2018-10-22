@@ -404,6 +404,30 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
         )
     expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
 
+    # Multiline commands
+    exec(:xcommand, 'SystemUnit SignInBanner Set', "Hello\nWorld!")
+        .should_send(
+            <<~COMMAND
+                xCommand SystemUnit SignInBanner Set | resultId=\"#{id_peek}\"
+                Hello
+                World!
+                .
+            COMMAND
+        )
+        .responds(
+            <<~JSON
+                {
+                    "CommandResponse":{
+                        "SignInBannerSetResult":{
+                            "status":"OK"
+                        }
+                    },
+                    "ResultId": \"#{id_pop}\"
+                }
+            JSON
+        )
+    expect(result).to eq status: 'OK'
+
 
     # -------------------------------------------------------------------------
     section 'Configuration'

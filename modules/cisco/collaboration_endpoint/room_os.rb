@@ -107,10 +107,11 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Execute an xCommand on the device.
     #
     # @param command [String] the command to execute
+    # @param multiline_body [String] an optional multiline body for the command
     # @param kwargs [Hash] the command arguments
     # @return [::Libuv::Q::Promise] resolves when the command completes
-    def xcommand(command, kwargs = {})
-        send_xcommand command, kwargs
+    def xcommand(command, multiline_body = nil, **kwargs)
+        send_xcommand command, multiline_body, kwargs
     end
 
     # Push a configuration settings to the device.
@@ -155,9 +156,10 @@ class Cisco::CollaborationEndpoint::RoomOs
     # to protect access to #xcommand and still refer the gruntwork here.
     #
     # @param comand [String] the xAPI command to execute
+    # @param multiline_body [String] an optional multiline body for the command
     # @param kwargs [Hash] the command keyword args
     # @return [::Libuv::Q::Promise] that will resolve when execution is complete
-    def send_xcommand(command, kwargs = {})
+    def send_xcommand(command, multiline_body = nil, **kwargs)
         request = Action.xcommand command, kwargs
 
         # Multi-arg commands (external source registration, UI interaction etc)
@@ -167,7 +169,7 @@ class Cisco::CollaborationEndpoint::RoomOs
         opts[:name] = command if kwargs.empty?
         opts[:name] = "#{command} #{kwargs.keys.first}" if kwargs.size == 1
 
-        do_send request, **opts do |response|
+        do_send request, multiline_body, **opts do |response|
             # The result keys are a little odd: they're a concatenation of the
             # last two command elements and 'Result', unless the command
             # failed in which case it's just 'Result'.
@@ -325,15 +327,21 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Execute raw command on the device.
     #
     # @param command [String] the raw command to execute
+    # @param multiline_body [String] an optional multiline body for the command
     # @param options [Hash] options for the transport layer
     # @yield [response]
     #   a pre-parsed response object for the command, if used this block
     #   should return the response result
     # @return [::Libuv::Q::Promise]
-    def do_send(command, **options)
+    def do_send(command, multiline_body = nil, **options)
         request_id = generate_request_uuid
 
-        request = "#{command} | resultId=\"#{request_id}\"\n"
+        if multiline_body
+            multiline_body += "\n" unless multiline_body.end_with? "\n"
+            multiline_body << ".\n"
+        end
+
+        request = "#{command} | resultId=\"#{request_id}\"\n#{multiline_body}"
 
         logger.debug { "-> #{request}" }
 
