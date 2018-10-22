@@ -195,7 +195,7 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
             }
         JSON
     )
-    expect(status[:configuration].dig(:audio, :input, :microphone, 1, :mode)).to be true
+    expect(status[:configuration].dig(:Audio, :Input, :Microphone, 1, :Mode)).to be true
 
     # -------------------------------------------------------------------------
     section 'Base comms (protected methods - ignore the access warnings)'
@@ -342,7 +342,7 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                 }
             JSON
         )
-    expect(result).to be :success
+    expect(result).to eq status: 'OK'
 
     # Command with arguments
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, Layout: :PIP)
@@ -359,7 +359,7 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                 }
             JSON
         )
-    expect(result).to be :success
+    expect(result).to eq status: 'OK'
 
     # Return device argument errors
     exec(:xcommand, 'Video Input SetMainVideoSource', ConnectorId: 1, SourceId: 1)
@@ -448,7 +448,7 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
         )
     expect(result).to be :success
 
-    # Multuple settings with failure with return a promise that rejects
+    # Multiple settings with failure with return a command failure
     exec(:xconfiguration, 'Video Input Connector 1', InputSourceType: :Camera, Foo: 'Bar', Quality: :Motion)
         .should_send("xConfiguration Video Input Connector 1 InputSourceType: Camera | resultId=\"#{id_peek}\"\n")
         .responds(
@@ -485,10 +485,7 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                 }
             JSON
         )
-    result.tap do |last_result|
-        expect(last_result.resolved?).to be true
-        expect { last_result.value }.to raise_error(CoroutineRejection)
-    end
+    expect { result }.to raise_error(Orchestrator::Error::CommandFailure)
 
 
     # -------------------------------------------------------------------------
@@ -564,5 +561,5 @@ Orchestrator::Testing.mock_device 'Cisco::CollaborationEndpoint::RoomOs',
                 }
             JSON
         )
-    expect(result['SystemTime']).to eq '2017-11-27T15:14:25+1000'
+    expect(result).to eq SystemTime: '2017-11-27T15:14:25+1000'
 end
