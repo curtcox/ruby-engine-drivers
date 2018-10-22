@@ -107,10 +107,10 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Execute an xCommand on the device.
     #
     # @param command [String] the command to execute
-    # @param args [Hash] the command arguments
+    # @param kwargs [Hash] the command arguments
     # @return [::Libuv::Q::Promise] resolves when the command completes
-    def xcommand(command, args = {})
-        send_xcommand command, args
+    def xcommand(command, kwargs = {})
+        send_xcommand command, kwargs
     end
 
     # Push a configuration settings to the device.
@@ -155,17 +155,17 @@ class Cisco::CollaborationEndpoint::RoomOs
     # to protect access to #xcommand and still refer the gruntwork here.
     #
     # @param comand [String] the xAPI command to execute
-    # @param args [Hash] the command keyword args
+    # @param kwargs [Hash] the command keyword args
     # @return [::Libuv::Q::Promise] that will resolve when execution is complete
-    def send_xcommand(command, args = {})
-        request = Action.xcommand command, args
+    def send_xcommand(command, kwargs = {})
+        request = Action.xcommand command, kwargs
 
         # Multi-arg commands (external source registration, UI interaction etc)
         # all need to be properly queued and sent without be overriden. In
         # these cases, leave the outgoing commands unnamed.
         opts = {}
-        opts[:name] = command if args.empty?
-        opts[:name] = "#{command} #{args.keys.first}" if args.size == 1
+        opts[:name] = command if kwargs.empty?
+        opts[:name] = "#{command} #{kwargs.keys.first}" if kwargs.size == 1
 
         do_send request, **opts do |response|
             # The result keys are a little odd: they're a concatenation of the
