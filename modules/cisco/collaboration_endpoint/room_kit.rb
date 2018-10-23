@@ -13,7 +13,7 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     description <<~DESC
         Control of Cisco RoomKit devices.
 
-        API access requires a local user with the 'integrator' role to be
+        API access requires a local user with the 'admin' role to be
         created on the codec.
     DESC
 

@@ -13,7 +13,7 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
     description <<~DESC
         Control of Cisco SX20 devices.
 
-        API access requires a local user with the 'integrator' role to be
+        API access requires a local user with the 'admin' role to be
         created on the codec.
     DESC
 
