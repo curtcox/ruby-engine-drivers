@@ -62,7 +62,7 @@ module Cisco::CollaborationEndpoint::UiExtensions
         end
     end
 
-    def ui_extenions_deploy(id, xml_def)
+    def ui_extensions_deploy(id, xml_def)
         send_xcommand 'UserInterface Extensions Set', xml_def, ConfigId: id
     end
 
