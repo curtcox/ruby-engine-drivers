@@ -65,17 +65,17 @@ class Dell::Projector::S718ql
     def power(state, opt = nil)
         if is_affirmative?(state)
             logger.debug "-- requested to power on"
-            @client.set('1.3.6.1.4.1.2699.2.4.1.4.3.0', value: 11)
+            @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.4.3.0', value: 11)
             self[:power] = On
         else
             logger.debug "-- requested to power off"
-            @client.set('1.3.6.1.4.1.2699.2.4.1.4.3.0', value: 7)
+            @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.4.3.0', value: 7)
             self[:power] = Off
         end
     end
 
     def power?(options = {}, &block)
-        state = @client.get('1.3.6.1.4.1.2699.2.4.1.4.3.0')
+        state = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.4.3.0')
         logger.debug { "Volume State #{state.inspect}" }
         state
     end
@@ -95,14 +95,14 @@ class Dell::Projector::S718ql
         raise "unknown input '#{value}'" unless value
 
         logger.debug "-- epson LCD, requested to switch to: #{input}"
-        @client.set('1.3.6.1.4.1.2699.2.4.1.6.1.1.3.1', value: value)
+        @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.6.1.1.3.1', value: value)
 
         self[:input] = input    # for a responsive UI
         self[:mute] = false
     end
 
     def input?
-        input = @client.get('1.3.6.1.4.1.2699.2.4.1.6.1.1.3.1')
+        input = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.6.1.1.3.1')
         self[:input] = INPUTS[input]
     end
 
@@ -113,14 +113,14 @@ class Dell::Projector::S718ql
         vol = 0 if vol < 0
         vol = 100 if vol > 100
 
-        @client.set('1.3.6.1.4.1.2699.2.4.1.16.2.0', value: vol)
+        @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.16.2.0', value: vol)
 
         # Seems to only return ':' for this command
         self[:volume] = vol
     end
 
     def volume?
-        self[:volume] = @client.get('1.3.6.1.4.1.2699.2.4.1.16.2.0')
+        self[:volume] = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.16.2.0')
     end
 
     #
@@ -128,7 +128,7 @@ class Dell::Projector::S718ql
     def mute(state = true)
         state = is_affirmative?(state)
         logger.debug { "-- requested to mute video #{state}" }
-        @client.set('1.3.6.1.4.1.2699.2.4.1.6.2.0', value: (state ? 1 : 2))
+        @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.6.2.0', value: (state ? 1 : 2))
         self[:mute] = state
     end
 
@@ -137,14 +137,14 @@ class Dell::Projector::S718ql
     end
 
     def mute?
-        self[:mute] = @client.get('1.3.6.1.4.1.2699.2.4.1.6.2.0') == 1
+        self[:mute] = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.6.2.0') == 1
     end
 
     # Audio mute
     def mute_audio(state = true)
         state = is_affirmative?(state)
         logger.debug { "-- requested to mute audio #{state}" }
-        @client.set('1.3.6.1.4.1.2699.2.4.1.16.3.0', value: (state ? 1 : 2))
+        @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.16.3.0', value: (state ? 1 : 2))
         self[:audio_mute] = state
     end
 
@@ -153,11 +153,11 @@ class Dell::Projector::S718ql
     end
 
     def audio_mute?
-        self[:audio_mute] = @client.get('1.3.6.1.4.1.2699.2.4.1.16.3.0') == 1
+        self[:audio_mute] = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.16.3.0') == 1
     end
 
     def query_error
-        self[:last_error] = @client.get('1.3.6.1.4.1.2699.2.4.1.18.1.1.5.1')
+        self[:last_error] = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.18.1.1.5.1')
     end
 
     def do_poll
