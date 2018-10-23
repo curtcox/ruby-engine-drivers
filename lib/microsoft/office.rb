@@ -524,18 +524,23 @@ class Microsoft::Office
         start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
 
-        endpoints = user_ids.map do |email|
+        all_endpoints = user_ids.map do |email|
             "/users/#{email}/calendarView"
         end
-        query = {
-            '$top': 200,
-            startDateTime: start_param,
-            endDateTime: end_param,
-        }
-        bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
 
-        check_response(bulk_response)
-        responses = JSON.parse(bulk_response.body)['responses']
+        responses = []
+        all_endpoints.each_slice(10).each do |endpoints|
+            query = {
+                '$top': 200,
+                startDateTime: start_param,
+                endDateTime: end_param,
+            }
+            bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
+
+            check_response(bulk_response)
+            responses += JSON.parse(bulk_response.body)['responses']
+        end
+
         recurring_bookings = {}
         responses.each_with_index do |res, i|
             recurring_bookings[user_ids[res['id'].to_i]] = res['body']['value']
