@@ -64,6 +64,8 @@ class Aca::Tracking::LocateUser
         @blacklist = Set.new((setting(:ignore_vendors) || {}).values)
         @ignore_hosts = Set.new((setting(:ignore_hostnames) || {}).values)
         @accept_hosts = Set.new((setting(:accept_hostnames) || {}).values)
+        @ignore_byod_hosts = Set.new((setting(:ignore_byod_hosts) || {}).values)
+        @accept_byod_hosts = Set.new((setting(:accept_byod_hosts) || {}).values)
         @warnings ||= {}
     end
 
@@ -104,16 +106,19 @@ class Aca::Tracking::LocateUser
     # This is used to directly map MAC addresses to usernames
     # Typically from a RADIUS server like MS Network Policy Server
     def associate(*macs)
-        macs.each do |mac, login|
+        macs.each do |mac, login, hostname|
             begin
+                parts = login.split("\\")
+                login = parts[-1]
+                domain = parts[0]
+
+                # Check the hostname is desirable
+                next if hostname && check_hostname(domain, login, hostname, byod: true)
                 username = ::User.bucket.get("macuser-#{mac}", quiet: true)
+
                 # Don't overwrite domain controller discoveries
                 # This differentiates BYOD from business devices
                 if username.nil? || username.start_with?('byod_')
-                    parts = login.split("\\")
-                    login = parts[-1]
-                    domain = parts[0]
-
                     user = ::Aca::Tracking::UserDevices.for_user("byod_#{login}", domain)
                     user.add(mac)
                 end
@@ -155,36 +160,45 @@ class Aca::Tracking::LocateUser
         end
     end
 
-
     protected
 
+    def check_hostname(domain, login, hostname, byod: false)
+        if byod
+            accept_hosts = @accept_byod_hosts
+            ignore_hosts = @ignore_byod_hosts
+        else
+            accept_hosts = @accept_hosts
+            ignore_hosts = @ignore_hosts
+        end
+
+        # Default to true if accept hosts filter is present
+        ignore_host = !accept_hosts.empty?
+        check = hostname.downcase
+
+        accept_hosts.each do |host|
+            if check.start_with? host
+                ignore_host = false
+                break
+            end
+        end
+
+        ignore_hosts.each do |host|
+            if check.start_with? host
+                ignore_host = true
+                break
+            end
+        end
+
+        if ignore_host
+            logger.debug { "ignoring hostname #{hostname} due to filter" }
+            return ignore_host
+        end
+        save_hostname_mapping(domain, login, hostname) if self[hostname] != login
+        ignore_host
+    end
 
     def perform_lookup(ip, login, domain, hostname, ttl)
-        if hostname
-            # Default to true if accept hosts filter is present
-            ignore_host = !@accept_hosts.empty?
-            check = hostname.downcase
-
-            @accept_hosts.each do |host|
-                if check.start_with? host
-                    ignore_host = false
-                    break
-                end
-            end
-
-            @ignore_hosts.each do |host|
-                if check.start_with? host
-                    ignore_host = true
-                    break
-                end
-            end
-
-            if ignore_host
-                logger.debug { "ignoring hostname #{hostname} due to filter" }
-                return
-            end
-            save_hostname_mapping(domain, login, hostname) if self[hostname] != login
-        end
+        return if hostname && check_hostname(domain, login, hostname)
 
         # prevents concurrent and repeat lookups for the one IP and user
         return if self[ip] == login || @looking_up[ip]
