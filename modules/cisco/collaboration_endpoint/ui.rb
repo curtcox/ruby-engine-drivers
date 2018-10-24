@@ -128,6 +128,8 @@ class Cisco::CollaborationEndpoint::Ui
 
         @codec_mod = mod.to_sym
 
+        thread.all(clear_events).value
+
         unsubscribe @event_binder if @event_binder
         @event_binder = system.subscribe(@codec_mod, :connected) do |notify|
             connected = notify.value
