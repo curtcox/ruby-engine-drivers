@@ -47,14 +47,6 @@ class Cisco::CollaborationEndpoint::Ui
 
 
     # ------------------------------
-    # Device event callbacks
-
-    def on_extensions_widget_action(event)
-        logger.debug event
-    end
-
-
-    # ------------------------------
     # UI deployment
 
     def deploy_extensions(id, xml_def)
@@ -67,6 +59,36 @@ class Cisco::CollaborationEndpoint::Ui
 
     def clear_extensions
         codec.xcommand 'UserInterface Extensions Clear'
+    end
+
+
+    # ------------------------------
+    # UI element interaction
+
+    def widget(id, value)
+        case value
+        when nil
+            codec.xcommand 'UserInterface Extensions Widget UnsetValue',
+                           WidgetId: id
+        when true
+            widget id, :on
+        when false
+            widget id, :off
+        else
+            codec.xcommand 'UserInterface Extensions Widget SetValue',
+                           Value: value, WidgetId: id
+        end
+    end
+
+    BUTTON_EVENT = [:pressed, :released, :clicked].freeze
+
+    def on_extensions_widget_action(event)
+        id, value, type = event.values_at :WidgetId, :Value, :Type
+
+        logger.debug { "#{id} #{type}" }
+
+        # Track values of stateful widgets as module state vars
+        self[id] = value unless BUTTON_EVENT.include?(type) && value == ''
     end
 
 
