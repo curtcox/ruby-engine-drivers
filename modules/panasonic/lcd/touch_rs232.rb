@@ -247,7 +247,7 @@ class Panasonic::LCD::Rs232
         else
             cmd = "#{COMMANDS[command]}:#{param}"
         end
-        #Standard Panasonic requires CR/LF - Touch LCD throw error on LF after CMD
+        #Standard Panasonic requires CR/LF - Touch LCD throw error on LF after CMD 
         full_cmd = hex_to_byte('02') << cmd << hex_to_byte('03')
 
         # Will only accept a single request at a time.
