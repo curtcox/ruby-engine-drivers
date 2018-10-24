@@ -70,6 +70,21 @@ class Cisco::CollaborationEndpoint::Ui
     end
 
 
+    # ------------------------------
+    # Popup messages
+
+    def msg_alert(text, title: '', duration: 0)
+        codec.xcommand 'UserInterface Message Alert Display',
+                       Text: text,
+                       Title: title,
+                       Duration: duration
+    end
+
+    def msg_alert_clear
+        codec.xcommand 'UserInterface Message Alert Clear'
+    end
+
+
     protected
 
 
