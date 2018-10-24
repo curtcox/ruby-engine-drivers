@@ -128,7 +128,7 @@ class Cisco::CollaborationEndpoint::Ui
 
         @codec_mod = mod.to_sym
 
-        thread.all(clear_events).value
+        clear_events
 
         unsubscribe @event_binder if @event_binder
         @event_binder = system.subscribe(@codec_mod, :connected) do |notify|
@@ -175,14 +175,28 @@ class Cisco::CollaborationEndpoint::Ui
         end
     end
 
+    # Perform an action for each event -> callback mapping.
+    def each_mapping(async: false)
+        device_mod = codec
+
+        interactions = event_mappings.map do |path, cb|
+            yield path, cb, device_mod
+        end
+
+        result = thread.finally interactions
+        result.value unless async
+    end
+
     def subscribe_events
-        event_mappings.map do |path, cb|
-            codec.on_event path, @__config__.settings.id, cb
+        mod_id = @__config__.settings.id
+
+        each_mapping do |path, cb, codec|
+            codec.on_event path, mod_id, cb
         end
     end
 
     def clear_events
-        event_mappings.map do |path, _|
+        each_mapping do |path, _, codec|
             codec.clear_event path
         end
     end
