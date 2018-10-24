@@ -144,7 +144,7 @@ class Cisco::CollaborationEndpoint::Ui
     def unbind
         logger.debug 'unbinding'
 
-        unsubscribe @event_binder
+        unsubscribe @event_binder if @event_binder
         @event_binder = nil
 
         clear_events
