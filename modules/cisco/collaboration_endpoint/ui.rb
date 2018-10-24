@@ -49,14 +49,17 @@ class Cisco::CollaborationEndpoint::Ui
     # ------------------------------
     # UI deployment
 
+    # Push a UI definition build with the in-room control editor to the device.
     def deploy_extensions(id, xml_def)
         codec.xcommand 'UserInterface Extensions Set', xml_def, ConfigId: id
     end
 
+    # Retrieve the extensions currently loaded.
     def list_extensions
         codec.xcommand 'UserInterface Extensions List'
     end
 
+    # Clear any deployed UI extensions.
     def clear_extensions
         codec.xcommand 'UserInterface Extensions Clear'
     end
@@ -65,23 +68,27 @@ class Cisco::CollaborationEndpoint::Ui
     # ------------------------------
     # UI element interaction
 
+    # Set the value of a custom UI widget.
     def widget(id, value)
+        widget_action = lambda do |action, **args|
+            codec.xcommand "UserInterface Extensions Widget #{action}", args
+        end
+
         case value
         when nil
-            codec.xcommand 'UserInterface Extensions Widget UnsetValue',
-                           WidgetId: id
+            widget_action[:UnsetValue, WidgetId: id]
         when true
             widget id, :on
         when false
             widget id, :off
         else
-            codec.xcommand 'UserInterface Extensions Widget SetValue',
-                           Value: value, WidgetId: id
+            widget_action[:SetValue, WidgetId: id, Value: value]
         end
     end
 
     BUTTON_EVENT = [:pressed, :released, :clicked].freeze
 
+    # Callback for changes to widget state.
     def on_extensions_widget_action(event)
         id, value, type = event.values_at :WidgetId, :Value, :Type
 
