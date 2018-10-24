@@ -98,8 +98,6 @@ class Microsoft::Office
         start_timing = Time.now.to_i
         response_value = response.value
         end_timing = Time.now.to_i
-        STDERR.puts "Graph request took #{end_timing - start_timing} seconds"
-        STDERR.flush
         return response_value
     end
 
@@ -148,26 +146,11 @@ class Microsoft::Office
         start_timing = Time.now.to_i
         response_value = response.value
         end_timing = Time.now.to_i
-        STDERR.puts "Bulk Graph request took #{end_timing - start_timing} seconds"
-        STDERR.flush
         return response_value
     end
 
 
     def log_graph_request(request_method, data, query, headers, graph_path, password, endpoints=nil)
-        STDERR.puts "--------------NEW GRAPH REQUEST------------"
-        STDERR.puts "#{request_method} to #{graph_path}"
-        STDERR.puts "Data:"
-        STDERR.puts data if data
-        STDERR.puts "Query:"
-        STDERR.puts query if query
-        STDERR.puts "Headers:"
-        STDERR.puts headers if headers
-        STDERR.puts "Endpoints:"
-        STDERR.puts endpoints if endpoints
-        STDERR.puts "Password auth is: #{password}"
-        STDERR.puts '--------------------------------------------'
-        STDERR.flush
     end
 
     def check_response(response)
@@ -175,9 +158,6 @@ class Microsoft::Office
         when 200, 201, 204
             return
         when 400
-            STDERR.puts "GOT ERROR"
-            STDERR.puts response.inspect
-            STDERR.flush
             if response['error']['code'] == 'ErrorInvalidIdMalformed'
                 raise Microsoft::Error::ErrorInvalidIdMalformed.new(response.body)
             else
@@ -527,9 +507,9 @@ class Microsoft::Office
         all_endpoints = user_ids.map do |email|
             "/users/#{email}/calendarView"
         end
-
+        slice_size = 20
         responses = []
-        all_endpoints.each_slice(10).each do |endpoints|
+        all_endpoints.each_slice(slice_size).with_index do |endpoints, ind|
             query = {
                 '$top': 200,
                 startDateTime: start_param,
@@ -538,7 +518,13 @@ class Microsoft::Office
             bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
 
             check_response(bulk_response)
-            responses += JSON.parse(bulk_response.body)['responses']
+            parsed_response = JSON.parse(bulk_response.body)['responses']
+            parsed_response.each do |res|
+                local_id = res['id'].to_i
+                global_id = local_id + (slice_size * ind.to_i)
+                res['id'] = global_id
+                responses.push(res)
+            end
         end
 
         recurring_bookings = {}
@@ -684,9 +670,6 @@ class Microsoft::Office
             endpoint = "/v1.0/users/#{current_user[:email]}/events/#{booking_id}"
         end
 
-        STDERR.puts "ENDPOINT IS"
-        STDERR.puts endpoint
-        STDERR.flush
 
 
         start_object = ensure_ruby_date(start_param).in_time_zone(timezone)
