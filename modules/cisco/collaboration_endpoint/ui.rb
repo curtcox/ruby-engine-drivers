@@ -161,13 +161,19 @@ class Cisco::CollaborationEndpoint::Ui
         system[@codec_mod]
     end
 
+    # Build a list of all callback methods that have been defined.
+    #
+    # Callback methods are denoted being single arity and beginning with `on_`.
     def ui_callbacks
-        public_methods(false).each_with_object([]) do |method, callbacks|
-            next if ::Orchestrator::Core::PROTECTED[method]
-            callbacks << method if method[0..2] == 'on_'
+        public_methods(false).each_with_object([]) do |name, callbacks|
+            next if ::Orchestrator::Core::PROTECTED[name]
+            next unless name[0..2] == 'on_'
+            next unless method(name).arity == 1
+            callbacks << name
         end
     end
 
+    # Build a list of device XPath -> callback mappings.
     def event_mappings
         ui_callbacks.map do |cb|
             path = "/Event/UserInterface/#{cb[3..-1].tr! '_', '/'}"
