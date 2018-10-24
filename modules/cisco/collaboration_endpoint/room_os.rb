@@ -146,6 +146,43 @@ class Cisco::CollaborationEndpoint::RoomOs
     end
 
 
+    # ------------------------------
+    # External feedback subscriptions
+
+    # Subscribe another module to async device events.
+    #
+    # Callback methods must be of arity 1 and public.
+    #
+    # @param path [String] the event path
+    # @param mod_id [Symbol] the module id containing the callback
+    # @param cb [Symbol] the callback method
+    def on_event(path, mod_id, cb)
+        logger.debug { "Registering callback for #{path} to #{mod_id}.#{cb}" }
+
+        register_feedback path do |event|
+            logger.debug { "Proxying #{path} event to #{mod_id}.#{cb}" }
+
+            reactor = ::Libuv::Reactor.current
+            # FIXME: switch to ModuleLoader.instance.get when available
+            mod     = ::Orchestrator::Control.instance.loaded? mod_id
+            proxy   = ::Orchestrator::Core::RequestProxy.new reactor, mod
+
+            proxy.send cb, event
+        end
+    end
+
+    # Clear external event subscribtions for a specific device path.
+    #
+    # @param path [String] the event path
+    def clear_event(path)
+        logger.debug { "Clearing event subscription for #{path}" }
+
+        unregister_feedback path
+    end
+
+    protect_method :on_event, :clear_event
+
+
     protected
 
 
