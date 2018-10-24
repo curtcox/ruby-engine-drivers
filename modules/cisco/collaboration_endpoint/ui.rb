@@ -20,11 +20,29 @@ class Cisco::CollaborationEndpoint::Ui
     end
 
     def on_unload
+        clear_extensions
         unbind
     end
 
     def on_update
-        bind setting(:codec) || :VidConf
+        codec_mod = setting(:codec) || :VidConf
+        ui_layout = setting :cisco_ui_layout
+
+        # Allow UI layouts to be stored as JSON
+        if ui_layout.is_a? Hash
+            logger.warn 'attempting experimental UI layout conversion'
+            # FIXME: does not currently work if keys are missing from generated
+            # xml (even if they are blank). Endpoints appear to ignore any
+            # layouts that do not match the expected structure perfectly.
+            ui_layout = (ui_layout[:Extensions] || ui_layout).to_xml \
+                root:          :Extensions,
+                skip_types:    true,
+                skip_instruct: true
+        end
+
+        bind(codec_mod) do
+            deploy_extensions 'test', ui_layout if ui_layout
+        end
     end
 
 
@@ -35,13 +53,20 @@ class Cisco::CollaborationEndpoint::Ui
         logger.debug event
     end
 
-    def on_presentation_externalsource(event)
-        logger.debug event
 
-        source_id = event.dig :Selected, :SourceIdentifier
-        self[:external_source] = source_id
-        # FIXME: clear on sharing stop instead?
-        signal_status(:external_source)
+    # ------------------------------
+    # UI deployment
+
+    def deploy_extensions(id, xml_def)
+        codec.xcommand 'UserInterface Extensions Set', xml_def, ConfigId: id
+    end
+
+    def list_extensions
+        codec.xcommand 'UserInterface Extensions List'
+    end
+
+    def clear_extensions
+        codec.xcommand 'UserInterface Extensions Clear'
     end
 
 
@@ -63,6 +88,7 @@ class Cisco::CollaborationEndpoint::Ui
         @event_binder = system.subscribe(@codec_mod, :connected) do |notify|
             connected = notify.value
             subscribe_events if connected
+            yield if block_given?
         end
 
         @codec_mod
