@@ -213,6 +213,53 @@ class Aca::Tracking::LocateUser
                 return
             end
 
+            # We search the wireless networks in case snooping is enabled on the
+            # port that the wireless controller is connected to
+            if @meraki_enabled
+                resp = @scanner.get(path: "/meraki/#{ip}").value
+                if resp.status == 200
+                    details = JSON.parse(resp.body, symbolize_names: true)
+
+                    if details[:seenEpoch] > ttl
+                        wifi_mac = details[:clientMac]
+
+                        if self[wifi_mac] != login
+                            logger.debug { "Meraki found #{wifi_mac} for #{ip} == #{login}" }
+
+                            # NOTE:: Wireless MAC addresses stored seperately from wired MACs
+                            user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
+                            user.add(wifi_mac)
+
+                            self[wifi_mac] = login
+                            self[ip] = login
+                            return
+                        end
+                    end
+                end
+            end
+
+            if @cmx_enabled
+                resp = @cmx.get(path: '/api/location/v2/clients', query: {ipAddress: ip}).value
+                if resp.status != 204 && (200...300).include?(resp.status)
+                    locations = JSON.parse(resp.body, symbolize_names: true)
+                    if locations.present? && locations[0][:currentlyTracked] == true
+                        wifi_mac = locations[0][:macAddress]
+
+                        if self[wifi_mac] != login
+                            logger.debug { "CMX found #{wifi_mac} for #{ip} == #{login}" }
+
+                            # NOTE:: Wireless MAC addresses stored seperately from wired MACs
+                            user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
+                            user.add(wifi_mac)
+
+                            self[wifi_mac] = login
+                            self[ip] = login
+                            return
+                        end
+                    end
+                end
+            end
+
             if mac && self[mac] != login
                 logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
 
@@ -221,51 +268,8 @@ class Aca::Tracking::LocateUser
 
                 self[mac] = login
                 self[ip] = login
-            else
-                if @meraki_enabled && mac.nil?
-                    resp = @scanner.get(path: "/meraki/#{ip}").value
-                    if resp.status == 200
-                        details = JSON.parse(resp.body, symbolize_names: true)
-
-                        if details[:seenEpoch] > ttl
-                            mac = details[:clientMac]
-
-                            if self[mac] != login
-                                logger.debug { "Meraki found #{mac} for #{ip} == #{login}" }
-
-                                # NOTE:: Wireless MAC addresses stored seperately from wired MACs
-                                user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
-                                user.add(mac)
-
-                                self[mac] = login
-                                self[ip] = login
-                            end
-                        end
-                    end
-                end
-
-                if @cmx_enabled && mac.nil?
-                    resp = @cmx.get(path: '/api/location/v2/clients', query: {ipAddress: ip}).value
-                    if resp.status != 204 && (200...300).include?(resp.status)
-                        locations = JSON.parse(resp.body, symbolize_names: true)
-                        if locations.present? && locations[0][:currentlyTracked] == true
-                            mac = locations[0][:macAddress]
-
-                            if self[mac] != login
-                                logger.debug { "CMX found #{mac} for #{ip} == #{login}" }
-
-                                # NOTE:: Wireless MAC addresses stored seperately from wired MACs
-                                user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
-                                user.add(mac)
-
-                                self[mac] = login
-                                self[ip] = login
-                            end
-                        end
-                    end
-                end
-
-                logger.debug { "unable to locate MAC for #{ip}" } if mac.nil?
+            elsif mac.nil?
+                logger.debug { "unable to locate MAC for #{ip}" }
             end
         rescue => e
             logger.print_error(e, "looking up #{ip}")
