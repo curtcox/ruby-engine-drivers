@@ -10,7 +10,7 @@ module Panasonic::LCD; end
 # * Protocol: https://aca.im/driver_docs/Panasonic/lcd_protocol2.pdf
 # * Commands: https://aca.im/driver_docs/Panasonic/panasonic_commands.pdf
 
-class Panasonic::LCD::Rs232
+class Panasonic::LCD::TouchRs232
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
@@ -247,7 +247,7 @@ class Panasonic::LCD::Rs232
         else
             cmd = "#{COMMANDS[command]}:#{param}"
         end
-        #Standard Panasonic requires CR/LF - Touch LCD throw error on LF after CMD 
+        #Standard Panasonic requires CR/LF - Touch LCD throw error on LF after CMD
         full_cmd = hex_to_byte('02') << cmd << hex_to_byte('03')
 
         # Will only accept a single request at a time.
