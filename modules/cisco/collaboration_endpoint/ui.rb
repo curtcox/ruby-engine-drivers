@@ -137,7 +137,7 @@ class Cisco::CollaborationEndpoint::Ui
     #
     # @param mod [Symbol] the id of the Cisco CE device module to bind to
     def bind(mod)
-        logger.debug "binding to #{mod}"
+        logger.debug { "binding to #{mod}" }
 
         @codec_mod = mod.to_sym
 
