@@ -172,7 +172,7 @@ class Microsoft::Office
         end
     end
 
-    def get_users(q: nil, limit: nil)
+    def get_users(q: nil, limit: nil, contact_email:nil)
 
         # If we have a query and the query has at least one space
         if q && q.include?(" ")
@@ -196,7 +196,9 @@ class Microsoft::Office
         endpoint = "/v1.0/users"
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
-        JSON.parse(request.body)['value']
+        user_list = JSON.parse(request.body)['value']
+        user_list += self.get_contacts(contact_email) if contact_email
+        user_list
     end
 
     def get_user(user_id:)
