@@ -95,8 +95,13 @@ class Cisco::CollaborationEndpoint::Ui
 
         logger.debug { "#{id} #{type}" }
 
-        # Track values of stateful widgets as module state vars
-        self[id] = value unless BUTTON_EVENT.include?(type) && value == ''
+        # Track values of stateful widgets as module state vars or provide an
+        # event stream for button based widgets
+        self[id] = if BUTTON_EVENT.include?(type) && value == ''
+                       type
+                   else
+                       value
+                   end
 
         # Trigger any bindings defined for the widget action
         begin
