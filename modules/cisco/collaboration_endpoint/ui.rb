@@ -132,8 +132,8 @@ class Cisco::CollaborationEndpoint::Ui
 
         unsubscribe @event_binder if @event_binder
         @event_binder = system.subscribe(@codec_mod, :connected) do |notify|
-            connected = notify.value
-            subscribe_events if connected
+            next unless notify.value
+            subscribe_events
             yield if block_given?
         end
 
