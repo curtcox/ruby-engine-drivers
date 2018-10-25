@@ -87,21 +87,14 @@ class Cisco::CollaborationEndpoint::Ui
         end
     end
 
-    BUTTON_EVENT = [:pressed, :released, :clicked].freeze
-
     # Callback for changes to widget state.
     def on_extensions_widget_action(event)
         id, value, type = event.values_at :WidgetId, :Value, :Type
 
         logger.debug { "#{id} #{type}" }
 
-        # Track values of stateful widgets as module state vars or provide an
-        # event stream for button based widgets
-        self[id] = if BUTTON_EVENT.include?(type) && value == ''
-                       type
-                   else
-                       value
-                   end
+        # Track values of stateful widgets
+        self[id] = value unless value == ''
 
         # Trigger any bindings defined for the widget action
         begin
@@ -109,6 +102,9 @@ class Cisco::CollaborationEndpoint::Ui
         rescue => e
             logger.error "error in binding for #{id}.#{type}: #{e}"
         end
+
+        # Provide an event stream for other modules to subscribe to
+        self[:__event_stream] = { id: id, type: type, value: value }
     end
 
 
