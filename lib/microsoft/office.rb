@@ -197,7 +197,7 @@ class Microsoft::Office
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
         user_list = JSON.parse(request.body)['value']
-        user_list += self.get_contacts(contact_email) if contact_email
+        user_list += self.get_contacts(owner_email:contact_email) if contact_email
         user_list
     end
 
