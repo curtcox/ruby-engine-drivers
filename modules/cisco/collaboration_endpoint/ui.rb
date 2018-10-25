@@ -27,6 +27,7 @@ class Cisco::CollaborationEndpoint::Ui
     def on_update
         codec_mod = setting(:codec) || :VidConf
         ui_layout = setting :cisco_ui_layout
+        @bindings = setting :cisco_ui_bindings || {}
 
         # Allow UI layouts to be stored as JSON
         if ui_layout.is_a? Hash
@@ -96,6 +97,13 @@ class Cisco::CollaborationEndpoint::Ui
 
         # Track values of stateful widgets as module state vars
         self[id] = value unless BUTTON_EVENT.include?(type) && value == ''
+
+        # Trigger any bindings defined for the widget action
+        begin
+            event_handler(id, type)&.call value
+        rescue => e
+            logger.error "error in binding for #{id}.#{type}: #{e}"
+        end
     end
 
 
@@ -202,8 +210,55 @@ class Cisco::CollaborationEndpoint::Ui
     end
 
     def clear_events
+        @event_handlers = nil
+
         each_mapping do |path, _, codec|
             codec.clear_event path
+        end
+    end
+
+    # Get the event handler for a UI widget interaction.
+    def event_handler(widget_id, event_type)
+        # Handlers are stored keyed on a tuple of [widget_id, event_type] and
+        # lazily built as required.
+        @event_handlers ||= Hash.new do |h, (id, type)|
+            config = @bindings.dig id, type
+            if config
+                handler = build_handler config
+                h.store [id, type].freeze, handler
+            end
+        end
+
+        @event_handlers[[widget_id, event_type]]
+    end
+
+    # Given the action for a binding, construct the executable event handler.
+    def build_handler(action)
+        case action
+
+        # Implicit arguments
+        # "mod.method"
+        when String
+            mod, method = action.split '.'
+            proc do |value|
+                logger.debug { "proxying event to #{mod}.#{method}" }
+                proxy = system[mod]
+                case proxy.arity method
+                when 0 then proxy.send method
+                when 1 then proxy.send method, value
+                else raise "incompatible binding (#{action})"
+                end
+            end
+
+        # Explicit / static arguments
+        # mod => { method => [params] }
+        when Hash
+            mod, command = action.first
+            method, args = command.first
+            proc do
+                logger.debug { "proxying event to #{mod}.#{method}" }
+                system[mod].send method, *args
+            end
         end
     end
 end
