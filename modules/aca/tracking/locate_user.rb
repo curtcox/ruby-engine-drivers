@@ -30,7 +30,8 @@ class Aca::Tracking::LocateUser
             'BizLink Docking Stations' => '9cebe8'
         },
         ignore_hostnames: {},
-        accept_hostnames: {}
+        accept_hostnames: {},
+        temporary_macs: {}
     })
 
     def on_load
@@ -61,6 +62,7 @@ class Aca::Tracking::LocateUser
             @cmx = nil
         end
 
+        @temporary = Set.new((setting(:temporary_macs) || {}).values)
         @blacklist = Set.new((setting(:ignore_vendors) || {}).values)
         @ignore_hosts = Set.new((setting(:ignore_hostnames) || {}).values)
         @accept_hosts = Set.new((setting(:accept_hostnames) || {}).values)
@@ -207,10 +209,16 @@ class Aca::Tracking::LocateUser
             logger.debug { "Looking up #{ip} for #{domain}\\#{login}" }
 
             mac = Aca::Tracking::SwitchPort.find_by_device_ip(ip)&.mac_address
-            if mac && @blacklist.include?(mac[0..5])
-                logger.warn "blacklisted device detected for #{domain}\\#{login}"
-                @warnings[login] = mac
-                return
+            if mac
+                check = mac[0..5]
+                if @blacklist.include?(check)
+                    logger.warn "blacklisted device detected for #{domain}\\#{login}"
+                    @warnings[login] = mac
+                    return
+                elsif @temporary.include?(check) && User.bucket.get("temporarily_block_mac-#{mac}", quiet: true)
+                    logger.warn "Ignoring temporary mac for #{domain}\\#{login} during transition period"
+                    return
+                end
             end
 
             # We search the wireless networks in case snooping is enabled on the
