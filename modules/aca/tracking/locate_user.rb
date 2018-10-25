@@ -215,9 +215,12 @@ class Aca::Tracking::LocateUser
                     logger.warn "blacklisted device detected for #{domain}\\#{login}"
                     @warnings[login] = mac
                     return
-                elsif @temporary.include?(check) && User.bucket.get("temporarily_block_mac-#{mac}", quiet: true)
-                    logger.warn "Ignoring temporary mac for #{domain}\\#{login} during transition period"
-                    return
+                elsif @temporary.include?(check)
+                    @warnings[login] = mac
+                    if User.bucket.get("temporarily_block_mac-#{mac}", quiet: true)
+                        logger.warn "Ignoring temporary mac for #{domain}\\#{login} during transition period"
+                        return
+                    end
                 end
             end
 
