@@ -41,7 +41,7 @@ class Cisco::CollaborationEndpoint::Ui
         end
 
         bind(codec_mod) do
-            deploy_extensions 'test', ui_layout if ui_layout
+            deploy_extensions 'ACA', ui_layout if ui_layout
         end
     end
 
