@@ -35,7 +35,9 @@ class Cisco::Switch::MerakiSNMP
         },
         ignore_macs: {
             "Cisco Phone Dock": "7001b5"
-        }
+        },
+        temporary_macs: {},
+        discovery_polling_period: 90
     })
 
     def on_load
@@ -81,6 +83,8 @@ class Cisco::Switch::MerakiSNMP
         new_client if @resolved_ip
         @remote_address = remote_address.downcase
         @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
+        @temporary = ::Set.new((setting(:temporary_macs) || {}).values)
+        @polling_period = setting(:discovery_polling_period) || 90
 
         @meraki_api = ::Cisco::MerakiDashboard.instance
         @api_key = setting(:meraki_api_key)
@@ -421,7 +425,19 @@ class Cisco::Switch::MerakiSNMP
         # Update the status of the switch port
         model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
         if model
-            notify = model.disconnected
+            # Check if MAC address is black listed.
+            # We want to remove the discovery information for the MAC
+            # We also need to prevent it being re-discovered for the polling
+            # period as the next person to connect will be mis-associated
+            # Need to create a database entry for the MAC with a TTL
+            mac = model.mac_address
+            temporary = if (mac && @temporary.include?(mac[0..5]))
+                logger.debug { "removing temporary MAC for #{model.username} with #{model.mac_address} at #{model.desk_id}" }
+                @polling_period
+            else
+                0
+            end
+            notify = model.disconnected(temporary: temporary)
             details = model.details
             self[interface] = details
 
