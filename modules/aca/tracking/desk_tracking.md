@@ -338,7 +338,7 @@ The `snooping drivers` also need to know the polling period of the domain contro
 * `discovery_polling_period` - in seconds - defaults to 90
 
 
-### Blacklisting always on docking stations
+### Blacklisting "always on" docking stations
 
 These keep the network port high when nothing is connected. To deal with this we
 have to blacklist MAC addresses at the snooping driver level. Settings:
