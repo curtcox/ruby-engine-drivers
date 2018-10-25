@@ -38,7 +38,9 @@ class Cisco::Switch::SnoopingCatalyst
         reserve_time: 5.minutes.to_i,
         ignore_macs: {
             "Cisco Phone Dock": "7001b5"
-        }
+        },
+        temporary_macs: {},
+        discovery_polling_period: 90
     })
 
     def on_load
@@ -79,6 +81,8 @@ class Cisco::Switch::SnoopingCatalyst
     def on_update
         @remote_address = remote_address.downcase
         @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
+        @temporary = ::Set.new((setting(:temporary_macs) || {}).values)
+        @polling_period = setting(:discovery_polling_period) || 90
 
         self[:name] = @switch_name = setting(:switch_name)
         self[:ip_address] = @remote_address
@@ -321,7 +325,14 @@ class Cisco::Switch::SnoopingCatalyst
         # Update the status of the switch port
         model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
         if model
-            notify = model.disconnected
+            # Check if MAC address is black listed.
+            # We want to remove the discovery information for the MAC
+            # We also need to prevent it being re-discovered for the polling
+            # period as the next person to connect will be mis-associated
+            # Need to create a database entry for the MAC with a TTL
+            mac = model.mac_address
+            temporary = (mac && @temporary.include?(mac[0..5])) ? @polling_period : 0
+            notify = model.disconnected(temporary: temporary)
             details = model.details
             self[interface] = details
 

@@ -310,3 +310,41 @@ You can reset all of this by doing the following:
 * `Aca::Tracking::UserDevices.by_domain.each(&:destroy)`
 
 this will all automatically be regenerated
+
+
+### Temporary assigning docking station MAC addresses
+
+You might want to temporarily assign MAC addresses to docking stations that require
+software to propagate MAC addresses.
+In case some staff members don't have the correct configuration or there is a driver
+issue.
+
+* NOTE:: we have seen cases where MAC address propagation does not work between
+different driver versions, so all driver releases should be tested for capability.
+
+MAC addresses that are assigned temporarily require multiple touch points.
+
+1. `locate_user.rb` checks if a temporary key in the database exists. If it exists, discovery is ignored.
+2. `locate_user.rb` assigns the black listed MAC address to a staff member
+3. `snooping drivers` remove the MAC address from the staff device list when the staff member unplugs
+4. `snooping drivers` set the temporary ignore key in the database
+
+Both the `locate_user.rb` script and the `snooping drivers` need to know the list of temporary blacklist macs. Setting:
+
+* `temporary_macs` - Hash of device names to the first 6 chars of the MAC address
+
+The `snooping drivers` also need to know the polling period of the domain controller script.
+
+* `discovery_polling_period` - in seconds - defaults to 90
+
+
+### Blacklisting always on docking stations
+
+These keep the network port high when nothing is connected. To deal with this we
+have to blacklist MAC addresses at the snooping driver level. Settings:
+
+* `ignore_macs` - Hash of device names to the first 6 chars of the MAC address
+
+The system deals with this by only updating the list of live ports after querying
+the snooping database. This way if a blacklisted device is found the status of the
+port can be set to not-connected.

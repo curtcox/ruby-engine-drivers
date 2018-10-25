@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+# For temporary MAC addresses
+require 'aca/tracking/user_devices'
+
 module Aca; end
 module Aca::Tracking
     class StaticDetails < ::Hash
@@ -167,8 +170,30 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         retry
     end
 
-    def disconnected
+    def disconnected(temporary: 0)
         return false unless connected?
+
+        # Is this MAC address a dock that we really want to ignore
+        if temporary > 0
+            mac = self.mac_address
+
+            # Don't blow away reservations if there is a clash
+            if self.reserved_mac == mac
+                self.reserve_time = 0
+                self.reserved_mac = nil
+                self.reserved_by = nil
+            end
+
+            # Block the MAC address from being discovered for a period of time
+            begin
+                self.class.set("temporarily_block_mac-#{self.mac_address}", ttl: temporary)
+                ::Aca::Tracking::UserDevices.with_mac(mac).each do |user|
+                    user.remove(mac)
+                end
+            rescue
+                # this isn't critical so we ignore errors here
+            end
+        end
 
         # Configure pre-defined reservation on disconnect
         now = Time.now.to_i
