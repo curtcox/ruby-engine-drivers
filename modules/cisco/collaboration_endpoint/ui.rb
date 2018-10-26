@@ -244,11 +244,8 @@ class Cisco::CollaborationEndpoint::Ui
             proc do |value|
                 logger.debug { "proxying event to #{mod}.#{method}" }
                 proxy = system[mod]
-                case proxy.arity method
-                when 0 then proxy.send method
-                when 1 then proxy.send method, value
-                else raise "incompatible binding (#{action})"
-                end
+                args  = proxy.arity(method).zero? ? nil : value
+                proxy.send method, *args
             end
 
         # Explicit / static arguments
