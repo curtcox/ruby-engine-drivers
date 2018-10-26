@@ -156,7 +156,7 @@ class Cisco::CollaborationEndpoint::Ui
         unsubscribe @event_binder if @event_binder
         @event_binder = nil
 
-        clear_events
+        clear_events async: true
 
         @codec_mod = nil
     end
@@ -202,18 +202,18 @@ class Cisco::CollaborationEndpoint::Ui
         result.value unless async
     end
 
-    def subscribe_events
+    def subscribe_events(**opts)
         mod_id = @__config__.settings.id
 
-        each_mapping do |path, cb, codec|
+        each_mapping(**opts) do |path, cb, codec|
             codec.on_event path, mod_id, cb
         end
     end
 
-    def clear_events
+    def clear_events(**opts)
         @event_handlers = nil
 
-        each_mapping do |path, _, codec|
+        each_mapping(**opts) do |path, _, codec|
             codec.clear_event path
         end
     end
