@@ -69,16 +69,21 @@ class Aca::Tracking::LocateUser
         @ignore_byod_hosts = Set.new((setting(:ignore_byod_hosts) || {}).values)
         @accept_byod_hosts = Set.new((setting(:accept_byod_hosts) || {}).values)
         @warnings ||= {}
+        @filters ||= {}
     end
 
     protect_method :clear_warnings, :warnings, :clean_up
 
     # Provides a list of users and the black listed mac addresses
     # This allows one to update configuration of these machines
-    attr_reader :warnings
+    attr_reader :warnings, :filters
 
     def clear_warnings
         @warnings = {}
+    end
+
+    def clear_filters
+        @filters = {}
     end
 
     # Removes all the references to a particular vendors mac addresses
@@ -143,7 +148,7 @@ class Aca::Tracking::LocateUser
             return unless mac
 
             # Remove the username details recorded for this MAC address
-            recorded_login = self[mac]
+            recorded_login = @filters[mac]
             if recorded_login != login
                 logger.warn { "removing #{mac} from recorded #{recorded_login} and reported #{login}" }
                 user = ::Aca::Tracking::UserDevices.for_user(recorded_login)
@@ -155,8 +160,8 @@ class Aca::Tracking::LocateUser
             user = ::Aca::Tracking::UserDevices.for_user(login, domain)
             user.remove(mac)
 
-            self[mac] = nil
-            self[ip] = nil
+            @filters[mac] = nil
+            @filters[ip] = nil
         ensure
             @looking_up.delete(ip)
         end
@@ -195,7 +200,7 @@ class Aca::Tracking::LocateUser
             logger.debug { "ignoring hostname #{hostname} due to filter" }
             return ignore_host
         end
-        save_hostname_mapping(domain, login, hostname) if self[hostname] != login
+        save_hostname_mapping(domain, login, hostname) if @filters[hostname] != login
         ignore_host
     end
 
@@ -203,7 +208,7 @@ class Aca::Tracking::LocateUser
         return if hostname && check_hostname(domain, login, hostname)
 
         # prevents concurrent and repeat lookups for the one IP and user
-        return if self[ip] == login || @looking_up[ip]
+        return if @filters[ip] == login || @looking_up[ip]
         begin
             @looking_up[ip] = true
             logger.debug { "Looking up #{ip} for #{domain}\\#{login}" }
@@ -234,15 +239,15 @@ class Aca::Tracking::LocateUser
                     if details[:seenEpoch] > ttl
                         wifi_mac = details[:clientMac]
 
-                        if self[wifi_mac] != login
+                        if @filters[wifi_mac] != login
                             logger.debug { "Meraki found #{wifi_mac} for #{ip} == #{login}" }
 
                             # NOTE:: Wireless MAC addresses stored seperately from wired MACs
                             user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
                             user.add(wifi_mac)
 
-                            self[wifi_mac] = login
-                            self[ip] = login
+                            @filters[wifi_mac] = login
+                            @filters[ip] = login
                             return
                         end
                     end
@@ -256,29 +261,29 @@ class Aca::Tracking::LocateUser
                     if locations.present? && locations[0][:currentlyTracked] == true
                         wifi_mac = locations[0][:macAddress]
 
-                        if self[wifi_mac] != login
+                        if @filters[wifi_mac] != login
                             logger.debug { "CMX found #{wifi_mac} for #{ip} == #{login}" }
 
                             # NOTE:: Wireless MAC addresses stored seperately from wired MACs
                             user = ::Aca::Tracking::UserDevices.for_user("wifi_#{login}", domain)
                             user.add(wifi_mac)
 
-                            self[wifi_mac] = login
-                            self[ip] = login
+                            @filters[wifi_mac] = login
+                            @filters[ip] = login
                             return
                         end
                     end
                 end
             end
 
-            if mac && self[mac] != login
+            if mac && @filters[mac] != login
                 logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
 
                 user = ::Aca::Tracking::UserDevices.for_user(login, domain)
                 user.add(mac)
 
-                self[mac] = login
-                self[ip] = login
+                @filters[mac] = login
+                @filters[ip] = login
             elsif mac.nil?
                 logger.debug { "unable to locate MAC for #{ip}" }
             end
@@ -299,7 +304,7 @@ class Aca::Tracking::LocateUser
         if existing
             if existing[:hostname] == hostname
                 logger.debug { "ignoring #{hostname} as already in database" }
-                self[hostname] = username
+                @filters[hostname] = username
                 return
             end
             existing[:hostname] = hostname
@@ -317,6 +322,6 @@ class Aca::Tracking::LocateUser
             bucket.set(key, data)
         end
 
-        self[hostname] = username
+        @filters[hostname] = username
     end
 end
