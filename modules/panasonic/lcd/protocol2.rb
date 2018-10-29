@@ -9,6 +9,10 @@ module Panasonic::LCD; end
 # Documentation:
 # * Protocol: https://aca.im/driver_docs/Panasonic/lcd_protocol2.pdf
 # * Commands: https://aca.im/driver_docs/Panasonic/panasonic_commands.pdf
+# The display must be set to Protocol2 using the IR remote:
+# - Press SETUP
+# - Select OSD language and press ENTER for >3secs
+# - Select Options > LAN Control Protocol: Protocol 2
 
 class Panasonic::LCD::Protocol2
     include ::Orchestrator::Constants
