@@ -277,11 +277,12 @@ class Aca::Tracking::LocateUser
             end
 
             if mac && @filters[mac] != login
-                logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
-
                 # Don't move wifi devices to desk tracking system
                 username = ::User.bucket.get("macuser-#{mac}", quiet: true)
-                if username.nil? || !(username.start_with?('byod_') || username.start_with?('wifi_'))
+                if username && (username.start_with?('byod_') || username.start_with?('wifi_'))
+                    logger.debug { "MAC #{mac} has been assigned as a WIFI device - ignoring" }
+                else
+                    logger.debug { "MAC #{mac} found for #{ip} == #{login}" }
                     user = ::Aca::Tracking::UserDevices.for_user(login, domain)
                     user.add(mac)
                 end
