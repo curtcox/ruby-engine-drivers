@@ -67,25 +67,45 @@ class Cisco::CollaborationEndpoint::Ui
 
 
     # ------------------------------
-    # UI element interaction
 
-    # Set the value of a custom UI widget.
-    def widget(id, value)
-        widget_action = lambda do |action, **args|
-            codec.xcommand "UserInterface Extensions Widget #{action}", args
-        end
 
-        case value
-        when nil
-            widget_action[:UnsetValue, WidgetId: id]
-        when true
-            widget id, :on
-        when false
-            widget id, :off
-        else
-            widget_action[:SetValue, WidgetId: id, Value: value]
+
+    # ------------------------------
+    # Element interaction
+
+    # Set the value of a widget.
+    def set(id, value)
+        return unset id if value.nil?
+
+        logger.debug { "setting #{id} to #{value}" }
+
+        codec.xcommand 'UserInterface Extensions Widget SetValue',
+                       WidgetId: id, Value: value
         end
     end
+
+    # Clear the value associated with a widget.
+    def unset(id)
+        logger.debug { "clearing #{id}" }
+
+        codec.xcommand 'UserInterface Extensions Widget UnsetValue',
+                       WidgetId: id
+    end
+
+    # Set the state of a switch widget.
+    def switch(id, state)
+        value = is_affirmative?(state) ? :on : :off
+        set id, value
+    end
+
+    # Set the highlight state for a button widget.
+    def highlight(id, state)
+        value = is_affirmative?(state) ? :active : :inactive
+        set id, value
+    end
+
+    # Set the text label used on text or spinner widget.
+    alias label set
 
     # Callback for changes to widget state.
     def on_extensions_widget_action(event)
