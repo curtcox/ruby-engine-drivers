@@ -241,7 +241,7 @@ class Panasonic::Camera::He50
         if direction == 'in'
             speed += 5
         elsif direction == 'out'
-            speed -= 5
+            speed -= 30
         end
         manual_zoom(speed)
     end
@@ -283,7 +283,7 @@ class Panasonic::Camera::He50
     end
 
     def manual_zoom(speed, priority: 50)
-        speed = in_range(speed.to_i, self[:joy_right], self[:joy_left]).to_s(16).upcase.rjust(3, '0')
+        speed = in_range(speed.to_i, self[:joy_right], self[:joy_left]).to_s(16).upcase.rjust(2, '0')
 
         req('Z', speed, :manual_zoom, priority: priority) do |data, resolve|
             val = extract(:manual_zoom, data, resolve)
