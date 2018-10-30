@@ -67,7 +67,23 @@ class Cisco::CollaborationEndpoint::Ui
 
 
     # ------------------------------
+    # Panel interaction
 
+    def close_panel
+        codec.xcommand 'UserInterface Extensions Panel Close'
+    end
+
+    def on_extensions_panel_clicked(event)
+        id = event[:PanelId]
+
+        logger.debug { "#{id} opened" }
+
+        self[:__active_panel] = id
+    end
+
+    # FIXME: at the time of writing, the device API does not provide the ability
+    # to monitor for user initiated panel close events. When available, track
+    # these and update self[:__active_panel] accordingly.
 
 
     # ------------------------------
