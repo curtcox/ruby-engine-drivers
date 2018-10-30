@@ -40,7 +40,7 @@ class Panasonic::Camera::He50
 
         self[:iris_max] = 0xFFF
         self[:iris_min] = 0x555
-        
+
         on_update
     end
 
@@ -98,7 +98,7 @@ class Panasonic::Camera::He50
         options[:delay] = 6000 if state
 
         logger.debug "Camera requested power #{state}"
-        
+
         req('O', state, :power, options) do |data, resolve|
             val = extract(:power, data, resolve)
             if val
@@ -110,7 +110,7 @@ class Panasonic::Camera::He50
 
     def installation(pos = nil)
         pos = (pos.to_sym == :desk ? 0 : 1) if pos
-        
+
         req('INS', pos, :installation) do |data, resolve|
             val = extract(:installation, data, resolve)
             if val
@@ -125,7 +125,7 @@ class Panasonic::Camera::He50
             pan = in_range(pan.to_i, self[:pan_max], self[:pan_min]).to_s(16).upcase.rjust(4, '0')
             tilt = in_range(tilt.to_i, self[:tilt_max], self[:tilt_min]).to_s(16).upcase.rjust(4, '0')
         end
-        
+
         req('APC', "#{pan}#{tilt}", :pantilt) do |data, resolve|
             val = extract(:pantilt, data, resolve)
             if val
@@ -235,6 +235,22 @@ class Panasonic::Camera::He50
         joystick(speed, 0x50)
     end
 
+    def adjust_zoom(direction)
+        direction = direction.to_s
+        speed = 0x50
+        if direction == 'in'
+            speed += 5
+        elsif direction == 'out'
+            speed -= 5
+        end
+        manual_zoom(speed)
+    end
+
+    def stop
+        manual_zoom(0x50, priority: 100)
+        joystick(0x50, 0x50)
+    end
+
     def limit(direction, state = nil)
         dir = LIMITS[direction.to_sym]
         state = (is_affirmative?(set) ? 1 : 0) unless state.nil?
@@ -266,10 +282,10 @@ class Panasonic::Camera::He50
         end
     end
 
-    def manual_zoom(speed)
+    def manual_zoom(speed, priority: 50)
         speed = in_range(speed.to_i, self[:joy_right], self[:joy_left]).to_s(16).upcase.rjust(3, '0')
 
-        req('Z', speed, :manual_zoom) do |data, resolve|
+        req('Z', speed, :manual_zoom, priority: priority) do |data, resolve|
             val = extract(:manual_zoom, data, resolve)
             if val
                 self[:manual_zoom] = val.to_i(16)
@@ -280,7 +296,7 @@ class Panasonic::Camera::He50
 
     def link_zoom(state = nil) # Link pantilt speed to zoom
         state = (is_affirmative?(state) ? 1 : 0) unless state.nil?
-        
+
         req('SWZ', state, :link_zoom) do |data, resolve|
             val = extract(:link_zoom, data, resolve)
             if val
@@ -322,7 +338,7 @@ class Panasonic::Camera::He50
 
     def auto_focus(state = nil)
         state = (is_affirmative?(state) ? 1 : 0) unless state.nil?
-        
+
         req('D1', state, :auto_focus) do |data, resolve|
             val = extract(:auto_focus, data, resolve)
             if val
@@ -355,7 +371,7 @@ class Panasonic::Camera::He50
 
     def auto_iris(state = nil)
         state = (is_affirmative?(state) ? 1 : 0) unless state.nil?
-        
+
         req('D3', state, :auto_iris) do |data, resolve|
             val = extract(:auto_iris, data, resolve)
             if val
@@ -421,4 +437,3 @@ class Panasonic::Camera::He50
         end
     end
 end
-
