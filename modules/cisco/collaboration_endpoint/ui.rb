@@ -48,7 +48,7 @@ class Cisco::CollaborationEndpoint::Ui
 
 
     # ------------------------------
-    # UI deployment
+    # Deployment
 
     # Push a UI definition build with the in-room control editor to the device.
     def deploy_extensions(id, xml_def)
@@ -78,7 +78,7 @@ class Cisco::CollaborationEndpoint::Ui
 
         logger.debug { "#{id} opened" }
 
-        self[:__active_panel] = id
+        track :__active_panel, id
     end
 
     # FIXME: at the time of writing, the device API does not provide the ability
@@ -97,7 +97,6 @@ class Cisco::CollaborationEndpoint::Ui
 
         codec.xcommand 'UserInterface Extensions Widget SetValue',
                        WidgetId: id, Value: value
-        end
     end
 
     # Clear the value associated with a widget.
@@ -130,7 +129,7 @@ class Cisco::CollaborationEndpoint::Ui
         logger.debug { "#{id} #{type}" }
 
         # Track values of stateful widgets
-        self[id] = value unless value == ''
+        track id, value unless ['', :increment, :decrement].include? value
 
         # Trigger any bindings defined for the widget action
         begin
@@ -140,7 +139,17 @@ class Cisco::CollaborationEndpoint::Ui
         end
 
         # Provide an event stream for other modules to subscribe to
-        self[:__event_stream] = { id: id, type: type, value: value }
+        track :__event_stream, { id: id, type: type, value: value }.freeze
+    end
+
+    # Alias the module state so that all widgets can be interacted with as if
+    # they were local status vars using []= and [] to set and get current value.
+    alias track []=
+    protected :track
+    # FIXME: the results in []= being enumerated by the funcs API
+    def []=(id, value)
+        set id, value
+        value
     end
 
 
