@@ -1,5 +1,6 @@
 require 'active_support/time'
 require 'logger'
+
 module Microsoft
     class Error < StandardError
         class ResourceNotFound < Error; end
@@ -47,7 +48,7 @@ class Microsoft::Office
             @client_secret,
             oauth_options
         )
-    end 
+    end
 
     def graph_token
        @graph_token = @graph_client.client_credentials.get_token({
@@ -172,6 +173,7 @@ class Microsoft::Office
         end
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list
     def get_users(q: nil, limit: nil, contact_email:nil)
 
         # If we have a query and the query has at least one space
@@ -201,6 +203,7 @@ class Microsoft::Office
         user_list
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_get
     def get_user(user_id:)
         endpoint = "/v1.0/users/#{user_id}"
         request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
@@ -218,6 +221,7 @@ class Microsoft::Office
         end
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
     def get_contacts(owner_email:, q:nil, limit:nil)
         query_params = { '$top': (limit || 1000) }
         query_params['$filter'] = "startswith(displayName, #{q}) or startswith(givenName, #{q}) or startswith(surname, #{q}) or emailAddresses/any(a:a/address eq  #{q})" if q
@@ -229,7 +233,7 @@ class Microsoft::Office
 
     def format_contacts(contacts)
         output_contacts = []
-        contacts.each do |contact| 
+        contacts.each do |contact|
             output_format = {}
             output_format[:id] = contact['id']
             output_format[:first_name] = contact['givenName']
@@ -242,6 +246,7 @@ class Microsoft::Office
         output_contacts
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
     def get_contact(owner_email:, contact_email:)
         endpoint = "/v1.0/users/#{owner_email}/contacts"
         query_params = {
@@ -263,6 +268,7 @@ class Microsoft::Office
         return get_contact(owner_email: owner_email, contact_email: contact_email).length > 0
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_contacts
     def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, organisation:nil, other:{})
         # This data is required so add it unconditionally
         contact_data = {
@@ -288,6 +294,7 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
     def get_organisations(owner_email:)
         query_params = {
             '$top': 1000
@@ -301,7 +308,7 @@ class Microsoft::Office
         orgs.uniq.compact
     end
 
-
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/api/user_findrooms
     def get_rooms(q: nil, limit: nil)
         filter_param = "startswith(name,'#{q}') or startswith(address,'#{q}')" if q
         query_params = {
@@ -314,6 +321,7 @@ class Microsoft::Office
         room_response = JSON.parse(request.body)['value']
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/api/user_findrooms
     def get_room(room_id:)
         endpoint = "/beta/users/#{@service_account_email}/findRooms"
         request = graph_request(request_method: 'get', endpoint: endpoint, password: true)
@@ -322,8 +330,9 @@ class Microsoft::Office
         room_response.select! { |room| room['email'] == room_id }
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/beta/api/user_findmeetingtimes
     def get_available_rooms(rooms:, start_param:, end_param:)
-        endpoint = "/v1.0/users/#{@service_account_email}/findMeetingTimes" 
+        endpoint = "/v1.0/users/#{@service_account_email}/findMeetingTimes"
         now = Time.now
         start_ruby_param = ensure_ruby_date((start_param || now))
         end_ruby_param = ensure_ruby_date((end_param || (now + 1.hour)))
@@ -333,7 +342,7 @@ class Microsoft::Office
 
         # Add the attendees
         rooms.map!{|room|
-            { 
+            {
                 type: 'required',
                 emailAddress: {
                     address: room[:email],
@@ -371,6 +380,7 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_get
     def get_booking(booking_id:, mailbox:)
         endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
         request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
@@ -378,6 +388,7 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_delete
     def delete_booking(booking_id:, mailbox:)
         endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
         request = graph_request(request_method: 'delete', endpoint: endpoint, password: @delegated)
@@ -466,7 +477,7 @@ class Microsoft::Office
         # Get the organiser and location data
         booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
         if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
-            booking['room_id'] = booking['locations'][0]['uniqueId'].downcase 
+            booking['room_id'] = booking['locations'][0]['uniqueId'].downcase
         end
         if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
             booking['room_name'] = booking['location']['displayName']
@@ -475,6 +486,7 @@ class Microsoft::Office
         booking
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_calendarview
     def bookings_request_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
         if user_id.class == Array
             user_id = user_id[0]
@@ -501,6 +513,7 @@ class Microsoft::Office
         recurring_bookings
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_calendarview
     def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week))
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
@@ -540,7 +553,7 @@ class Microsoft::Office
         return get_bookings_by_user(user_id: room_id, start_param: start_param, end_param: end_param)
     end
 
-
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_events
     def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney')
         description = String(description)
         attendees = Array(attendees)
@@ -633,7 +646,7 @@ class Microsoft::Office
                 }
             }
         end
-        
+
         if recurrence
             event[:recurrence] = {
                 pattern: {
@@ -661,6 +674,7 @@ class Microsoft::Office
         response = JSON.parse(request.body)
     end
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_update
     def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Sydney')
         # We will always need a room and endpoint passed in
         room = Orchestrator::ControlSystem.find_by_email(room_id)
@@ -722,7 +736,7 @@ class Microsoft::Office
 
 
     # Takes a date of any kind (epoch, string, time object) and returns a time object
-    def ensure_ruby_date(date) 
+    def ensure_ruby_date(date)
         if !(date.class == Time || date.class == DateTime)
             if string_is_digits(date)
 
@@ -735,9 +749,9 @@ class Microsoft::Office
                 end
 
                 # Convert to datetimes
-                date = Time.at(date)           
+                date = Time.at(date)
             else
-                date = Time.parse(date)                
+                date = Time.parse(date)
             end
         end
         return date
