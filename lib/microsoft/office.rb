@@ -84,7 +84,7 @@ class Microsoft::Office
 
         graph_path = "#{@graph_domain}#{endpoint}"
 
-        log_graph_request(request_method, data, query, headers, graph_path, password)
+            log_graph_request(request_method, data, query, headers, graph_path, password)
 
 
         graph_api_options = {inactivity_timeout: 25000, keepalive: false}
@@ -132,6 +132,9 @@ class Microsoft::Office
             requests: request_array
         }.to_json
 
+
+        log_graph_request(request_method, data, query, headers, graph_path, password, endpoints)
+
         graph_api_options = {inactivity_timeout: 25000, keepalive: false}
 
 
@@ -152,6 +155,19 @@ class Microsoft::Office
 
 
     def log_graph_request(request_method, data, query, headers, graph_path, password, endpoints=nil)
+        STDERR.puts "--------------NEW GRAPH REQUEST------------"
+        STDERR.puts "#{request_method} to #{graph_path}"
+        STDERR.puts "Data:"
+        STDERR.puts data if data
+        STDERR.puts "Query:"
+        STDERR.puts query if query
+        STDERR.puts "Headers:"
+        STDERR.puts headers if headers
+        STDERR.puts "Endpoints:"
+        STDERR.puts endpoints if endpoints
+        STDERR.puts "Password auth is: #{password}"
+        STDERR.puts '--------------------------------------------'
+        STDERR.flush
     end
 
     def check_response(response)
