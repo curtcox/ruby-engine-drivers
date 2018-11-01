@@ -80,7 +80,7 @@ class Cisco::CollaborationEndpoint::Ui
 
         logger.debug { "#{id} opened" }
 
-        track :__active_panel, id
+        self[:__active_panel] = id
     end
 
     # FIXME: at the time of writing, the device API does not provide the ability
@@ -104,8 +104,7 @@ class Cisco::CollaborationEndpoint::Ui
         # the API. In these cases, ensure locally tracked state remains valid.
         update.then do
             # Ensure the value maps to the same as those recevied in responses
-            value = ::Cisco::CollaborationEndpoint::Xapi::Response.convert value
-            track id, value
+            self[id] = ::Cisco::CollaborationEndpoint::Xapi::Response.convert value
         end
     end
 
@@ -116,7 +115,7 @@ class Cisco::CollaborationEndpoint::Ui
         update = codec.xcommand 'UserInterface Extensions Widget UnsetValue',
                                 WidgetId: id
 
-        update.then { track id, nil }
+        update.then { self[id] = nil }
     end
 
     # Set the state of a switch widget.
@@ -141,7 +140,7 @@ class Cisco::CollaborationEndpoint::Ui
         logger.debug { "#{id} #{type}" }
 
         # Track values of stateful widgets
-        track id, value unless ['', :increment, :decrement].include? value
+        self[id] = value unless ['', :increment, :decrement].include? value
 
         # Trigger any bindings defined for the widget action
         begin
@@ -151,22 +150,21 @@ class Cisco::CollaborationEndpoint::Ui
         end
 
         # Provide an event stream for other modules to subscribe to
-        track :__event_stream, { id: id, type: type, value: value }.freeze
+        self[:__event_stream] = { id: id, type: type, value: value }.freeze
     end
 
-    # Alias the module state so that all widgets can be interacted with as if
-    # they were local status vars using []= and [] to set and get current value.
-    def track(status, value)
-        # FIXME: as []= is injected by DependancyManager, it's not availble to
-        # directly alias via `alias track []=`. Look at other options here so
-        # that the same implementation is garunteed if things change and we
-        # don't leak internals here.
-        @__config__.trak(status.to_sym, value)
-        value
+    # Allow the all widget state to be interacted with externally as though
+    # is was local status vars by using []= and [] so set and get.
+    # FIXME: this cause []= to be exposed as an API method
+    def []=(status, value)
+        if caller_locations.map(&:path).include? __FILE__
+            # Internal use follows standard behaviour provided by Core::Mixin
+            @__config__.trak(status.to_sym, value)
+            # FIXME: setting to nil does not remove from status - need delete
+        else
+            set status, value
+        end
     end
-    protected :track
-    # FIXME: this exposes []= as an API method
-    alias []= set
 
 
     # ------------------------------
