@@ -93,7 +93,14 @@ class Cisco::CollaborationEndpoint::Ui
 
     # Set the value of a widget.
     def set(id, value)
-        return unset id if value.nil?
+        case value
+        when nil
+            return unset id
+        when true, false
+            # FIXME: the can result in an error being logged due to the inital
+            # type mismatch - need a neater way to handle loss of info
+            return switch(id, value).catch { highlight id, value }
+        end
 
         logger.debug { "setting #{id} to #{value}" }
 
@@ -284,15 +291,7 @@ class Cisco::CollaborationEndpoint::Ui
         @__config__.status.each do |key, value|
             # Non-widget related status prefixed with `__`
             next if key =~ /^__.*/
-
-            # Map bool values back to :on|:off or :active|:inactive
-            if [true, false].include? value
-                # FIXME: the results in an error being logged due to the inital
-                # type mismatch - need a neater way to handle loss of info
-                switch(key, value).catch { highlight(key, value) }
-            else
-                set key, value
-            end
+            set key, value
         end
     end
 
