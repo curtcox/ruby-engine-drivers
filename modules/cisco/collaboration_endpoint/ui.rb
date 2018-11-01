@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+load File.join(__dir__, 'xapi', 'response.rb')
+
 module Cisco; end
 module CollaborationEndpoint; end
 
@@ -95,16 +97,26 @@ class Cisco::CollaborationEndpoint::Ui
 
         logger.debug { "setting #{id} to #{value}" }
 
-        codec.xcommand 'UserInterface Extensions Widget SetValue',
-                       WidgetId: id, Value: value
+        update = codec.xcommand 'UserInterface Extensions Widget SetValue',
+                                WidgetId: id, Value: value
+
+        # The device does not raise an event when a widget state is changed via
+        # the API. In these cases, ensure locally tracked state remains valid.
+        update.then do
+            # Ensure the value maps to the same as those recevied in responses
+            value = ::Cisco::CollaborationEndpoint::Xapi::Response.convert value
+            track id, value
+        end
     end
 
     # Clear the value associated with a widget.
     def unset(id)
         logger.debug { "clearing #{id}" }
 
-        codec.xcommand 'UserInterface Extensions Widget UnsetValue',
-                       WidgetId: id
+        update = codec.xcommand 'UserInterface Extensions Widget UnsetValue',
+                                WidgetId: id
+
+        update.then { track id, nil }
     end
 
     # Set the state of a switch widget.
@@ -144,13 +156,17 @@ class Cisco::CollaborationEndpoint::Ui
 
     # Alias the module state so that all widgets can be interacted with as if
     # they were local status vars using []= and [] to set and get current value.
-    alias track []=
-    protected :track
-    # FIXME: the results in []= being enumerated by the funcs API
-    def []=(id, value)
-        set id, value
+    def track(status, value)
+        # FIXME: as []= is injected by DependancyManager, it's not availble to
+        # directly alias via `alias track []=`. Look at other options here so
+        # that the same implementation is garunteed if things change and we
+        # don't leak internals here.
+        @__config__.trak(status.to_sym, value)
         value
     end
+    protected :track
+    # FIXME: this exposes []= as an API method
+    alias []= set
 
 
     # ------------------------------

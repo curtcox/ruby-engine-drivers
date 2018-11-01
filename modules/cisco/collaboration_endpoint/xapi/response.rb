@@ -64,14 +64,14 @@ module Cisco::CollaborationEndpoint::Xapi::Response
     # @param value [String] the value to convert
     # @param valuespace [Symbol] the Cisco value space reference
     # @return the value as an appropriate core datatype
-    def convert(value, valuespace)
+    def convert(value, valuespace = nil)
         parser = PARSERS[valuespace]
         if parser
             parser.call(value)
         else
             begin
                 Integer(value)
-            rescue ArgumentError
+            rescue
                 if truthy? value
                     true
                 elsif falsey? value
