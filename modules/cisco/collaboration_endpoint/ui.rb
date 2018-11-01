@@ -29,7 +29,7 @@ class Cisco::CollaborationEndpoint::Ui
     def on_update
         codec_mod = setting(:codec) || :VidConf
         ui_layout = setting :cisco_ui_layout
-        @bindings = setting :cisco_ui_bindings || {}
+        bindings  = setting :cisco_ui_bindings || {}
 
         # Allow UI layouts to be stored as JSON
         if ui_layout.is_a? Hash
@@ -45,6 +45,7 @@ class Cisco::CollaborationEndpoint::Ui
 
         bind(codec_mod) do
             deploy_extensions 'ACA', ui_layout if ui_layout
+            bindings.each { |id, config| link_widget id, config }
         end
     end
 
@@ -147,12 +148,16 @@ class Cisco::CollaborationEndpoint::Ui
 
         logger.debug { "#{id} #{type}" }
 
+        id   = id.to_sym
+        type = type.to_sym
+
         # Track values of stateful widgets
         self[id] = value unless ['', :increment, :decrement].include? value
 
         # Trigger any bindings defined for the widget action
         begin
-            event_handler(id, type)&.call value
+            handler = event_handlers.fetch [id, type], nil
+            handler&.call value
         rescue => e
             logger.error "error in binding for #{id}.#{type}: #{e}"
         end
@@ -162,7 +167,7 @@ class Cisco::CollaborationEndpoint::Ui
     end
 
     # Allow the all widget state to be interacted with externally as though
-    # is was local status vars by using []= and [] so set and get.
+    # is was local status vars by using []= and [] to set and get.
     # FIXME: this cause []= to be exposed as an API method
     def []=(status, value)
         if caller_locations.map(&:path).include? __FILE__
@@ -205,9 +210,11 @@ class Cisco::CollaborationEndpoint::Ui
         @codec_mod = mod.to_sym
 
         clear_events
+        clear_subscriptions
 
-        unsubscribe @event_binder if @event_binder
-        @event_binder = system.subscribe(@codec_mod, :connected) do |notify|
+        @subscriptions = []
+
+        @subscriptions << system.subscribe(@codec_mod, :connected) do |notify|
             next unless notify.value
             subscribe_events
             yield if block_given?
@@ -221,8 +228,7 @@ class Cisco::CollaborationEndpoint::Ui
     def unbind
         logger.debug 'unbinding'
 
-        unsubscribe @event_binder if @event_binder
-        @event_binder = nil
+        clear_subscriptions
 
         clear_events async: true
 
@@ -236,6 +242,15 @@ class Cisco::CollaborationEndpoint::Ui
     def codec
         raise 'not currently bound to a codec module' unless bound?
         system[@codec_mod]
+    end
+
+    # Push the current module state to the device.
+    def sync_widget_state
+        @__config__.status.each do |key, value|
+            # Non-widget related status prefixed with `__`
+            next if key =~ /^__.*/
+            set key, value
+        end
     end
 
     # Build a list of all callback methods that have been defined.
@@ -286,28 +301,64 @@ class Cisco::CollaborationEndpoint::Ui
         end
     end
 
-    # Push the current module state to device widget state.
-    def sync_widget_state
-        @__config__.status.each do |key, value|
-            # Non-widget related status prefixed with `__`
-            next if key =~ /^__.*/
-            set key, value
+    def clear_subscriptions
+        @subscriptions&.each { |ref| unsubscribe ref }
+        @subscriptions = nil
+    end
+
+    def event_handlers
+        @events_handlers ||= {}
+    end
+
+    # Wire up a widget based on a binding target.
+    def link_widget(id, bindings)
+        logger.debug { "setting up bindings for #{id}" }
+
+        id = id.to_sym
+
+        if bindings.is_a? String
+            bindings = [:clicked, :changed, :status].product([bindings]).to_h
+        end
+
+        bindings.each do |type, target|
+            type = type.to_sym
+
+            # Status / feedback state binding
+            if type == :status
+                case target
+                # "mod.status"
+                when String
+                    mod, state = target.split '.'
+                    link_feedback id, mod, state
+
+                # mod => status (provided for compatability with event bindings)
+                when Hash
+                    mod, state = target.first
+                    link_feedback id, mod, state
+
+                else
+                    logger.warn { "invalid #{type} binding for #{id}" }
+                end
+
+            # Event binding
+            else
+                handler = build_handler target
+                if handler
+                    event_handlers.store [id, type].freeze, handler
+                else
+                    logger.warn { "invalid #{type} binding for #{id}" }
+                end
+            end
         end
     end
 
-    # Get the event handler for a UI widget interaction.
-    def event_handler(widget_id, event_type)
-        # Handlers are stored keyed on a tuple of [widget_id, event_type] and
-        # lazily built as required.
-        @event_handlers ||= Hash.new do |h, (id, type)|
-            config = @bindings.dig id, type
-            if config
-                handler = build_handler config
-                h.store [id, type].freeze, handler
-            end
-        end
+    # Bind a widget to another modules status var for feedback.
+    def link_feedback(id, mod, state)
+        logger.debug { "linking #{id} state to #{mod}.#{state}" }
 
-        @event_handlers[[widget_id, event_type]]
+        @subscriptions << system.subscribe(mod, state) do |notify|
+            set id, notify.value
+        end
     end
 
     # Given the action for a binding, construct the executable event handler.
