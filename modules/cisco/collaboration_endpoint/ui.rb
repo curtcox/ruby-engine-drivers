@@ -285,9 +285,11 @@ class Cisco::CollaborationEndpoint::Ui
             # Non-widget related status prefixed with `__`
             next if key =~ /^__.*/
 
-            # Map bool values back to :on | :off
+            # Map bool values back to :on|:off or :active|:inactive
             if [true, false].include? value
-                switch key, value
+                # FIXME: the results in an error being logged due to the inital
+                # type mismatch - need a neater way to handle loss of info
+                switch(key, value).catch { highlight(key, value) }
             else
                 set key, value
             end
