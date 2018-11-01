@@ -203,6 +203,7 @@ class Cisco::CollaborationEndpoint::Ui
             next unless notify.value
             subscribe_events
             yield if block_given?
+            sync_widget_state
         end
 
         @codec_mod
@@ -274,6 +275,21 @@ class Cisco::CollaborationEndpoint::Ui
 
         each_mapping(**opts) do |path, _, codec|
             codec.clear_event path
+        end
+    end
+
+    # Push the current module state to device widget state.
+    def sync_widget_state
+        @__config__.status.each do |key, value|
+            # Non-widget related status prefixed with `__`
+            next if key =~ /^__.*/
+
+            # Map bool values back to :on | :off
+            if [true, false].include? value
+                switch key, value
+            else
+                set key, value
+            end
         end
     end
 
