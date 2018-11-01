@@ -125,9 +125,10 @@ class Cisco::CollaborationEndpoint::Ui
     end
 
     # Set the highlight state for a button widget.
-    def highlight(id, state)
+    def highlight(id, state = true, momentary: false, time: 500)
         value = is_affirmative?(state) ? :active : :inactive
         set id, value
+        schedule.in(time) { highlight id, !value } if momentary
     end
 
     # Set the text label used on text or spinner widget.
