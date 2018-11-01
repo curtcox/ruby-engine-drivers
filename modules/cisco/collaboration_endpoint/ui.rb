@@ -119,7 +119,7 @@ class Cisco::CollaborationEndpoint::Ui
     end
 
     # Set the state of a switch widget.
-    def switch(id, state)
+    def switch(id, state = !self[id])
         value = is_affirmative?(state) ? :on : :off
         set id, value
     end
