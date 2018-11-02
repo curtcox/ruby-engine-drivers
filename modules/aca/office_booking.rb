@@ -123,9 +123,11 @@ class Aca::OfficeBooking
 
         # Skype join button available 2min before the start of a meeting
         @skype_start_offset = setting(:skype_start_offset) || 120
+        @skype_check_offset = setting(:skype_check_offset) || 380 # 5min + 20 seconds
 
         # Skype join button not available in the last 8min of a meeting
         @skype_end_offset = setting(:skype_end_offset) || 480
+        @force_skype_extract = setting(:force_skype_extract)
 
         # Because restarting the modules results in a 'swipe' of the last read card
         ignore_first_swipe = true
@@ -152,7 +154,7 @@ class Aca::OfficeBooking
         # Do we want to use exchange web services to manage bookings
         if CAN_OFFICE
             logger.debug "Setting OFFICE"
-            @office_organiser_location = setting(:office_organiser_location) 
+            @office_organiser_location = setting(:office_organiser_location)
             @office_client_id = setting(:office_client_id)
             @office_secret = setting(:office_secret)
             @office_scope = setting(:office_scope)
@@ -403,7 +405,7 @@ class Aca::OfficeBooking
         req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.to_i
         req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.to_i
 
-       
+
         # TODO:: Catch error for booking failure
         begin
             id = make_office_booking req_params
@@ -413,7 +415,7 @@ class Aca::OfficeBooking
             raise e
         end
 
-        
+
         logger.debug { "successfully created booking: #{id}" }
         "Ok"
     end
@@ -601,12 +603,54 @@ class Aca::OfficeBooking
 
     def todays_bookings(response, office_organiser_location)
         results = []
-        response.each{|booking| 
-            # start_time = Time.parse(booking['start']['dateTime']).utc.iso8601[0..18] + 'Z'
-            # end_time = Time.parse(booking['end']['dateTime']).utc.iso8601[0..18] + 'Z'
+
+        set_skype_url = true if @force_skype_extract
+        now_int = now.to_i
+
+        response.each{ |booking|
             if booking['start'].key?("timeZone")
-                start_time = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc.iso8601
-                end_time = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['end']['dateTime']).utc.iso8601
+                real_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc
+                real_end = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['end']['dateTime']).utc
+                start_time = real_start.iso8601
+                end_time = real_end.iso8601
+            else
+                # TODO:: this needs review. Does MS ever respond without a timeZone?
+                real_start = Time.parse(booking['start']['dateTime']).utc
+                real_end = Time.parse(booking['end']['dateTime']).utc
+                start_time = real_start.iso8601[0..18] + 'Z'
+                end_time = real_end.iso8601[0..18] + 'Z'
+            end
+
+            #logger.debug { "\n\ninspecting booking:\n#{booking.inspect}\n\n" }
+            # Get body data: booking['body'].values.join("")
+
+            # Extract the skype meeting URL
+            if set_skype_url
+                start_integer = real_start.to_i - @skype_check_offset
+                join_integer = real_start.to_i - @skype_start_offset
+                end_integer = real_end.to_i - @skype_end_offset
+
+                if now_int > start_integer && now_int < end_integer && booking['body']
+                    body = booking['body'].values.join('')
+                    match = body.match(/\"pexip\:\/\/(.+?)\"/)
+                    if match
+                        set_skype_url = false
+                        self[:pexip_meeting_uid] = start_integer
+                        self[:pexip_meeting_address] = match[1]
+                    else
+                        links = URI.extract(body).select { |url| url.start_with?('https://meet.lync') }
+                        if links[0].present?
+                            if now_int > join_integer
+                                self[:can_join_skype_meeting] = true
+                                self[:skype_meeting_pending] = true
+                            else
+                                self[:skype_meeting_pending] = true
+                            end
+                            set_skype_url = false
+                            self[:skype_meeting_address] = links[0]
+                        end
+                    end
+                end
             end
 
             if office_organiser_location == 'attendees'
@@ -620,7 +664,7 @@ class Aca::OfficeBooking
                 # Grab the organiser
                 organizer = booking['organizer']['name']
             end
-            
+
             subject = booking['subject']
             if booking.key?('sensitivity') && ['private','confidential'].include?(booking['sensitivity'])
                 organizer = ""
@@ -642,7 +686,7 @@ class Aca::OfficeBooking
     def log(msg)
         STDERR.puts msg
         logger.info msg
-        STDERR.flush 
+        STDERR.flush
     end
     # =======================================
 end
