@@ -77,6 +77,11 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
     command 'Call Accept' => :call_accept, CallId_: Integer
     command 'Call Reject' => :call_reject, CallId_: Integer
     command 'Call Disconnect' => :hangup, CallId_: Integer
+
+    command 'Call DTMFSend' => :dtmf_send,
+            DTMFString: String,
+            CallId_: (0..65534)
+
     command 'Dial' => :dial,
             Number:  String,
             Protocol_: [:H320, :H323, :Sip, :Spark],
