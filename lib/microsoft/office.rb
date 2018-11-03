@@ -399,11 +399,16 @@ class Microsoft::Office
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_get
     def get_booking(booking_id:, mailbox:, icaluid:nil)
         if icaluid && booking_id.nil?
-            endpoint = "/v1.0/users/#{mailbox}/events?$filter=iCalUId eq '#{icaluid}'"
+
+            # Build our query to only get bookings within our datetimes
+            query_hash = {}
+            query_hash['$filter'] = "iCalUId eq '#{icaluid}'"
+            endpoint = "/v1.0/users/#{mailbox}/events"
+            request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated, query: query_hash)
         else
             endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
-        end
         request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
+        end
         check_response(request)
         JSON.parse(request.body)
     end
