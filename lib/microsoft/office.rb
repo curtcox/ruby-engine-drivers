@@ -732,12 +732,13 @@ class Microsoft::Office
             timeZone: TIMEZONE_MAPPING[timezone.to_sym]
         } if end_param
 
+        event[:location] = {
+            displayName: room.name,
+            locationEmailAddress: room.email
+        }
+
         event[:body] = {
             contentType: 'html',
-            location: {
-                displayName: room.name,
-                locationEmailAddress: room.email
-            },
             content: description
         } if description
 
@@ -761,7 +762,7 @@ class Microsoft::Office
 
         request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: @delegated)
         check_response(request)
-        response = JSON.parse(request.body)['value']
+        response = JSON.parse(request.body)
     end
 
 
