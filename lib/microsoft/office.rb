@@ -730,6 +730,10 @@ class Microsoft::Office
 
         event[:body] = {
             contentType: 'html',
+            location: {
+                displayName: room.name,
+                locationEmailAddress: room.email
+            },
             content: description
         } if description
 
