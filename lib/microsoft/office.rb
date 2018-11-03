@@ -701,7 +701,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_update
-    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Sydney', mailbox_location_override:nil)
+    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Sydney')
         # We will always need a room and endpoint passed in
         room = Orchestrator::ControlSystem.find_by_email(room_id) || Orchestrator::ControlSystem.find(room_id)
 
@@ -711,8 +711,6 @@ class Microsoft::Office
         elsif @mailbox_location == 'user'
             endpoint = "/v1.0/users/#{current_user[:email]}/events/#{booking_id}"
         end
-
-        endpoint = "/v1.0/users/#{mailbox_location_override}/events/#{booking_id}" if mailbox_location_override
 
 
 
