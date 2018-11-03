@@ -397,8 +397,12 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_get
-    def get_booking(booking_id:, mailbox:)
-        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
+    def get_booking(booking_id:, mailbox:, icaluid:nil)
+        if icaluid && booking_id.nil?
+            endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
+        else
+            endpoint = "/v1.0/users/#{mailbox}/events?$filter=iCalUId eq '#{icaluid}'"
+        end
         request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
         check_response(request)
         JSON.parse(request.body)
