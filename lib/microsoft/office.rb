@@ -478,6 +478,7 @@ class Microsoft::Office
         # Get some data about the booking
         booking['title'] = booking['subject']
         booking['booking_id'] = booking['id']
+        booking['icaluid'] = booking['iCalUId']
 
         # Format the attendees and save the old format
         new_attendees = []
