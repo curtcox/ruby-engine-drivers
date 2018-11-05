@@ -413,6 +413,20 @@ class Microsoft::Office
         JSON.parse(request.body)
     end
 
+    def accept_booking(booking_id:, mailbox:, comment:nil)
+        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}/accept"
+        params = {
+            request_method: 'post',
+            endpoint: endpoint,
+            password: @delegated
+        }
+        params[:data] = { "comment": comment } if comment
+        request = graph_request(params)
+        end
+        check_response(request)
+        JSON.parse(request.body)
+
+    end
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_delete
     def delete_booking(booking_id:, mailbox:)
         endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
