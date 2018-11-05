@@ -420,9 +420,8 @@ class Microsoft::Office
             endpoint: endpoint,
             password: @delegated
         }
-        params[:data] = { "comment": comment } if comment
+        params[:data] = { comment: comment } if comment
         request = graph_request(params)
-        end
         check_response(request)
         JSON.parse(request.body)
 
