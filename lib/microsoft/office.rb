@@ -14,6 +14,7 @@ end
 class Microsoft::Office
     TIMEZONE_MAPPING = {
         "Sydney": "AUS Eastern Standard Time"
+        "Brisbane": "Australia/Brisbane"
     }
     def initialize(
             client_id:,
@@ -599,14 +600,16 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_events
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney')
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney', endpoint_override:nil)
         description = String(description)
         attendees = Array(attendees)
 
         # Get our room
         room = Orchestrator::ControlSystem.find(room_id)
 
-        if @mailbox_location == 'room' || current_user.nil?
+        if endpoint_override
+            endpoint = "/v1.0/users/#{endpoint_override}/events"
+        elsif @mailbox_location == 'room' || current_user.nil?
             endpoint = "/v1.0/users/#{room.email}/events"
         elsif @mailbox_location == 'user'
             endpoint = "/v1.0/users/#{current_user[:email]}/events"
