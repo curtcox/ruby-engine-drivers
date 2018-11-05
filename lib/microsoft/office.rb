@@ -13,7 +13,7 @@ end
 
 class Microsoft::Office
     TIMEZONE_MAPPING = {
-        "Sydney": "AUS Eastern Standard Time"
+        "Sydney": "AUS Eastern Standard Time",
         "Brisbane": "Australia/Brisbane"
     }
     def initialize(
