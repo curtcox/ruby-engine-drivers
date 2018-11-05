@@ -682,8 +682,8 @@ class Microsoft::Office
         if current_user
             event[:organizer] = {
                 emailAddress: {
-                    address: current_user.email,
-                    name: current_user.name
+                    address: current_user[:email],
+                    name: current_user[:name]
                 }
             }
         else
