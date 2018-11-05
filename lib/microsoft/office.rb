@@ -263,12 +263,17 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
-    def get_contact(owner_email:, contact_email:)
+    def get_contact(owner_email:, contact_email:nil)
         endpoint = "/v1.0/users/#{owner_email}/contacts"
-        query_params = {
-            '$top': 1,
-            '$filter': "emailAddresses/any(a:a/address eq  '#{contact_email}')"
-        }
+        if contact_email
+            query_params = {
+                '$top': 1,
+                '$filter': "emailAddresses/any(a:a/address eq  '#{contact_email}')"
+            }
+        else
+            query_params = { '$top': 999 }
+        end
+
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
         JSON.parse(request.body)['value']
