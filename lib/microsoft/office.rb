@@ -787,6 +787,21 @@ class Microsoft::Office
         response = JSON.parse(request.body)
     end
 
+    def check_in_attendee(booking_id:, room_id:, attendee_email:)
+        booking = self.get_booking(booking_id: booking_id, mailbox: room_id)
+        new_attendees = []
+        booking['attendees'].each do |attendee|
+            new_attendee = attendee.dup
+            if new_attendee['emailAddress']['address'] == attendee_email
+                 new_attendee['status']['response'] = 'Accepted'
+             end
+            new_attendees.push(new_attendee)
+        end
+        endpoint = "/v1.0/users/#{room_id}/events/#{booking_id}"
+        event = { attendees: new_attendees }
+        request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: @delegated)
+    end
+
 
     # Takes a date of any kind (epoch, string, time object) and returns a time object
     def ensure_ruby_date(date)
