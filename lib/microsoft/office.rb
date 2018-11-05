@@ -484,6 +484,7 @@ class Microsoft::Office
         booking['title'] = booking['subject']
         booking['booking_id'] = booking['id']
         booking['icaluid'] = booking['iCalUId']
+        booking['show_as'] = booking['showAs']
 
         # Format the attendees and save the old format
         new_attendees = []
