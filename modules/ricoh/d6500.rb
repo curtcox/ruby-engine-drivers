@@ -13,7 +13,7 @@ class Ricoh::D6500
     generic_name :Display
 
     # Communication settings
-    tokenize indicator: "\+", delimiter: "\r"
+    tokenize delimiter: "\r"
 
     default_settings(
         id: '02'
@@ -45,9 +45,9 @@ class Ricoh::D6500
         # Execute command
         logger.debug { "Target = #{target} and self[:power] = #{self[:power]}" }
         if target == On && self[:power] != On
-            send_cmd("#{COMMANDS[:power]}#{prepend('001')}", name: :power_cmd)
+            send_cmd("#{COMMANDS[:power_cmd]}#{prepend('001')}", name: :power_cmd)
         elsif target == Off && self[:power] != Off
-            send_cmd("#{COMMANDS[:power]}#{prepend('000')}", name: :power_cmd)
+            send_cmd("#{COMMANDS[:power_cmd]}#{prepend('000')}", name: :power_cmd)
         end
     end
 
@@ -72,7 +72,7 @@ class Ricoh::D6500
     def switch_to(input)
         self[:input_target] = input
         input = input.to_sym if input.class == String
-        send_cmd("#{COMMANDS[:input]}#{prepend(INPUTS[input])}", name: :input_cmd)
+        send_cmd("#{COMMANDS[:input_cmd]}#{prepend(INPUTS[input])}", name: :input_cmd)
     end
 
     def input?
@@ -91,7 +91,7 @@ class Ricoh::D6500
     def switch_audio(input)
         self[:audio] = input
         input = input.to_sym if input.class == String
-        send_cmd("#{COMMANDS[:audio]}#{prepend(AUDIO_INPUTS[input])}", name: :audio_cmd)
+        send_cmd("#{COMMANDS[:audio_cmd]}#{prepend(AUDIO_INPUTS[input])}", name: :audio_cmd)
     end
 
     def audio?
@@ -103,7 +103,7 @@ class Ricoh::D6500
         self[:volume_target] = val
         val = val.to_s.rjust(3, '0')
         logger.debug("volume = #{prepend(val)}")
-        send_cmd("#{COMMANDS[:volume]}#{prepend(val)}", name: :volume_cmd)
+        send_cmd("#{COMMANDS[:volume_cmd]}#{prepend(val)}", name: :volume_cmd)
     end
 
     def volume?
@@ -117,9 +117,9 @@ class Ricoh::D6500
         # Execute command
         logger.debug { "Target = #{target} and self[:mute] = #{self[:mute]}" }
         if target == On && self[:mute] != On
-            send_cmd("#{COMMANDS[:mute]}#{prepend('001')}", name: :mute_cmd)
+            send_cmd("#{COMMANDS[:mute_cmd]}#{prepend('001')}", name: :mute_cmd)
         elsif target == Off && self[:mute] != Off
-            send_cmd("#{COMMANDS[:mute]}#{prepend('000')}", name: :mute_cmd)
+            send_cmd("#{COMMANDS[:mute_cmd]}#{prepend('000')}", name: :mute_cmd)
         end
     end
 
@@ -140,31 +140,34 @@ class Ricoh::D6500
         audio_inq: '88'
     }.freeze
     def send_cmd(cmd, options = {})
-        req = "3#{get_length(cmd)}3#{self[:id][0]}3#{self[:id][1]}73#{cmd}0D"
+        req = "3#{self[:id][0]}3#{self[:id][1]}73#{cmd}0D"
+        req = "3#{req.length / 2}#{req}"
         logger.debug("tell -- 0x#{req} -- #{options[:name]}")
         options[:hex_string] = true
         send(req, options)
     end
 
     def send_inq(inq, options = {})
-        req = "3#{get_length(cmd)}3#{self[:id][0]}3#{self[:id][1]}67#{cmd}#{prepend('000')}0D"
+        req = "3#{self[:id][0]}3#{self[:id][1]}67#{inq}#{prepend('000')}0D"
+        req = "3#{req.length / 2}#{req}"
         logger.debug("ask -- 0x#{req} -- #{options[:name]}")
         options[:hex_string] = true
         send(req, options)
     end
 
     def received(data, deferrable, command)
-        hex = byte_to_hex(data)
-        return :success if command.nil? || command[:name].nil?
+        hex = byte_to_hex(data).upcase
+        value = hex[-5] + hex[-3] + hex[-1]
+        logger.debug("value is #{value}")
 
         case command[:name]
         when :power_cmd
-            self[:power] = self[:power_target] if true
+            self[:power] = self[:power_target] if hex[-2..-1] == '2B'
         when :power_inq
-            self[:power] = On if hex == "80000080"
-            self[:power] = Off if hex == "80010081"
+            self[:power] = On if value == '001'
+            self[:power] = Off if value == '000'
         when :input
-            self[:input] = INPUTS_INQ[hex]
+            self[:input] = INPUTS[value.to_sym]
         when :volume
             self[:volume] = byte_to_hex(data[-2]).to_i(16)
         when :mute
@@ -172,16 +175,8 @@ class Ricoh::D6500
             self[:mute] = Off if hex == "82010184"
         end
 
-        logger.debug { "Received 0x#{hex}\n" }
-    end
-
-    def get_length(req)
-        # req only contains value which is 3 bytes
-        # 2 bytes for id
-        # 1 byte for cmd type
-        # 1 byte for cmd code
-        # 1 byte for delimiter
-        req.length / 2 + 5
+        logger.debug("Received 0x#{hex}\n")
+        :success
     end
 
     def prepend(str)
