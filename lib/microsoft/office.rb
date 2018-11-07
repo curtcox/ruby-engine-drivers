@@ -461,7 +461,7 @@ class Microsoft::Office
         recurring_bookings.each do |u_id, bookings|
             is_available = true
             bookings.each_with_index do |booking, i|
-                bookings[i] = extract_booking_data(booking, available_from, available_to)
+                bookings[i] = extract_booking_data(booking, available_from, available_to, u_id)
                 if bookings[i]['free'] == false
                     is_available = false
                 end
@@ -480,7 +480,7 @@ class Microsoft::Office
         end
     end
 
-    def extract_booking_data(booking, start_param, end_param)
+    def extract_booking_data(booking, start_param, end_param, room_email)
         # Create time objects of the start and end for easier use
         booking_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
         booking_end = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
@@ -524,9 +524,10 @@ class Microsoft::Office
 
         # Get the organiser and location data
         booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
-        if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
-            booking['room_id'] = booking['locations'][0]['uniqueId'].downcase
-        end
+        # if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
+        #     booking['room_id'] = booking['locations'][0]['uniqueId'].downcase
+        # end
+        booking['room_id'] = room_email
         if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
             booking['room_name'] = booking['location']['displayName']
         end
