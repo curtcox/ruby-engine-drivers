@@ -431,7 +431,7 @@ class Microsoft::Office
         params[:data] = { comment: comment } if comment
         request = graph_request(params)
         check_response(request)
-        JSON.parse(request.body)
+        return true
 
     end
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_delete
