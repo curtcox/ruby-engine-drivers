@@ -13,7 +13,7 @@ class Ricoh::D6500
     generic_name :Display
 
     # Communication settings
-    tokenize delimiter: "\r"
+    tokenize delimiter: "\x0D"
 
     default_settings(
         id: '02'
@@ -68,10 +68,11 @@ class Ricoh::D6500
         multimedia: '009',
         network: '010',
         usb: '011'
-    }.freeze
+    }
+    INPUTS.merge!(INPUTS.invert)
     def switch_to(input)
-        self[:input_target] = input
         input = input.to_sym if input.class == String
+        self[:input_target] = input
         send_cmd("#{COMMANDS[:input_cmd]}#{prepend(INPUTS[input])}", name: :input_cmd)
     end
 
@@ -89,8 +90,8 @@ class Ricoh::D6500
         multimedia: '006'
     }.freeze
     def switch_audio(input)
-        self[:audio] = input
         input = input.to_sym if input.class == String
+        self[:audio_target] = input
         send_cmd("#{COMMANDS[:audio_cmd]}#{prepend(AUDIO_INPUTS[input])}", name: :audio_cmd)
     end
 
@@ -157,24 +158,24 @@ class Ricoh::D6500
 
     def received(data, deferrable, command)
         hex = byte_to_hex(data).upcase
-        value = hex[-5] + hex[-3] + hex[-1]
-        logger.debug("value is #{value}")
-
-        case command[:name]
-        when :power_cmd
-            self[:power] = self[:power_target] if hex[-2..-1] == '2B'
-        when :power_inq
-            self[:power] = On if value == '001'
-            self[:power] = Off if value == '000'
-        when :input
-            self[:input] = INPUTS[value.to_sym]
-        when :volume
-            self[:volume] = byte_to_hex(data[-2]).to_i(16)
-        when :mute
-            self[:mute] = On if hex == "82010083"
-            self[:mute] = Off if hex == "82010184"
+        if hex[-2..-1] == '2B'
+            cmd = command[:name].to_s[/[a-z]+/]
+            self[cmd] = self[cmd + '_target']
+        else
+            value = hex[-5] + hex[-3] + hex[-1]
+            case command[:name]
+            when :power_inq
+                self[:power] = value == '001' ? On : Off
+            when :input_inq
+                self[:input] = INPUTS[value]
+            when :audio_inq
+                self[:audio] = AUDIO_INPUTS[value]
+            when :volume_inq
+                self[:volume] = value.to_i
+            when :mute_inq
+                self[:mute] = value == '001' ? On : Off
+            end
         end
-
         logger.debug("Received 0x#{hex}\n")
         :success
     end
