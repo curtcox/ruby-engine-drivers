@@ -251,7 +251,7 @@ class Microsoft::Office
     def format_contacts(contacts)
         output_contacts = []
         contacts.each do |contact|
-            if contact.key?('emailAddresses') && contact['emailAddresses'].empty?
+            if contact.key?('emailAddresses') && !contact['emailAddresses'].empty?
                 output_format = {}
                 output_format[:id] = contact['id']
                 output_format[:first_name] = contact['givenName']
