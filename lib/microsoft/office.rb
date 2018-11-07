@@ -251,14 +251,16 @@ class Microsoft::Office
     def format_contacts(contacts)
         output_contacts = []
         contacts.each do |contact|
-            output_format = {}
-            output_format[:id] = contact['id']
-            output_format[:first_name] = contact['givenName']
-            output_format[:last_name] = contact['surname']
-            output_format[:phone] = contact['businessPhones'][0]
-            output_format[:organisation] = contact['companyName']
-            output_format[:email] = contact['emailAddresses'][0]['address']
-            output_contacts.push(output_format)
+            if contact.key?('emailAddresses') && contact['emailAddresses'].empty?
+                output_format = {}
+                output_format[:id] = contact['id']
+                output_format[:first_name] = contact['givenName']
+                output_format[:last_name] = contact['surname']
+                output_format[:phone] = contact['businessPhones'][0]
+                output_format[:organisation] = contact['companyName']
+                output_format[:email] = contact['emailAddresses'][0]['address']
+                output_contacts.push(output_format)
+            end
         end
         output_contacts
     end
