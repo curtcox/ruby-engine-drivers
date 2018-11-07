@@ -792,13 +792,13 @@ class Microsoft::Office
         response = JSON.parse(request.body)
     end
 
-    def check_in_attendee(booking_id:, room_id:, attendee_email:)
+    def check_in_attendee(booking_id:, room_id:, attendee_email:, response_type:'Accepted')
         booking = self.get_booking(booking_id: booking_id, mailbox: room_id)
         new_attendees = []
         booking['attendees'].each do |attendee|
             new_attendee = attendee.dup
             if new_attendee['emailAddress']['address'] == attendee_email
-                 new_attendee['status']['response'] = 'Accepted'
+                 new_attendee['status']['response'] = response_type
              end
             new_attendees.push(new_attendee)
         end
