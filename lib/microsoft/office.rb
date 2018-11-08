@@ -733,7 +733,7 @@ class Microsoft::Office
 
         if endpoint_override
             endpoint = "/v1.0/users/#{endpoint_override}/events/#{booking_id}"
-        elsif mailbox_location == 'room' || current_user.nil?
+        elsif @mailbox_location == 'room' || current_user.nil?
             endpoint = "/v1.0/users/#{room.email}/events/#{booking_id}"
         elsif @mailbox_location == 'user'
             endpoint = "/v1.0/users/#{current_user[:email]}/events/#{booking_id}"
