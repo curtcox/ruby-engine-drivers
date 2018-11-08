@@ -605,7 +605,7 @@ class Aca::OfficeBooking
         results = []
 
         set_skype_url = true if @force_skype_extract
-        now_int = now.to_i
+        now_int = Time.now.to_i
 
         response.each{ |booking|
             if booking['start'].key?("timeZone")
