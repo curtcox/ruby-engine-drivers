@@ -405,7 +405,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_get
-    def get_booking(booking_id:, mailbox:, icaluid:nil, extensions=[])
+    def get_booking(booking_id:, mailbox:, icaluid:nil, extensions:[])
         if icaluid && booking_id.nil?
 
             # Build our query to only get bookings within our datetimes
