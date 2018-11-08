@@ -527,7 +527,7 @@ class Microsoft::Office
         # if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
         #     booking['room_id'] = booking['locations'][0]['uniqueId'].downcase
         # end
-        booking['room_id'] = room_email
+        # booking['room_id'] = room_email
         if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
             booking['room_name'] = booking['location']['displayName']
         end
