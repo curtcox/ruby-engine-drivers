@@ -411,11 +411,17 @@ class Microsoft::Office
             # Build our query to only get bookings within our datetimes
             query_hash = {}
             query_hash['$filter'] = "iCalUId eq '#{icaluid}'"
+            query_hash['$expand'] = "extensions($filter=id eq '#{extensions[0]}')"
             endpoint = "/v1.0/users/#{mailbox}/events"
             request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated, query: query_hash)
         else
             endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
-        request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
+            if extensions
+                query_hash = { '$expand': "extensions($filter=id eq '#{extensions[0]}')" }
+                request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated, query: query_hash)
+            else
+                request = graph_request(request_method: 'get', endpoint: endpoint, password: @delegated)
+            end
         end
         check_response(request)
         JSON.parse(request.body)
