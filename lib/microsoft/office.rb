@@ -405,7 +405,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_get
-    def get_booking(booking_id:, mailbox:, icaluid:nil)
+    def get_booking(booking_id:, mailbox:, icaluid:nil, extensions=[])
         if icaluid && booking_id.nil?
 
             # Build our query to only get bookings within our datetimes
@@ -603,7 +603,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_events
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML")
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML", extensions:[])
         description = String(description)
         attendees = Array(attendees)
 
@@ -681,6 +681,16 @@ class Microsoft::Office
             isOrganizer: false,
             attendees: attendees
         }
+        exts = []
+        extensions.each do |extension|
+            ext = {
+                "@odata.type": "microsoft.graph.openTypeExtension",
+                "extensionName": extension[:name]
+            }
+            ext[extension[:key]] = extension[:value]
+            exts.push(ext)
+        end
+        event[:extensions] = exts
 
         if current_user
             event[:organizer] = {
