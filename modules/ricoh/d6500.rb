@@ -158,7 +158,7 @@ class Ricoh::D6500
 
     def received(data, deferrable, command)
         hex = byte_to_hex(data).upcase
-        if hex[-2..-1] == '2B'
+        if hex[-2..-1] == '2B' # this means the sent command was valid
             cmd = command[:name].to_s[/[a-z]+/]
             self[cmd] = self[cmd + '_target']
         else
