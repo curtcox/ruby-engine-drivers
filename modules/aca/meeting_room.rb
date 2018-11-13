@@ -722,7 +722,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:show_emergency_popup] = false
         end
     end
-    
+
     def shutdown(all = false, scheduled_shutdown = false)
         if all
             perform_action(mod: :System, func: :shutdown_actual).then do
@@ -1305,27 +1305,27 @@ class Aca::MeetingRoom < Aca::Joiner
     # Wake on LAN power display management
     # ------------------------------------
     def warm_up_displays
-        if setting(:broadcast)
-            system.all(:Display).each do |display|
+        system.all(:Display).each do |display|
+            arity = display.arity(:power)
+            # Checks if the displays support broadcast and hence require
+            # warming up.
+            if check_arity(arity)
+                display.power(On, setting(:broadcast))
+                display.power Off
+            end
+        end
+
+        @vidwalls.each do |key, details|
+            display = system.get_implicit(key)
+            if display
                 arity = display.arity(:power)
                 if check_arity(arity)
-                    display.power(On, setting(:broadcast))
-                    display.power Off
+                    walldisp = system.all(details[:module])
+                    walldisp.power(On, setting(:broadcast))
+                    walldisp.power Off
                 end
-            end
-
-            @vidwalls.each do |key, details|
-                display = system.get_implicit(key)
-                if display
-                    arity = display.arity(:power)
-                    if check_arity(arity)
-                        walldisp = system.all(details[:module])
-                        walldisp.power(On, setting(:broadcast))
-                        walldisp.power Off
-                    end
-                else
-                    logger.error "Invalid video wall configuration!"
-                end
+            else
+                logger.error "Invalid video wall configuration!"
             end
         end
     end

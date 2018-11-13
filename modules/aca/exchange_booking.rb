@@ -379,8 +379,8 @@ class Aca::ExchangeBooking
         }.then(proc { |count|
             logger.debug { "successfully removed #{count} bookings" }
 
-            self[:last_meeting_started] = start_time
-            self[:meeting_pending] = start_time
+            self[:last_meeting_started] = 0
+            self[:meeting_pending] = 0
             self[:meeting_ending] = false
             self[:meeting_pending_notice] = false
 
@@ -679,7 +679,7 @@ class Aca::ExchangeBooking
         end
 
         cli = Viewpoint::EWSClient.new(*@ews_creds)
-        
+
 
         if @use_act_as
             opts = {}
@@ -715,11 +715,22 @@ class Aca::ExchangeBooking
                     meeting.get_all_properties!
 
                     if meeting.body
-                        # Lync: <a name="OutJoinLink">
-                        # Skype: <a name="x_OutJoinLink">
-                        body_parts = meeting.body.split('OutJoinLink"')
-                        if body_parts.length > 1
-                            links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
+                        match = meeting.body.match(/\"pexip\:\/\/(.+?)\"/)
+                        if match
+                            set_skype_url = false
+                            self[:pexip_meeting_uid] = start_integer
+                            self[:pexip_meeting_address] = match[1]
+                        else
+                            links = URI.extract(meeting.body).select { |url| url.start_with?('https://meet.lync') }
+                            if links.empty?
+                                # Lync: <a name="OutJoinLink">
+                                # Skype: <a name="x_OutJoinLink">
+                                body_parts = meeting.body.split('OutJoinLink"')
+                                if body_parts.length > 1
+                                    links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
+                                end
+                            end
+
                             if links[0].present?
                                 if now_int > join_integer
                                     self[:can_join_skype_meeting] = true
@@ -763,6 +774,7 @@ class Aca::ExchangeBooking
         end
 
         if set_skype_url
+            self[:pexip_meeting_address] = nil
             self[:can_join_skype_meeting] = false
             self[:skype_meeting_pending] = false
             system[:Skype].set_uri(nil) if skype_exists
