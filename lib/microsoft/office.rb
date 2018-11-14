@@ -449,7 +449,7 @@ class Microsoft::Office
     end
 
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true)
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil)
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
 
@@ -467,7 +467,7 @@ class Microsoft::Office
         recurring_bookings.each do |u_id, bookings|
             is_available = true
             bookings.each_with_index do |booking, i|
-                bookings[i] = extract_booking_data(booking, available_from, available_to, u_id)
+                bookings[i] = extract_booking_data(booking, available_from, available_to, u_id, internal_domain)
                 if bookings[i]['free'] == false
                     is_available = false
                 end
@@ -486,7 +486,7 @@ class Microsoft::Office
         end
     end
 
-    def extract_booking_data(booking, start_param, end_param, room_email)
+    def extract_booking_data(booking, start_param, end_param, room_email, internal_domain=nil)
         # Create time objects of the start and end for easier use
         booking_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
         booking_end = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
@@ -513,16 +513,28 @@ class Microsoft::Office
         booking['icaluid'] = booking['iCalUId']
         booking['show_as'] = booking['showAs']
 
+        # Check whether this event has external attendees
+        booking_has_visitors = false
+
         # Format the attendees and save the old format
         new_attendees = []
         booking['attendees'].each do |attendee|
+            attendee_email = attendee['emailAddress']['address']
             if attendee['type'] == 'resource'
-                booking['room_id'] = attendee['emailAddress']['address'].downcase
+                booking['room_id'] = attendee_email.downcase
             else
-                new_attendees.push({
-                    email: attendee['emailAddress']['address'],
-                    name: attendee['emailAddress']['name']
-                })
+                # Check if attendee is external or internal
+                internal_domain = ENV['INTERNAL_DOMAIN'] || internal_domain
+                mail_object = Mail::Address.new(attendee_email)
+                mail_domain = mail_object.domain
+                booking_has_visitors = true if mail_domain != internal_domain
+                attendee_object = {
+                    email: attendee_email,
+                    name: attendee['emailAddress']['name'],
+                    visitor: (mail_domain != internal_domain),
+                    organisation: attendee_email.split('@')[1..-1].split('.')[0]
+                }
+                new_attendees.push(attendee_object)
             end
         end
         booking['old_attendees'] = booking['attendees']
