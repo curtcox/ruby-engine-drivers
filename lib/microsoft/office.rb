@@ -241,7 +241,7 @@ class Microsoft::Office
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_contacts
     def get_contacts(owner_email:, q:nil, limit:nil)
         query_params = { '$top': (limit || 1000) }
-        query_params['$filter'] = "startswith(displayName, #{q}) or startswith(givenName, #{q}) or startswith(surname, #{q}) or emailAddresses/any(a:a/address eq  #{q})" if q
+        query_params['$filter'] = "startswith(displayName, '#{q}') or startswith(givenName, '#{q}') or startswith(surname, '#{q}') or emailAddresses/any(a:a/address eq  '#{q}')" if q
         endpoint = "/v1.0/users/#{owner_email}/contacts"
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
