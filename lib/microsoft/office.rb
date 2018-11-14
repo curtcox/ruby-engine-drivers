@@ -537,6 +537,7 @@ class Microsoft::Office
                 new_attendees.push(attendee_object)
             end
         end
+        booking['visitors'] = booking_has_visitors
         booking['old_attendees'] = booking['attendees']
         booking['attendees'] = new_attendees
 
