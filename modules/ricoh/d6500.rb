@@ -158,6 +158,7 @@ class Ricoh::D6500
 
     def received(data, deferrable, command)
         hex = byte_to_hex(data).upcase
+        logger.debug("Received 0x#{hex}\n")
         if hex[-2..-1] == '2B' # this means the sent command was valid
             cmd = command[:name].to_s[/[a-z]+/]
             self[cmd] = self[cmd + '_target']
@@ -176,7 +177,6 @@ class Ricoh::D6500
                 self[:mute] = value == '001' ? On : Off
             end
         end
-        logger.debug("Received 0x#{hex}\n")
         :success
     end
 
