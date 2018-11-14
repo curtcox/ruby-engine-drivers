@@ -532,7 +532,7 @@ class Microsoft::Office
                     email: attendee_email,
                     name: attendee['emailAddress']['name'],
                     visitor: (mail_domain != internal_domain),
-                    organisation: attendee_email.split('@')[1..-1].split('.')[0]
+                    organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
                 }
                 new_attendees.push(attendee_object)
             end
