@@ -551,7 +551,7 @@ class Microsoft::Office
             booking['room_name'] = booking['location']['displayName']
         end
 
-        booking_info = User.bucket.get("bookinginfo-#{booking['id']}", quiet: true)
+        booking_info = User.bucket.get("bookinginfo-#{booking['iCalUId']}", quiet: true)
         if booking_info
             booking['catering'] = booking_info['catering'] if booking_info.key?('catering')
             booking['parking'] = booking_info['parking'] if booking_info.key?('parking')
