@@ -8,7 +8,7 @@ class Ricoh::PJ_WXL4540
     include ::Orchestrator::Transcoder
 
     # Discovery Information
-    tcp_port 50915 # Need to go through an RS232 gatway
+    tcp_port 50915 # This port number is probably wrong
     descriptive_name 'Ricoh Projector Furud WXL4540'
     generic_name :Display
 
