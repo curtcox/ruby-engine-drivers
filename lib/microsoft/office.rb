@@ -493,12 +493,14 @@ class Microsoft::Office
         booking_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
         booking_end = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
 
-        if room.settings.key?('setup')
-            booking_start = booking_start - room.settings['setup'].to_i.seconds
-        end
-        
-        if room.settings.key?('breakdown')
-            booking_end = booking_end + room.settings['breakdown'].to_i.seconds
+        if room
+            if room.settings.key?('setup')
+                booking_start = booking_start - room.settings['setup'].to_i.seconds
+            end
+            
+            if room.settings.key?('breakdown')
+                booking_end = booking_end + room.settings['breakdown'].to_i.seconds
+            end
         end
 
         # Check if this means the room is unavailable
