@@ -62,6 +62,11 @@ class Aca::Tracking::LocateUser
             @cmx = nil
         end
 
+        self[:domain_controller_posted_at] ||= 0
+        self[:radius_controller_posted_at] ||= 0
+        self[:meraki_failed_requests] ||= 0
+        self[:cmx_failed_requests] ||= 0
+
         @temporary = Set.new((setting(:temporary_macs) || {}).values)
         @blacklist = Set.new((setting(:ignore_vendors) || {}).values)
         @ignore_hosts = Set.new((setting(:ignore_hostnames) || {}).values)
@@ -108,6 +113,8 @@ class Aca::Tracking::LocateUser
         ips.each do |ip, login, domain, hostname|
             perform_lookup(ip, login, domain, hostname, ttl)
         end
+
+        self[:domain_controller_posted_at] = Time.now.to_i
     end
 
     # This is used to directly map MAC addresses to usernames
@@ -133,6 +140,8 @@ class Aca::Tracking::LocateUser
                 logger.print_error(e, "associating MAC #{mac} to #{login}")
             end
         end
+
+        self[:radius_controller_posted_at] = Time.now.to_i
     end
 
     # For use with shared desktop computers that anyone can log into
@@ -251,6 +260,12 @@ class Aca::Tracking::LocateUser
                             return
                         end
                     end
+                elsif resp.status != 404
+                    self[:meraki_failed_requests] += 1
+                    self[:meraki_failure] = {
+                        time: Time.now.to_i,
+                        code: resp.status
+                    }
                 end
             end
 
@@ -273,6 +288,12 @@ class Aca::Tracking::LocateUser
                             return
                         end
                     end
+                elsif resp.status != 204
+                    self[:cmx_failed_requests] += 1
+                    self[:cmx_failure] = {
+                        time: Time.now.to_i,
+                        code: resp.status
+                    }
                 end
             end
 
