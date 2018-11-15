@@ -496,10 +496,14 @@ class Microsoft::Office
         if room
             if room.settings.key?('setup')
                 booking_start_with_setup = booking_start - room.settings['setup'].to_i.seconds
+            else
+                booking_start_with_setup = booking_start
             end
             
             if room.settings.key?('breakdown')
                 booking_end_with_setup = booking_end + room.settings['breakdown'].to_i.seconds
+            else
+                booking_end_with_setup = booking_end
             end
         end
 
