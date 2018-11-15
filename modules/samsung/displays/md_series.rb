@@ -424,6 +424,9 @@ DESC
 
         logger.debug { "Sending to Samsung: #{array_to_str(data)}" }
 
-        send(array_to_str(data), options)
+        send(array_to_str(data), options).catch do |reason|
+            disconnect
+            thread.reject(reason)
+        end
     end
 end
