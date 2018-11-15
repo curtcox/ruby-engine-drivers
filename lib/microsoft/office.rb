@@ -827,19 +827,16 @@ class Microsoft::Office
         response = JSON.parse(request.body)
     end
 
-    def check_in_attendee(booking_id:, room_id:, attendee_email:, response_type:'Accepted')
-        booking = self.get_booking(booking_id: booking_id, mailbox: room_id)
-        new_attendees = []
-        booking['attendees'].each do |attendee|
-            new_attendee = attendee.dup
-            if new_attendee['emailAddress']['address'] == attendee_email
-                 new_attendee['status']['response'] = response_type
-             end
-            new_attendees.push(new_attendee)
-        end
-        endpoint = "/v1.0/users/#{room_id}/events/#{booking_id}"
-        event = { attendees: new_attendees }
-        request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: @delegated)
+    def check_in_attendee(owner_email:, attendee_email:, icaluid:, response_type:'Accepted')
+        # Do whatever this client requires upon checking
+        # VisitorEmail.deliver
+
+        # Mark this user as checked in
+        booking_info = User.bucket.get("bookinginfo-#{icaluid}").dup
+        booking_info[:check_ins] ||= []
+        booking_info[:check_ins].push(attendee_email)
+        User.bucket.set("bookinginfo-#{icaluid}", booking_info)
+        return true
     end
 
 
