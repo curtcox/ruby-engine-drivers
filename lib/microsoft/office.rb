@@ -508,9 +508,9 @@ class Microsoft::Office
         end
 
         # Check if this means the room is unavailable
-        booking_overlaps_start = booking_start_with_setup < start_param && booking_end_with_setup > start_param
-        booking_in_between = booking_start_with_setup >= start_param && booking_end_with_setup <= end_param
-        booking_overlaps_end = booking_start_with_setup < end_param && booking_end_with_setup > end_param
+        booking_overlaps_start = (booking_start_with_setup || booking_start) < start_param && (booking_end_with_setup || booking_end) > start_param
+        booking_in_between = (booking_start_with_setup || booking_start) >= start_param && (booking_end_with_setup || booking_end) <= end_param
+        booking_overlaps_end = (booking_start_with_setup || booking_start) < end_param && (booking_end_with_setup || booking_end) > end_param
         if booking_overlaps_start || booking_in_between || booking_overlaps_end
             booking['free'] = false
         else
