@@ -487,9 +487,19 @@ class Microsoft::Office
     end
 
     def extract_booking_data(booking, start_param, end_param, room_email, internal_domain=nil)
+        room = Orchestrator::ControlSystem.find_by_email(room_email)
+
         # Create time objects of the start and end for easier use
         booking_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
         booking_end = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
+
+        if room.settings.key?('setup')
+            booking_start = booking_start - room.settings['setup'].to_i.seconds
+        end
+        
+        if room.settings.key?('breakdown')
+            booking_end = booking_end + room.settings['breakdown'].to_i.seconds
+        end
 
         # Check if this means the room is unavailable
         booking_overlaps_start = booking_start < start_param && booking_end > start_param
