@@ -830,13 +830,13 @@ class Microsoft::Office
     def check_in_attendee(owner_email:, attendee_email:, icaluid:, response_type:'Accepted')
         # Do whatever this client requires upon checking
         # VisitorEmail.deliver
-
+        user_details = self.get_contact(owner_email:owner_email, contact_email:attendee_email)
         # Mark this user as checked in
         booking_info = User.bucket.get("bookinginfo-#{icaluid}").dup
         booking_info[:check_ins] ||= []
         booking_info[:check_ins].push(attendee_email)
         User.bucket.set("bookinginfo-#{icaluid}", booking_info)
-        return true
+        return user_details
     end
 
 
