@@ -65,7 +65,9 @@ class Aca::Tracking::LocateUser
 
         self[:domain_controller_posted_at] ||= 0
         self[:radius_controller_posted_at] ||= 0
+        self[:meraki_enabled] = @meraki_enabled
         self[:meraki_failed_requests] ||= 0
+        self[:cmx_enabled] = @cmx_enabled
         self[:cmx_failed_requests] ||= 0
 
         @temporary = Set.new((setting(:temporary_macs) || {}).values)
