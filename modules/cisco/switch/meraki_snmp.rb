@@ -95,6 +95,8 @@ class Cisco::Switch::MerakiSNMP
         self[:level] = setting(:level)
 
         @reserve_time = setting(:reserve_time) || 0
+        self[:last_successful_query] ||= 0
+        @temp_last_updated = 0
     end
 
     def on_unload
@@ -273,6 +275,8 @@ class Cisco::Switch::MerakiSNMP
         (@check_interface - checked).each { |iface| remove_lookup(iface) }
         self[:reserved] = @reserved_interface.to_a
 
+        self[:last_successful_query] = @temp_last_updated
+
         nil
     end
 
@@ -358,6 +362,7 @@ class Cisco::Switch::MerakiSNMP
             remove_interfaces.each { |iface| remove_reserved(iface) }
             add_interfaces.each { |iface| remove_lookup(iface) }
             self[:reserved] = @reserved_interface.to_a
+            @temp_last_updated = Time.now.to_i
         }.value
     end
 
