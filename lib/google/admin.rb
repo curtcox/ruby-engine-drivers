@@ -40,7 +40,7 @@ class Google::Admin
 
     def get_users(q: nil, limit: nil)
         authorization = Google::Auth.get_application_default(@scopes).dup
-        authorization.sub = @admin_email
+        authorization.sub = @admin_email if @admin_email
         @admin.authorization = authorization
         options = {
             domain: @domain
@@ -62,7 +62,7 @@ class Google::Admin
 
     def get_user(user_id:)
         authorization = Google::Auth.get_application_default(@scopes).dup
-        authorization.sub = @admin_email
+        authorization.sub = @admin_email if @admin_email
         @admin.authorization = authorization
         options = {
             domain: @domain
@@ -76,7 +76,7 @@ class Google::Admin
 
     def get_available_rooms(room_ids:, start_param:, end_param:)
         authorization = Google::Auth.get_application_default(@scopes).dup
-        authorization.sub = @admin_email
+        authorization.sub = @admin_email if @admin_email
         @calendar.authorization = authorization
         now = Time.now
         start_param = ensure_ruby_date((start_param || now))
@@ -100,14 +100,14 @@ class Google::Admin
 
     def delete_booking(room_id:, booking_id:)
         authorization = Google::Auth.get_application_default(@scopes).dup
-        authorization.sub = @admin_email
+        authorization.sub = @admin_email if @admin_email
         @calendar.authorization = authorization
         @calendar.delete_event(room_id, booking_id)
     end
 
     def get_bookings(email:, start_param:nil, end_param:nil)
         authorization = Google::Auth.get_application_default(@scopes).dup
-        authorization.sub = @admin_email
+        authorization.sub = @admin_email if @admin_email
         @calendar.authorization = authorization
         if start_param.nil?
             start_param = DateTime.now
@@ -132,7 +132,7 @@ class Google::Admin
 
     def create_booking(room_email:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, timezone:'Sydney')
         authorization = Google::Auth.get_application_default(@scopes).dup
-        authorization.sub = @admin_email
+        authorization.sub = @admin_email if @admin_email
         @calendar.authorization = authorization
         description = String(description)
         attendees = Array(attendees)
