@@ -37,12 +37,14 @@ class Loqit::Lockers
             serial:,
             wsdl:,
             log: false,
-            log_level: :debug
+            log_level: :debug   
         )
         savon_config = {
             :wsdl => wsdl,
-            :log => log,
-            :log_level => log_level
+            :log => false,
+            :log_level => :debug,
+            :open_timeout => 1,
+            :read_timeout => 1
         }
 
         @client = Savon.client savon_config
@@ -86,18 +88,18 @@ class Loqit::Lockers
         
         if start_number
             (start_number.to_i..end_number.to_i).each do |num|
-                puts "WORKING ON NUMBER: #{num}"
-                locker_status = new_request('show_locker_status', [num.to_s])
-                all_lockers_detailed.push(locker_status)
-                sleep 0.03
+                # puts "WORKING ON NUMBER: #{num}"
+                # locker_status = new_request('show_locker_status', [num.to_s])
+                all_lockers_detailed.push(self.show_locker_status(num.to_s))
+                # sleep 0.1
             end
         else
             all_lockers = self.list_lockers
             all_lockers[0..19].each_with_index do |locker, ind|
-                puts "WORKING ON NUMBER: #{num}"
-                locker_status = new_request('show_locker_status', [locker['number']])
-                all_lockers_detailed.push(locker_status)
-                sleep 0.03
+                # puts "WORKING ON NUMBER: #{num}"
+                # locker_status = new_request('show_locker_status', [locker['number']])
+                all_lockers_detailed.push(self.show_locker_status(locker['number']))
+                # sleep 0.1
             end
         end
         all_lockers_detailed
@@ -106,7 +108,7 @@ class Loqit::Lockers
     def add_to_queue(locker_number)
     end
 
-    def show_locker_status(locker_number)
+    def show_locker_status(locker_number, retries = 3)
         response = @client.call(:show_locker_status,
             message: {
                 lockerNumber: locker_number,
@@ -115,6 +117,12 @@ class Loqit::Lockers
             soap_header: @header
         ).body[:show_locker_status_response][:return]
         JSON.parse(response)
+    rescue Net::OpenTimeout
+        puts "GOT FAILURE"
+        puts "RETRIES: #{retries}"
+        puts "---------------"
+        retries -= 1
+        retry if retries > 0
     end
 
     def open_locker(locker_number)   
