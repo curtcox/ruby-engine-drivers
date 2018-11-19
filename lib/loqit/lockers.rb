@@ -56,6 +56,8 @@ class Loqit::Lockers
                 serialnumber: @serial
             }
         }
+        @queue = Queue.new
+        Thread.new { process_requests! }
     end
 
     def list_lockers
@@ -70,17 +72,24 @@ class Loqit::Lockers
 
     def list_lockers_detailed(start_number:nil, end_number:nil)
         all_lockers_detailed = []
+        thread = Libuv::Reactor.current
+        defer = thread.defer
         if start_number
             (start_number.to_i..end_number.to_i).each do |num|
-                all_lockers_detailed.push(self.show_locker_status(num.to_s))
+                @queue << [defer, num.to_s]
+                all_lockers_detailed.push(defer.promise.value)
             end
         else
             all_lockers = self.list_lockers
            all_lockers[0..19].each_with_index do |locker, ind|
-                all_lockers_detailed.push(self.show_locker_status(locker['number']))
+                @queue << [defer, locker['number']]
+                all_lockers_detailed.push(defer.promise.value)
             end
         end
         all_lockers_detailed
+    end
+
+    def add_to_queue(locker_number)
     end
 
     def show_locker_status(locker_number)
@@ -129,4 +138,14 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
+     def process_requests!
+        loop do
+            defer, locker_num = @queue.pop
+            begin
+                defer.resolve self.show_locker_status(locker_num)
+            rescue => e
+                defer.reject e
+            end
+        end
+    end
 end
