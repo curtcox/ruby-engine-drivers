@@ -87,7 +87,7 @@ class Loqit::Lockers
         if start_number
             (start_number.to_i..end_number.to_i).each do |num|
                 puts "WORKING ON NUMBER: #{num}"
-                locker_status = new_request(show_locker_status, locker['number'])
+                locker_status = new_request(show_locker_status, [num.to_s])
                 all_lockers_detailed.push(locker_status)
                 sleep 0.03
             end
@@ -95,7 +95,7 @@ class Loqit::Lockers
             all_lockers = self.list_lockers
             all_lockers[0..19].each_with_index do |locker, ind|
                 puts "WORKING ON NUMBER: #{num}"
-                locker_status = new_request(show_locker_status, locker['number'])
+                locker_status = new_request(show_locker_status, [locker['number']])
                 all_lockers_detailed.push(locker_status)
                 sleep 0.03
             end
