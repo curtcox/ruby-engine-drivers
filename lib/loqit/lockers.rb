@@ -60,6 +60,17 @@ class Loqit::Lockers
         Thread.new { process_requests! }
     end
 
+    def new_request(name, *args)
+        thread = Libuv::Reactor.current
+        defer = thread.defer
+        @queue << [defer, name, args]
+        defer.promise.value
+    end
+
+    def new_ruby_request(name, *args, &block)
+        @queue << [block, name, args]
+    end
+
     def list_lockers
         response = @client.call(:list_lockers,
             message: {
@@ -72,8 +83,7 @@ class Loqit::Lockers
 
     def list_lockers_detailed(start_number:nil, end_number:nil)
         all_lockers_detailed = []
-        thread = Libuv::Reactor.current
-        defer = thread.defer
+        
         if start_number
             (start_number.to_i..end_number.to_i).each do |num|
                 @queue << [defer, num.to_s]
@@ -140,9 +150,13 @@ class Loqit::Lockers
 
      def process_requests!
         loop do
-            defer, locker_num = @queue.pop
+            defer, name, args = @queue.pop
             begin
-                defer.resolve self.show_locker_status(locker_num)
+                if defer.respond_to? :call
+                    defer.call self.__send__(name, *args)
+                else
+                    defer.resolve self.__send__(name, *args)
+                end
             rescue => e
                 defer.reject e
             end
