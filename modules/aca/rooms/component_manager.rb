@@ -7,19 +7,18 @@ module Aca::Rooms::Components; end
 
 module Aca::Rooms::ComponentManager
     module Composer
-        Hook = Struct.new :before, :during, :after
+        Hook = Struct.new :method, :position, :action
 
         def compose_with(component, &extensions)
-            # Nested hash of { components => { method => Hook } }
+            # Hash of { component => [Hook] }
             const_set :HOOKS, {} unless const_defined? :HOOKS
-            hooks = const_get :HOOKS
-            hooks[component] ||= Hash.new { |h, k| h[k] = Hook.new }
+            hooks = const_get(:HOOKS)[component] = []
 
             # Mini-DSL for defining cross-component behaviours
             composer = Class.new do
-                Hook.members.each do |position|
+                [:before, :during, :after].each do |position|
                     define_method position do |method, &action|
-                        hooks[component][method][position] = action
+                        hooks << Hook.new(method, position, action)
                     end
                 end
             end
@@ -27,16 +26,6 @@ module Aca::Rooms::ComponentManager
             composer.new.instance_eval(&extensions)
 
             self
-
-            # HOOKS = {
-            #     Power: {
-            #         powerup: ...
-            #     }
-            # }
-            #
-            # HOOKS = {
-            #     powerup: [...]
-            # }
         end
     end
 
@@ -54,22 +43,33 @@ module Aca::Rooms::ComponentManager
             hooks = modules.select   { |mod| mod.singleton_class < Composer }
                            .flat_map { |mod| mod::HOOKS.values_at(*components) }
                            .compact
+                           .flatten
 
-            # Map [{ method => Hook }] to { method => [Hook] }
-            hooks = hooks.reduce { |a, b| a.merge(b) { |_, x, y| [*x, *y] } }
-                         .transform_values!          { |x| Array.wrap x }
+            # Map from [Hook] to { method => { position => [action] } }
+            hooks = hooks.each_with_object({}) do |hook, h|
+                ((h[hook.method] ||= {})[hook.position] ||= []) << hook.action
+            end
 
             overrides = Module.new do
-                hooks.each do |method, hook_list|
+                hooks.each do |method, actions|
                     define_method method do |*args|
-                        actions = [
-                            [hook_list.map(&:before)],
-                            [hook_list.map(&:during), -> { super }],
-                            [hook_list.map(&:after)]
-                        ]
+                        result = nil
 
-                        actions.reduce do
+                        sequence = [
+                            actions[:before],
+                            [
+                                proc { result = super(*args) },
+                                *actions[:during]
+                            ],
+                            actions[:after]
+                        ].compact!
 
+                        sequence.reduce(thread.finally) do |prev, succ|
+                            prev.then do
+                                thread.all(succ.map { |x| instance_exec(*args, &x) })
+                            end
+                        end.then do
+                            result
                         end
                     end
                 end
