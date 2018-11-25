@@ -15,16 +15,7 @@ module Aca::Rooms::ComponentManager
         # be preserved, but will be deferred until the completion of any
         # composite behaviours.
         def compose_with(component, &extensions)
-            # Build out a module heirachy so that <base>::Compositions::<other>
-            # exists and can be used to house any behaviour extensions to be
-            # applied when both components are in use.
-            overlay = [:Compositions, component].reduce(self) do |context, name|
-                if context.const_defined? name, false
-                    context.const_get name
-                else
-                    context.const_set name, Module.new
-                end
-            end
+            overlay = overlay_module_for component
 
             hooks = {}
 
@@ -55,17 +46,32 @@ module Aca::Rooms::ComponentManager
                         actions[:after]
                     ].compact!
 
-                    sequence.reduce(thread.finally) do |a, b|
+                    exec_actions = sequence.reduce(thread.finally) do |a, b|
                         a.then do
                             thread.all(b.map { |x| instance_exec(*args, &x) })
                         end
-                    end.then do
-                        result
                     end
+
+                    exec_actions.then { result }
                 end
             end
 
             self
+        end
+
+        private
+
+        # Build out a module heirachy so that <base>::Compositions::<other>
+        # exists and can be used to house any behaviour extensions to be
+        # applied when both components are in use.
+        def overlay_module_for(component)
+            [:Compositions, component].reduce(self) do |context, name|
+                if context.const_defined? name, false
+                    context.const_get name
+                else
+                    context.const_set name, Module.new
+                end
+            end
         end
     end
 
