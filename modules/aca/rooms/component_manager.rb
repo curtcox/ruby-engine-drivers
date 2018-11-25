@@ -7,23 +7,63 @@ module Aca::Rooms::Components; end
 
 module Aca::Rooms::ComponentManager
     module Composer
-        Hook = Struct.new :method, :position, :action
-
+        # Mini-DSL for defining cross-component behaviours.
+        #
+        # With the block provided `before`, `during`, or `after` can be used
+        # to insert additional behaviour to methods that should only exist when
+        # both components are in use. The result of the original method will
+        # be preserved, but will be deferred until the completion of any
+        # composite behaviours.
         def compose_with(component, &extensions)
-            # Hash of { component => [Hook] }
-            const_set :HOOKS, {} unless const_defined? :HOOKS
-            hooks = const_get(:HOOKS)[component] = []
+            # Build out a module heirachy so that <base>::Compositions::<other>
+            # exists and can be used to house any behaviour extensions to be
+            # applied when both components are in use.
+            overlay = [:Compositions, component].reduce(self) do |context, name|
+                if context.const_defined? name, false
+                    context.const_get name
+                else
+                    context.const_set name, Module.new
+                end
+            end
 
-            # Mini-DSL for defining cross-component behaviours
+            hooks = {}
+
+            # Eval the block to populate hooks with the overlay actions as
+            # method => { position => [actions] }
             composer = Class.new do
                 [:before, :during, :after].each do |position|
                     define_method position do |method, &action|
-                        hooks << Hook.new(method, position, action)
+                        ((hooks[method] ||= {})[position] ||= []) << action
                     end
                 end
             end
 
             composer.new.instance_eval(&extensions)
+
+            # Build the overlay Module for prepending
+            hooks.each do |method, actions|
+                # FIXME: this removes visibility of original args
+                overlay.send :define_method, method do |*args|
+                    result = nil
+
+                    sequence = [
+                        actions[:before],
+                        [
+                            proc { |*x| result = super(*x) },
+                            *actions[:during]
+                        ],
+                        actions[:after]
+                    ].compact!
+
+                    sequence.reduce(thread.finally) do |a, b|
+                        a.then do
+                            thread.all(b.map { |x| instance_exec(*args, &x) })
+                        end
+                    end.then do
+                        result
+                    end
+                end
+            end
 
             self
         end
@@ -31,51 +71,25 @@ module Aca::Rooms::ComponentManager
 
     module Mixin
         def components(*components)
+            # Load the associated module
             modules = components.map do |component|
                 fqn = "::Aca::Rooms::Components::#{component}"
                 ::Orchestrator::DependencyManager.load fqn, :logic
             end
 
-            # Include the component methods
+            # Include the component
             include(*modules)
 
-            # Get all cross-component behaviours for the loaded components
-            hooks = modules.select   { |mod| mod.singleton_class < Composer }
-                           .flat_map { |mod| mod::HOOKS.values_at(*components) }
-                           .compact
-                           .flatten
+            # Compose cross-component behaviours
+            overlays = modules.flat_map do |base|
+                next unless base.const_defined? :Compositions, false
 
-            # Map from [Hook] to { method => { position => [action] } }
-            hooks = hooks.each_with_object({}) do |hook, h|
-                ((h[hook.method] ||= {})[hook.position] ||= []) << hook.action
-            end
-
-            overrides = Module.new do
-                hooks.each do |method, actions|
-                    define_method method do |*args|
-                        result = nil
-
-                        sequence = [
-                            actions[:before],
-                            [
-                                proc { result = super(*args) },
-                                *actions[:during]
-                            ],
-                            actions[:after]
-                        ].compact!
-
-                        sequence.reduce(thread.finally) do |prev, succ|
-                            prev.then do
-                                thread.all(succ.map { |x| instance_exec(*args, &x) })
-                            end
-                        end.then do
-                            result
-                        end
-                    end
+                components.each_with_object([]) do |component, compositions|
+                    next unless base::Compositions.const_defined? component
+                    compositions << base::Compositions.const_get(component)
                 end
             end
-
-            prepend overrides
+            prepend(*overlays.compact)
         end
     end
 
