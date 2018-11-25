@@ -31,7 +31,8 @@ class Aca::Tracking::LocateUser
         },
         ignore_hostnames: {},
         accept_hostnames: {},
-        temporary_macs: {}
+        temporary_macs: {},
+        ignore_users: {}
     })
 
     def on_load
@@ -68,6 +69,7 @@ class Aca::Tracking::LocateUser
         @accept_hosts = Set.new((setting(:accept_hostnames) || {}).values)
         @ignore_byod_hosts = Set.new((setting(:ignore_byod_hosts) || {}).values)
         @accept_byod_hosts = Set.new((setting(:accept_byod_hosts) || {}).values)
+        @ignore_users = Set.new((setting(:ignore_users) || {}).values.map(&:downcase))
         @warnings ||= {}
         @filters ||= {}
     end
@@ -106,6 +108,7 @@ class Aca::Tracking::LocateUser
     def lookup(*ips)
         ttl = 10.minutes.ago.to_i
         ips.each do |ip, login, domain, hostname|
+            next if @ignore_users.include?(login.downcase)
             perform_lookup(ip, login, domain, hostname, ttl)
         end
     end
@@ -114,6 +117,7 @@ class Aca::Tracking::LocateUser
     # Typically from a RADIUS server like MS Network Policy Server
     def associate(*macs)
         macs.each do |mac, login, hostname|
+            next if @ignore_users.include?(login.downcase)
             begin
                 parts = login.split("\\")
                 login = parts[-1]
@@ -232,7 +236,9 @@ class Aca::Tracking::LocateUser
             # We search the wireless networks in case snooping is enabled on the
             # port that the wireless controller is connected to
             if @meraki_enabled
+                logger.debug { "Wireless check for IP #{ip}" }
                 resp = @scanner.get(path: "/meraki/#{ip}").value
+                logger.debug { "Wireless check for got #{resp.status.inspect}" }
                 if resp.status == 200
                     details = JSON.parse(resp.body, symbolize_names: true)
 

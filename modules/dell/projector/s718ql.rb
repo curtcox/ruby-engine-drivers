@@ -1,4 +1,4 @@
-require 'protocols/snmp'
+require 'protocols/simple_snmp'
 
 module Dell; end
 module Dell::Projector; end
@@ -18,7 +18,7 @@ class Dell::Projector::S718ql
         snmp_timeout: 4000,
         snmp_options: {
             version: 'v2c',
-            community: 'public',
+            community: 'private',
         }
     })
 
@@ -28,29 +28,40 @@ class Dell::Projector::S718ql
 
         # Meta data for inquiring interfaces
         self[:type] = :projector
+
+        schedule.every('60s') { do_poll }
         on_update
     end
 
-    def on_update
-        new_client if @resolved_ip
+    def on_unload
+        @client.close
     end
 
-    def on_unload
-        @transport&.close
-        @transport = nil
-        @client&.close
-        @client = nil
+    def on_update
+        #new_client if @resolved_ip
+        options = setting(:snmp_options) || {}
+        proxy = Protocols::SimpleSnmp.new(self)
+        options[:proxy] = proxy
+        @client = NETSNMP::Client.new(options.to_h.symbolize_keys)
     end
+
+    #def on_unload
+    #    @transport&.close
+    #    @transport = nil
+    #    @client&.close
+    #    @client = nil
+    #end
 
     def hostname_resolution(ip)
         @resolved_ip = ip
 
         # Create a new client once we know the IP address of the device.
         # Might have been a hostname in the settings.
-        new_client
+        #new_client
     end
 
     def new_client
+        return
         @transport&.close
         @client&.close
 
@@ -65,7 +76,7 @@ class Dell::Projector::S718ql
     def power(state, opt = nil)
         if is_affirmative?(state)
             logger.debug "-- requested to power on"
-            @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.4.3.0', value: 11)
+            resp = @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.4.3.0', value: 11)
             self[:power] = On
         else
             logger.debug "-- requested to power off"
@@ -74,9 +85,12 @@ class Dell::Projector::S718ql
         end
     end
 
-    def power?(options = {}, &block)
-        state = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.4.3.0')
-        logger.debug { "Volume State #{state.inspect}" }
+    def power?
+        state = @client.get(oid: '1.3.6.1.4.1.2699.2.4.1.4.2.0')
+        logger.debug { "Power State #{state.inspect}" }
+	self[:power] = state == 11 || state == 10
+        self[:warming] = state == 10
+        self[:cooling] = state == 9
         state
     end
 
@@ -85,7 +99,8 @@ class Dell::Projector::S718ql
     INPUTS = {
         :hdmi => 5,
         :hdmi2 => 14,
-        :hdmi3 => 17
+        :hdmi3 => 17,
+	:network => 16
     }
     INPUTS.merge!(INPUTS.invert)
 
@@ -94,9 +109,9 @@ class Dell::Projector::S718ql
         value = INPUTS[input]
         raise "unknown input '#{value}'" unless value
 
-        logger.debug "-- epson LCD, requested to switch to: #{input}"
-        @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.6.1.1.3.1', value: value)
-
+        logger.debug "Requested to switch to: #{input}"
+        response = @client.set(oid: '1.3.6.1.4.1.2699.2.4.1.6.1.1.3.1', value: value)
+        logger.debug "Recieved: #{response}"
         self[:input] = input    # for a responsive UI
         self[:mute] = false
     end
@@ -161,6 +176,16 @@ class Dell::Projector::S718ql
     end
 
     def do_poll
+	power?
+	input?
+	mute?
+    end
 
+    protected
+
+    def received(data, resolve, command)
+        # return the data which resolves the request promise.
+        # the proxy uses fibers to provide this to the NETSNMP client
+        data
     end
 end

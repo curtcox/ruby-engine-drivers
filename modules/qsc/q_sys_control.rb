@@ -317,9 +317,9 @@ class Qsc::QSysControl
                 
                 case type
                 when :fader
-                    self["fader#{control_id}"] = (value.to_f * 10).to_i
+                    self["#{control_id}"] = (value.to_f * 10).to_i
                 when :mute
-                    self["fader#{control_id}_mute"] = value.to_i == 1
+                    self["#{control_id}"] = value.to_i == 1
                 end
             else
                 value = resp[2]
@@ -352,9 +352,9 @@ class Qsc::QSysControl
 
                     case type
                     when :fader
-                        self["fader#{control_id}"] = (value.to_f * 10).to_i
+                        self["#{control_id}"] = (value.to_f * 10).to_i
                     when :mute
-                        self["fader#{control_id}_mute"] = value == 1
+                        self["#{control_id}"] = value == 1
                     end
                 end
             else

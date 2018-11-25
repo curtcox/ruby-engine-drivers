@@ -15,6 +15,7 @@ class Extron::Recorder::SMP300Series < Extron::Base
     # This should consume the whole copyright message
     tokenize delimiter: "\r\n", wait_ready: /Copyright.*/i
 
+
     # NOTE:: The channel arguments are here for compatibility with other recording devices
     def information(channel = 1)
         # Responds with "<ChA1*ChB3>*<stopped>*<internal>*<437342288>*<00:00:00>*<155:40:43>"
@@ -22,7 +23,12 @@ class Extron::Recorder::SMP300Series < Extron::Base
     end
 
     def record(channel = 1)
-        do_send("\eY1RCDR", name: :record_action)
+        do_send("\eY1RCDR", name: :record_action, delay: 5000, delay_on_receive: 5000, wait: true)
+    end
+
+    def stream(enable = true, channel = 1)
+	action = enable ? 1 : 0
+        do_send("\e#{channel}*#{action}STRC", name: :record_action)
     end
 
     def stop(channel = 1)
@@ -35,6 +41,10 @@ class Extron::Recorder::SMP300Series < Extron::Base
 
     def status(channel = 1)
         do_send("\eYRCDR", name: :status)
+    end
+
+    def stream_status(channel = 1)
+        do_send("\e#{channel}STRC", name: :stream_status)
     end
 
     # only works with scheduled recordings
@@ -58,6 +68,7 @@ class Extron::Recorder::SMP300Series < Extron::Base
     def do_poll
         information
         status
+	stream_status
     end
 
     protected
@@ -71,21 +82,23 @@ class Extron::Recorder::SMP300Series < Extron::Base
             return :success
         end
 
-        if data[0] == '<'
-            parts = data[1..-2].split('>*<')
+        if data[0..3] == 'Inf*'
+            parts = data[5..-2].split('>*<')
+	logger.debug "#{parts.inspect}"
             self[:recording_channels] = parts[1]
             self[:recording_to] = parts[2]
             self[:time_remaining] = parts[-1]
-            self[:recording_time] = parts[-2]
+            self[:duration] = parts[-2]
             self[:free_space] = parts[-3]
         elsif data.start_with? 'RcdrY'
-            self[:channel1] = case data[-1].to_i
+            self[:status] = self[:channel1] = case data[-1].to_i
+
             when 0
                 clear_recording_poller
                 :idle
             when 1
                 if @recording.nil?
-                    @recording = schedule.every(1000) { recording_duration }
+                    @recording = schedule.in(5000) { @recording = schedule.every(1000) { do_poll } }
                 end
                 :recording
             when 2
@@ -94,7 +107,9 @@ class Extron::Recorder::SMP300Series < Extron::Base
             end
         elsif data.start_with? 'Inf35'
             self[:duration] = data.split('*')[1]
-        end
+	elsif data.start_with? 'Strc'
+	    self[:streaming] = (data.split('*')[1] == '1')
+	    end
 
         :success
     end

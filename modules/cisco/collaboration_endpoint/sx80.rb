@@ -178,7 +178,11 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
         if [0, nil, :none, 'none', :blank, 'blank'].include? input
             presentation_stop
         else
-            presentation_start presentation_source: input
+	    if self[:configuration]&.dig(:Video, :Input, :Connector, input, :InputSourceType) == :camera
+	      camera_select connector_id: input	
+	    else
+              presentation_start presentation_source: input
+	    end
         end
     end
 

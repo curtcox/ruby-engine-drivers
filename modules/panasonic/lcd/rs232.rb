@@ -69,12 +69,12 @@ class Panasonic::LCD::Rs232
             self[:power_target] = On
             do_send(:power_on, retries: 10, name: :power, delay: 10000, timeout: 15000)
             logger.debug "requested to power on"
-            do_send(:power_query)
+	    power?
         else
             self[:power_target] = Off
             do_send(:power_off, retries: 10, name: :power, delay: 8000)
             logger.debug "requested to power off"
-            do_send(:power_query)
+	    power?
         end
     end
 
@@ -102,6 +102,7 @@ class Panasonic::LCD::Rs232
 
         # Projector doesn't automatically unmute
         unmute if self[:mute]
+        power(true) if (self[:power] == false)
 
         logger.debug { "requested to switch to: #{input}" }
         do_send(:input, INPUTS[input], retries: 10, delay_on_receive: 2000).then do
@@ -111,7 +112,7 @@ class Panasonic::LCD::Rs232
     end
 
     def input?
-        do_send(:current_input)
+        do_send(:current_inputi, name: :input?)
     end
 
     #
@@ -122,7 +123,7 @@ class Panasonic::LCD::Rs232
         logger.debug "requested to mute #{val}"
         do_send(:audio_mute, actual)    # Audio + Video
         do_poll
-    end
+    end
     alias_method :mute, :mute_audio
 
     def unmute_audio
@@ -131,12 +132,12 @@ class Panasonic::LCD::Rs232
     alias_method :unmute, :unmute_audio
 
     def muted?
-        do_send(:audio_mute_query)
+        do_send(:audio_mute_query, name: :muted?)
     end
 
     def volume(level)
         # Unable to query current volume
-        do_send(:volume, level.to_s.rjust(3, '0')).then { self[:volume] = level.to_i }
+        do_send(:volume, level.to_s.rjust(3, '0'), name: :volume?).then { self[:volume] = level.to_i }
     end
 
     def volume?
@@ -144,7 +145,7 @@ class Panasonic::LCD::Rs232
     end
 
     def do_poll
-        power?(priority: 0).then do
+        power?(priority: 0, name: :power?).then do
             if self[:power]
                 input?
                 volume?

@@ -203,7 +203,7 @@ class Extron::Switcher::Dtp < Extron::Base
 
     def query_fader(groups, type = :volume)
         Array(groups).each do |group|
-            do_send("\eG#{group}AU", group_type: type, wait: true)
+            do_send("\eH#{group}AU", group_type: type, wait: true)
         end
     end
 

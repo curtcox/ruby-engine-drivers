@@ -191,7 +191,8 @@ class Panasonic::Projector::Rs232
         when :power_off
             self[:power] = false
             ensure_power_state
-        else
+        else 
+            return :success unless command
             res = data
             case command[:name]
             when :power_query
