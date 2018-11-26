@@ -449,7 +449,7 @@ class Microsoft::Office
     end
 
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil)
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil)
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
 
@@ -468,7 +468,7 @@ class Microsoft::Office
             is_available = true
             bookings.each_with_index do |booking, i|
                 bookings[i] = extract_booking_data(booking, available_from, available_to, u_id, internal_domain)
-                if bookings[i]['free'] == false
+                if bookings[i]['free'] == false && bookings[i]['id'] != ignore_booking
                     is_available = false
                 end
             end
