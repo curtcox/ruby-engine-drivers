@@ -111,6 +111,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
         self[:building] = setting(:building)
         self[:level] = setting(:level)
 
+        self[:last_successful_query] ||= 0
+
         @reserve_time = setting(:reserve_time) || 0
     end
 
@@ -380,6 +382,8 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @scheduled_status_query = checked.empty?
         (@check_interface - checked).each { |iface| remove_lookup(iface) }
         self[:reserved] = @reserved_interface.to_a
+
+        self[:last_successful_query] = Time.now.to_i
 
         nil
     end
