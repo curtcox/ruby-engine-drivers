@@ -3,6 +3,8 @@
 
 module Aca; end
 class Aca::Ping
+    include ::Orchestrator::Constants
+
     # Discovery Information
     udp_port 9
     descriptive_name 'Ping Device (ICMP)'
