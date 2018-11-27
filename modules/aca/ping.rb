@@ -11,7 +11,8 @@ class Aca::Ping
     generic_name :Ping
 
     default_settings({
-        ping_every: '2m'
+        ping_every: '2m',
+        ping_count: 2
     })
 
     def on_load
@@ -19,13 +20,15 @@ class Aca::Ping
     end
 
     def on_update
+        @ping_count = setting(:ping_count) || 2
         schedule.clear
-        schedule.every(setting(:ping_every)) { ping_device }
+        schedule.every(setting(:ping_every) || '2m') { ping_device }
     end
 
     def ping_device
-        ping = ::UV::Ping.new(remote_address, count: 3)
-        set_connected_state(ping.ping)
+        ping = ::UV::Ping.new(remote_address, count: @ping_count)
+        ping.ping
+        set_connected_state(ping.pingable)
         logger.debug { {
             host: ping.ip,
             pingable: ping.pingable,
