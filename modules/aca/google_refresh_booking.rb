@@ -346,7 +346,7 @@ class Aca::GoogleRefreshBooking
             self[:today] = bookings
         }, proc { |e| logger.print_error(e, 'error fetching bookings') })
     end
-    
+
     # ======================================
     # Meeting Helper Functions
     # ======================================
@@ -523,7 +523,7 @@ class Aca::GoogleRefreshBooking
                 start_param: start_time,
                 end_param: end_time,
                 subject: subject,
-                current_user: (organizer || nil)
+                current_user: (organizer || nil),
                 timezone: ENV['TIMEZONE'] || 'Sydney'
             })
         
