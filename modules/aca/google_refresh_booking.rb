@@ -515,7 +515,7 @@ class Aca::GoogleRefreshBooking
         logger.info "Got #{events.length} results!"
         logger.info events.to_json
 
-        results
+        events
     end
     
     def log(data)
