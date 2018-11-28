@@ -314,48 +314,22 @@ class Aca::GoogleRefreshBooking
     end
 
 
-
-    # ======================================
-    # ROOM BOOKINGS:
-    # ======================================
     def fetch_bookings(*args)
+        options = {
+            client_id: @google_client_id,
+            client_secret: @google_secret,
+            scope: @google_scope,
+            redirect_uri: @google_redirect_uri,
+            refresh_token: @google_refresh_token,
+            grant_type: "refresh_token"
+        }
 
-    
-        # @google_organiser_location = setting(:google_organiser_location)
-        # @google_client_id = setting(:google_client_id)
-        # @google_secret = setting(:google_client_secret)
-        # @google_redirect_uri = setting(:google_redirect_uri)
-        # @google_refresh_token = setting(:google_refresh_token)
-        # @google_room = (setting(:google_room) || system.email)
+        authorization = Google::Auth::UserRefreshCredentials.new options
 
-        # client = OAuth2::Client.new(@google_client_id, @google_secret, {site: @google_site, token_url: @google_token_url})
-
-
-        # options = {
-        #     client_id: @google_client_id,
-        #     client_secret: @google_secret,
-        #     scope: @google_scope,
-        #     redirect_uri: @google_redirect_uri,
-        #     refresh_token: @google_refresh_token,
-        #     grant_type: "refresh_token"
-        # }
-        # logger.info "AUTHORIZING WITH OPTIONS:"
-        # STDERR.puts "AUTHORIZING WITH OPTIONS:"
-        # STDERR.puts options
-        # logger.info options
-        # STDERR.puts @google_admin_email
-        # logger.info @google_admin_email
-        # STDERR.flush
-
-        # authorization = Google::Auth::UserRefreshCredentials.new options
-
-        authorization = Google::Auth.get_application_default(@google_scope).dup
-        authorization.sub = @google_admin_email
-
-        calendar_api = Google::Apis::CalendarV3
-        calendar = calendar_api::CalendarService.new
+        Calendar = Google::Apis::CalendarV3
+        calendar = Calendar::CalendarService.new
         calendar.authorization = authorization
-        events = calendar.list_events(system.email, time_min: ActiveSupport::TimeZone.new(@google_timezone).now.midnight.iso8601, time_max: ActiveSupport::TimeZone.new(@google_timezone).now.tomorrow.midnight.iso8601).items
+        events = calendar.list_events(system.email)
         
         task {
             todays_bookings(events)
@@ -363,8 +337,7 @@ class Aca::GoogleRefreshBooking
             self[:today] = bookings
         }, proc { |e| logger.print_error(e, 'error fetching bookings') })
     end
-
-
+    
     # ======================================
     # Meeting Helper Functions
     # ======================================
