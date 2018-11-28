@@ -214,8 +214,8 @@ class Aca::GoogleRefreshBooking
             end
         end
 
-        @google_client  = ::Google::Admin.new({
-            admin_email: ENV['GOOGLE_ADMIN_EMAIL'],
+        @google  = ::Google::Admin.new({
+            admin_email: nil,
             domain: ENV['GOOGLE_DOMAIN']
         })
 
@@ -330,6 +330,8 @@ class Aca::GoogleRefreshBooking
         calendar = Calendar::CalendarService.new
         calendar.authorization = authorization
         events = calendar.list_events(system.email)
+
+        events = @google.get_bookings(email: system.email, start_param: DateTime.now - 1.day, end_param: DateTime.now + 1.day ) 
         
         task {
             todays_bookings(events)
