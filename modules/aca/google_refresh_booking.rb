@@ -139,7 +139,7 @@ class Aca::GoogleRefreshBooking
         if CAN_LDAP
             @ldap_creds = setting(:ldap_creds)
             if @ldap_creds
-                encrypt = @ldap_creds[:encryption]
+                encrypt = @ldap_creds[:encryption] 
                 encrypt[:method] = encrypt[:method].to_sym if encrypt && encrypt[:method]
                 @tree_base = setting(:tree_base)
                 @ldap_user = @ldap_creds.delete :auth
@@ -511,22 +511,9 @@ class Aca::GoogleRefreshBooking
     end
 
     def todays_bookings(events)
-        results = []
 
-        events.each{|event| 
-            
-            results.push({
-                :Start => event.start.date_time.utc.iso8601,
-                :End => event.end.date_time.utc.iso8601,
-                :Subject => event.summary,
-                :owner => event.organizer.display_name
-                # :setup => 0,
-                # :breakdown => 0
-            })
-        }
-
-        logger.info "Got #{results.length} results!"
-        logger.info results.to_json
+        logger.info "Got #{events.length} results!"
+        logger.info events.to_json
 
         results
     end
