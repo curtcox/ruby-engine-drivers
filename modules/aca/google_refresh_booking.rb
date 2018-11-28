@@ -314,23 +314,7 @@ class Aca::GoogleRefreshBooking
     end
 
 
-    def fetch_bookings(*args)
-        options = {
-            client_id: @google_client_id,
-            client_secret: @google_secret,
-            scope: @google_scope,
-            redirect_uri: @google_redirect_uri,
-            refresh_token: @google_refresh_token,
-            grant_type: "refresh_token"
-        }
-
-        authorization = Google::Auth::UserRefreshCredentials.new options
-
-        Calendar = Google::Apis::CalendarV3
-        calendar = Calendar::CalendarService.new
-        calendar.authorization = authorization
-        events = calendar.list_events(system.email)
-
+    def fetch_bookings(*args)    
         events = @google.get_bookings(email: system.email, start_param: DateTime.now - 1.day, end_param: DateTime.now + 1.day ) 
         
         task {
