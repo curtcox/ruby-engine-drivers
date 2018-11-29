@@ -86,7 +86,8 @@ class Fortytwo::ItApi
         }
         query_params['$filter'] = filter_param if defined? filter_param
         query_params.compact!
-        api_request(request_method: 'get', endpoint: 'user', query: query_params)
+        response = api_request(request_method: 'get', endpoint: 'user', query: query_params)
+        JSON.parse(response.body)['value']
     end
 
     def get_orgs(q: nil, limit: 100, ids:nil)
@@ -111,7 +112,8 @@ class Fortytwo::ItApi
         }
         query_params['$filter'] = filter_param if defined? filter_param
         query_params.compact!
-        api_request(request_method: 'get', endpoint: 'org', query: query_params)
+        response = api_request(request_method: 'get', endpoint: 'org', query: query_params)
+        JSON.parse(response.body)['value']
     end
 
 
