@@ -757,7 +757,9 @@ class Microsoft::Office
                 "@odata.type": "microsoft.graph.openTypeExtension",
                 "extensionName": extension[:name]
             }
-            ext[extension[:key]] = extension[:value]
+            extension[:values].each do |ext_key, ext_value|
+                ext[ext_key] = ext_value
+            end
             exts.push(ext)
         end
         event[:extensions] = exts
