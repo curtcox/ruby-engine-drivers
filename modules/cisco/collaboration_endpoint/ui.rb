@@ -28,8 +28,8 @@ class Cisco::CollaborationEndpoint::Ui
 
     def on_update
         codec_mod = setting(:codec) || :VidConf
-        ui_layout = setting :cisco_ui_layout
-        bindings  = setting :cisco_ui_bindings || {}
+        ui_layout = setting(:cisco_ui_layout)
+        bindings  = setting(:cisco_ui_bindings) || {}
 
         # Allow UI layouts to be stored as JSON
         if ui_layout.is_a? Hash
