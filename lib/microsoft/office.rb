@@ -459,7 +459,7 @@ class Microsoft::Office
 
 
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil)
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[])
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
 
@@ -469,15 +469,15 @@ class Microsoft::Office
 
         # Array of all bookings within our period
         if bulk
-            recurring_bookings = bookings_request_by_users(user_id, start_param, end_param)
+            recurring_bookings = bookings_request_by_users(user_id, start_param, end_param, extensions)
         else
-            recurring_bookings = bookings_request_by_user(user_id, start_param, end_param)
+            recurring_bookings = bookings_request_by_user(user_id, start_param, end_param, extensions)
         end
 
         recurring_bookings.each do |u_id, bookings|
             is_available = true
             bookings.each_with_index do |booking, i|
-                bookings[i] = extract_booking_data(booking, available_from, available_to, u_id, internal_domain)
+                bookings[i] = extract_booking_data(booking, available_from, available_to, u_id, internal_domain, extensions)
                 if bookings[i]['free'] == false && bookings[i]['id'] != ignore_booking
                     is_available = false
                 end
@@ -496,7 +496,7 @@ class Microsoft::Office
         end
     end
 
-    def extract_booking_data(booking, start_param, end_param, room_email, internal_domain=nil)
+    def extract_booking_data(booking, start_param, end_param, room_email, internal_domain=nil, extensions=[])
         room = Orchestrator::ControlSystem.find_by_email(room_email)
 
         # Create time objects of the start and end for easier use
@@ -538,6 +538,16 @@ class Microsoft::Office
         booking['booking_id'] = booking['id']
         booking['icaluid'] = booking['iCalUId']
         booking['show_as'] = booking['showAs']
+
+        if booking.key?('extensions') && !extensions.empty?
+            booking['extensions'].each do |ext|
+                if extensions.include?(ext['id'])
+                    ext.each do |ext_key, ext_val|
+                        booking[ext_key] = ext_val if !['@odata.type', 'id','extensionName'].include?(ext_key)
+                    end
+                end
+            end
+        end
 
         # Check whether this event has external attendees
         booking_has_visitors = false
@@ -587,7 +597,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_calendarview
-    def bookings_request_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week))
+    def bookings_request_by_user(user_id, start_param=Time.now, end_param=(Time.now + 1.week), extensions=[])
         if user_id.class == Array
             user_id = user_id[0]
         end
@@ -600,7 +610,9 @@ class Microsoft::Office
         # Build our query to only get bookings within our datetimes
         query_hash = {}
         query_hash['$top'] = "200"
-
+        extensions.each do |ext_name|
+            query['$expand'] = "Extensions($filter=id eq 'Microsoft.OutlookServices.OpenTypeExtension.#{ext_name}')"
+        end
         if not start_param.nil?
             query_hash['startDateTime'] = start_param
             query_hash['endDateTime'] = end_param
@@ -614,7 +626,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_calendarview
-    def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week))
+    def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week), extensions=[])
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
@@ -630,6 +642,9 @@ class Microsoft::Office
                 startDateTime: start_param,
                 endDateTime: end_param,
             }
+            extensions.each do |ext_name|
+                query['$expand'] = "Extensions($filter=id eq 'Microsoft.OutlookServices.OpenTypeExtension.#{ext_name}')"
+            end   
             bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
 
             check_response(bulk_response)
