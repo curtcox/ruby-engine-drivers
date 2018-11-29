@@ -449,6 +449,16 @@ class Microsoft::Office
     end
 
 
+    # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_delete
+    def delete_contact(contact_id:, mailbox:)
+        endpoint = "/v1.0/users/#{mailbox}/events/#{contact_id}"
+        request = graph_request(request_method: 'delete', endpoint: endpoint, password: @delegated)
+        check_response(request)
+        200
+    end
+
+
+
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil)
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
@@ -649,7 +659,7 @@ class Microsoft::Office
         attendees = Array(attendees)
 
         # Get our room
-        room = Orchestrator::ControlSystem.find(room_id)
+        room = Orchestrator::ControlSystem.find_by_id(room_id) || Orchestrator::ControlSystem.find_by_email(room_id)
 
         if endpoint_override
             endpoint = "/v1.0/users/#{endpoint_override}/events"
