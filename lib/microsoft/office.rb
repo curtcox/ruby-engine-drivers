@@ -541,7 +541,7 @@ class Microsoft::Office
 
         if booking.key?('extensions') && !extensions.empty?
             booking['extensions'].each do |ext|
-                if extensions.include?("Microsoft.OutlookServices.OpenTypeExtension.#{ext['id']}")
+                if extensions.map {|e| "Microsoft.OutlookServices.OpenTypeExtension.#{e}"}.include?(ext['id'])
                     ext.each do |ext_key, ext_val|
                         booking[ext_key] = ext_val if !['@odata.type', 'id','extensionName'].include?(ext_key)
                     end
