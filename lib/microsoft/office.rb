@@ -582,7 +582,11 @@ class Microsoft::Office
         booking['attendees'] = new_attendees
 
         # Get the organiser and location data
-        booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
+        if booking.key?('owner') && booking.key?('owner_name')
+            booking['organizer'] = { name: booking['owner_name'], email: booking['owner']}
+        else
+            booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
+        end
         # if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
         #     booking['room_id'] = booking['locations'][0]['uniqueId'].downcase
         # end
