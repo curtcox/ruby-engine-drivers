@@ -77,13 +77,20 @@ module Aca::Rooms::ComponentManager
 
     module Mixin
         def components(*components)
+            component_settings = {}
+
             # Load the associated module
             modules = components.map do |component|
-                fqn = "::Aca::Rooms::Components::#{component}"
-                ::Orchestrator::DependencyManager.load fqn, :logic
+                mod, settings = load component
+
+                component_settings.merge! settings do |key, _, _|
+                    raise "setting \"#{key}\" declared in multiple components"
+                end
+
+                mod
             end
 
-            # Include the component
+            # Include the components
             include(*modules)
 
             # Compose cross-component behaviours
@@ -96,6 +103,40 @@ module Aca::Rooms::ComponentManager
                 end
             end
             prepend(*overlays.compact)
+
+            # Bubble up settings definitions
+            setting component_settings
+        end
+
+        private
+
+        # Load a component, returning a reference to the Module and the
+        # settings it defines.
+        #
+        # Settings may be defined by using the 'setting' keyword within the
+        # component module. Support for this is temporarily mixed in during
+        # load below.
+        def load(component)
+            fqn = "::Aca::Rooms::Components::#{component}"
+
+            settings = {}
+
+            mod = if ::Aca::Rooms::Components.const_defined? component
+                      ::Aca::Rooms::Components.const_get component
+                  else
+                      ::Aca::Rooms::Components.const_set component, Module.new
+                  end
+
+            mod.define_singleton_method :setting do |hash|
+                settings.merge! hash do |key, _, _|
+                    raise "\"#{key}\" declared multiple times in #{fqn}"
+                end
+            end
+
+
+            ::Orchestrator::DependencyManager.load fqn, :logic
+
+            [mod, settings]
         end
     end
 
