@@ -560,7 +560,11 @@ class Microsoft::Office
                 booking['room_id'] = attendee_email.downcase
             else
                 # Check if attendee is external or internal
-                internal_domain = ENV['INTERNAL_DOMAIN'] || internal_domain
+                if booking.key?('owner')
+                    Mail::Address.new(booking.key?('owner')).domain
+                else
+                    internal_domain = ENV['INTERNAL_DOMAIN'] || internal_domain
+                end
                 mail_object = Mail::Address.new(attendee_email)
                 mail_domain = mail_object.domain
                 booking_has_visitors = true if mail_domain != internal_domain
