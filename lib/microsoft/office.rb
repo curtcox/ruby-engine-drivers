@@ -459,7 +459,7 @@ class Microsoft::Office
 
 
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[])
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
 
@@ -469,7 +469,7 @@ class Microsoft::Office
 
         # Array of all bookings within our period
         if bulk
-            recurring_bookings = bookings_request_by_users(user_id, start_param, end_param, extensions)
+            recurring_bookings = bookings_request_by_users(user_id, start_param, end_param, extensions, custom_query)
         else
             recurring_bookings = bookings_request_by_user(user_id, start_param, end_param, extensions)
         end
@@ -634,7 +634,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_calendarview
-    def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week), extensions=[])
+    def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week), extensions=[], custom_query:[])
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
@@ -653,6 +653,11 @@ class Microsoft::Office
             extensions.each do |ext_name|
                 query['$expand'] = "Extensions($filter=id eq 'Microsoft.OutlookServices.OpenTypeExtension.#{ext_name}')"
             end   
+
+            custom_query.each do |query_key, query_val|
+                query[query_key] = query_val
+            end
+            
             bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
 
             check_response(bulk_response)
