@@ -634,7 +634,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_list_calendarview
-    def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week), extensions=[], custom_query:[])
+    def bookings_request_by_users(user_ids, start_param=Time.now, end_param=(Time.now + 1.week), extensions=[], custom_query=[])
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).iso8601.split("+")[0]
@@ -657,7 +657,7 @@ class Microsoft::Office
             custom_query.each do |query_key, query_val|
                 query[query_key] = query_val
             end
-            
+
             bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
 
             check_response(bulk_response)
