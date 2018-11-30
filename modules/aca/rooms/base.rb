@@ -9,6 +9,9 @@ class Aca::Rooms::Base
     include ::Orchestrator::Constants
     include ::Aca::Rooms::ComponentManager
 
+    generic_name :System
+    implements   :logic
+
     def self.setting(hash)
         previous = @default_settings || {}
         default_settings previous.merge hash
