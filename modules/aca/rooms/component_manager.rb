@@ -127,6 +127,9 @@ module Aca::Rooms::ComponentManager
                       ::Aca::Rooms::Components.const_set component, Module.new
                   end
 
+            # Inject a `setting` class method that pushes back into settings
+            # here via a closure. This enables any settings used by the
+            # component to be declared as `setting key: <default>`.
             mod.define_singleton_method :setting do |hash|
                 settings.merge! hash do |key, _, _|
                     raise "\"#{key}\" declared multiple times in #{fqn}"
