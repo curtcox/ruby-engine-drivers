@@ -27,7 +27,7 @@ module Aca::Rooms::Components::Io
     end
 end
 
-Aca::Rooms::Components::Io.extend ::Aca::Rooms::ComponentManager::Composer
+# Aca::Rooms::Components::Io.extend ::Aca::Rooms::ComponentManager::Composer
 
 Aca::Rooms::Components::Io.compose_with :Power do
     during :powerup do

@@ -133,6 +133,7 @@ module Aca::Rooms::ComponentManager
                 end
             end
 
+            mod.extend Composer
 
             ::Orchestrator::DependencyManager.load fqn, :logic
 
