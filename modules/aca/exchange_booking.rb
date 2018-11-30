@@ -785,7 +785,7 @@ class Aca::ExchangeBooking
             # Prevent connections handing with TIME_WAIT
             # cli.ews.connection.httpcli.reset_all
 
-            if ["Private", "Confidential"].inculde?(meeting.sensitivity)
+            if ["Private", "Confidential"].include?(meeting.sensitivity)
                 subject = meeting.sensitivity
             else
                 subject = item[:subject][:text]
