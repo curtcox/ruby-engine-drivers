@@ -682,7 +682,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_events
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML", extensions:[])
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML", extensions:[], location:nil)
         description = String(description)
         attendees = Array(attendees)
 
@@ -760,6 +760,7 @@ class Microsoft::Office
             isOrganizer: false,
             attendees: attendees
         }
+        event[:location][:displayName] = location if location
         exts = []
         extensions.each do |extension|
             ext = {
