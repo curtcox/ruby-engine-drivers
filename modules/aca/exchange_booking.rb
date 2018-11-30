@@ -674,7 +674,7 @@ class Aca::ExchangeBooking
             meeting_time = Time.parse(meeting.ews_item[:start][:text])
 
             # Remove any meetings that match the start time provided
-            if meeting_time.to_i == delete_at                
+            if meeting_time.to_i == delete_at
                 # new_booking = meeting.update_item!({ end: Time.now.utc.iso8601.chop })
 
                 meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
@@ -760,6 +760,7 @@ class Aca::ExchangeBooking
                                     self[:skype_meeting_pending] = true
                                 end
                                 set_skype_url = false
+                                self[:skype_meeting_address] = links[0]
                                 system[:Skype].set_uri(links[0]) if skype_exists
                             end
                         end
@@ -784,7 +785,12 @@ class Aca::ExchangeBooking
             # Prevent connections handing with TIME_WAIT
             # cli.ews.connection.httpcli.reset_all
 
-            subject = item[:subject][:text]
+            if ["Private", "Confidential"].inculde?(meeting.sensitivity)
+                subject = meeting.sensitivity
+            else
+                subject = item[:subject][:text]
+            end
+            
             {
                 :Start => start,
                 :End => ending,
