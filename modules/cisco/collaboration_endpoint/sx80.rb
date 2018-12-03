@@ -32,6 +32,7 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
         end
 
         self[:calls] = {}
+        self[:in_call] = false
         register_feedback '/Status/Call' do |call|
             calls = self[:calls].deep_merge call
             calls.reject! do |_, props|
@@ -87,7 +88,7 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     command 'Call DTMFSend' => :dtmf_send,
            CallId: (0..65534),
            DTMFString: String
-    
+
     command 'Dial' => :dial,
             Number:  String,
             Protocol_: [:H320, :H323, :Sip, :Spark],
@@ -180,7 +181,7 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             presentation_stop
         else
 	    if self[:configuration]&.dig(:Video, :Input, :Connector, input, :InputSourceType) == :camera
-	      camera_select connector_id: input	
+	      camera_select connector_id: input
 	    else
               presentation_start presentation_source: input
 	    end
