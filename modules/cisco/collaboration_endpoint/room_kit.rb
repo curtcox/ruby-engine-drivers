@@ -38,6 +38,7 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
                 props[:status] == :Idle || props.include?(:ghost)
             end
             self[:calls] = calls
+            self[:in_call] = calls.present?
         end
     end
 
