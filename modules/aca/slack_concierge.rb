@@ -61,7 +61,7 @@ class Aca::SlackConcierge
         messages = []
         all_messages.each do |message|
            messages.push(message) if (!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message'
-        }
+        end
 
         # Output count as if this gets > 1000 we need to paginate
 
