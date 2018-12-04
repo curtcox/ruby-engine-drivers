@@ -38,26 +38,45 @@ class Aca::SlackConcierge
         message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, thread_ts: thread_id, username: 'Concierge'
     end
 
-    def update_last_message_read(email)
-        authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
-        user = User.find_by_email(authority_id, email)
+    def update_last_message_read(email_or_thread)
+        authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
+        user = User.find_by_email(authority_id, email_or_thread)
+        user = User.find(User.bucket.get("slack-user-#{email_or_thread}", quiet: true)) if user.nil?
         user.last_message_read = Time.now.to_i * 1000
         user.save!
     end
 
+
     def get_threads
-        messages = @client.web_client.channels_history({channel: setting(:channel), oldest: (Time.now - 12.months).to_i, count: 1000})['messages']
-        messages.delete_if{ |message|
-            !((!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message')
+        # Get the messages from far back (when over 1000 we need to paginate)
+        page_count = 1
+        all_messages = @client.web_client.channels_history({channel:setting(:channel), count: 1000})['messages']
+
+        while (all_messages.length) == (1000 * page_count)
+            page_count += 1
+            all_messages += @client.web_client.channels_history({channel: "CEHDN0QP5", latest: all_messages.last['ts'], count: 1000})['messages']
+        end
+
+        # Delete messages that aren't threads ((either has no thread_ts OR thread_ts == ts) AND type == bot_message)
+        messages = []
+        all_messages.each do |message|
+           messages.push(message) if (!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message'
         }
-        logger.debug "Processing messages in get_threads"
+
+        # Output count as if this gets > 1000 we need to paginate
+
+        # For every message, grab the user's details out of it
         messages.each_with_index{|message, i|   
+            # If the message has a username associated (not a status message, etc)
+            # Then grab the details and put it into the message
             if message.key?('username')
-                authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
+                authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
                 user = User.find_by_email(authority_id, messages[i]['email'])
                 messages[i]['email'] = message['username'] 
                 messages[i]['name'] = user.name
             end
+
+            # If the user sending the message exists (this should essentially always be the case)
             if !user.nil?
                 messages[i]['last_sent'] = user.last_message_sent
                 messages[i]['last_read'] = user.last_message_read
@@ -65,11 +84,12 @@ class Aca::SlackConcierge
                 messages[i]['last_sent'] = nil
                 messages[i]['last_read'] = nil
             end
+
             # update_last_message_read(messages[i]['email'])
             messages[i]['replies'] = get_message(message['ts'])
         }
-        logger.debug "Finished processing messages in get_threads"
-        logger.debug messages[0]
+
+        # Bind the frontend to the messages
         self["threads"] = messages
     end
 
@@ -91,86 +111,60 @@ class Aca::SlackConcierge
         return nil
     end
 
-    def update_read_time(thread_id)
-        user = User.find(User.bucket.get("slack-user-#{thread_id}", quiet: true))
-        user.last_message_read = Time.now.to_i * 1000
-        user.save!
-    end
 
     protected
 
     # Create a realtime WS connection to the Slack servers
     def create_websocket
 
-        logger.debug "Creating websocket"
-
+        # Set our token and other config options
         ::Slack.configure do |config|
             config.token = setting(:slack_api_token)
-            # config.logger = logger
             config.logger = Logger.new(STDOUT)
             config.logger.level = Logger::INFO
             fail 'Missing slack api token setting!' unless config.token
         end
 
-        logger.debug "Configured slack"
-
+        # Use Libuv as our concurrency driver
         ::Slack::RealTime.configure do |config|
-            config.concurrency = Slack::RealTime::Concurrency::Libuv
+           config.concurrency = Slack::RealTime::Concurrency::Libuv
         end
-        logger.debug "Configured slack concurrency"
-        
 
+        # Create the client and set the callback function when a message is received
         @client = ::Slack::RealTime::Client.new
         
         get_threads
 
-        logger.debug "Created client!!"
 
         @client.on :message do |data|
-            logger.debug "----------------- Got message! -----------------"
-            logger.debug data
-            logger.debug "------------------------------------------------"
 
             begin
-                #@client.typing channel: data.channel
                 # Disregard if we have a subtype key and it's a reply to a message
                 if data.key?('subtype') && data['subtype'] == 'message_replied'
                     next
                 end
-                user_email = nil
-                # # This is not a reply 
-                if data.key?('thread_ts')
-                    #  if data['username'].include?('(')
-                    #     user_email = data['username'].split(' (')[1][0..-2] if data.key?('username')
-                    # end
-                    get_thread(data['ts'])
-                    get_thread(data['thread_ts'])
-                else
-                    logger.info "Adding thread to binding"
-                    if data['username'].include?('(')
-                        data['name'] = data['username'].split(' (')[0] if data.key?('username')
-                        data['email'] = data['username'].split(' (')[1][0..-2] if data.key?('username')
-                        # user_email = data['email']
-                    else
-                        data['name'] = data['username']
-                    end
-                    messages = self["threads"].dup.unshift(data)
-                    self["threads"] = messages
-                    # if user_email
-                    #     authority_id = Authority.find_by_domain('uat-book.internationaltowers.com').id
-                    #     user = User.find_by_email(authority_id, user_email)
-                    #     user.last_message_read = Time.now.to_i * 1000
-                    #     user.save!
-                    # end
-                    logger.debug "Getting threads! "
-                    get_threads
-                end
 
-                
+                # Ensure that it is a bot_message
+                if data['subtype'] == 'bot_message'
+                    # We will likely never get thread_ts == ts
+                    # Because when a message event happens, it's before a thread is created
+                    if data.key?('thread_ts')
+                        if data['thread_ts'] == data['ts']
+                            STDERR.puts "GOT SOMEWHERE WE DIDN'T THINK POSSIBLE!"
+                            STDERR.puts "REWRITE CODE!"
+                            STDERR.flush
+                        end
+                        self["threads"].each_with_index do |thread, i|
+                            if thread['ts'] == data['thread_ts']
+                                self["threads"][i]['replies'].insert(0,data)
+                            end
+                        end
+                    else
+                        self["threads"].insert(0,data)
+                    end    
+                end                
                 
             rescue Exception => e
-                logger.debug e.message
-                logger.debug e.backtrace
             end
         end
 
