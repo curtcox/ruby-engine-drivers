@@ -165,9 +165,9 @@ class Aca::SlackConcierge
                         new_threads = self["threads"].dup
                         new_threads.each_with_index do |thread, i|
                             if thread['ts'] == data['thread_ts']
-                                data['email'] = data['username']
+                                data['email'] = data['username'].dup
                                 new_threads[i]['replies'] ||= []
-                                new_threads[i]['replies'].insert(0,data)
+                                new_threads[i]['replies'].insert(0,data.dup)
                             end
                         end
                         self["threads"] = new_threads
