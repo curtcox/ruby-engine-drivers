@@ -186,7 +186,7 @@ class Aca::SlackConcierge
                                 data['last_sent'] = user.last_message_sent
                             end
                         end
-                        self["threads"] = self["threads"].deep_dup.insert(0, data.deep_dup.to_h)
+                        self["threads"] = self["threads"].deep_dup.insert(0, replies_object)
                     end    
                 end                
                 
