@@ -172,7 +172,7 @@ class Aca::SlackConcierge
                         end
                         self["threads"] = new_threads
                     else
-                        data['replies'] ||= [data]
+                        data['replies'] ||= [data.dup]
 
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
