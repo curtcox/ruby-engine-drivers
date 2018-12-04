@@ -94,7 +94,15 @@ class Aca::SlackConcierge
     end
 
     def get_message(ts)
-        messages = @client.web_client.channels_history({channel: setting(:channel), latest: ts, inclusive: true})['messages'][0]
+        # Get the messages
+        slack_api = UV::HttpEndpoint.new("https://slack.com")
+        req = {
+            token: @client.token,
+            channel: setting(:channel),
+            thread_ts: thretsad_id
+        }
+        response = slack_api.post(path: 'https://slack.com/api/channels.replies', body: req).value
+        JSON.parse(response.body)['messages']
     end
 
     def get_thread(thread_id)
