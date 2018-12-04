@@ -71,8 +71,8 @@ class Aca::SlackConcierge
             # Then grab the details and put it into the message
             if message.key?('username')
                 authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
-                user = User.find_by_email(authority_id, messages[i]['email'])
-                messages[i]['email'] = message['username'] 
+                user = User.find_by_email(authority_id, message['username'] )
+                messages[i]['email'] = user.email
                 messages[i]['name'] = user.name
             end
 
