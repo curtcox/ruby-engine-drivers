@@ -148,15 +148,13 @@ class Aca::SlackConcierge
 
             begin
 
-                logger.info "-----NEW MESSAGE RECEIVED----"
-                logger.info data.inspect
-                logger.info "-----------------------------"
-
                 # Ensure that it is a bot_message or slack client reply
                  if ['bot_message'].include?(data['subtype'])
 
                     # If this is a reply (has a thread_ts field)
                     if data.key?('thread_ts')
+                        logger.info "!!!!! GOT INSIDE USING THREAD TS !!!!!"
+                        logger.info "WITH TEXT #{data['text']}"
 
                         # Duplicate the current threads array so we don't have ref issues
                         new_threads = self["threads"].deep_dup
@@ -172,6 +170,8 @@ class Aca::SlackConcierge
                         end
                         self["threads"] = new_threads
                     else
+                        logger.info "XXXXX GOT INSIDE WITHOUT THREAD TS XXXXX"
+                        logger.info "WITH TEXT #{data['text']}"
                         data['replies'] ||= [data.deep_dup.to_h]
 
                         if data['username'] != 'Concierge'
