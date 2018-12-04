@@ -164,7 +164,8 @@ class Aca::SlackConcierge
                             break
                         end
                     end
-                    self["threads"] = new_threads
+                    @threads = new_threads
+                    self["threads"] = new_threads.deep_dup
                 else
                     new_message = data.to_h
 
@@ -180,8 +181,8 @@ class Aca::SlackConcierge
                     new_message_copy = new_message.deep_dup
                     new_message['replies'] = [new_message_copy]
 
-                    new_threads = @threads.deep_dup
-                    self["threads"] = new_threads.insert(0, new_message)
+                    @threads = @threads.deep_dup.insert(0, new_message)
+                    self["threads"] = @threads.deep_dup.insert(0, new_message)
                 end    
             end                
             
