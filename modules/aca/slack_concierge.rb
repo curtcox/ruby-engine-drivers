@@ -153,25 +153,20 @@ class Aca::SlackConcierge
 
                     # If this is a reply (has a thread_ts field)
                     if data.key?('thread_ts')
-                        logger.info "!!!!! GOT INSIDE USING THREAD TS !!!!!"
-                        logger.info "WITH TEXT #{data['text']}"
-
-                        # Duplicate the current threads array so we don't have ref issues
+                        new_message = data.to_h
                         new_threads = self["threads"].deep_dup
 
                         # Loop through the array and add user data
                         new_threads.each_with_index do |thread, i|
                             # If the ID of the looped message equals the new message thread ID
-                            if thread['ts'] == data['thread_ts']
-                                data['email'] = data['username']
-                                new_threads[i]['replies'].insert(0, data.to_h.deep_dup)
+                            if thread['ts'] ==new_message['thread_ts']
+                               new_message['email'] =new_message['username']
+                                new_threads[i]['replies'].insert(0, new_message)
                                 break
                             end
                         end
                         self["threads"] = new_threads
                     else
-                        logger.info "XXXXX GOT INSIDE WITHOUT THREAD TS XXXXX"
-                        logger.info "WITH TEXT #{data['text']}"
                         new_message = data.to_h
 
                         if new_message['username'] != 'Concierge'
