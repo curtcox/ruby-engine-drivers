@@ -154,25 +154,24 @@ class Aca::SlackConcierge
 
                 # Ensure that it is a bot_message or slack client reply
                  if ['bot_message'].include?(data['subtype'])
-                    # We will likely never get thread_ts == ts
-                    # Because when a message event happens, it's before a thread is created
+
+                    # If this is a reply (has a thread_ts field)
                     if data.key?('thread_ts')
-                        if data['thread_ts'] == data['ts']
-                            STDERR.puts "GOT SOMEWHERE WE DIDN'T THINK POSSIBLE!"
-                            STDERR.puts "REWRITE CODE!"
-                            STDERR.flush
-                        end
-                        new_threads = self["threads"].dup
+
+                        # Duplicate the current threads array so we don't have ref issues
+                        new_threads = self["threads"].clone
+
+                        # Loop through the array and add user data
                         new_threads.each_with_index do |thread, i|
+                            # If the ID of the looped message equals the new message thread ID
                             if thread['ts'] == data['thread_ts']
-                                data['email'] = data['username'].dup
-                                new_threads[i]['replies'] ||= []
-                                new_threads[i]['replies'].insert(0,data.dup)
+                                data['email'] = data['username']
+                                new_threads[i]['replies'].insert(0, data.clone)
                             end
                         end
                         self["threads"] = new_threads
                     else
-                        data['replies'] ||= [data.dup]
+                        data['replies'] ||= [data.clone]
 
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
@@ -182,7 +181,7 @@ class Aca::SlackConcierge
                                 data['last_sent'] = user.last_message_sent
                             end
                         end
-                        self["threads"] = self["threads"].dup.insert(0,data.dup)
+                        self["threads"] = self["threads"].clone.insert(0, data.clone)
                     end    
                 end                
                 
