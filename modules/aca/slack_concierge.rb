@@ -172,11 +172,20 @@ class Aca::SlackConcierge
                     else
                         logger.info "XXXXX GOT INSIDE WITHOUT THREAD TS XXXXX"
                         logger.info "WITH TEXT #{data['text']}"
-                        replies_object = data.to_h.dup
-                        logger.info "REPLIES OBJECT HAS TYPE"
-                        logger.info replies_object.class
-                        logger.info replies_object.inspect
+                        replies_object = {
+                            bot_id: data['bot_id'],
+                            channel: data['channel'],
+                            event_ts: data['event_ts'],
+                            subtype: data['subtype'],
+                            team: data['team'],
+                            text: data['text'],
+                            ts: data['ts'],
+                            type: data['type'],
+                            username: data['username']
+                        }
+                        logger.info replies_object.class # => Hash
                         data['replies'] = [replies_object]
+                        self["threads"] = self["threads"].deep_dup.insert(0, data.to_h.deep_dup)
 
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
@@ -186,7 +195,6 @@ class Aca::SlackConcierge
                                 data['last_sent'] = user.last_message_sent
                             end
                         end
-                        self["threads"] = self["threads"].deep_dup.insert(0, data.to_h.deep_dup)
                     end    
                 end                
                 
