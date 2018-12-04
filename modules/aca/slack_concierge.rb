@@ -176,7 +176,7 @@ class Aca::SlackConcierge
                         logger.info "REPLIES OBJECT HAS TYPE"
                         logger.info replies_object.class
                         logger.info replies_object.inspect
-                        data['replies'] = [replies_object]
+                        data['replies'] = [replies_object.class]
 
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
