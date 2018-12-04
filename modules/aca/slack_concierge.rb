@@ -170,7 +170,7 @@ class Aca::SlackConcierge
                             end
                         end
                     else
-                        data['replies'] ||= get_message(data['ts'])
+                        data['replies'] ||= [data]
                         self["threads"].insert(0,data)
                     end    
                 end                
