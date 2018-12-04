@@ -184,7 +184,7 @@ class Aca::SlackConcierge
                         end
 
                         new_message_copy = new_message.deep_dup
-                        new_message['replies'] = new_message_copy
+                        new_message['replies'] = [new_message_copy]
 
                         new_threads = self["threads"].deep_dup
                         self["threads"] = new_threads.insert(0, new_message)
