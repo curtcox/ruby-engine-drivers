@@ -180,6 +180,7 @@ class Aca::SlackConcierge
                             team: data['team'],
                             text: data['text'],
                             ts: data['ts'],
+                            tester: "AHHH TEST",
                             type: data['type'],
                             username: data['username']
                         }
