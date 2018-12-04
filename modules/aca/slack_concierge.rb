@@ -156,11 +156,13 @@ class Aca::SlackConcierge
                         end
                         self["threads"].each_with_index do |thread, i|
                             if thread['ts'] == data['thread_ts']
+                                data['email'] = data['username']
                                 self["threads"][i]['replies'] ||= []
                                 self["threads"][i]['replies'].insert(0,data)
                             end
                         end
                     else
+                        data['replies'] ||= []
                         self["threads"].insert(0,data)
                     end    
                 end                
