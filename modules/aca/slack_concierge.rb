@@ -139,13 +139,13 @@ class Aca::SlackConcierge
         @client.on :message do |data|
 
             begin
-                # Disregard if we have a subtype key and it's a reply to a message
-                if data.key?('subtype') && data['subtype'] == 'message_replied'
-                    next
-                end
 
-                # Ensure that it is a bot_message
-                if data['subtype'] == 'bot_message'
+                logger.info "-----NEW MESSAGE RECEIVED----"
+                logger.info data.inspect
+                logger.info "-----------------------------"
+
+                # Ensure that it is a bot_message or slack client reply
+                 if ['bot_message', 'message_replied'].include?(data['subtype'])
                     # We will likely never get thread_ts == ts
                     # Because when a message event happens, it's before a thread is created
                     if data.key?('thread_ts')
@@ -156,6 +156,7 @@ class Aca::SlackConcierge
                         end
                         self["threads"].each_with_index do |thread, i|
                             if thread['ts'] == data['thread_ts']
+                                self["threads"][i]['replies'] ||= []
                                 self["threads"][i]['replies'].insert(0,data)
                             end
                         end
