@@ -93,13 +93,13 @@ class Aca::SlackConcierge
         self["threads"] = messages
     end
 
-    def get_message(ts)
+    def get_message(thread_id)
         # Get the messages
         slack_api = UV::HttpEndpoint.new("https://slack.com")
         req = {
             token: @client.token,
             channel: setting(:channel),
-            thread_ts: thretsad_id
+            thread_ts: thread_id
         }
         response = slack_api.post(path: 'https://slack.com/api/channels.replies', body: req).value
         JSON.parse(response.body)['messages']
