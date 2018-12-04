@@ -145,49 +145,44 @@ class Aca::SlackConcierge
 
 
         @client.on :message do |data|
+             # Ensure that it is a bot_message or slack client reply
+             if ['bot_message'].include?(data['subtype'])
 
-            begin
+                # If this is a reply (has a thread_ts field)
+                if data.key?('thread_ts')
+                    new_message = data.to_h
+                    new_threads = self["threads"].deep_dup
 
-                # Ensure that it is a bot_message or slack client reply
-                 if ['bot_message'].include?(data['subtype'])
-
-                    # If this is a reply (has a thread_ts field)
-                    if data.key?('thread_ts')
-                        new_message = data.to_h
-                        new_threads = self["threads"].deep_dup
-
-                        # Loop through the array and add user data
-                        new_threads.each_with_index do |thread, i|
-                            # If the ID of the looped message equals the new message thread ID
-                            if thread['ts'] == new_message['thread_ts']
-                                new_message['email'] = new_message['username']
-                                new_threads[i]['replies'].insert(0, new_message)
-                                break
-                            end
+                    # Loop through the array and add user data
+                    new_threads.each_with_index do |thread, i|
+                        # If the ID of the looped message equals the new message thread ID
+                        if thread['ts'] == new_message['thread_ts']
+                            new_message['email'] = new_message['username']
+                            new_threads[i]['replies'].insert(0, new_message)
+                            break
                         end
-                        self["threads"] = new_threads
-                    else
-                        new_message = data.to_h
+                    end
+                    self["threads"] = new_threads
+                else
+                    new_message = data.to_h
 
-                        if new_message['username'] != 'Concierge'
-                            authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
-                            user = User.find_by_email(authority_id, new_message['username'])
-                            if user
-                                new_message['last_read'] = user.last_message_read
-                                new_message['last_sent'] = user.last_message_sent
-                            end
+                    if new_message['username'] != 'Concierge'
+                        authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
+                        user = User.find_by_email(authority_id, new_message['username'])
+                        if user
+                            new_message['last_read'] = user.last_message_read
+                            new_message['last_sent'] = user.last_message_sent
                         end
+                    end
 
-                        new_message_copy = new_message.to_h
-                        new_message['replies'] = [new_message_copy]
+                    new_message_copy = new_message.to_h
+                    new_message['replies'] = [new_message_copy]
 
-                        new_threads = self["threads"].deep_dup
-                        self["threads"] = new_threads.insert(0, new_message)
-                    end    
-                end                
-                
-            rescue Exception => e
-            end
+                    new_threads = self["threads"].deep_dup
+                    self["threads"] = new_threads.insert(0, new_message)
+                end    
+            end                
+            
         end
 
         @client.start!
