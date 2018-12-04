@@ -184,9 +184,8 @@ class Aca::SlackConcierge
                             type: data['type'],
                             username: data['username']
                         }
-                        logger.info replies_object.class # => Hash
                         data['replies'] = [replies_object]
-                        self["threads"] = self["threads"].deep_dup.insert(0, data.to_h.deep_dup)
+                        self["threads"] = self["threads"].to_h.deep_dup.insert(0, data.to_h.deep_dup)
 
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
