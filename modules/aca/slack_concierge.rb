@@ -172,11 +172,11 @@ class Aca::SlackConcierge
                     else
                         logger.info "XXXXX GOT INSIDE WITHOUT THREAD TS XXXXX"
                         logger.info "WITH TEXT #{data['text']}"
-                        replies_object = data.to_h.deep_dup
+                        replies_object = data.to_h.dup
                         logger.info "REPLIES OBJECT HAS TYPE"
                         logger.info replies_object.class
                         logger.info replies_object.inspect
-                        data['replies'] = [replies_object.class]
+                        data['replies'] = [replies_object]
 
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
