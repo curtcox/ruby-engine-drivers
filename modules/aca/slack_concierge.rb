@@ -161,6 +161,7 @@ class Aca::SlackConcierge
                         if thread['ts'] == new_message['thread_ts']
                             new_message['email'] = new_message['username']
                             new_threads[i]['replies'].insert(0, new_message)
+                            self["thread_#{new_message['thread_ts']}"] = new_threads[i]['replies'].dup
                             break
                         end
                     end
