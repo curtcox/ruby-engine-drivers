@@ -171,6 +171,15 @@ class Aca::SlackConcierge
                         end
                     else
                         data['replies'] ||= [data]
+
+                        if data['username'] != 'Concierge'
+                            authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
+                            user = User.find_by_email(authority_id, data['username'])
+                            if user
+                                data['last_read'] = user.last_message_read
+                                data['last_sent'] = user.last_message_sent
+                            end
+                        end
                         self["threads"].insert(0,data)
                     end    
                 end                
