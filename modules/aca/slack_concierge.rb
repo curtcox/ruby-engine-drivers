@@ -153,7 +153,7 @@ class Aca::SlackConcierge
                 logger.info "-----------------------------"
 
                 # Ensure that it is a bot_message or slack client reply
-                 if ['bot_message', 'message_replied'].include?(data['subtype'])
+                 if ['bot_message'].include?(data['subtype'])
                     # We will likely never get thread_ts == ts
                     # Because when a message event happens, it's before a thread is created
                     if data.key?('thread_ts')
