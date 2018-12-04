@@ -172,35 +172,22 @@ class Aca::SlackConcierge
                     else
                         logger.info "XXXXX GOT INSIDE WITHOUT THREAD TS XXXXX"
                         logger.info "WITH TEXT #{data['text']}"
-                        replies_object = {
-                            bot_id: data['bot_id'],
-                            channel: data['channel'],
-                            event_ts: data['event_ts'],
-                            subtype: data['subtype'],
-                            team: data['team'],
-                            text: data['text'],
-                            ts: data['ts'],
-                            tester: "AHHH TEST",
-                            type: data['type'],
-                            username: data['username']
-                        }
-                        
-                        if data['username'] != 'Concierge'
+                        new_message = data.to_h
+
+                        if new_message['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
-                            user = User.find_by_email(authority_id, data['username'])
+                            user = User.find_by_email(authority_id, new_message['username'])
                             if user
-                                data['last_read'] = user.last_message_read
-                                data['last_sent'] = user.last_message_sent
+                                new_message['last_read'] = user.last_message_read
+                                new_message['last_sent'] = user.last_message_sent
                             end
                         end
 
-                        data['replies'] = [replies_object]
-                        old_threads = self["threads"].deep_dup
-                        new_message = [data.to_h]
-                        
+                        new_message_copy = new_message.deep_dup
+                        new_message['replies'] = new_message_copy
 
-
-                        self["threads"] = new_message + old_threads
+                        new_threads = self["threads"].deep_dup
+                        self["threads"] = new_threads.insert(0, new_message)
                     end    
                 end                
                 
