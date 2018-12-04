@@ -24,6 +24,7 @@ class Aca::SlackConcierge
     def on_update
         on_unload   
         create_websocket
+        @threads = []
         self[:building] = setting(:building) || :barangaroo
         self[:channel] = setting(:channel) || :concierge
     end
@@ -90,7 +91,8 @@ class Aca::SlackConcierge
         }
 
         # Bind the frontend to the messages
-        self["threads"] = messages
+        @threads = messages
+        self["threads"] = @threads.deep_dup
     end
 
     def get_message(thread_id)
@@ -151,7 +153,7 @@ class Aca::SlackConcierge
                 # If this is a reply (has a thread_ts field)
                 if data.key?('thread_ts')
                     new_message = data.to_h
-                    new_threads = self["threads"].deep_dup
+                    new_threads = @threads.deep_dup
 
                     # Loop through the array and add user data
                     new_threads.each_with_index do |thread, i|
@@ -175,10 +177,10 @@ class Aca::SlackConcierge
                         end
                     end
 
-                    new_message_copy = new_message.deep_dup.to_h
+                    new_message_copy = new_message.deep_dup
                     new_message['replies'] = [new_message_copy]
 
-                    new_threads = self["threads"].deep_dup
+                    new_threads = @threads.deep_dup
                     self["threads"] = new_threads.insert(0, new_message)
                 end    
             end                
