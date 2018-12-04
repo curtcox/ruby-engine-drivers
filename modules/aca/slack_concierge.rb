@@ -164,7 +164,7 @@ class Aca::SlackConcierge
                             # If the ID of the looped message equals the new message thread ID
                             if thread['ts'] == data['thread_ts']
                                 data['email'] = data['username']
-                                new_threads[i]['replies'].insert(0, data.deep_dup.to_h)
+                                new_threads[i]['replies'].insert(0, data.to_h.deep_dup)
                                 break
                             end
                         end
@@ -172,7 +172,7 @@ class Aca::SlackConcierge
                     else
                         logger.info "XXXXX GOT INSIDE WITHOUT THREAD TS XXXXX"
                         logger.info "WITH TEXT #{data['text']}"
-                        replies_object = data.deep_dup.to_h
+                        replies_object = data.to_h.deep_dup
                         logger.info "REPLIES OBJECT HAS TYPE"
                         logger.info replies_object.class
                         logger.info replies_object.inspect
