@@ -159,20 +159,20 @@ class Aca::SlackConcierge
                     if data.key?('thread_ts')
 
                         # Duplicate the current threads array so we don't have ref issues
-                        new_threads = self["threads"].dup
+                        new_threads = self["threads"].deep_dup
 
                         # Loop through the array and add user data
                         new_threads.each_with_index do |thread, i|
                             # If the ID of the looped message equals the new message thread ID
                             if thread['ts'] == data['thread_ts']
                                 data['email'] = data['username']
-                                new_threads[i]['replies'].insert(0, data.dup.to_h)
+                                new_threads[i]['replies'].insert(0, data.deep_dup.to_h)
                                 break
                             end
                         end
                         self["threads"] = new_threads
                     else
-                        data['replies'] ||= [data.dup.to_h]
+                        data['replies'] ||= [data.deep_dup.to_h]
 
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
@@ -182,7 +182,7 @@ class Aca::SlackConcierge
                                 data['last_sent'] = user.last_message_sent
                             end
                         end
-                        self["threads"] = self["threads"].dup.insert(0, data.dup.to_h)
+                        self["threads"] = self["threads"].deep_dup.insert(0, data.deep_dup.to_h)
                     end    
                 end                
                 
