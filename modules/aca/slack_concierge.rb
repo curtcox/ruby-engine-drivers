@@ -162,13 +162,15 @@ class Aca::SlackConcierge
                             STDERR.puts "REWRITE CODE!"
                             STDERR.flush
                         end
-                        self["threads"].each_with_index do |thread, i|
+                        new_threads = self["threads"].dup
+                        new_threads.each_with_index do |thread, i|
                             if thread['ts'] == data['thread_ts']
                                 data['email'] = data['username']
-                                self["threads"][i]['replies'] ||= []
-                                self["threads"][i]['replies'].insert(0,data)
+                                new_threads[i]['replies'] ||= []
+                                new_threads[i]['replies'].insert(0,data)
                             end
                         end
+                        self["threads"] = new_threads
                     else
                         data['replies'] ||= [data]
 
@@ -180,7 +182,7 @@ class Aca::SlackConcierge
                                 data['last_sent'] = user.last_message_sent
                             end
                         end
-                        self["threads"].insert(0,data)
+                        self["threads"] = self["threads"].insert(0,data)
                     end    
                 end                
                 
