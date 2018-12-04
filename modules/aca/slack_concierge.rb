@@ -184,9 +184,7 @@ class Aca::SlackConcierge
                             type: data['type'],
                             username: data['username']
                         }
-                        data['replies'] = [replies_object]
-                        self["threads"] = self["threads"].to_h.deep_dup.insert(0, data.to_h.deep_dup)
-
+                        
                         if data['username'] != 'Concierge'
                             authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
                             user = User.find_by_email(authority_id, data['username'])
@@ -195,6 +193,14 @@ class Aca::SlackConcierge
                                 data['last_sent'] = user.last_message_sent
                             end
                         end
+
+                        data['replies'] = [replies_object]
+                        old_threads = self["threads"].deep_dup
+                        new_message = [data.to_h]
+                        
+
+
+                        self["threads"] = new_message + old_threads
                     end    
                 end                
                 
