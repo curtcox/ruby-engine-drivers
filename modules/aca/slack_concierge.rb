@@ -159,8 +159,8 @@ class Aca::SlackConcierge
                         # Loop through the array and add user data
                         new_threads.each_with_index do |thread, i|
                             # If the ID of the looped message equals the new message thread ID
-                            if thread['ts'] ==new_message['thread_ts']
-                               new_message['email'] =new_message['username']
+                            if thread['ts'] == new_message['thread_ts']
+                                new_message['email'] = new_message['username']
                                 new_threads[i]['replies'].insert(0, new_message)
                                 break
                             end
@@ -178,7 +178,7 @@ class Aca::SlackConcierge
                             end
                         end
 
-                        new_message_copy = new_message.deep_dup
+                        new_message_copy = new_message.to_h
                         new_message['replies'] = [new_message_copy]
 
                         new_threads = self["threads"].deep_dup
