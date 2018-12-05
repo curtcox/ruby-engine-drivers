@@ -137,7 +137,7 @@ class Fortytwo::ItApi
             'bookerExternalId': owner_id
         }
         post_data = visitor_object
-        response = api_request(request_method: 'post', endpoint: 'visitor', query: query_params, body: post_data)
+        response = api_request(request_method: 'post', endpoint: 'visitor', query: query_params, data: post_data)
         JSON.parse(response.body)['value']
     end
 
