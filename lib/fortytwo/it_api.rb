@@ -131,6 +131,16 @@ class Fortytwo::ItApi
         JSON.parse(response.body)['value']
     end
 
+    def add_visitor(owner_id:, visitor_object:)
+        # If we have a query and the query has at least one space
+        query_params = {
+            'bookerExternalId': owner_id
+        }
+        post_data = visitor_object
+        response = api_request(request_method: 'post', endpoint: 'visitor', query: query_params, body: post_data)
+        JSON.parse(response.body)['value']
+    end
+
 
     protected
 
