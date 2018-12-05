@@ -861,7 +861,7 @@ class Microsoft::Office
 
         event[:body] = {
             contentType: 'html',
-            content: description
+            content: "X!X!X!"
         } if description
 
         # Let's assume that the request has the current user and room as an attendee already
@@ -884,7 +884,11 @@ class Microsoft::Office
             type: 'resource'
         })
 
-        request = graph_request(request_method: 'patch', endpoint: endpoint, data: event.to_json, password: @delegated)
+        event = event.to_json
+
+        event.gsub!("X!X!X!",description)
+        
+        request = graph_request(request_method: 'patch', endpoint: endpoint, data: event, password: @delegated)
         check_response(request)
         response = JSON.parse(request.body)
     end
