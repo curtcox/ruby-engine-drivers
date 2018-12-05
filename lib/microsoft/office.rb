@@ -744,7 +744,7 @@ class Microsoft::Office
             subject: subject,
             body: {
                 contentType: content_type,
-                content: description
+                content: "X!X!X!"
             },
             start: {
                 dateTime: start_param,
@@ -810,6 +810,8 @@ class Microsoft::Office
         end
 
         event = event.to_json
+
+        event.gsub!("X!X!X!",description)
 
         request = graph_request(request_method: 'post', endpoint: endpoint, data: event, password: @delegated)
 
