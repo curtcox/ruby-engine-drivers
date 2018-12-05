@@ -874,6 +874,8 @@ class Microsoft::Office
             }
         } if attendees
 
+        event[:attendees] ||= []
+
         event[:attendees].push({
             emailAddress: {
                 address: room.email,
