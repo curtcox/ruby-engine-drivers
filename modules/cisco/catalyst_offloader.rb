@@ -38,8 +38,9 @@ class Cisco::CatalystOffloader
                 @tokeniser.extract(data).each do |response|
                     next unless @defer
                     begin
-                        @defer.resolve Marshal.load(response)
+                        @defer.resolve Marshal.load(response[4..-1])
                     rescue => e
+                        @logger.debug { "OFFLOAD: error loading response #{e.message}" }
                         @defer.reject e
                     end
                 end
@@ -47,14 +48,14 @@ class Cisco::CatalystOffloader
 
             # Attempt to connect to offload process
             @connection.connect('127.0.0.1', 30001) { |socket|
-                @logger.debug "connected to offload task"
+                @logger.debug "OFFLOAD: connected to offload task"
                 @connected = true
                 defer.resolve(true)
                 socket.start_read
 
                 write(:client, @snmp_settings)
             }.finally {
-                @logger.debug "disconnected from offload task"
+                @logger.debug "OFFLOAD: disconnected from offload task"
                 @defer&.reject RuntimeError.new('connection lost')
                 @defer = nil
 
@@ -76,6 +77,7 @@ class Cisco::CatalystOffloader
         end
 
         def disconnect
+            @logger.debug "OFFLOAD: worker termination requested"
             @terminated = true
             @connection.close
         end

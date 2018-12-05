@@ -15,18 +15,20 @@ namespace :offload do
 
         Libuv.reactor.run do |reactor|
             tcp = reactor.tcp
-            tcp.bind('127.0.0.1', port) do |client|
-                tokeniser = ::UV::AbstractTokenizer.new(::Cisco::CatalystOffloader::ParserSettings)
+            tcp.bind('0.0.0.0', port) do |client|
+                tokeniser = ::UV::AbstractTokenizer.new(::Cisco::CatalystOffloader::Proxy::ParserSettings)
                 snmp_client = nil
 
                 client.progress do |data|
                     tokeniser.extract(data).each do |response|
                         begin
-                            args = Marshal.load(response)
+                            args = Marshal.load(response[4..-1])
                             if args[0] == :client
+                                STDOUT.puts "reloading client for #{args[1][:hostname]}"
                                 snmp_client&.close
                                 snmp_client = ::Cisco::Switch::CatalystSNMPClient.new(reactor, args[1])
                             else
+                                STDOUT.puts "received request #{args[0]}"
                                 retval = snmp_client.__send__(*args)
                                 if args[0].to_s.start_with? 'query'
                                     msg =  Marshal.dump(retval)
@@ -38,11 +40,13 @@ namespace :offload do
                         end
                     end
                 end
+                client.enable_nodelay
                 client.start_read
             end
             tcp.catch do |e|
                 STDOUT.puts "failed to bind port\n#{e.message}\n#{e.backtrace.join("\n")}"
             end
+            tcp.listen(1024)
         end
 
         puts "offload catalyst snmp closed..."
