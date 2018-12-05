@@ -117,6 +117,21 @@ class Fortytwo::ItApi
     end
 
 
+    def get_visitors(owner_id: nil, limit: 100)
+        # If we have a query and the query has at least one space
+        query_params = {
+            '$top': limit
+        }
+        # # TODO:: ONCE STEPHEN GETS BACK TO US
+        # if owner_id
+        #     query_params['$filter'] = 
+        # end
+        # query_params['$filter'] = filter_param if defined? filter_param
+        response = api_request(request_method: 'get', endpoint: 'visitor', query: query_params)
+        JSON.parse(response.body)['value']
+    end
+
+
     protected
 
     def api_token
