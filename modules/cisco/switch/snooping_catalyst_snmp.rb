@@ -14,7 +14,7 @@ module Cisco::Switch; end
 
 # The SNMP clients
 load File.join(__dir__, '../catalyst_snmp_client.rb')
-#load File.join(__dir__, '../catalyst_offloader.rb')
+load File.join(__dir__, '../catalyst_offloader.rb')
 
 class Cisco::Switch::SnoopingCatalystSNMP
     include ::Orchestrator::Constants
@@ -101,6 +101,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
     def on_unload
         @client&.close
+        @client.disconnect if @client.is_a? ::Cisco::CatalystOffloader::Proxy
         @client = nil
 
         td = ::Aca::TrapDispatcher.instance
@@ -381,8 +382,13 @@ class Cisco::Switch::SnoopingCatalystSNMP
     def rebuild_client
         @client&.close
         @client = if @offload_snmp
-            # TODO:: obtain remote client
+            if @client.is_a? ::Cisco::CatalystOffloader::Proxy
+                @client.new_setting(@snmp_settings)
+            else
+                ::Cisco::CatalystOffloader.instance.register(thread, @snmp_settings)
+            end
         else
+            @client.disconnect if @client.is_a? ::Cisco::CatalystOffloader::Proxy
             ::Cisco::Switch::CatalystSNMPClient.new(thread, @snmp_settings)
         end
     end

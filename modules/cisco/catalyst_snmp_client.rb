@@ -107,7 +107,7 @@ class Cisco::Switch::CatalystSNMPClient
         client = @client
         if @defer
             @defer.promise.finally { client.close }
-            @defer.reject RuntimeError.new("client closed by user")
+            @defer.reject RuntimeError.new('client closed by user')
             @defer = nil
         else
             client&.close
@@ -135,7 +135,7 @@ class Cisco::Switch::CatalystSNMPClient
             @if_mappings = mappings
         ensure
             defer.resolve(true)
-            @defer = nil if defer = @defer
+            @defer = nil if defer == @defer
         end
     end
 
@@ -172,7 +172,7 @@ class Cisco::Switch::CatalystSNMPClient
             [interfaces_down, interfaces_up]
         ensure
             defer.resolve(true)
-            @defer = nil if defer = @defer
+            @defer = nil if defer == @defer
         end
     end
 
@@ -203,7 +203,7 @@ class Cisco::Switch::CatalystSNMPClient
             entries
         ensure
             defer.resolve(true)
-            @defer = nil if defer = @defer
+            @defer = nil if defer == @defer
         end
     end
 end
