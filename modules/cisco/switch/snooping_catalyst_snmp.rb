@@ -331,7 +331,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def query_connected_devices
-        if @client.processing
+        if @client&.processing
             logger.debug 'Skipping device query... busy processing'
             return
         end
@@ -385,7 +385,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             if @client.is_a? ::Cisco::CatalystOffloader::Proxy
                 @client.new_setting(@snmp_settings)
             else
-                ::Cisco::CatalystOffloader.instance.register(thread, @snmp_settings)
+                ::Cisco::CatalystOffloader.instance.register(thread, logger, @snmp_settings)
             end
         else
             @client.disconnect if @client.is_a? ::Cisco::CatalystOffloader::Proxy

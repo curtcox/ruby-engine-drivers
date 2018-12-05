@@ -8,8 +8,9 @@ class Cisco::CatalystOffloader
     include Singleton
 
     class Proxy
-        def initialize(reactor, snmp_settings)
+        def initialize(reactor, logger, snmp_settings)
             @reactor = reactor
+            @logger = logger
             @snmp_settings = snmp_settings
             @defer = nil
 
@@ -46,12 +47,14 @@ class Cisco::CatalystOffloader
 
             # Attempt to connect to offload process
             @connection.connect('127.0.0.1', 30001) { |socket|
+                @logger.debug "connected to offload task"
                 @connected = true
                 defer.resolve(true)
                 socket.start_read
 
                 write(:client, @snmp_settings)
             }.finally {
+                @logger.debug "disconnected from offload task"
                 @defer&.reject RuntimeError.new('connection lost')
                 @defer = nil
 
@@ -131,8 +134,8 @@ class Cisco::CatalystOffloader
         Libuv::Reactor.default.schedule { start_process } if !defined?(::Rake::Task)
     end
 
-    def register(reactor, snmp_settings)
-        Proxy.new(reactor, snmp_settings)
+    def register(reactor, logger, snmp_settings)
+        Proxy.new(reactor, logger, snmp_settings)
     end
 
     def start_process
