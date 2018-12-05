@@ -31,6 +31,7 @@ class Fortytwo::ItApi
         data = data.to_json if !data.nil? && data.class != String
 
         headers['Authorization'] = "Bearer #{api_token}"
+        headers['Content-Type'] = "application/json"
 
         api_path = "#{@api_domain}#{endpoint}"
 
