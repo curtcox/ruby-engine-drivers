@@ -11,9 +11,11 @@ namespace :offload do
         require File.join(__dir__, '../../modules/cisco/catalyst_offloader.rb')
 
         port = args[:tcp_port].to_i
+        puts "offload catalyst snmp binding to port #{port}"
 
         Libuv.reactor.run do |reactor|
-            reactor.tcp.bind('127.0.0.1', port) do |client|
+            tcp = reactor.tcp
+            tcp.bind('127.0.0.1', port) do |client|
                 tokeniser = ::UV::AbstractTokenizer.new(::Cisco::CatalystOffloader::ParserSettings)
                 snmp_client = nil
 
@@ -38,6 +40,11 @@ namespace :offload do
                 end
                 client.start_read
             end
+            tcp.catch do |e|
+                STDOUT.puts "failed to bind port\n#{e.message}\n#{e.backtrace.join("\n")}"
+            end
         end
+
+        puts "offload catalyst snmp closed..."
     end
 end
