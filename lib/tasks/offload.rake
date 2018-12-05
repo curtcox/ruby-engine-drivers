@@ -12,7 +12,7 @@ namespace :offload do
 
         port = args[:tcp_port].to_i
 
-        Libuv.reactor.run do { |reactor|
+        Libuv.reactor.run do |reactor|
             reactor.tcp.bind('127.0.0.1', port) do |client|
                 tokeniser = ::UV::AbstractTokenizer.new(::Cisco::CatalystOffloader::ParserSettings)
                 snmp_client = nil
@@ -38,6 +38,6 @@ namespace :offload do
                 end
                 client.start_read
             end
-        }
+        end
     end
 end
