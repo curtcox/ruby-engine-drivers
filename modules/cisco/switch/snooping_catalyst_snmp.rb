@@ -149,7 +149,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         end
 
         if ifIndex && state
-            if @client.processing
+            if @client&.processing
                 @client.promise.finally { on_trap(ifIndex, state) }
             else
                 on_trap(ifIndex, state)
@@ -379,7 +379,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
     end
 
     def rebuild_client
-        @client.close
+        @client&.close
         @client = if @offload_snmp
             # TODO:: obtain remote client
         else

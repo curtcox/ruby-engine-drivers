@@ -117,77 +117,93 @@ class Cisco::Switch::CatalystSNMPClient
     # Index short name lookup
     # ifName: 1.3.6.1.2.1.31.1.1.1.1.xx  (where xx is the ifIndex)
     def query_index_mappings
-        @defer = @reactor.defer
-        client = new_client
-        mappings = {}
+        raise "processing in progress" if @defer
 
-        @reactor.work {
-            client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
-                oid_code = oid_code[23..-1]
-                mappings[oid_code.to_i] = value.downcase
-            end
-        }.value
+        client = @client || new_client
+        defer = @defer = @reactor.defer
 
-        @if_mappings = mappings
-    ensure
-        @defer.resolve(true)
-        @defer = nil
+        begin
+            mappings = {}
+
+            @reactor.work {
+                client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
+                    oid_code = oid_code[23..-1]
+                    mappings[oid_code.to_i] = value.downcase
+                end
+            }.value
+
+            @if_mappings = mappings
+        ensure
+            defer.resolve(true)
+            @defer = nil if defer = @defer
+        end
     end
 
     # ifOperStatus: 1.3.6.1.2.1.2.2.1.8.xx == up(1), down(2), testing(3)
     def query_interface_status
-        @defer = @reactor.defer
-        client = @client
-        interfaces_up = []
-        interfaces_down = []
-        if_mappings = @if_mappings
+        raise "processing in progress" if @defer
 
-        @reactor.work {
-            client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
-                oid_code = oid_code[20..-1]
-                interface = if_mappings[oid_code.to_i]
-                next unless interface
+        if_mappings = @if_mappings || query_index_mappings
 
-                case value
-                when 1 # up
-                    interfaces_up << interface
-                when 2 # down
-                    interfaces_down << interface
-                else
-                    next
+        client = @client || new_client
+        defer = @defer = @reactor.defer
+
+        begin
+            interfaces_up = []
+            interfaces_down = []
+
+            @reactor.work {
+                client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
+                    oid_code = oid_code[20..-1]
+                    interface = if_mappings[oid_code.to_i]
+                    next unless interface
+
+                    case value
+                    when 1 # up
+                        interfaces_up << interface
+                    when 2 # down
+                        interfaces_down << interface
+                    else
+                        next
+                    end
                 end
-            end
-        }.value
+            }.value
 
-        [interfaces_down, interfaces_up]
-    ensure
-        @defer.resolve(true)
-        @defer = nil
+            [interfaces_down, interfaces_up]
+        ensure
+            defer.resolve(true)
+            @defer = nil if defer = @defer
+        end
     end
 
     # A row instance contains the Mac address, IP address type, IP address, VLAN number, interface number, leased time, and status of this instance.
     # http://www.oidview.com/mibs/9/CISCO-DHCP-SNOOPING-MIB.html
     # http://www.snmplink.org/OnLineMIB/Cisco/index.html#1634
     def query_snooping_bindings
-        @defer = @reactor.defer
-        client = @client
-        entries = {}
+        raise "processing in progress" if @defer
 
-        @reactor.work {
-            client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
-                part, entry_id = oid_code[28..-1].split('.', 2)
-                next if entry_id.nil?
+        client = @client || new_client
+        defer = @defer = @reactor.defer
 
-                entry = entries[entry_id] || ::Cisco::Switch::SnoopingEntry.new
-                entry.id = entry_id
-                entry.__send__("#{::Cisco::Switch::EntryParts[part]}=", value)
-                entries[entry_id] = entry
-            end
-        }.value
+        begin
+            entries = {}
 
-        entries
-    ensure
-        @defer.resolve(true)
-        @defer = nil
+            @reactor.work {
+                client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
+                    part, entry_id = oid_code[28..-1].split('.', 2)
+                    next if entry_id.nil?
+
+                    entry = entries[entry_id] || ::Cisco::Switch::SnoopingEntry.new
+                    entry.id = entry_id
+                    entry.__send__("#{::Cisco::Switch::EntryParts[part]}=", value)
+                    entries[entry_id] = entry
+                end
+            }.value
+
+            entries
+        ensure
+            defer.resolve(true)
+            @defer = nil if defer = @defer
+        end
     end
 end
