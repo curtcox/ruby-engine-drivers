@@ -19,6 +19,7 @@ namespace :offload do
             tcp.bind('0.0.0.0', port) do |client|
                 tokeniser = ::UV::AbstractTokenizer.new(::Cisco::CatalystOffloader::Proxy::ParserSettings)
                 snmp_client = nil
+                client_host = nil
                 connected += 1
                 STDOUT.puts "total connections: #{connected}"
 
@@ -28,10 +29,11 @@ namespace :offload do
                             args = Marshal.load(response[4..-1])
                             if args[0] == :client
                                 STDOUT.puts "reloading client with #{args[1]}"
+                                client_host = args[1][:host]
                                 snmp_client&.close
                                 snmp_client = ::Cisco::Switch::CatalystSNMPClient.new(reactor, args[1])
                             else
-                                STDOUT.puts "received request #{args[0]}"
+                                STDOUT.puts "received request #{client_host} #{args[0]}"
                                 retval = snmp_client.__send__(*args)
                                 if args[0].to_s.start_with? 'query'
                                     msg =  Marshal.dump(retval)
