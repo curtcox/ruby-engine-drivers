@@ -66,7 +66,11 @@ class Cisco::CatalystOffloader
                     defer.reject RuntimeError.new('failed to connect')
                 end
 
-                connect(defer) unless @terminated
+                if !@terminated
+                    @reactor.scheduler.in(4000) do
+                        connect(defer) unless @terminated
+                    end
+                end
             }
         end
 
@@ -115,6 +119,8 @@ class Cisco::CatalystOffloader
             @connecting.then { write(:query_index_mappings) }
             @defer = @reactor.defer
             @defer.promise.value
+        ensure
+            @defer = nil
         end
 
         def query_interface_status
@@ -122,6 +128,8 @@ class Cisco::CatalystOffloader
             @connecting.then { write(:query_interface_status) }
             @defer = @reactor.defer
             @defer.promise.value
+        ensure
+            @defer = nil
         end
 
         def query_snooping_bindings
@@ -129,6 +137,8 @@ class Cisco::CatalystOffloader
             @connecting.then { write(:query_snooping_bindings) }
             @defer = @reactor.defer
             @defer.promise.value
+        ensure
+            @defer = nil
         end
     end
 

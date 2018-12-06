@@ -11,6 +11,7 @@ namespace :offload do
         require File.join(__dir__, '../../modules/cisco/catalyst_offloader.rb')
 
         port = args[:tcp_port].to_i
+        connected = 0
         puts "offload catalyst snmp binding to port #{port}"
 
         Libuv.reactor.run do |reactor|
@@ -18,13 +19,15 @@ namespace :offload do
             tcp.bind('0.0.0.0', port) do |client|
                 tokeniser = ::UV::AbstractTokenizer.new(::Cisco::CatalystOffloader::Proxy::ParserSettings)
                 snmp_client = nil
+                connected += 1
+                STDOUT.puts "total connections: #{connected}"
 
                 client.progress do |data|
                     tokeniser.extract(data).each do |response|
                         begin
                             args = Marshal.load(response[4..-1])
                             if args[0] == :client
-                                STDOUT.puts "reloading client for #{args[1][:hostname]}"
+                                STDOUT.puts "reloading client with #{args[1]}"
                                 snmp_client&.close
                                 snmp_client = ::Cisco::Switch::CatalystSNMPClient.new(reactor, args[1])
                             else
@@ -45,6 +48,10 @@ namespace :offload do
             end
             tcp.catch do |e|
                 STDOUT.puts "failed to bind port\n#{e.message}\n#{e.backtrace.join("\n")}"
+            end
+            tcp.finally do
+                connected -= 1
+                STDOUT.puts "total connections: #{connected}"
             end
             tcp.listen(1024)
         end

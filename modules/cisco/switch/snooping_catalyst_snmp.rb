@@ -384,6 +384,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @client = if @offload_snmp
             if @client.is_a? ::Cisco::CatalystOffloader::Proxy
                 @client.new_setting(@snmp_settings)
+                @client
             else
                 ::Cisco::CatalystOffloader.instance.register(thread, logger, @snmp_settings)
             end
