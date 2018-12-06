@@ -149,12 +149,13 @@ class Cisco::CatalystOffloader
 
     def start_process
         return if @worker
+        reactor = Libuv::Reactor.default
 
         # Start the rake task that will do the SNMP processing
-        @worker = @reactor.spawn('rake', args: "offload:catalyst_snmp['30001']", mode: :inherit)
+        @worker = reactor.spawn('rake', args: "offload:catalyst_snmp['30001']", mode: :inherit)
         @worker.finally do
             STDOUT.puts "offload task closed! Restarting in 5s..."
-            @reactor.scheduler.in('5s') do
+            reactor.scheduler.in('5s') do
                 @worker = nil
                 start_process
             end
