@@ -41,19 +41,19 @@ namespace :offload do
                                 end
                             end
                         rescue => e
-                            STDOUT.puts "failed to marshal request\n#{e.message}\n#{e.backtrace.join("\n")}"
+                            STDOUT.puts "failed to marshal request\n#{e.message}\n#{e.backtrace&.join("\n")}"
                         end
                     end
                 end
                 client.enable_nodelay
                 client.start_read
+                client.finally do
+                    connected -= 1
+                    STDOUT.puts "total connections: #{connected}"
+                end
             end
             tcp.catch do |e|
-                STDOUT.puts "failed to bind port\n#{e.message}\n#{e.backtrace.join("\n")}"
-            end
-            tcp.finally do
-                connected -= 1
-                STDOUT.puts "total connections: #{connected}"
+                STDOUT.puts "failed to bind port\n#{e.message}\n#{e.backtrace&.join("\n")}"
             end
             tcp.listen(1024)
         end
