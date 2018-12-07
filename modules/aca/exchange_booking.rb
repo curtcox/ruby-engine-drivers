@@ -614,10 +614,15 @@ class Aca::ExchangeBooking
     def make_ews_booking(user_email: nil, subject: 'On the spot booking', room_email:, start_time:, end_time:)
         user_email ||= self[:email]  # if swipe card used
 
+        if subject.empty? 
+            subject = "Quick Book by Display Panel On #{system.name}"
+        end
+        
         booking = {
             subject: subject,
             start: start_time,
-            end: end_time
+            end: end_time,
+            location: system.name
         }
 
         if user_email
