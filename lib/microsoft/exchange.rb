@@ -214,6 +214,7 @@ class Microsoft::Exchange
         # events = @ews_client.get_item(:calendar, opts = {act_as: email}).items
         events.each{|event|
             event.get_all_properties!
+            internal_domain = Mail::Address.new(event.organizer.email).domain
             booking = {}
             booking[:subject] = event.subject
             booking[:title] = event.subject
@@ -232,9 +233,11 @@ class Microsoft::Exchange
                     booking[:room_id] = attendee.email
                     next
                 end
+                email_domain = Mail::Address.new(attendee.email).domain
                 {
                     name: attendee.name,
-                    email: attendee.email
+                    email: attendee.email,
+                    visitor: (internal_domain == email_domain)
                 }
             }.compact if event.required_attendees
             if @hide_all_day_bookings
