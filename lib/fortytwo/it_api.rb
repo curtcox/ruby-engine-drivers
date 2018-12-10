@@ -146,7 +146,20 @@ class Fortytwo::ItApi
     protected
 
     def api_token
-        # For now just get a new token each time. In the future we will store the token and check if it expires
-        @api_client.client_credentials.get_token.token
+        # Get the token
+        token = User.bucket.get("fortytwo-token", quiet: true)
+        if token.nil? || token[:expiry] >= Time.now.to_i
+            # Get a new token and save it
+            new_token = @api_client.client_credentials.get_token
+            new_token_model = {
+                token: new_token.token,
+                expiry: Time.now.to_i + new_token.expires_in,
+            }
+            User.bucket.set("fortytwo-token", new_token_model)
+            return new_token.token
+        else
+            # Use the existing token
+            token[:token]
+        end
     end
 end
