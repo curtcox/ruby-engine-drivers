@@ -237,7 +237,7 @@ class Microsoft::Exchange
                 {
                     name: attendee.name,
                     email: attendee.email,
-                    visitor: (internal_domain == email_domain),
+                    visitor: (internal_domain != email_domain),
                     organisation: attendee.email.split('@')[1..-1].join("").split('.')[0].capitalize
                 }
             }.compact if event.required_attendees
