@@ -82,10 +82,12 @@ class Cisco::CatalystOffloader
             return promise if defer.nil?
 
             sched = @reactor.scheduler.in(180_000) do
-                defer&.reject RuntimeError.new('request timeout')
-                @defer = nil if @defer == defer
-                @logger.debug "OFFLOAD: closing connection due to timeout"
-                @connection.close
+                if @defer == defer
+                    defer&.reject RuntimeError.new('request timeout')
+                    @defer = nil
+                    @logger.debug "OFFLOAD: closing connection due to timeout"
+                    @connection.close
+                end
             end
             defer.finally { sched.cancel }
         end
