@@ -77,8 +77,10 @@ class Cisco::CatalystOffloader
         def write(*args)
             raise "connection not ready" unless @connected
             msg =  Marshal.dump(args)
-            @connection.write("#{[msg.length].pack('V')}#{msg}")
             defer = @defer
+            promise = @connection.write("#{[msg.length].pack('V')}#{msg}")
+            return promise if defer.nil?
+
             sched = @reactor.scheduler.in(180_000) do
                 defer&.reject RuntimeError.new('request timeout')
                 @defer = nil if @defer == defer
