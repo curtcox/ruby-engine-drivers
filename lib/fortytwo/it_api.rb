@@ -148,7 +148,7 @@ class Fortytwo::ItApi
     def api_token
         # Get the token
         token = User.bucket.get("fortytwo-token", quiet: true)
-        if token.nil? || token[:expiry] >= Time.now.to_i
+        if token.nil? || token[:expiry] <= Time.now.to_i
             # Get a new token and save it
             new_token = @api_client.client_credentials.get_token
             new_token_model = {
