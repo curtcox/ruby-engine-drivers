@@ -38,7 +38,12 @@ class Cisco::CatalystOffloader
                 @tokeniser.extract(data).each do |response|
                     next unless @defer
                     begin
-                        @defer.resolve Marshal.load(response[4..-1])
+                        response = Marshal.load(response[4..-1])
+                        if response.is_a? Exception
+                            @defer.reject response
+                        else
+                            @defer.resolve response
+                        end
                     rescue => e
                         @logger.debug { "OFFLOAD: error loading response #{e.message}" }
                         @defer.reject e

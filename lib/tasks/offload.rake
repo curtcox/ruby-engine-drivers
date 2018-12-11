@@ -34,7 +34,12 @@ namespace :offload do
                                 snmp_client = ::Cisco::Switch::CatalystSNMPClient.new(reactor, args[1])
                             else
                                 STDOUT.puts "received request #{client_host} #{args[0]}"
-                                retval = snmp_client.__send__(*args)
+                                retval = nil
+                                begin
+                                    retval = snmp_client.__send__(*args)
+                                rescue => e
+                                    retval = e
+                                end
                                 if args[0].to_s.start_with? 'query'
                                     msg =  Marshal.dump(retval)
                                     client.write("#{[msg.length].pack('V')}#{msg}")
