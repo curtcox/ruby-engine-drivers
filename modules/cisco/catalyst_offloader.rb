@@ -107,27 +107,27 @@ class Cisco::CatalystOffloader
 
         def new_setting(snmp_settings)
             @snmp_settings = snmp_settings
-            @connecting.then { write(:client, snmp_settings) }
             @defer&.reject RuntimeError.new('client closed by user')
             @defer = nil
+            @connecting.then { write(:client, snmp_settings) }
         end
 
         def new_client
-            @connecting.then { write(:new_client) }
             @defer&.reject RuntimeError.new('client closed by user')
             @defer = nil
+            @connecting.then { write(:new_client) }
         end
 
         def close
-            @connecting.then { write(:close) }
             @defer&.reject RuntimeError.new('client closed by user')
             @defer = nil
+            @connecting.then { write(:close) }
         end
 
         def query_index_mappings
             raise "processing in progress" if @defer
-            @connecting.then { write(:query_index_mappings) }
             @defer = @reactor.defer
+            @connecting.then { write(:query_index_mappings) }
             @defer.promise.value
         ensure
             @defer = nil
@@ -135,8 +135,8 @@ class Cisco::CatalystOffloader
 
         def query_interface_status
             raise "processing in progress" if @defer
-            @connecting.then { write(:query_interface_status) }
             @defer = @reactor.defer
+            @connecting.then { write(:query_interface_status) }
             @defer.promise.value
         ensure
             @defer = nil
@@ -144,8 +144,8 @@ class Cisco::CatalystOffloader
 
         def query_snooping_bindings
             raise "processing in progress" if @defer
-            @connecting.then { write(:query_snooping_bindings) }
             @defer = @reactor.defer
+            @connecting.then { write(:query_snooping_bindings) }
             @defer.promise.value
         ensure
             @defer = nil
