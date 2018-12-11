@@ -81,7 +81,7 @@ class Cisco::CatalystOffloader
             promise = @connection.write("#{[msg.length].pack('V')}#{msg}")
             return promise if defer.nil?
 
-            sched = @reactor.scheduler.in(240_000) do
+            sched = @reactor.scheduler.in(180_000) do
                 if @defer == defer
                     defer&.reject RuntimeError.new('request timeout')
                     @defer = nil
