@@ -78,6 +78,14 @@ class Cisco::CatalystOffloader
             raise "connection not ready" unless @connected
             msg =  Marshal.dump(args)
             @connection.write("#{[msg.length].pack('V')}#{msg}")
+            defer = @defer
+            sched = @reactor.scheduler.in(180_000) do
+                defer&.reject RuntimeError.new('request timeout')
+                @defer = nil if @defer == defer
+                @logger.debug "OFFLOAD: closing connection due to timeout"
+                @connection.close
+            end
+            defer.finally { sched.cancel }
         end
 
         def disconnect
