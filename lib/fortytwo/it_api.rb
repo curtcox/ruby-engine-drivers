@@ -123,11 +123,10 @@ class Fortytwo::ItApi
         query_params = {
             '$top': limit
         }
-        # # TODO:: ONCE STEPHEN GETS BACK TO US
-        # if owner_id
-        #     query_params['$filter'] = 
-        # end
-        # query_params['$filter'] = filter_param if defined? filter_param
+        if owner_id
+            query_params['$filter'] = "Bookers/any(b:b eq '#{owner_id}')"
+        end
+        query_params['$filter'] = filter_param if defined? filter_param
         response = api_request(request_method: 'get', endpoint: 'visitor', query: query_params)
         JSON.parse(response.body)['value']
     end
