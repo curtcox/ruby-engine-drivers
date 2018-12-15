@@ -107,10 +107,11 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Execute an xCommand on the device.
     #
     # @param command [String] the command to execute
-    # @param args [Hash] the command arguments
+    # @param multiline_body [String] an optional multiline body for the command
+    # @param kwargs [Hash] the command arguments
     # @return [::Libuv::Q::Promise] resolves when the command completes
-    def xcommand(command, args = {})
-        send_xcommand command, args
+    def xcommand(command, multiline_body = nil, **kwargs)
+        send_xcommand command, multiline_body, kwargs
     end
 
     # Push a configuration settings to the device.
@@ -145,6 +146,43 @@ class Cisco::CollaborationEndpoint::RoomOs
     end
 
 
+    # ------------------------------
+    # External feedback subscriptions
+
+    # Subscribe another module to async device events.
+    #
+    # Callback methods must be of arity 1 and public.
+    #
+    # @param path [String] the event path
+    # @param mod_id [Symbol] the module id containing the callback
+    # @param cb [Symbol] the callback method
+    def on_event(path, mod_id, cb)
+        logger.debug { "Registering callback for #{path} to #{mod_id}.#{cb}" }
+
+        register_feedback path do |event|
+            logger.debug { "Proxying #{path} event to #{mod_id}.#{cb}" }
+
+            reactor = ::Libuv::Reactor.current
+            # FIXME: switch to ModuleLoader.instance.get when available
+            mod     = ::Orchestrator::Control.instance.loaded? mod_id
+            proxy   = ::Orchestrator::Core::RequestProxy.new reactor, mod
+
+            proxy.send cb, event
+        end
+    end
+
+    # Clear external event subscribtions for a specific device path.
+    #
+    # @param path [String] the event path
+    def clear_event(path)
+        logger.debug { "Clearing event subscription for #{path}" }
+
+        unregister_feedback path
+    end
+
+    protect_method :on_event, :clear_event
+
+
     protected
 
 
@@ -155,19 +193,20 @@ class Cisco::CollaborationEndpoint::RoomOs
     # to protect access to #xcommand and still refer the gruntwork here.
     #
     # @param comand [String] the xAPI command to execute
-    # @param args [Hash] the command keyword args
+    # @param multiline_body [String] an optional multiline body for the command
+    # @param kwargs [Hash] the command keyword args
     # @return [::Libuv::Q::Promise] that will resolve when execution is complete
-    def send_xcommand(command, args = {})
-        request = Action.xcommand command, args
+    def send_xcommand(command, multiline_body = nil, **kwargs)
+        request = Action.xcommand command, kwargs
 
         # Multi-arg commands (external source registration, UI interaction etc)
         # all need to be properly queued and sent without be overriden. In
         # these cases, leave the outgoing commands unnamed.
         opts = {}
-        opts[:name] = command if args.empty?
-        opts[:name] = "#{command} #{args.keys.first}" if args.size == 1
+        opts[:name] = command if kwargs.empty?
+        opts[:name] = "#{command} #{kwargs.keys.first}" if kwargs.size == 1
 
-        do_send request, **opts do |response|
+        do_send request, multiline_body, **opts do |response|
             # The result keys are a little odd: they're a concatenation of the
             # last two command elements and 'Result', unless the command
             # failed in which case it's just 'Result'.
@@ -325,15 +364,21 @@ class Cisco::CollaborationEndpoint::RoomOs
     # Execute raw command on the device.
     #
     # @param command [String] the raw command to execute
+    # @param multiline_body [String] an optional multiline body for the command
     # @param options [Hash] options for the transport layer
     # @yield [response]
     #   a pre-parsed response object for the command, if used this block
     #   should return the response result
     # @return [::Libuv::Q::Promise]
-    def do_send(command, **options)
+    def do_send(command, multiline_body = nil, **options)
         request_id = generate_request_uuid
 
-        request = "#{command} | resultId=\"#{request_id}\"\n"
+        if multiline_body
+            multiline_body += "\n" unless multiline_body.end_with? "\n"
+            multiline_body << ".\n"
+        end
+
+        request = "#{command} | resultId=\"#{request_id}\"\n#{multiline_body}"
 
         logger.debug { "-> #{request}" }
 

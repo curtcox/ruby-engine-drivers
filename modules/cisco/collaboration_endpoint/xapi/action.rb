@@ -28,17 +28,15 @@ module Cisco::CollaborationEndpoint::Xapi::Action
     # Serialize an xAPI action into transmittable command.
     #
     # @param type [ACTION_TYPE] the type of action to execute
-    # @param args [String, Array<String>] the action args
-    # @param kwargs [Hash] an optional hash of keyword arguments for the action
+    # @param args [String|Hash, Array<String|Hash>] the action args
     # @return [String]
-    def create_action(type, *args, **kwargs)
+    def create_action(type, *args)
         unless ACTION_TYPE.include? type
             raise ArgumentError,
                   "Invalid action type. Must be one of #{ACTION_TYPE}."
         end
 
-        kwargs.merge! args.pop if args.last.is_a? Hash
-
+        kwargs = args.last.is_a?(Hash) ? args.pop : {}
         kwargs = kwargs.compact.map do |name, value|
             value = "\"#{value}\"" if value.is_a? String
             "#{name}: #{value}"
@@ -50,10 +48,10 @@ module Cisco::CollaborationEndpoint::Xapi::Action
     # Serialize an xCommand into transmittable command.
     #
     # @param path [String, Array<String>] command path
-    # @param args [Hash] an optional hash of keyword arguments
+    # @param kwargs [Hash] an optional hash of keyword arguments
     # @return [String]
-    def xcommand(path, args)
-        create_action :xCommand, path, **args
+    def xcommand(path, kwargs = {})
+        create_action :xCommand, path, kwargs
     end
 
     # Serialize an xConfiguration action into a transmittable command.
