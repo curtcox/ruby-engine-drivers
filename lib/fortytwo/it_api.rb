@@ -152,7 +152,7 @@ class Fortytwo::ItApi
             'from': from,
             'body': body
         }
-        response = api_request(request_method: 'post', endpoint: 'visitor', data: sms_object)
+        response = api_request(request_method: 'post', endpoint: 'sms', data: sms_object)
         JSON.parse(response.body)
     end
 
