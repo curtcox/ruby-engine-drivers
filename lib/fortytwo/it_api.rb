@@ -140,6 +140,22 @@ class Fortytwo::ItApi
         JSON.parse(response.body)
     end
 
+    def send_sms(to:, body:, from:'IT Concierge')
+        # Change to aussie number
+        if to[0] == '0'
+            to = '+61' + to[1..-1]
+        end
+
+        # If we have a query and the query has at least one space
+        sms_object = {
+            'to': to,
+            'from': from,
+            'body': body
+        }
+        response = api_request(request_method: 'post', endpoint: 'visitor', data: sms_object)
+        JSON.parse(response.body)
+    end
+
 
     protected
 
