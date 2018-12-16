@@ -140,7 +140,7 @@ class Fortytwo::ItApi
         JSON.parse(response.body)
     end
 
-    def send_sms(to:, body:, from:'IT Concierge')
+    def send_sms(to:, body:, from:'Concierge')
         # Change to aussie number
         if to[0] == '0'
             to = '+61' + to[1..-1]
