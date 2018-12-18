@@ -26,7 +26,7 @@ class Aca::SlackConcierge
         create_websocket
         @threads = []
         self[:building] = setting(:building) || :barangaroo
-        self[:channel] = setting(:channel) || :concierge
+        self[:`] = setting(:channel) || :concierge
     end
 
     def on_unload
@@ -55,7 +55,7 @@ class Aca::SlackConcierge
 
         while (all_messages.length) == (1000 * page_count)
             page_count += 1
-            all_messages += @client.web_client.channels_history({channel: "CEHDN0QP5", latest: all_messages.last['ts'], count: 1000})['messages']
+            all_messages += @client.web_client.channels_history({channel: setting(:channel), latest: all_messages.last['ts'], count: 1000})['messages']
         end
 
         # Delete messages that aren't threads ((either has no thread_ts OR thread_ts == ts) AND type == bot_message)
