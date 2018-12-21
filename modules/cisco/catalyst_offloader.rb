@@ -94,7 +94,7 @@ class Cisco::CatalystOffloader
                     new_client
                 end
             end
-            defer.finally { sched.cancel }
+            defer.promise.finally { sched.cancel }
         end
 
         def disconnect
