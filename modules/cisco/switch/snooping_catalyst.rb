@@ -384,6 +384,6 @@ class Cisco::Switch::SnoopingCatalyst
 
     def normalise(interface)
         # Port-channel == po
-        interface.downcase.gsub('tengigabitethernet', 'te').gsub('gigabitethernet', 'gi').gsub('fastethernet', 'fa')
+        interface.downcase.gsub('tengigabitethernet', 'te').gsub('twogigabitethernet', 'tw').gsub('gigabitethernet', 'gi').gsub('fastethernet', 'fa')
     end
 end
