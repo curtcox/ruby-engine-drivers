@@ -620,7 +620,7 @@ class Microsoft::Office
         query_hash = {}
         query_hash['$top'] = "200"
         extensions.each do |ext_name|
-            query['$expand'] = "Extensions($filter=id eq 'Microsoft.OutlookServices.OpenTypeExtension.#{ext_name}')"
+            query_hash['$expand'] = "Extensions($filter=id eq 'Microsoft.OutlookServices.OpenTypeExtension.#{ext_name}')"
         end
         if not start_param.nil?
             query_hash['startDateTime'] = start_param
@@ -683,7 +683,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_events
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML", extensions:[], location:nil)
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, recurrence_end: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML", extensions:[], location:nil)
         description = String(description)
         attendees = Array(attendees)
 
@@ -799,8 +799,9 @@ class Microsoft::Office
                     daysOfWeek: [start_object.strftime("%A")]
                 },
                 range: {
-                    type: 'noEnd',
-                    startDate: start_object.strftime("%F")
+                    type: 'endDate',
+                    startDate: start_object.strftime("%F"),
+                    endDate: Time.at(recurrence_end).strftime("%F")
                 }
             }
         end
