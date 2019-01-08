@@ -887,7 +887,7 @@ class Microsoft::Office
 
         event = event.to_json
 
-        event.gsub!("X!X!X!",description)
+        event.gsub!("X!X!X!",description) if description
         
         request = graph_request(request_method: 'patch', endpoint: endpoint, data: event, password: @delegated)
         check_response(request)
