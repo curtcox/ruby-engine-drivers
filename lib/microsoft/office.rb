@@ -245,10 +245,10 @@ class Microsoft::Office
         endpoint = "/v1.0/users/#{owner_email}/contacts"
         request = graph_request(request_method: 'get', endpoint: endpoint, query: query_params, password: @delegated)
         check_response(request)
-        return format_contacts(JSON.parse(request.body)['value'])
+        return format_contacts(JSON.parse(request.body)['value'], owner_email)
     end
 
-    def format_contacts(contacts)
+    def format_contacts(contacts, host)
         output_contacts = []
         contacts.each do |contact|
             if contact.key?('emailAddresses') && !contact['emailAddresses'].empty?
@@ -259,6 +259,9 @@ class Microsoft::Office
                 output_format[:phone] = contact['businessPhones'][0]
                 output_format[:organisation] = contact['companyName']
                 output_format[:email] = contact['emailAddresses'][0]['address']
+                output_format[:title] = contact['title']
+                output_format[:host] = host
+                output_format[:purpose] = "Here to see #{host}"
                 output_contacts.push(output_format)
             end
         end
