@@ -296,9 +296,10 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_contacts
-    def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, organisation:nil, other:{})
+    def add_contact(owner_email:, email:, first_name:, last_name:, phone:nil, organisation:nil, other:{}, title:"")
         # This data is required so add it unconditionally
         contact_data = {
+            title: title,
             givenName: first_name,
             surname: last_name,
             emailAddresses: [{
