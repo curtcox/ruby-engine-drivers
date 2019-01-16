@@ -542,6 +542,7 @@ class Microsoft::Office
         booking['booking_id'] = booking['id']
         booking['icaluid'] = booking['iCalUId']
         booking['show_as'] = booking['showAs']
+        booking['created'] = booking['createdDateTime']
 
         if booking.key?('extensions') && !extensions.empty?
             booking['extensions'].each do |ext|
@@ -605,6 +606,7 @@ class Microsoft::Office
             booking['parking'] = booking_info[:parking] if booking_info.key?(:parking)
             booking['notes'] = booking_info[:notes] if booking_info.key?(:notes)
         end
+
 
         booking
     end
