@@ -41,12 +41,12 @@ class Zoom::Meeting
     #     "enforce_login": false
     #   }
     # }
-    def create_meeting(owner_email:, start_time:, duration:, topic:, agenda:nil, countries:, timezone:'Australia/Sydney')
+    def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:, timezone:'Australia/Sydney')
         zoom_params = {
             "topic": topic,
             "type": 2,
             "start_time": Time.at(start_time).iso8601,
-            "duration": 30,
+            "duration": (duration || 30),
             "timezone": timezone,
             "settings": {
               "host_video": true,
@@ -84,7 +84,7 @@ class Zoom::Meeting
         request_method = request_method.to_sym
         data = data.to_json if !data.nil? && data.class != String
 
-        headers['Authorization'] = "Bearer #{api_token}"
+        headers['Authorization'] = "Bearer #{generate_jwt}"
         headers['Content-Type'] = "application/json"
 
         api_path = "#{@api_full_path}#{endpoint}"
