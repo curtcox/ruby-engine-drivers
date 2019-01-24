@@ -182,7 +182,7 @@ class Aca::SlackConcierge
                         user = find_user(new_message['username'])
                         if user
                             new_message['last_read'] = user.last_message_read
-                            new_message['last_sent'] = user.last_message_sent
+                            new_message['last_sent'] = Time.now.to_i * 1000
                         end
                     end
 
