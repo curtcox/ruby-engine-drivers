@@ -7,7 +7,7 @@ require 'jwt'
 # Secret: cghDnHqVEeSSoPRy0oQXfBjsrmPWDqm81dNr
 # Token: eyJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJrRUtqRVJvQlIzT0hacXQ4MGp0VVVnIn0.CJWvJmDrdIbJT7EXZtKMOhl-3Y_u-Mdzn5W34725t0U
 # JWT (long expiry): eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOm51bGwsImlzcyI6InI1eFBEcXUtU09hNzhoM2NxZ25kRmciLCJleHAiOjE3NjcwMTMxNDAsImlhdCI6MTU0ODAyOTE1Nn0.P5VrccVn3GGardbqajeiILb7pGaMMThFUIlxK0Fcc_Y
-
+module Zoom; end;
 
 class Zoom::Meeting
     def initialize(
