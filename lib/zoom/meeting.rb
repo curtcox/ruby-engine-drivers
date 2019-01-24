@@ -41,7 +41,7 @@ class Zoom::Meeting
     #     "enforce_login": false
     #   }
     # }
-    def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:, timezone:'Australia/Sydney')
+    def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:[], timezone:'Australia/Sydney')
         zoom_params = {
             "topic": topic,
             "type": 2,
