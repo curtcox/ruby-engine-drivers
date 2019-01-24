@@ -40,8 +40,7 @@ class Aca::SlackConcierge
     end
 
     def update_last_message_read(email_or_thread)
-        authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
-        user = User.find_by_email(authority_id, email_or_thread)
+        user = find_user(email_or_thread)
         user = User.find(User.bucket.get("slack-user-#{email_or_thread}", quiet: true)) if user.nil?
         user.last_message_read = Time.now.to_i * 1000
         user.save!
@@ -71,8 +70,7 @@ class Aca::SlackConcierge
             # If the message has a username associated (not a status message, etc)
             # Then grab the details and put it into the message
             if message.key?('username')
-                authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
-                user = User.find_by_email(authority_id, message['username'] )
+                user = find_user(message['username'])
                 messages[i]['email'] = user.email
                 messages[i]['name'] = user.name
             end
@@ -124,6 +122,16 @@ class Aca::SlackConcierge
 
     protected
 
+    def find_user(email)
+        authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
+        user = User.find_by_email(authority_id, email )
+        if user.nil?
+            authority_id = Authority.find_by_domain(ENV['STAFF_DOMAIN']).id
+            user = User.find_by_email(authority_id, email )
+        end
+        user
+    end
+
     # Create a realtime WS connection to the Slack servers
     def create_websocket
 
@@ -171,8 +179,7 @@ class Aca::SlackConcierge
                     new_message = data.to_h
 
                     if new_message['username'] != 'Concierge'
-                        authority_id = Authority.find_by_domain(ENV['EMAIL_DOMAIN']).id
-                        user = User.find_by_email(authority_id, new_message['username'])
+                        user = find_user(new_message['username'])
                         if user
                             new_message['last_read'] = user.last_message_read
                             new_message['last_sent'] = user.last_message_sent
