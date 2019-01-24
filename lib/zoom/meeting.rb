@@ -62,7 +62,7 @@ class Zoom::Meeting
         }
         zoom_params['agenda'] = agenda if agenda
         response = api_request(request_method: 'post', endpoint: "users/#{owner_email}/meetings", data: zoom_params)
-        JSON.parse(reponse.body)
+        JSON.parse(response.body)
     end
 
     protected
