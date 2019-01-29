@@ -482,7 +482,7 @@ class Microsoft::Office
             is_available = true
             bookings.each_with_index do |booking, i|
                 bookings[i] = extract_booking_data(booking, available_from, available_to, u_id, internal_domain, extensions)
-                if bookings[i]['free'] == false && bookings[i]['id'] != ignore_booking
+                if bookings[i]['free'] == false && bookings[i]['icaluid'] != ignore_booking
                     is_available = false
                 end
             end
