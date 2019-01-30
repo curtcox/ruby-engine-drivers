@@ -18,6 +18,7 @@ class Qsc::QSysCamera
     def on_update
         @mod_id = setting(:driver) || :Mixer
         @ids = setting(:ids)
+        self[no_discrete_zoom] = true
     end
 
     def power(state)
