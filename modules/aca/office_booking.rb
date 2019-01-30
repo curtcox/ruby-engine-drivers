@@ -667,8 +667,8 @@ class Aca::OfficeBooking
 
             subject = booking['subject']
             if booking.key?('sensitivity') && ['private','confidential'].include?(booking['sensitivity'])
-                organizer = ""
-                subject = ""
+                organizer = "Private"
+                subject = "Private"
             end
 
             results.push({
