@@ -89,6 +89,8 @@ class Cisco::Switch::SnoopingCatalyst
         self[:building] = setting(:building)
         self[:level] = setting(:level)
 
+        self[:last_successful_query] ||= 0
+
         @reserve_time = setting(:reserve_time) || 0
         @snooping ||= []
     end
@@ -256,6 +258,8 @@ class Cisco::Switch::SnoopingCatalyst
             self[:reserved] = @reserved_interface.to_a
             @snooping.clear
 
+            self[:last_successful_query] = Time.now.to_i
+
             return :success
         end
 
@@ -380,6 +384,6 @@ class Cisco::Switch::SnoopingCatalyst
 
     def normalise(interface)
         # Port-channel == po
-        interface.downcase.gsub('tengigabitethernet', 'te').gsub('gigabitethernet', 'gi').gsub('fastethernet', 'fa')
+        interface.downcase.gsub('tengigabitethernet', 'te').gsub('twogigabitethernet', 'tw').gsub('gigabitethernet', 'gi').gsub('fastethernet', 'fa')
     end
 end
