@@ -482,7 +482,7 @@ class Microsoft::Office
             is_available = true
             bookings.each_with_index do |booking, i|
                 bookings[i] = extract_booking_data(booking, available_from, available_to, u_id, internal_domain, extensions)
-                if bookings[i]['free'] == false && bookings[i]['id'] != ignore_booking
+                if bookings[i]['free'] == false && bookings[i]['icaluid'] != ignore_booking
                     is_available = false
                 end
             end
@@ -693,13 +693,20 @@ class Microsoft::Office
         description = String(description)
         attendees = Array(attendees)
 
+        if room_id.class != Array
+            room_id = [room_id]
+        end
+
         # Get our room
-        room = Orchestrator::ControlSystem.find_by_id(room_id) || Orchestrator::ControlSystem.find_by_email(room_id)
+        rooms = room_id.map do |r_id| 
+            Orchestrator::ControlSystem.find_by_id(r_id) || Orchestrator::ControlSystem.find_by_email(r_id)
+        end
+            
 
         if endpoint_override
             endpoint = "/v1.0/users/#{endpoint_override}/events"
         elsif @mailbox_location == 'room' || current_user.nil?
-            endpoint = "/v1.0/users/#{room.email}/events"
+            endpoint = "/v1.0/users/#{rooms[0].email}/events"
         elsif @mailbox_location == 'user'
             endpoint = "/v1.0/users/#{current_user[:email]}/events"
         end
@@ -726,14 +733,16 @@ class Microsoft::Office
             }
         }
 
-        # Add the room as an attendee
-        attendees.push({
-            type: "resource",
-            emailAddress: {
-                address: room.email,
-                name: room.name
-            }
-        })
+        rooms.each do |room|
+            # Add the room as an attendee
+            attendees.push({
+                type: "resource",
+                emailAddress: {
+                    address: room.email,
+                    name: room.name
+                }
+            })
+        end
 
         # Add the current user as an attendee
         if current_user
@@ -761,8 +770,8 @@ class Microsoft::Office
                 timeZone: TIMEZONE_MAPPING[timezone.to_sym]
             },
             location: {
-                displayName: room.name,
-                locationEmailAddress: room.email
+                displayName: rooms.map{|room| room.name}.join(" and "),
+                locationEmailAddress: rooms[0].id
             },
             isOrganizer: false,
             attendees: attendees
@@ -791,8 +800,8 @@ class Microsoft::Office
         else
             event[:organizer] = {
                 emailAddress: {
-                    address: room.email,
-                    name: room.name
+                    address: rooms[0].email,
+                    name: rooms[0].name
                 }
             }
         end
