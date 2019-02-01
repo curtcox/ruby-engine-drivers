@@ -168,7 +168,8 @@ class Aca::SlackConcierge
                         # If the ID of the looped message equals the new message thread ID
                         if thread['ts'] == new_message['thread_ts']
                             new_message['email'] = new_message['username']
-                            new_threads[i]['replies'].insert(0, new_message)
+                            new_threads[i]['replies'].push(new_message)
+                            new_threads[i]['latest_reply'] = new_message['ts']
                             self["thread_#{new_message['thread_ts']}"] = new_threads[i]['replies'].dup
                             break
                         end
