@@ -170,7 +170,8 @@ class Loqit::Lockers
         results = elastic_lockers.search(query)[:results]
         results.each do |r|
             clear_credentials(r.locker_id)
-            # also need to delete the bookings from couchbase
+            r[:released] = true
+            r.save!
         end
     end
 
