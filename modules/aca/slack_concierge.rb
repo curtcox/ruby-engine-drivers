@@ -40,6 +40,13 @@ class Aca::SlackConcierge
     end
 
     def update_last_message_read(email_or_thread)
+        @threads.each do |thread|
+            thread['replies'].each_with_index do |reply, i|
+                if reply['ts'] == email_or_thread
+                    @threads[i]['last_read'] = Time.now.to_i * 1000
+                end
+            end
+        end
         user = find_user(email_or_thread)
         user = User.find(User.bucket.get("slack-user-#{email_or_thread}", quiet: true)) if user.nil?
         user.last_message_read = Time.now.to_i * 1000
@@ -168,7 +175,8 @@ class Aca::SlackConcierge
                         # If the ID of the looped message equals the new message thread ID
                         if thread['ts'] == new_message['thread_ts']
                             new_message['email'] = new_message['username']
-                            new_threads[i]['replies'].insert(0, new_message)
+                            new_threads[i]['replies'].push(new_message)
+                            new_threads[i]['latest_reply'] = new_message['ts']
                             self["thread_#{new_message['thread_ts']}"] = new_threads[i]['replies'].dup
                             break
                         end
