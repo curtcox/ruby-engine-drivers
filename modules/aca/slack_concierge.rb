@@ -39,12 +39,12 @@ class Aca::SlackConcierge
         message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, thread_ts: thread_id, username: 'Concierge'
     end
 
-    # def update_last_message_read(email_or_thread)
-    #     user = find_user(email_or_thread)
-    #     user = User.find(User.bucket.get("slack-user-#{email_or_thread}", quiet: true)) if user.nil?
-    #     user.last_message_read = Time.now.to_i * 1000
-    #     user.save!
-    # end
+    def update_last_message_read(email_or_thread)
+        user = find_user(email_or_thread)
+        user = User.find(User.bucket.get("slack-user-#{email_or_thread}", quiet: true)) if user.nil?
+        user.last_message_read = Time.now.to_i * 1000
+        user.save!
+    end
 
 
     def get_threads
@@ -76,13 +76,13 @@ class Aca::SlackConcierge
             end
 
             # If the user sending the message exists (this should essentially always be the case)
-            # if !user.nil?
-            #     messages[i]['last_sent'] = user.last_message_sent
-            #     messages[i]['last_read'] = user.last_message_read
-            # else
-            #     messages[i]['last_sent'] = nil
-            #     messages[i]['last_read'] = nil
-            # end
+            if !user.nil?
+                messages[i]['last_sent'] = user.last_message_sent
+                messages[i]['last_read'] = user.last_message_read
+            else
+                messages[i]['last_sent'] = nil
+                messages[i]['last_read'] = nil
+            end
 
             # update_last_message_read(messages[i]['email'])
             messages[i]['replies'] = get_message(message['ts'])
@@ -181,10 +181,10 @@ class Aca::SlackConcierge
 
                     if new_message['username'] != 'Concierge'
                         user = find_user(new_message['username'])
-                        # if user
-                        #     new_message['last_read'] = user.last_message_read
-                        #     new_message['last_sent'] = Time.now.to_i * 1000
-                        # end
+                        if user
+                            new_message['last_read'] = user.last_message_read
+                            new_message['last_sent'] = Time.now.to_i * 1000
+                        end
                     end
 
                     new_message_copy = new_message.deep_dup
