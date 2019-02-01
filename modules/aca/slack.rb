@@ -34,9 +34,9 @@ class Aca::Slack
             user_id = get_user_id(data.thread_ts) || get_user_id(data.ts)
 
         # Assuming the user exists (it should always as they must send the first message)_
-	    if !user_id.nil?
-            	self["last_message_#{user_id}"] = data
-	    end
+	    # if !user_id.nil?
+     #        	self["last_message_#{user_id}"] = data
+	    # end
         end
     end
 
@@ -61,7 +61,7 @@ class Aca::Slack
             User.bucket.set("slack-user-#{thread_id}", user.id)
 	        on_message(message.message)
         end
-        user.last_message_sent = Time.now.to_i * 1000
+        # user.last_message_sent = Time.now.to_i * 1000
         user.save!
     end
 
@@ -85,16 +85,12 @@ class Aca::Slack
             messages = JSON.parse(response.body)['messages']
             
             {
-                last_sent: user.last_message_sent,
-                last_read: user.last_message_read,
                 thread_id: thread_id,
                 messages: messages
             }
         # Otherwise just send back nothing
         else
             {
-                last_sent: user.last_message_sent,
-                last_read: user.last_message_read,
                 thread_id: nil,
                 messages: []
             }
