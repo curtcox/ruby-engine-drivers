@@ -41,7 +41,7 @@ class Aca::SlackConcierge
 
     def update_last_message_read(thread_id)
         @threads.each_with_index do |thread, i|
-            if tread['ts'] == thread_id
+            if thread['ts'] == thread_id
                 @threads[i]['last_read'] = Time.now.to_i * 1000
             end
         end
