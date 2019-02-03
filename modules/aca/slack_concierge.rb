@@ -40,11 +40,9 @@ class Aca::SlackConcierge
     end
 
     def update_last_message_read(thread_id)
-        @threads.each do |thread|
-            thread['replies'].each_with_index do |reply, i|
-                if reply['ts'] == thread_id
-                    @threads[i]['last_read'] = Time.now.to_i * 1000
-                end
+        @threads.each_with_index do |thread, i|
+            if tread['ts'] == thread_id
+                @threads[i]['last_read'] = Time.now.to_i * 1000
             end
         end
         user = find_user(thread_id)
