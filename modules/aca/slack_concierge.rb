@@ -39,7 +39,7 @@ class Aca::SlackConcierge
         message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, thread_ts: thread_id, username: 'Concierge'
     end
 
-    def update_last_message_read(email_or_thread)
+    def     (email_or_thread)
         @threads.each do |thread|
             thread['replies'].each_with_index do |reply, i|
                 if reply['ts'] == email_or_thread
@@ -67,7 +67,15 @@ class Aca::SlackConcierge
         # Delete messages that aren't threads ((either has no thread_ts OR thread_ts == ts) AND type == bot_message)
         messages = []
         all_messages.each do |message|
-           messages.push(message) if (!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message'
+            if (!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message'
+                if message.key?('username')
+                    user = find_user(message['username'])
+                    next if user.nil?
+                    message['email'] = user.email
+                    message['name'] = user.name
+                end
+                messages.push(message) 
+            end
         end
 
         # Output count as if this gets > 1000 we need to paginate
