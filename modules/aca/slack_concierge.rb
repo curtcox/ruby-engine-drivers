@@ -42,7 +42,10 @@ class Aca::SlackConcierge
     def update_last_message_read(thread_id)
         @threads.each_with_index do |thread, i|
             if thread['ts'] == thread_id
-                @threads[i]['last_read'] = Time.now.to_i * 1000
+                message_obj = @threads[i].dup
+                message_obj['last_read'] = Time.now.to_i * 1000
+                @threads[i] = message_obj
+                self["threads"] = @threads.deep_dup
             end
         end
         user = find_user(thread_id)
