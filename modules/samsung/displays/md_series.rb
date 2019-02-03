@@ -98,7 +98,8 @@ DESC
         :net_standby => 0xB5,   # Keep NIC active in standby
         :eco_solution => 0xE6,  # Eco options (auto power off)
         :auto_power => 0x33,
-        :screen_split => 0xB2    # Tri / quad split (larger panels only)
+        :screen_split => 0xB2,  # Tri / quad split (larger panels only)
+        :software_version => 0x0E 
     }
     COMMAND.merge!(COMMAND.invert)
 
@@ -142,6 +143,11 @@ DESC
 
     def unmute
         power(true)
+    end
+
+    #check software version
+    def software_version?
+        do_send (:software_version)
     end
 
     INPUTS = {
@@ -393,6 +399,8 @@ DESC
             when :screen_split
                 state = value[0]
                 self[:screen_split] = state.positive?
+            when :software_version
+                self[:software_version] = value
             end
             :success
 
