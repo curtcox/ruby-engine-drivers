@@ -120,6 +120,9 @@ class Aca::OfficeBooking
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
         self[:booking_endable] = setting(:booking_endable)
         self[:timeout] = setting(:timeout)
+        self[:booking_set_host] = setting(:booking_set_host)
+        self[:booking_set_title] = setting(:booking_set_title)
+        self[:booking_search_user] = setting(:booking_search_user)
 
         # Skype join button available 2min before the start of a meeting
         @skype_start_offset = setting(:skype_start_offset) || 120
@@ -667,8 +670,8 @@ class Aca::OfficeBooking
 
             subject = booking['subject']
             if booking.key?('sensitivity') && ['private','confidential'].include?(booking['sensitivity'])
-                organizer = ""
-                subject = ""
+                organizer = "Private"
+                subject = "Private"
             end
 
             results.push({

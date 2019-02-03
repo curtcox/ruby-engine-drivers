@@ -37,7 +37,7 @@ class Loqit::Lockers
             serial:,
             wsdl:,
             log: false,
-            log_level: :debug   
+            log_level: :debug
         )
         savon_config = {
             :wsdl => wsdl,
@@ -85,7 +85,7 @@ class Loqit::Lockers
 
     def list_lockers_detailed(start_number:nil, end_number:nil)
         all_lockers_detailed = []
-        
+
         if start_number
             (start_number.to_i..end_number.to_i).each do |num|
                 # puts "WORKING ON NUMBER: #{num}"
@@ -125,7 +125,7 @@ class Loqit::Lockers
         retry if retries > 0
     end
 
-    def open_locker(locker_number)   
+    def open_locker(locker_number)
         response = @client.call(:open_locker,
             message: {
                 lockerNumber: locker_number
@@ -135,7 +135,7 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
-    def store_credentials(locker_number, user_pin_code, user_card, test_if_free=false)   
+    def store_credentials(locker_number, user_pin_code, user_card, test_if_free=false)
         payload = {
             lockerNumber: locker_number,
             userPincode: user_pin_code
@@ -149,7 +149,33 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
-    def customer_has_locker(user_card)   
+    # this is untested
+    def clear_credentials(locker_number)
+        store_credentials(locker_number, '', '')
+    end
+
+    def clear_lockers
+        elastic_lockers ||= Elastic.new(Locker)
+
+        date_range = {
+            range: {
+                'doc.end_time' => {
+                    lte: Time.now.to_i
+                }
+            }
+        }
+
+        query = elastic_lockers.query
+        query.raw_filter(date_range)
+        results = elastic_lockers.search(query)[:results]
+        results.each do |r|
+            clear_credentials(r.locker_id)
+            r[:released] = true
+            r.save!
+        end
+    end
+
+    def customer_has_locker(user_card)
         response = @client.call(:customer_has_locker,
             message: {
                 lockerNumber: locker_number,
