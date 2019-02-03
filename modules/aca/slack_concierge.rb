@@ -78,6 +78,7 @@ class Aca::SlackConcierge
             # Then grab the details and put it into the message
             if message.key?('username')
                 user = find_user(message['username'])
+                next if user.nil?
                 messages[i]['email'] = user.email
                 messages[i]['name'] = user.name
             end
@@ -190,7 +191,7 @@ class Aca::SlackConcierge
                         user = find_user(new_message['username'])
                         if user
                             new_message['last_read'] = user.last_message_read
-                            new_message['last_sent'] = Time.now.to_i * 1000
+                            new_message['last_sent'] = user.last_message_sent
                         end
                     end
 
