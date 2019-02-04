@@ -133,11 +133,7 @@ class Microsoft::Office
             requests: request_array
         }.to_json
 
-
-        log_graph_request(request_method, data, query, headers, graph_path, password, endpoints)
-
         graph_api_options = {inactivity_timeout: 25000, keepalive: false}
-
 
         if @internet_proxy
             proxy = URI.parse(@internet_proxy)
