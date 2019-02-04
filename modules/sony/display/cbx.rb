@@ -59,7 +59,8 @@ class Sony::Display::CBX
 
         # category, command
         COMMANDS = {
-            power: [0x00, 0x00],
+            power_on: [0x00, 0x02, 0x01, 0x8F],
+            power_off: [0x00, 0x8E]
             input: [0x00, 0x01],
             audio_mute: [0x00, 0x03],
             signal_status: [0x00, 0x75],
@@ -80,3 +81,38 @@ class Sony::Display::CBX
             end
         end
     end
+
+    def build_checksum(command)
+        check = 0
+        command.each do |byte|
+            check = (check + byte) & 0xFF
+        end
+        [check]
+    end
+
+    def do_send(command, param = nil, options = {})
+        # Check for missing params
+        if param.is_a? Hash
+            options = param
+            param = nil
+        end
+
+        # Control + Mode
+        if param.nil?
+            options[:name] = command
+            cmd = [0x8C, 0x00] + COMMANDS[command] + [0xFF, 0xFF]
+        else
+            options[:name] = :"#{command}_cmd"
+            type = [0x8C, 0x00] + COMMANDS[command]
+            if !param.is_a?(Array)
+                param = [param]
+            end
+            data = [param.length + 1] + param
+            cmd = type + data
+        end
+
+        cmd = cmd + build_checksum(cmd)
+
+        send(cmd, options)
+    end
+end
