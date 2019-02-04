@@ -400,7 +400,7 @@ DESC
                 state = value[0]
                 self[:screen_split] = state.positive?
             when :software_version
-                self[:software_version] = value
+                self[:software_version] = array_to_str(value)
             end
             :success
 
