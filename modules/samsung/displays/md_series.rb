@@ -461,7 +461,7 @@ DESC
         data << (data.reduce(:+) & 0xFF)              # Add checksum
         data = [0xAA] + data                          # Add header
 
-        logger.debug { "Sending to Samsung: #{array_to_str(data)}" }
+        logger.debug { "Sending to Samsung: #{byte_to_hex(array_to_str(data))}" }
 
         send(array_to_str(data), options).catch do |reason|
             disconnect
