@@ -99,7 +99,8 @@ DESC
         :eco_solution => 0xE6,  # Eco options (auto power off)
         :auto_power => 0x33,
         :screen_split => 0xB2,  # Tri / quad split (larger panels only)
-        :software_version => 0x0E 
+        :software_version => 0x0E,
+        :serial_number => 0x0B
     }
     COMMAND.merge!(COMMAND.invert)
 
@@ -148,6 +149,10 @@ DESC
     #check software version
     def software_version?
         do_send (:software_version)
+    end
+
+    def serial_number?
+        do_send(:serial_number)
     end
 
     # ability to send custom mdc commands via backoffice
@@ -406,6 +411,8 @@ DESC
                 self[:screen_split] = state.positive?
             when :software_version
                 self[:software_version] = array_to_str(value)
+            when :serial_number
+                self[:serial_number] = array_to_str(value)
             end
             :success
 
