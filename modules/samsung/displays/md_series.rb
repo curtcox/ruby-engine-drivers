@@ -150,6 +150,11 @@ DESC
         do_send (:software_version)
     end
 
+    # ability to send custom mdc commands via backoffice
+    def custom_mcd (command, value = "")
+        do_send(hex_to_byte(command).bytes[0], hex_to_byte(value).bytes)
+    end 
+
     INPUTS = {
         :vga => 0x14,       # pc in manual
         :dvi => 0x18,
