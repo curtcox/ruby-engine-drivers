@@ -39,16 +39,17 @@ class Aca::SlackConcierge
         message = @client.web_client.chat_postMessage channel: setting(:channel), text: message_text, thread_ts: thread_id, username: 'Concierge'
     end
 
-    def update_last_message_read(email_or_thread)
-        @threads.each do |thread|
-            thread['replies'].each_with_index do |reply, i|
-                if reply['ts'] == email_or_thread
-                    @threads[i]['last_read'] = Time.now.to_i * 1000
-                end
+    def update_last_message_read(thread_id)
+        @threads.each_with_index do |thread, i|
+            if thread['ts'] == thread_id
+                message_obj = @threads[i].dup
+                message_obj['last_read'] = Time.now.to_i * 1000
+                @threads[i] = message_obj
+                self["threads"] = @threads.deep_dup
             end
         end
-        user = find_user(email_or_thread)
-        user = User.find(User.bucket.get("slack-user-#{email_or_thread}", quiet: true)) if user.nil?
+        user = find_user(thread_id)
+        user = User.find(User.bucket.get("slack-user-#{thread_id}", quiet: true)) if user.nil?
         user.last_message_read = Time.now.to_i * 1000
         user.save!
     end
@@ -67,7 +68,16 @@ class Aca::SlackConcierge
         # Delete messages that aren't threads ((either has no thread_ts OR thread_ts == ts) AND type == bot_message)
         messages = []
         all_messages.each do |message|
-           messages.push(message) if (!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message'
+            if (!message.key?('thread_ts') || message['thread_ts'] == message['ts']) && message['subtype'] == 'bot_message'
+                if message.key?('username')
+                    user = find_user(message['username'])
+                    if !user.nil? && !User.bucket.get("slack-user-#{message['ts']}", quiet: true).nil?
+                        message['email'] = user.email
+                        message['name'] = user.name
+                        messages.push(message) 
+                    end
+                end
+            end
         end
 
         # Output count as if this gets > 1000 we need to paginate
@@ -78,6 +88,7 @@ class Aca::SlackConcierge
             # Then grab the details and put it into the message
             if message.key?('username')
                 user = find_user(message['username'])
+                next if user.nil?
                 messages[i]['email'] = user.email
                 messages[i]['name'] = user.name
             end
@@ -190,7 +201,7 @@ class Aca::SlackConcierge
                         user = find_user(new_message['username'])
                         if user
                             new_message['last_read'] = user.last_message_read
-                            new_message['last_sent'] = Time.now.to_i * 1000
+                            new_message['last_sent'] = user.last_message_sent
                         end
                     end
 
