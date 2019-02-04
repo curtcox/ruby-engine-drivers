@@ -154,27 +154,6 @@ class Loqit::Lockers
         store_credentials(locker_number, '', '')
     end
 
-    def clear_lockers
-        elastic_lockers ||= Elastic.new(Locker)
-
-        date_range = {
-            range: {
-                'doc.end_time' => {
-                    lte: Time.now.to_i
-                }
-            }
-        }
-
-        query = elastic_lockers.query
-        query.raw_filter(date_range)
-        results = elastic_lockers.search(query)[:results]
-        results.each do |r|
-            clear_credentials(r.locker_id)
-            r[:released] = true
-            r.save!
-        end
-    end
-
     def customer_has_locker(user_card)
         response = @client.call(:customer_has_locker,
             message: {
