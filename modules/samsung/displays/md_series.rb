@@ -414,7 +414,7 @@ DESC
             when :serial_number
                 self[:serial_number] = array_to_str(value)
             else
-                logger.debug "Samsung responded with ACK: #{array_to_str(value)}"
+                logger.debug "Samsung responded with ACK: #{value}"
             end
             :success
 
