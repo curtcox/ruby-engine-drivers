@@ -413,6 +413,8 @@ DESC
                 self[:software_version] = array_to_str(value)
             when :serial_number
                 self[:serial_number] = array_to_str(value)
+            else
+                logger.debug "Samsung responded with ACK: #{value}"
             end
             :success
 
