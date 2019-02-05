@@ -419,7 +419,7 @@ DESC
             :success
 
         when :nak
-            logger.debug "Samsung responded with NAK: #{value}"
+            logger.debug { "Samsung responded with NAK: #{array_to_str(Array(value))}" }
             :failed  # Failed response
 
         else
