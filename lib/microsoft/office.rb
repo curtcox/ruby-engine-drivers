@@ -714,7 +714,7 @@ class Microsoft::Office
         end_object = ensure_ruby_date(end_param).in_time_zone(timezone)
         start_param = ensure_ruby_date(start_param).in_time_zone(timezone).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).in_time_zone(timezone).iso8601.split("+")[0]
-
+        recurrence_end = ensure_ruby_date(recurrence_end)
 
         # Add the attendees
         attendees.map!{|a|
@@ -814,7 +814,7 @@ class Microsoft::Office
                 range: {
                     type: 'endDate',
                     startDate: start_object.strftime("%F"),
-                    endDate: Time.at(recurrence_end).strftime("%F")
+                    endDate: recurrence_end.strftime("%F")
                 }
             }
         end
