@@ -156,7 +156,7 @@ DESC
     end
 
     # ability to send custom mdc commands via backoffice
-    def custom_mcd (command, value = "")
+    def custom_mdc (command, value = "")
         do_send(hex_to_byte(command).bytes[0], hex_to_byte(value).bytes)
     end 
 
@@ -419,7 +419,7 @@ DESC
             :success
 
         when :nak
-            logger.debug "Samsung responded with NAK: #{value}"
+            logger.debug { "Samsung responded with NAK: #{array_to_str(Array(value))}" }
             :failed  # Failed response
 
         else
