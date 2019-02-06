@@ -466,6 +466,8 @@ class Microsoft::Office
         # Allow passing in epoch, time string or ruby Time class
         start_param = ensure_ruby_date(start_param).utc.iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).utc.iso8601.split("+")[0]
+        available_from = ensure_ruby_date(available_from).utc.iso8601.split("+")[0]
+        available_to = ensure_ruby_date(available_to).utc.iso8601.split("+")[0]
 
         # Array of all bookings within our period
         if bulk
