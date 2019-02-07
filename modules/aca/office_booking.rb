@@ -336,7 +336,7 @@ class Aca::OfficeBooking
             real_room.settings['linked_rooms'].each do |linked_room_id|
                 linked_room = Orchestrator::ControlSystem.find_by_id(linked_room_id)
                 if linked_room
-                    response += @client.get_bookings_by_user(user_id: linked_room.id, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)[:bookings]
+                    response += @client.get_bookings_by_user(user_id: linked_room.email, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)[:bookings]
                 end
             end
         end
