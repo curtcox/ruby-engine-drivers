@@ -331,6 +331,14 @@ class Aca::OfficeBooking
     def fetch_bookings(*args)
         # Make the request
         response = @client.get_bookings_by_user(user_id: @office_room, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)[:bookings]
+        if system.settings.key?('linked_rooms')
+            system.settings['linked_rooms'].each do |linked_room_id|
+                linked_room = Orchestrator::ControlSystem.find_by_id(linked_room_id)
+                if linked_room
+                    response += @client.get_bookings_by_user(user_id: linked_room.id, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)[:bookings]
+                end
+            end
+        end
         self[:today] = todays_bookings(response, @office_organiser_location)
     end
 
