@@ -789,7 +789,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_events
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, recurrence_end: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML", extensions:[], location:nil, add_current_user: true)
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, recurrence_end: nil, is_private: false, timezone:'UTC', endpoint_override:nil, content_type:"HTML", extensions:[], location:nil, add_current_user: true)
         description = String(description)
         attendees = Array(attendees)
 
