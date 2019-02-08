@@ -14,7 +14,8 @@ end
 class Microsoft::Office
     TIMEZONE_MAPPING = {
         "Sydney": "AUS Eastern Standard Time",
-        "Brisbane": "Australia/Brisbane"
+        "Brisbane": "Australia/Brisbane",
+        "UTC": "UTC"
     }
     def initialize(
             client_id:,
