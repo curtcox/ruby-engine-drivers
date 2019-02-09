@@ -664,7 +664,7 @@ class Microsoft::Office
         booking['attendees'].each do |attendee|
             attendee_email = attendee['emailAddress']['address']
             if attendee['type'] == 'resource'
-                booking['room_id'].push(attendee_email.downcase)
+                booking['room_id'].push(attendee_email.downcase)    
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
@@ -684,6 +684,9 @@ class Microsoft::Office
                 new_attendees.push(attendee_object)
             end
         end
+
+        # Remove me once frontend supports multi-room
+        booking['room_id'] = booking['room_id'][0]
         booking['visitors'] = booking_has_visitors
         booking['old_attendees'] = booking['attendees']
         booking['attendees'] = new_attendees
