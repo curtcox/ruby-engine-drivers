@@ -42,6 +42,7 @@ class Zoom::Meeting
     #   }
     # }
     def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:[], password:nil, alternative_host:nil, timezone:'Australia/Sydney')
+        start_time = ensure_ruby_epoch(start_time)
         zoom_params = {
             "topic": topic,
             "type": 2,
@@ -121,6 +122,27 @@ class Zoom::Meeting
         STDERR.puts headers if headers
         STDERR.puts '--------------------------------------------'
         STDERR.flush
+    end
+
+    def ensure_ruby_epoch(date)
+        if !(date.class == Time || date.class == DateTime)
+            if string_is_digits(date)
+
+                # Convert to an integer
+                date = date.to_i
+
+                # If JavaScript epoch remove milliseconds
+                if date.to_s.length == 13
+                    date /= 1000
+                end
+
+                # Convert to datetimes
+                date = Time.at(date)
+            else
+                date = Time.parse(date)
+            end
+        end
+        return date.to_i
     end
 
 end
