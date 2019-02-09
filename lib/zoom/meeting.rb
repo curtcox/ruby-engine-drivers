@@ -67,6 +67,10 @@ class Zoom::Meeting
         JSON.parse(response.body)
     end
 
+    def get_user(owner_email:)
+        response = api_request(request_method: 'get', endpoint: "users/#{owner_email}")
+    end
+
     protected
 
     def generate_jwt
