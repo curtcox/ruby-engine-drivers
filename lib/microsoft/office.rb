@@ -660,10 +660,11 @@ class Microsoft::Office
 
         # Format the attendees and save the old format
         new_attendees = []
+        booking['room_id'] = []
         booking['attendees'].each do |attendee|
             attendee_email = attendee['emailAddress']['address']
             if attendee['type'] == 'resource'
-                booking['room_id'] = attendee_email.downcase
+                booking['room_id'].push(attendee_email.downcase)
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
@@ -1009,6 +1010,7 @@ class Microsoft::Office
         request = graph_request(request_method: 'patch', endpoint: endpoint, data: event, password: @delegated)
         check_response(request)
         response = JSON.parse(request.body)
+        format_booking_data(response, room.email)
     end
 
     def check_in_attendee(owner_email:, attendee_email:, icaluid:, response_type:'Accepted')
