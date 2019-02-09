@@ -41,11 +41,11 @@ class Zoom::Meeting
     #     "enforce_login": false
     #   }
     # }
-    def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:[], password:nil, alternative_host:nil, timezone:'Australia/Sydney')
+    def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:[], password:nil, alternative_host:nil, timezone:'Australia/Sydney', type: 2)
         start_time = ensure_ruby_epoch(start_time)
         zoom_params = {
             "topic": topic,
-            "type": 2,
+            "type": type,
             "start_time": Time.at(start_time).iso8601,
             "duration": (duration || 30),
             "timezone": timezone,
