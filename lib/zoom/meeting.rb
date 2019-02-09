@@ -69,6 +69,7 @@ class Zoom::Meeting
 
     def get_user(owner_email:)
         response = api_request(request_method: 'get', endpoint: "users/#{owner_email}")
+        JSON.parse(response.body)
     end
 
     protected
