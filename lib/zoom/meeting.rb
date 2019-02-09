@@ -145,4 +145,10 @@ class Zoom::Meeting
         return date.to_i
     end
 
+    # Returns true if a string is all digits (used to check for an epoch)
+    def string_is_digits(string)
+        string = string.to_s
+        string.scan(/\D/).empty?
+    end
+
 end
