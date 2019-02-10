@@ -115,6 +115,7 @@ class Aca::ExchangeBooking
         self[:booking_min_duration] = setting(:booking_min_duration)
         self[:booking_disable_future] = setting(:booking_disable_future)
         self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
         self[:hide_all_day_bookings] = setting(:hide_all_day_bookings)
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
