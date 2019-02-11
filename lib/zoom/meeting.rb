@@ -63,7 +63,7 @@ class Zoom::Meeting
         }
         zoom_params['agenda'] = agenda if agenda
         zoom_params['password'] = password if password
-        zoom_params['alternative_host'] = alternative_host if alternative_host
+        zoom_params['schedule_for'] = alternative_host if alternative_host
         response = api_request(request_method: 'post', endpoint: "users/#{owner_email}/meetings", data: zoom_params)
         JSON.parse(response.body)
     end
