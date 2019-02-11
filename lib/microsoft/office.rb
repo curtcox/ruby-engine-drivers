@@ -458,7 +458,43 @@ class Microsoft::Office
         200
     end
 
+    def get_bookings_created_from(mailboxes:, created_from:)
+        mailboxes = Array(mailboxes)
+        created_from = ensure_ruby_date(created_from).utc.iso8601
 
+        all_endpoints = mailboxes.map do |email|
+            "/users/#{email}/events"
+        end
+
+        slice_size = 20
+        responses = []
+        all_endpoints.each_slice(slice_size).with_index do |endpoints, ind|
+            query = {
+                '$top': 200,
+                '$filter': "createdDateTime gt #{created_from}"
+            }
+
+            bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
+
+            check_response(bulk_response)
+            parsed_response = JSON.parse(bulk_response.body)['responses']
+            parsed_response.each do |res|
+                local_id = res['id'].to_i
+                global_id = local_id + (slice_size * ind.to_i)
+                res['id'] = global_id
+                responses.push(res)
+            end
+        end
+
+        bookings = {}
+        responses.each_with_index do |res, i|
+            bookings[mailboxes[res['id'].to_i]] = res['body']['value']
+        end
+        bookings
+        bookings.each do |email, booking|
+            bookings[email] = format_booking_data(booking, email)
+        end
+    end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
         # The user_ids param can be passed in as a string or array but is always worked on as an array
