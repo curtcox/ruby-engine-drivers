@@ -115,6 +115,7 @@ class Lutron::Lighting
     def button_press(area, button)
         send_cmd 'DEVICE', area, button, 3
     end
+    alias trigger button_press
 
     def led(area, device, state)
         val = if state.is_a?(Integer)
@@ -134,10 +135,6 @@ class Lutron::Lighting
     # =============
     # COMPATIBILITY
     # =============
-    def trigger(area, scene)
-        scene(area, scene, @trigger_type)
-    end
-
     def light_level(area, level, component = nil, fade = 1000)
         if component
             level(area, level, fade, component)

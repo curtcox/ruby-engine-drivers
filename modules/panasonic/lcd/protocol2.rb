@@ -48,6 +48,7 @@ class Panasonic::LCD::Protocol2
     def on_update
         @username = setting(:username) || 'dispadmin'
         @password = setting(:password) || '@Panasonic'
+        @polling_enabled = setting(:polling_enabled)
     end
 
     def connected
@@ -150,7 +151,7 @@ class Panasonic::LCD::Protocol2
 
     def do_poll
         power?(priority: 0).then do
-            if self[:power]
+            if self[:power] && @polling_enabled
                 muted?
                 volume?
             end
