@@ -41,10 +41,11 @@ class Zoom::Meeting
     #     "enforce_login": false
     #   }
     # }
-    def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:[], timezone:'Australia/Sydney')
+    def create_meeting(owner_email:, start_time:, duration:nil, topic:, agenda:nil, countries:[], password:nil, alternative_host:nil, timezone:'Australia/Sydney', type: 2)
+        start_time = ensure_ruby_epoch(start_time)
         zoom_params = {
             "topic": topic,
-            "type": 2,
+            "type": type,
             "start_time": Time.at(start_time).iso8601,
             "duration": (duration || 30),
             "timezone": timezone,
@@ -61,7 +62,14 @@ class Zoom::Meeting
             }
         }
         zoom_params['agenda'] = agenda if agenda
+        zoom_params['password'] = password if password
+        zoom_params['schedule_for'] = alternative_host if alternative_host
         response = api_request(request_method: 'post', endpoint: "users/#{owner_email}/meetings", data: zoom_params)
+        JSON.parse(response.body)
+    end
+
+    def get_user(owner_email:)
+        response = api_request(request_method: 'get', endpoint: "users/#{owner_email}")
         JSON.parse(response.body)
     end
 
@@ -114,6 +122,33 @@ class Zoom::Meeting
         STDERR.puts headers if headers
         STDERR.puts '--------------------------------------------'
         STDERR.flush
+    end
+
+    def ensure_ruby_epoch(date)
+        if !(date.class == Time || date.class == DateTime)
+            if string_is_digits(date)
+
+                # Convert to an integer
+                date = date.to_i
+
+                # If JavaScript epoch remove milliseconds
+                if date.to_s.length == 13
+                    date /= 1000
+                end
+
+                # Convert to datetimes
+                date = Time.at(date)
+            else
+                date = Time.parse(date)
+            end
+        end
+        return date.to_i
+    end
+
+    # Returns true if a string is all digits (used to check for an epoch)
+    def string_is_digits(string)
+        string = string.to_s
+        string.scan(/\D/).empty?
     end
 
 end

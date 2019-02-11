@@ -14,7 +14,8 @@ end
 class Microsoft::Office
     TIMEZONE_MAPPING = {
         "Sydney": "AUS Eastern Standard Time",
-        "Brisbane": "Australia/Brisbane"
+        "Brisbane": "Australia/Brisbane",
+        "UTC": "UTC"
     }
     def initialize(
             client_id:,
@@ -457,7 +458,43 @@ class Microsoft::Office
         200
     end
 
+    def get_bookings_created_from(mailboxes:, created_from:)
+        mailboxes = Array(mailboxes)
+        created_from = ensure_ruby_date(created_from).utc.iso8601
 
+        all_endpoints = mailboxes.map do |email|
+            "/users/#{email}/events"
+        end
+
+        slice_size = 20
+        responses = []
+        all_endpoints.each_slice(slice_size).with_index do |endpoints, ind|
+            query = {
+                '$top': 200,
+                '$filter': "createdDateTime gt #{created_from}"
+            }
+
+            bulk_response = bulk_graph_request(request_method: 'get', endpoints: endpoints, query: query )
+
+            check_response(bulk_response)
+            parsed_response = JSON.parse(bulk_response.body)['responses']
+            parsed_response.each do |res|
+                local_id = res['id'].to_i
+                global_id = local_id + (slice_size * ind.to_i)
+                res['id'] = global_id
+                responses.push(res)
+            end
+        end
+
+        bookings = {}
+        responses.each_with_index do |res, i|
+            bookings[mailboxes[res['id'].to_i]] = []
+            res['body']['value'].each do |booking|
+                bookings[mailboxes[res['id'].to_i]].push(format_booking_data(booking, mailboxes[res['id'].to_i]))
+            end
+        end
+        bookings
+    end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
         # The user_ids param can be passed in as a string or array but is always worked on as an array
@@ -496,6 +533,108 @@ class Microsoft::Office
                 return recurring_bookings[user_id[0]][:bookings]
             end
         end
+    end
+
+    def format_booking_data(booking, room_email, internal_domain=nil, extensions=[]) 
+        room = Orchestrator::ControlSystem.find_by_email(room_email)
+
+        # Create time objects of the start and end for easier use
+        booking_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime'])
+        booking_end = ActiveSupport::TimeZone.new(booking['end']['timeZone']).parse(booking['end']['dateTime'])
+
+        if room
+            if room.settings.key?('setup')
+                booking_start_with_setup = booking_start - room.settings['setup'].to_i.seconds
+            else
+                booking_start_with_setup = booking_start
+            end
+            
+            if room.settings.key?('breakdown')
+                booking_end_with_setup = booking_end + room.settings['breakdown'].to_i.seconds
+            else
+                booking_end_with_setup = booking_end
+            end
+        end
+
+
+        # Grab the start and end in the right format for the frontend
+        # booking['Start'] = booking_start.utc.iso8601
+        # booking['End'] = booking_end.utc.iso8601
+        booking['start_epoch'] = booking_start.to_i
+        booking['end_epoch'] = booking_end.to_i
+
+        # Get some data about the booking
+        booking['title'] = booking['subject']
+        booking['booking_id'] = booking['id']
+        booking['icaluid'] = booking['iCalUId']
+        booking['show_as'] = booking['showAs']
+        booking['created'] = booking['createdDateTime']
+
+        if booking.key?('extensions') && !extensions.empty?
+            booking['extensions'].each do |ext|
+                if extensions.map {|e| "Microsoft.OutlookServices.OpenTypeExtension.#{e}"}.include?(ext['id'])
+                    ext.each do |ext_key, ext_val|
+                        booking[ext_key] = ext_val if !['@odata.type', 'id','extensionName'].include?(ext_key)
+                    end
+                end
+            end
+        end
+
+        # Check whether this event has external attendees
+        booking_has_visitors = false
+
+        # Format the attendees and save the old format
+        new_attendees = []
+        booking['attendees'].each do |attendee|
+            attendee_email = attendee['emailAddress']['address']
+            if attendee['type'] == 'resource'
+                booking['room_id'] = attendee_email.downcase
+            else
+                # Check if attendee is external or internal
+                if booking.key?('owner')
+                    internal_domain = Mail::Address.new(booking['owner']).domain
+                else
+                    internal_domain = ENV['INTERNAL_DOMAIN'] || internal_domain
+                end
+                mail_object = Mail::Address.new(attendee_email)
+                mail_domain = mail_object.domain
+                booking_has_visitors = true if mail_domain != internal_domain
+                attendee_object = {
+                    email: attendee_email,
+                    name: attendee['emailAddress']['name'],
+                    visitor: (mail_domain != internal_domain),
+                    organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
+                }
+                new_attendees.push(attendee_object)
+            end
+        end
+        booking['visitors'] = booking_has_visitors
+        booking['old_attendees'] = booking['attendees']
+        booking['attendees'] = new_attendees
+
+        # Get the organiser and location data
+        if booking.key?('owner') && booking.key?('owner_name')
+            booking['organizer'] = { name: booking['owner_name'], email: booking['owner']}
+        else
+            booking['organizer'] = { name: booking['organizer']['emailAddress']['name'], email: booking['organizer']['emailAddress']['address']}
+        end
+        # if !booking.key?('room_id') && booking['locations'] && !booking['locations'].empty? && booking['locations'][0]['uniqueId']
+        #     booking['room_id'] = booking['locations'][0]['uniqueId'].downcase
+        # end
+        # booking['room_id'] = room_email
+        if !booking['location']['displayName'].nil? && !booking['location']['displayName'].empty?
+            booking['room_name'] = booking['location']['displayName']
+        end
+
+        booking_info = User.bucket.get("bookinginfo-#{booking['iCalUId']}", quiet: true)
+        if booking_info
+            booking['catering'] = booking_info[:catering] if booking_info.key?(:catering)
+            booking['parking'] = booking_info[:parking] if booking_info.key?(:parking)
+            booking['notes'] = booking_info[:notes] if booking_info.key?(:notes)
+        end
+
+
+        booking
     end
 
     def extract_booking_data(booking, start_param, end_param, room_email, internal_domain=nil, extensions=[])
@@ -557,10 +696,11 @@ class Microsoft::Office
 
         # Format the attendees and save the old format
         new_attendees = []
+        booking['room_id'] = []
         booking['attendees'].each do |attendee|
             attendee_email = attendee['emailAddress']['address']
             if attendee['type'] == 'resource'
-                booking['room_id'] = attendee_email.downcase
+                booking['room_id'].push(attendee_email.downcase)    
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
@@ -580,6 +720,9 @@ class Microsoft::Office
                 new_attendees.push(attendee_object)
             end
         end
+
+        # Remove me once frontend supports multi-room
+        booking['room_id'] = booking['room_id'][0]
         booking['visitors'] = booking_has_visitors
         booking['old_attendees'] = booking['attendees']
         booking['attendees'] = new_attendees
@@ -687,7 +830,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/user_post_events
-    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, recurrence_end: nil, is_private: false, timezone:'Sydney', endpoint_override:nil, content_type:"HTML", extensions:[], location:nil, add_current_user: true)
+    def create_booking(room_id:, start_param:, end_param:, subject:, description:nil, current_user:, attendees: nil, recurrence: nil, recurrence_end: nil, is_private: false, timezone:'UTC', endpoint_override:nil, content_type:"HTML", extensions:[], location:nil, add_current_user: true)
         description = String(description)
         attendees = Array(attendees)
 
@@ -832,6 +975,7 @@ class Microsoft::Office
         check_response(request)
 
         response = JSON.parse(request.body)
+        format_booking_data(response, rooms[0].email)
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_update
@@ -905,6 +1049,7 @@ class Microsoft::Office
         request = graph_request(request_method: 'patch', endpoint: endpoint, data: event, password: @delegated)
         check_response(request)
         response = JSON.parse(request.body)
+        format_booking_data(response, room.email)
     end
 
     def check_in_attendee(owner_email:, attendee_email:, icaluid:, response_type:'Accepted')
