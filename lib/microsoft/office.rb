@@ -488,14 +488,12 @@ class Microsoft::Office
 
         bookings = {}
         responses.each_with_index do |res, i|
-            bookings[mailboxes[res['id'].to_i]] = res['body']['value']
-        end
-        bookings
-        bookings.each do |email, bookings|
-            bookings.each_with_index do |booking, i|
-                bookings[email][i] = format_booking_data(booking, email)
+            bookings[mailboxes[res['id'].to_i]] = []
+            res['body']['value'].each do |booking|
+                bookings[mailboxes[res['id'].to_i]].push(format_booking_data(booking, mailboxes[res['id'].to_i]))
             end
         end
+        bookings
     end
 
     def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
