@@ -491,8 +491,10 @@ class Microsoft::Office
             bookings[mailboxes[res['id'].to_i]] = res['body']['value']
         end
         bookings
-        bookings.each do |email, booking|
-            bookings[email] = format_booking_data(booking, email)
+        bookings.each do |email, bookings|
+            bookings.each do |booking|
+                bookings[email] = format_booking_data(booking, email)
+            end
         end
     end
 
