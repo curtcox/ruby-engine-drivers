@@ -492,8 +492,8 @@ class Microsoft::Office
         end
         bookings
         bookings.each do |email, bookings|
-            bookings.each do |booking|
-                bookings[email] = format_booking_data(booking, email)
+            bookings.each_with_index do |booking, i|
+                bookings[email][i] = format_booking_data(booking, email)
             end
         end
     end
