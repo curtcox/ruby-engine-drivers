@@ -98,6 +98,7 @@ class Aca::Tracking::PeopleCounter
         # attribute :average,      type: Integer
         # attribute :median,       type: Integer
         # attribute :organiser,    type: String
+        # attribute :start_time,   type: Integer
 
         dataset.room_email = system.email
         dataset.system_id = system.id
@@ -107,6 +108,7 @@ class Aca::Tracking::PeopleCounter
         dataset.median = count
         dataset.booking_id = booking[:id]
         dataset.organiser = booking[:owner]
+        dataset.start_time = booking[:start]
         return dataset if dataset.save!
     end
 
