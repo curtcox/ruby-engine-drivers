@@ -23,7 +23,7 @@ class Aca::Tracking::PeopleCount < CouchbaseOrm::Base
     view :all, emit_key: :room_email
 
     def set_id
-        self.id = "pcount-#{self.booking_id}"
+        self.id = "count-#{self.booking_id}"
     end
 
 end

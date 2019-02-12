@@ -67,7 +67,7 @@ class Aca::Tracking::PeopleCounter
         logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
         # Add the change to the dataset for that meeting
-        current_dataset = Aca::Tracking::PeopleCount.find_by_id("pcount-#{current[:id]}")
+        current_dataset = Aca::Tracking::PeopleCount.find_by_id("count-#{current[:id]}")
         if current_dataset.nil?
             current_dataset = create_dataset(new_count, current)
             logger.info "Created dataset with ID: #{current_dataset.id}"
@@ -120,7 +120,7 @@ class Aca::Tracking::PeopleCounter
         total_duration = 0
 
         # Get the dataset
-        dataset = ::Aca::Tracking::PeopleCount.find_by_id("pcount-#{meeting[:id]}")
+        dataset = ::Aca::Tracking::PeopleCount.find_by_id("count-#{meeting[:id]}")
 
         events = dataset.counts.dup
 
