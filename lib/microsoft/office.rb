@@ -746,6 +746,7 @@ class Microsoft::Office
             booking['catering'] = booking_info[:catering] if booking_info.key?(:catering)
             booking['parking'] = booking_info[:parking] if booking_info.key?(:parking)
             booking['notes'] = booking_info[:notes] if booking_info.key?(:notes)
+            booking['food_ordered'] = booking_info[:food_ordered] if booking_info.key?(:food_ordered)
         end
 
 
