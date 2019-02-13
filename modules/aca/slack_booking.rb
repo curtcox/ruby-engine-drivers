@@ -58,18 +58,6 @@ class Aca::SlackBooking
     def create_websocket
 
 
-        @office = ::Microsoft::Office.new({
-            client_id: ENV['OFFICE_CLIENT_ID'],
-            client_secret: ( ENV["OFFICE_CLIENT_SECRET"] || "M6o]=6{Qi>*:?+_>|%}#_s[*/}$1}^N[.=D&>Lg--}!+{=&.*{/:|J_|%.{="),
-            app_site: ENV["OFFICE_SITE"] || "https://login.microsoftonline.com",
-            app_token_url: ENV["OFFICE_TOKEN_URL"],
-            app_scope: ENV['OFFICE_SCOPE'] || "https://graph.microsoft.com/.default",
-            graph_domain: ENV['GRAPH_DOMAIN'] || "https://graph.microsoft.com",
-            service_account_email: ENV['OFFICE_ACCOUNT_EMAIL'],
-            service_account_password: ENV['OFFICE_ACCOUNT_PASSWORD'],
-            internet_proxy: ENV['INTERNET_PROXY']
-        })
-
         # Set our token and other config options
         ::Slack.configure do |config|
             config.token = setting(:slack_api_token)
