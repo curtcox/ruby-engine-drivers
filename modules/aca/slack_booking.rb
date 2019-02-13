@@ -48,7 +48,7 @@ class Aca::Slack
                     @client.web_client.chat_postMessage channel: setting(:channel), text: room.name, username: 'Room Bot'
                 end
             end
-            
+        end
             # @office
     end
 
