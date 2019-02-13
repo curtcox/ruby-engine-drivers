@@ -535,7 +535,7 @@ class Microsoft::Office
         end
     end
 
-    def format_booking_data(booking, room_email, internal_domain=nil, extensions=[]) 
+    def format_booking_data(booking, room_email, internal_domain=nil, extensions=[])
         room = Orchestrator::ControlSystem.find_by_email(room_email)
 
         # Create time objects of the start and end for easier use
@@ -548,7 +548,7 @@ class Microsoft::Office
             else
                 booking_start_with_setup = booking_start
             end
-            
+
             if room.settings.key?('breakdown')
                 booking_end_with_setup = booking_end + room.settings['breakdown'].to_i.seconds
             else
@@ -631,6 +631,7 @@ class Microsoft::Office
             booking['catering'] = booking_info[:catering] if booking_info.key?(:catering)
             booking['parking'] = booking_info[:parking] if booking_info.key?(:parking)
             booking['notes'] = booking_info[:notes] if booking_info.key?(:notes)
+            booking['food_ordered'] = booking_info[:food_ordered] if booking_info.key?(:food_ordered)
         end
 
 
@@ -650,7 +651,7 @@ class Microsoft::Office
             else
                 booking_start_with_setup = booking_start
             end
-            
+
             if room.settings.key?('breakdown')
                 booking_end_with_setup = booking_end + room.settings['breakdown'].to_i.seconds
             else
@@ -700,7 +701,7 @@ class Microsoft::Office
         booking['attendees'].each do |attendee|
             attendee_email = attendee['emailAddress']['address']
             if attendee['type'] == 'resource'
-                booking['room_id'].push(attendee_email.downcase)    
+                booking['room_id'].push(attendee_email.downcase)
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
@@ -801,7 +802,7 @@ class Microsoft::Office
             }
             extensions.each do |ext_name|
                 query['$expand'] = "Extensions($filter=id eq 'Microsoft.OutlookServices.OpenTypeExtension.#{ext_name}')"
-            end   
+            end
 
             custom_query.each do |query_key, query_val|
                 query[query_key] = query_val
@@ -840,10 +841,10 @@ class Microsoft::Office
         end
 
         # Get our room
-        rooms = room_id.map do |r_id| 
+        rooms = room_id.map do |r_id|
             Orchestrator::ControlSystem.find_by_id(r_id) || Orchestrator::ControlSystem.find_by_email(r_id)
         end
-            
+
 
         if endpoint_override
             endpoint = "/v1.0/users/#{endpoint_override}/events"
@@ -1046,7 +1047,7 @@ class Microsoft::Office
         event = event.to_json
 
         event.gsub!("X!X!X!",description) if description
-        
+
         request = graph_request(request_method: 'patch', endpoint: endpoint, data: event, password: @delegated)
         check_response(request)
         response = JSON.parse(request.body)
