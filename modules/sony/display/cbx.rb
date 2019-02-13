@@ -40,11 +40,11 @@ class Sony::Display::CBX
 		power? do
 			if state && !self[:power]		# Request to power on if off
 				self[:stable_state] = false
-				do_send([COMMANDS[:power], 0x01], :timeout => 15000, :delay_on_receive => 5000, :name => :power)
+				do_send([COMMANDS[:power]], :timeout => 15000, :delay_on_receive => 5000, :name => :power)
 				
 			elsif !state && self[:power]	# Request to power off if on
 				self[:stable_state] = false
-				do_send([COMMANDS[:power], 0x00], :timeout => 15000, :delay_on_receive => 5000, :name => :power)
+				do_send([COMMANDS[:power]], :timeout => 15000, :delay_on_receive => 5000, :name => :power)
 				self[:frozen] = false
 			end
 		end
@@ -60,23 +60,21 @@ class Sony::Display::CBX
         # category, command
         COMMANDS = {
             power_on: [0x00, 0x02, 0x01, 0x8F],
-            power_off: [0x00, 0x8E]
-            input: [0x00, 0x01],
-            audio_mute: [0x00, 0x03],
-            signal_status: [0x00, 0x75],
-            mute: [0x00, 0x8D],
-    
-            volume: [0x10, 0x30]
+            power_off: [0x00, 0x02, 0x00, 0x8E],
+            input1: [0x02, 0x03, 0x04, 0x01, 0x96],
+            picture_mute: [0x0D, 0x03, 0x01, 0x00, 0x9D],
+            picture_unmute: [0x0D, 0x03, 0x01, 0x01 0x9E],
+            audio_mute: [0x06, 0x03, 0x01, 0x01, 0x97],
+            audio_unmute: [0x06, 0x03, 0x01, 0x00, 0x96]
             }
         COMMANDS.merge!(COMMANDS.invert)
 
     def do_poll(*args)
         power?({:priority => 0}) do
             if self[:power]
-                input?
-                mute?
+                input1?
+                picture_mute?
                 audio_mute?
-                volume?
                 do_send(:signal_status, {:priority => 0})
             end
         end
