@@ -8,13 +8,13 @@ require 'microsoft/office'
 # Signing Secret: 8e4f0421de528a602903aefc9acb4524
 # Verification Token: eYEilNP8PpfLop3rjKmVE3gz
 # Bot token: xoxb-32027075415-549994563445-ORN5cfzecXHfQsoa9qUD6WVM
-class Aca::Slack
+class Aca::SlackBooking
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
 
 
-    descriptive_name 'Slack Connector'
+    descriptive_name 'Slack Booking'
     generic_name :Slack
     implements :logic
 
