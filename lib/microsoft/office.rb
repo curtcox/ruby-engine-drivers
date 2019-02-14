@@ -604,7 +604,7 @@ class Microsoft::Office
                 attendee_object = {
                     email: attendee_email,
                     name: attendee['emailAddress']['name'],
-                    visitor: (mail_domain != internal_domain),
+                    visitor: internal_domains.include?(mail_domain),
                     organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
                 }
                 new_attendees.push(attendee_object)
