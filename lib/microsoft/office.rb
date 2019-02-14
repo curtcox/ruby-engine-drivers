@@ -863,6 +863,14 @@ class Microsoft::Office
         end_param = ensure_ruby_date(end_param).in_time_zone(timezone).iso8601.split("+")[0]
         recurrence_end = ensure_ruby_date(recurrence_end)
 
+        # Get the timezone out of the room's zone if it has any
+        rooms[0].zones.each do |zone_id|
+            zone = Orchestrator::Zone.find(zone_id)
+            if zone.settings.key?("timezone")
+                timezone = zone.settings['timezone']
+            end
+        end
+
         # Add the attendees
         attendees.map!{|a|
             if a[:optional]
@@ -1002,6 +1010,14 @@ class Microsoft::Office
         end_object = ensure_ruby_date(end_param).in_time_zone(timezone)
         start_param = ensure_ruby_date(start_param).in_time_zone(timezone).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).in_time_zone(timezone).iso8601.split("+")[0]
+
+        # Get the timezone out of the room's zone if it has any
+        room.zones.each do |zone_id|
+            zone = Orchestrator::Zone.find(zone_id)
+            if zone.settings.key?("timezone")
+                timezone = zone.settings['timezone']
+            end
+        end
 
         event = {}
         event[:subject] = subject if subject
