@@ -12,13 +12,13 @@ module Microsoft
 end
 
 class Microsoft::Office
-    TIMEZONE_MAPPING = {
-        "Sydney": "AUS Eastern Standard Time",
-        "Brisbane": "Australia/Brisbane",
-        "HK": "Asia/Hong_Kong",
-        "Hong_Kong": "Asia/Hong_Kong",
-        "UTC": "UTC"
-    }
+    # TIMEZONE_MAPPING = {
+    #     "Sydney": "AUS Eastern Standard Time",
+    #     "Brisbane": "Australia/Brisbane",
+    #     "HK": "Asia/Hong_Kong",
+    #     "Hong_Kong": "Asia/Hong_Kong",
+    #     "UTC": "UTC"
+    # }
     def initialize(
             client_id:,
             client_secret:,
@@ -916,11 +916,11 @@ class Microsoft::Office
             },
             start: {
                 dateTime: start_param,
-                timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+                timeZone: timezone
             },
             end: {
                 dateTime: end_param,
-                timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+                timeZone: timezone
             },
             location: {
                 displayName: rooms.map{|room| room.name}.join(" and "),
@@ -1024,12 +1024,12 @@ class Microsoft::Office
 
         event[:start] = {
             dateTime: start_param,
-            timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+            timeZone: timezone
         } if start_param
 
         event[:end] = {
             dateTime: end_param,
-            timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+            timeZone: timezone
         } if end_param
 
         event[:location] = {
