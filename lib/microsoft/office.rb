@@ -498,7 +498,7 @@ class Microsoft::Office
         bookings
     end
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.month), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
 
