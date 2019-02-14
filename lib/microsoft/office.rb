@@ -703,7 +703,7 @@ class Microsoft::Office
         booking['attendees'].each do |attendee|
             attendee_email = attendee['emailAddress']['address']
             if attendee['type'] == 'resource'
-                booking['room_id'].push(attendee_email.downcase)
+                booking['room_id'].push(attendee_email.downcase) if Orchestrator::ControlSystem.find_by_email(attendee_email.downcase)
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
