@@ -381,12 +381,12 @@ class Microsoft::Office
             activityDomain: 'unrestricted',
             timeslots: [{
                 start: {
-                    DateTime: start_param,
+                    dateTime: start_param,
                     TimeZone: 'UTC'
                 },
                 end: {
-                    DateTime: end_param,
-                    TimeZone: 'UTC'
+                    dateTime: end_param,
+                    timeZone: 'UTC'
                 }
             }]
         }
