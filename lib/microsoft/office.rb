@@ -12,11 +12,13 @@ module Microsoft
 end
 
 class Microsoft::Office
-    TIMEZONE_MAPPING = {
-        "Sydney": "AUS Eastern Standard Time",
-        "Brisbane": "Australia/Brisbane",
-        "UTC": "UTC"
-    }
+    # TIMEZONE_MAPPING = {
+    #     "Sydney": "AUS Eastern Standard Time",
+    #     "Brisbane": "Australia/Brisbane",
+    #     "HK": "Asia/Hong_Kong",
+    #     "Hong_Kong": "Asia/Hong_Kong",
+    #     "UTC": "UTC"
+    # }
     def initialize(
             client_id:,
             client_secret:,
@@ -86,7 +88,9 @@ class Microsoft::Office
 
         graph_path = "#{@graph_domain}#{endpoint}"
 
+        if Rails.env != 'test'        
             log_graph_request(request_method, data, query, headers, graph_path, password)
+        end
 
 
         graph_api_options = {inactivity_timeout: 25000, keepalive: false}
@@ -140,7 +144,10 @@ class Microsoft::Office
             proxy = URI.parse(@internet_proxy)
             graph_api_options[:proxy] = { host: proxy.host, port: proxy.port }
         end
-        log_graph_request(request_method, bulk_data, query, headers, graph_path, password, endpoints)
+
+        if Rails.env != 'test'                
+            log_graph_request(request_method, bulk_data, query, headers, graph_path, password, endpoints)
+        end
 
         graph_api = UV::HttpEndpoint.new(@graph_domain, graph_api_options)
         response = graph_api.__send__('post', path: graph_path, headers: headers, body: bulk_data)
@@ -379,12 +386,12 @@ class Microsoft::Office
             activityDomain: 'unrestricted',
             timeslots: [{
                 start: {
-                    DateTime: start_param,
+                    dateTime: start_param,
                     TimeZone: 'UTC'
                 },
                 end: {
-                    DateTime: end_param,
-                    TimeZone: 'UTC'
+                    dateTime: end_param,
+                    timeZone: 'UTC'
                 }
             }]
         }
@@ -496,7 +503,7 @@ class Microsoft::Office
         bookings
     end
 
-    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.week), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
+    def get_bookings_by_user(user_id:, start_param:Time.now, end_param:(Time.now + 1.month), available_from: Time.now, available_to: (Time.now + 1.hour), bulk: false, availability: true, internal_domain:nil, ignore_booking: nil, extensions:[], custom_query:[])
         # The user_ids param can be passed in as a string or array but is always worked on as an array
         user_id = Array(user_id)
 
@@ -592,17 +599,17 @@ class Microsoft::Office
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
-                    internal_domain = Mail::Address.new(booking['owner']).domain
+                    internal_domains = [ ::Mail::Address.new(booking['owner']).domain ]
                 else
-                    internal_domain = ENV['INTERNAL_DOMAIN'] || internal_domain
+                    internal_domains = ENV['INTERNAL_DOMAIN'].split(",") || internal_domain
                 end
-                mail_object = Mail::Address.new(attendee_email)
+                mail_object = ::Mail::Address.new(attendee_email)
                 mail_domain = mail_object.domain
-                booking_has_visitors = true if mail_domain != internal_domain
+                booking_has_visitors = true if not internal_domains.include?(mail_domain)
                 attendee_object = {
                     email: attendee_email,
                     name: attendee['emailAddress']['name'],
-                    visitor: (mail_domain != internal_domain),
+                    visitor: !internal_domains.include?(mail_domain),
                     organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
                 }
                 new_attendees.push(attendee_object)
@@ -702,21 +709,21 @@ class Microsoft::Office
         booking['attendees'].each do |attendee|
             attendee_email = attendee['emailAddress']['address']
             if attendee['type'] == 'resource'
-                booking['room_id'].push(attendee_email.downcase)
+                booking['room_id'].push(attendee_email.downcase) if Orchestrator::ControlSystem.find_by_email(attendee_email.downcase)
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
-                    internal_domain = Mail::Address.new(booking['owner']).domain
+                    internal_domains = [::Mail::Address.new(booking['owner']).domain]
                 else
-                    internal_domain = ENV['INTERNAL_DOMAIN'] || internal_domain
+                    internal_domains = ENV['INTERNAL_DOMAIN'].split(",") || internal_domain
                 end
-                mail_object = Mail::Address.new(attendee_email)
+                mail_object = ::Mail::Address.new(attendee_email)
                 mail_domain = mail_object.domain
-                booking_has_visitors = true if mail_domain != internal_domain
+                booking_has_visitors = true if not internal_domains.include?(mail_domain)
                 attendee_object = {
                     email: attendee_email,
                     name: attendee['emailAddress']['name'],
-                    visitor: (mail_domain != internal_domain),
+                    visitor: !internal_domains.include?(mail_domain),
                     organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
                 }
                 new_attendees.push(attendee_object)
@@ -855,6 +862,15 @@ class Microsoft::Office
             endpoint = "/v1.0/users/#{current_user[:email]}/events"
         end
 
+        # Get the timezones out of the room's zone if it has any
+        rooms[0].zones.each do |zone_id|
+            zone = Orchestrator::Zone.find(zone_id)
+            if zone.settings.key?("timezone")
+                timezone = zone.settings['timezone']
+            end
+        end
+
+
         # Ensure our start and end params are Ruby dates and format them in Graph format
         start_object = ensure_ruby_date(start_param).in_time_zone(timezone)
         end_object = ensure_ruby_date(end_param).in_time_zone(timezone)
@@ -907,11 +923,11 @@ class Microsoft::Office
             },
             start: {
                 dateTime: start_param,
-                timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+                timeZone: timezone
             },
             end: {
                 dateTime: end_param,
-                timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+                timeZone: timezone
             },
             location: {
                 displayName: rooms.map{|room| room.name}.join(" and "),
@@ -951,17 +967,22 @@ class Microsoft::Office
         end
 
         if recurrence
+            recurrence_range = {
+                type: 'endDate',
+                startDate: start_object.strftime("%F"),
+                endDate: recurrence_end.strftime("%F")
+            }
+            STDERR.puts "Creating recurrence with details:"
+            STDERR.puts recurrence_range
+            STDERR.puts "In timezone: #{timezone}"
+            STDERR.flush
             event[:recurrence] = {
                 pattern: {
                     type: recurrence,
                     interval: 1,
                     daysOfWeek: [start_object.strftime("%A")]
                 },
-                range: {
-                    type: 'endDate',
-                    startDate: start_object.strftime("%F"),
-                    endDate: recurrence_end.strftime("%F")
-                }
+                range: recurrence_range
             }
         end
 
@@ -1002,17 +1023,25 @@ class Microsoft::Office
         start_param = ensure_ruby_date(start_param).in_time_zone(timezone).iso8601.split("+")[0]
         end_param = ensure_ruby_date(end_param).in_time_zone(timezone).iso8601.split("+")[0]
 
+        # Get the timezone out of the room's zone if it has any
+        room.zones.each do |zone_id|
+            zone = Orchestrator::Zone.find(zone_id)
+            if zone.settings.key?("timezone")
+                timezone = zone.settings['timezone']
+            end
+        end
+
         event = {}
         event[:subject] = subject if subject
 
         event[:start] = {
             dateTime: start_param,
-            timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+            timeZone: timezone
         } if start_param
 
         event[:end] = {
             dateTime: end_param,
-            timeZone: TIMEZONE_MAPPING[timezone.to_sym]
+            timeZone: timezone
         } if end_param
 
         event[:location] = {
