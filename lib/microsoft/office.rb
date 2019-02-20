@@ -594,11 +594,11 @@ class Microsoft::Office
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
-                    internal_domains = [Mail::Address.new(booking['owner']).domain]
+                    internal_domains = [ ::Mail::Address.new(booking['owner']).domain ]
                 else
                     internal_domains = ENV['INTERNAL_DOMAIN'].split(",") || internal_domain
                 end
-                mail_object = Mail::Address.new(attendee_email)
+                mail_object = ::Mail::Address.new(attendee_email)
                 mail_domain = mail_object.domain
                 booking_has_visitors = true if not internal_domains.include?(mail_domain)
                 attendee_object = {
@@ -707,11 +707,11 @@ class Microsoft::Office
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
-                    internal_domains = [Mail::Address.new(booking['owner']).domain]
+                    internal_domains = [::Mail::Address.new(booking['owner']).domain]
                 else
                     internal_domains = ENV['INTERNAL_DOMAIN'].split(",") || internal_domain
                 end
-                mail_object = Mail::Address.new(attendee_email)
+                mail_object = ::Mail::Address.new(attendee_email)
                 mail_domain = mail_object.domain
                 booking_has_visitors = true if not internal_domains.include?(mail_domain)
                 attendee_object = {
