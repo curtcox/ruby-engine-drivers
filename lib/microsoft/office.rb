@@ -707,7 +707,7 @@ class Microsoft::Office
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
-                    internal_domain = Mail::Address.new(booking['owner']).domain
+                    internal_domains = [Mail::Address.new(booking['owner']).domain]
                 else
                     internal_domains = ENV['INTERNAL_DOMAIN'].split(",") || internal_domain
                 end
