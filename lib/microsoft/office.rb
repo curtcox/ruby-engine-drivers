@@ -88,7 +88,9 @@ class Microsoft::Office
 
         graph_path = "#{@graph_domain}#{endpoint}"
 
+        if Rails.env != 'test'        
             log_graph_request(request_method, data, query, headers, graph_path, password)
+        end
 
 
         graph_api_options = {inactivity_timeout: 25000, keepalive: false}
@@ -142,7 +144,10 @@ class Microsoft::Office
             proxy = URI.parse(@internet_proxy)
             graph_api_options[:proxy] = { host: proxy.host, port: proxy.port }
         end
-        log_graph_request(request_method, bulk_data, query, headers, graph_path, password, endpoints)
+
+        if Rails.env != 'test'                
+            log_graph_request(request_method, bulk_data, query, headers, graph_path, password, endpoints)
+        end
 
         graph_api = UV::HttpEndpoint.new(@graph_domain, graph_api_options)
         response = graph_api.__send__('post', path: graph_path, headers: headers, body: bulk_data)
