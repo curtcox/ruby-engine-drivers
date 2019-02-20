@@ -966,17 +966,21 @@ class Microsoft::Office
         end
 
         if recurrence
+            recurrence_range = {
+                type: 'endDate',
+                startDate: start_object.strftime("%F"),
+                endDate: recurrence_end.strftime("%F")
+            }
+            STDERR.puts "Creating recurrence with details:"
+            STDERR.puts recurrence_range
+            STDERR.flush
             event[:recurrence] = {
                 pattern: {
                     type: recurrence,
                     interval: 1,
                     daysOfWeek: [start_object.strftime("%A")]
                 },
-                range: {
-                    type: 'endDate',
-                    startDate: start_object.strftime("%F"),
-                    endDate: recurrence_end.strftime("%F")
-                }
+                range: recurrence_range
             }
         end
 
