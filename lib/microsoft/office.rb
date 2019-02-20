@@ -973,6 +973,7 @@ class Microsoft::Office
             }
             STDERR.puts "Creating recurrence with details:"
             STDERR.puts recurrence_range
+            STDERR.puts "In timezone: #{timezone}"
             STDERR.flush
             event[:recurrence] = {
                 pattern: {
