@@ -88,7 +88,7 @@ class Microsoft::Office
 
         graph_path = "#{@graph_domain}#{endpoint}"
 
-        if Rails.env != 'test'        
+        if Rails.env != 'test'
             log_graph_request(request_method, data, query, headers, graph_path, password)
         end
 
@@ -145,7 +145,7 @@ class Microsoft::Office
             graph_api_options[:proxy] = { host: proxy.host, port: proxy.port }
         end
 
-        if Rails.env != 'test'                
+        if Rails.env != 'test'
             log_graph_request(request_method, bulk_data, query, headers, graph_path, password, endpoints)
         end
 
@@ -756,6 +756,7 @@ class Microsoft::Office
             booking['parking'] = booking_info[:parking] if booking_info.key?(:parking)
             booking['notes'] = booking_info[:notes] if booking_info.key?(:notes)
             booking['food_ordered'] = booking_info[:food_ordered] if booking_info.key?(:food_ordered)
+            booking['walk_in'] = booking_info[:walk_in] if booking_info.key?(:walk_in)
         end
 
 
