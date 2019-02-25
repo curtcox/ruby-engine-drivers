@@ -81,7 +81,6 @@ class Aca::ExchangeBooking
             { http_opts: { ssl_verify_mode: 0 } }
         ],
         ews_room: 'room@email.address',
-        ews_booking_can_remove: true
     })
 
 
@@ -121,7 +120,6 @@ class Aca::ExchangeBooking
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
         self[:icon] = setting(:icon)
-        @ews_booking_can_remove = setting(:ews_booking_can_remove)
         @hide_all_day_bookings = Boolean(setting(:hide_all_day_bookings))
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
@@ -651,7 +649,6 @@ class Aca::ExchangeBooking
     end
 
     def delete_ews_booking(delete_at)
-        if @ews_booking_can_remove
           now = Time.now
           if @timezone
               start  = now.in_time_zone(@timezone).midnight
@@ -693,7 +690,6 @@ class Aca::ExchangeBooking
 
           # Return the number of meetings removed
           count
-        end
     end
 
     def todays_bookings(first=false, skype_exists=false)
