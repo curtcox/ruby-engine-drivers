@@ -80,7 +80,7 @@ class Aca::ExchangeBooking
             'password',
             { http_opts: { ssl_verify_mode: 0 } }
         ],
-        ews_room: 'room@email.address',
+        ews_room: 'room@email.address'
     })
 
 
