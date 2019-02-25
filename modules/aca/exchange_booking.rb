@@ -384,7 +384,7 @@ class Aca::ExchangeBooking
         define_setting(:last_meeting_started, meeting_ref)
     end
 
-    def cancel_meeting(start_time)
+    def cancel_meeting(start_time, reason = "timeout")
         task {
             if start_time.class == Integer
                 delete_ews_booking (start_time / 1000).to_i
@@ -394,7 +394,7 @@ class Aca::ExchangeBooking
                 delete_ews_booking start_time.to_i
             end
         }.then(proc { |count|
-            logger.debug { "successfully removed #{count} bookings" }
+            logger.warn { "successfully removed #{count} bookings due to #{reason}" }
 
             self[:last_meeting_started] = 0
             self[:meeting_pending] = 0
@@ -791,7 +791,7 @@ class Aca::ExchangeBooking
             else
                 subject = item[:subject][:text]
             end
-            
+
             {
                 :Start => start,
                 :End => ending,
