@@ -114,6 +114,7 @@ class Aca::ExchangeBooking
         self[:last_meeting_started] = setting(:last_meeting_started)
         self[:cancel_meeting_after] = setting(:cancel_meeting_after)
         self[:booking_min_duration] = setting(:booking_min_duration)
+        self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
         self[:booking_disable_future] = setting(:booking_disable_future)
         self[:booking_max_duration] = setting(:booking_max_duration)
         self[:hide_all_day_bookings] = setting(:hide_all_day_bookings)
