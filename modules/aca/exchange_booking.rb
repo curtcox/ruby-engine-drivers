@@ -121,7 +121,7 @@ class Aca::ExchangeBooking
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
         self[:icon] = setting(:icon)
-        self[:ews_booking_can_remove] = setting(:ews_booking_can_remove)
+        @ews_booking_can_remove = setting(:ews_booking_can_remove)
         @hide_all_day_bookings = Boolean(setting(:hide_all_day_bookings))
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
@@ -651,7 +651,7 @@ class Aca::ExchangeBooking
     end
 
     def delete_ews_booking(delete_at)
-        if ews_booking_can_remove
+        if @ews_booking_can_remove
           now = Time.now
           if @timezone
               start  = now.in_time_zone(@timezone).midnight
