@@ -80,7 +80,8 @@ class Aca::ExchangeBooking
             'password',
             { http_opts: { ssl_verify_mode: 0 } }
         ],
-        ews_room: 'room@email.address'
+        ews_room: 'room@email.address',
+        ews_booking_can_remove: true
     })
 
 
@@ -119,6 +120,7 @@ class Aca::ExchangeBooking
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
         self[:icon] = setting(:icon)
+        self[:ews_booking_can_remove] = setting(:ews_booking_can_remove)
         @hide_all_day_bookings = Boolean(setting(:hide_all_day_bookings))
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
@@ -648,47 +650,49 @@ class Aca::ExchangeBooking
     end
 
     def delete_ews_booking(delete_at)
-        now = Time.now
-        if @timezone
-            start  = now.in_time_zone(@timezone).midnight
-            ending = now.in_time_zone(@timezone).tomorrow.midnight
-        else
-            start  = now.midnight
-            ending = now.tomorrow.midnight
+        if ews_booking_can_remove
+          now = Time.now
+          if @timezone
+              start  = now.in_time_zone(@timezone).midnight
+              ending = now.in_time_zone(@timezone).tomorrow.midnight
+          else
+              start  = now.midnight
+              ending = now.tomorrow.midnight
+          end
+
+          count = 0
+
+          cli = Viewpoint::EWSClient.new(*@ews_creds)
+
+          if @use_act_as
+              # TODO:: think this line can be removed??
+              # delete_at = Time.parse(delete_at.to_s).to_i
+
+              opts = {}
+              opts[:act_as] = @ews_room if @ews_room
+
+              folder = cli.get_folder(:calendar, opts)
+              items = folder.items({:calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
+          else
+              cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
+              items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
+          end
+
+          items.each do |meeting|
+              meeting_time = Time.parse(meeting.ews_item[:start][:text])
+
+              #  any meetings that match the start time provided
+              if meeting_time.to_i == delete_at
+                  # new_booking = meeting.update_item!({ end: Time.now.utc.iso8601.chop })
+
+                  meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
+                  count += 1
+              end
+          end
+
+          # Return the number of meetings removed
+          count
         end
-
-        count = 0
-
-        cli = Viewpoint::EWSClient.new(*@ews_creds)
-
-        if @use_act_as
-            # TODO:: think this line can be removed??
-            # delete_at = Time.parse(delete_at.to_s).to_i
-
-            opts = {}
-            opts[:act_as] = @ews_room if @ews_room
-
-            folder = cli.get_folder(:calendar, opts)
-            items = folder.items({:calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
-        else
-            cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
-            items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
-        end
-
-        items.each do |meeting|
-            meeting_time = Time.parse(meeting.ews_item[:start][:text])
-
-            # Remove any meetings that match the start time provided
-            if meeting_time.to_i == delete_at
-                # new_booking = meeting.update_item!({ end: Time.now.utc.iso8601.chop })
-
-                meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
-                count += 1
-            end
-        end
-
-        # Return the number of meetings removed
-        count
     end
 
     def todays_bookings(first=false, skype_exists=false)
