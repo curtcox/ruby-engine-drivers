@@ -380,18 +380,24 @@ class Aca::OfficeBooking
         define_setting(:last_meeting_started, meeting_ref)
     end
 
-    def cancel_meeting(start_time)
-        if start_time.class == Integer
-            delete_ews_booking (start_time / 1000).to_i
-        else
-            # Converts to time object regardless of start_time being string or time object
-            start_time = Time.parse(start_time.to_s)
-            delete_ews_booking start_time.to_i
-        end
-        self[:last_meeting_started] = start_time
-        self[:meeting_pending] = start_time
-        self[:meeting_ending] = false
-        self[:meeting_pending_notice] = false
+    def cancel_meeting(start_time, reason = "timeout")
+        task {
+            if start_time.class == Integer
+                delete_ews_booking (start_time / 1000).to_i
+            else
+                # Converts to time object regardless of start_time being string or time object
+                start_time = Time.parse(start_time.to_s)
+                delete_ews_booking start_time.to_i
+            end
+        }.then(proc { 
+            logger.warn { "successfully removed #{count} bookings due to #{reason}" }
+            self[:last_meeting_started] = start_time
+            self[:meeting_pending] = start_time
+            self[:meeting_ending] = false
+            self[:meeting_pending_notice] = false
+            fetch_bookings
+            true
+        })
     end
 
     # If last meeting started !== meeting pending then
