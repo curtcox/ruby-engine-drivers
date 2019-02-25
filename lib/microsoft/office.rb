@@ -88,7 +88,9 @@ class Microsoft::Office
 
         graph_path = "#{@graph_domain}#{endpoint}"
 
+        if Rails.env != 'test'
             log_graph_request(request_method, data, query, headers, graph_path, password)
+        end
 
 
         graph_api_options = {inactivity_timeout: 25000, keepalive: false}
@@ -142,7 +144,10 @@ class Microsoft::Office
             proxy = URI.parse(@internet_proxy)
             graph_api_options[:proxy] = { host: proxy.host, port: proxy.port }
         end
-        log_graph_request(request_method, bulk_data, query, headers, graph_path, password, endpoints)
+
+        if Rails.env != 'test'
+            log_graph_request(request_method, bulk_data, query, headers, graph_path, password, endpoints)
+        end
 
         graph_api = UV::HttpEndpoint.new(@graph_domain, graph_api_options)
         response = graph_api.__send__('post', path: graph_path, headers: headers, body: bulk_data)
@@ -594,11 +599,11 @@ class Microsoft::Office
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
-                    internal_domains = [Mail::Address.new(booking['owner']).domain]
+                    internal_domains = [ ::Mail::Address.new(booking['owner']).domain ]
                 else
                     internal_domains = ENV['INTERNAL_DOMAIN'].split(",") || internal_domain
                 end
-                mail_object = Mail::Address.new(attendee_email)
+                mail_object = ::Mail::Address.new(attendee_email)
                 mail_domain = mail_object.domain
                 booking_has_visitors = true if not internal_domains.include?(mail_domain)
                 attendee_object = {
@@ -634,6 +639,8 @@ class Microsoft::Office
             booking['parking'] = booking_info[:parking] if booking_info.key?(:parking)
             booking['notes'] = booking_info[:notes] if booking_info.key?(:notes)
             booking['food_ordered'] = booking_info[:food_ordered] if booking_info.key?(:food_ordered)
+            booking['walk_in'] = booking_info[:walk_in] if booking_info.key?(:walk_in)
+            booking['event'] = booking_info[:event] if booking_info.key?(:event)
         end
 
 
@@ -707,11 +714,11 @@ class Microsoft::Office
             else
                 # Check if attendee is external or internal
                 if booking.key?('owner')
-                    internal_domain = Mail::Address.new(booking['owner']).domain
+                    internal_domains = [::Mail::Address.new(booking['owner']).domain]
                 else
                     internal_domains = ENV['INTERNAL_DOMAIN'].split(",") || internal_domain
                 end
-                mail_object = Mail::Address.new(attendee_email)
+                mail_object = ::Mail::Address.new(attendee_email)
                 mail_domain = mail_object.domain
                 booking_has_visitors = true if not internal_domains.include?(mail_domain)
                 attendee_object = {
@@ -750,6 +757,8 @@ class Microsoft::Office
             booking['parking'] = booking_info[:parking] if booking_info.key?(:parking)
             booking['notes'] = booking_info[:notes] if booking_info.key?(:notes)
             booking['food_ordered'] = booking_info[:food_ordered] if booking_info.key?(:food_ordered)
+            booking['walk_in'] = booking_info[:walk_in] if booking_info.key?(:walk_in)
+            booking['event'] = booking_info[:event] if booking_info.key?(:event)
         end
 
 
@@ -961,17 +970,22 @@ class Microsoft::Office
         end
 
         if recurrence
+            recurrence_range = {
+                type: 'endDate',
+                startDate: start_object.strftime("%F"),
+                endDate: recurrence_end.strftime("%F")
+            }
+            STDERR.puts "Creating recurrence with details:"
+            STDERR.puts recurrence_range
+            STDERR.puts "In timezone: #{timezone}"
+            STDERR.flush
             event[:recurrence] = {
                 pattern: {
                     type: recurrence,
                     interval: 1,
                     daysOfWeek: [start_object.strftime("%A")]
                 },
-                range: {
-                    type: 'endDate',
-                    startDate: start_object.strftime("%F"),
-                    endDate: recurrence_end.strftime("%F")
-                }
+                range: recurrence_range
             }
         end
 
@@ -992,7 +1006,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_update
-    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Sydney', endpoint_override:nil)
+    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Australia/Sydney', endpoint_override:nil)
         # We will always need a room and endpoint passed in
         room = Orchestrator::ControlSystem.find_by_email(room_id) || Orchestrator::ControlSystem.find(room_id)
 
