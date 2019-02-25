@@ -123,7 +123,7 @@ class Panasonic::LCD::Rs232
         logger.debug "requested to mute #{val}"
         do_send(:audio_mute, actual)    # Audio + Video
         do_poll
-    end
+    end
     alias_method :mute, :mute_audio
 
     def unmute_audio
@@ -204,6 +204,7 @@ class Panasonic::LCD::Rs232
             self[:power] = true
             ensure_power_state
         else
+            return :success unless command
             res = data.split(':')[1]
             case command[:name]
             when :power_query
@@ -249,7 +250,8 @@ class Panasonic::LCD::Rs232
             cmd = "#{COMMANDS[command]}:#{param}"
         end
 
-        full_cmd = hex_to_byte('02') << cmd << hex_to_byte('030D')
+        full_cmd = "#{hex_to_byte('02')}#{cmd}#{hex_to_byte('030D')}"
+        logger.debug { "requesting: #{full_cmd}"  }
 
         # Will only accept a single request at a time.
         send(full_cmd, options)
