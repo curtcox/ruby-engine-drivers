@@ -110,19 +110,43 @@ class Aca::OfficeBooking
         self[:touch_enabled] = setting(:touch_enabled) || false
         self[:name] = self[:room_name] = setting(:room_name) || system.name
 
+        self[:name] = self[:room_name] = setting(:room_name) || system.name
+        self[:touch_enabled] = setting(:touch_enabled) || false
+        self[:arrow_direction] = setting(:arrow_direction)
+        self[:hearing_assistance] = setting(:hearing_assistance)
+        self[:timeline_start] = setting(:timeline_start)
+        self[:timeline_end] = setting(:timeline_end)
+        self[:title] = setting(:title)
+        self[:description] = setting(:description)
+        self[:icon] = setting(:icon)
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
+
+        self[:timeout] = setting(:timeout)
+        self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
         self[:booking_controls] = setting(:booking_controls)
         self[:booking_catering] = setting(:booking_catering)
         self[:booking_hide_details] = setting(:booking_hide_details)
         self[:booking_hide_availability] = setting(:booking_hide_availability)
         self[:booking_hide_user] = setting(:booking_hide_user)
+        self[:booking_hide_modal] = setting(:booking_hide_modal)
+        self[:booking_hide_title] = setting(:booking_hide_title)
         self[:booking_hide_description] = setting(:booking_hide_description)
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
-        self[:booking_endable] = setting(:booking_endable)
-        self[:timeout] = setting(:timeout)
         self[:booking_set_host] = setting(:booking_set_host)
         self[:booking_set_title] = setting(:booking_set_title)
+        self[:booking_set_ext] = setting(:booking_set_ext)
         self[:booking_search_user] = setting(:booking_search_user)
+        self[:booking_disable_future] = setting(:booking_disable_future)
+        self[:booking_min_duration] = setting(:booking_min_duration)
+        self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:booking_duration_step] = setting(:booking_duration_step)
+        self[:booking_endable] = setting(:booking_endable)
+        self[:booking_ask_cancel] = setting(:booking_ask_cancel)
+        self[:booking_ask_end] = setting(:booking_ask_end)
+        self[:booking_default_title] = setting(:booking_default_title)
+        self[:booking_select_free] = setting(:booking_select_free)
+        self[:booking_hide_all] = setting(:booking_hide_all) || false
+        self[:hide_all] = setting(:booking_hide_all) || false # for backwards compatibility only
 
         # Skype join button available 2min before the start of a meeting
         @skype_start_offset = setting(:skype_start_offset) || 120
