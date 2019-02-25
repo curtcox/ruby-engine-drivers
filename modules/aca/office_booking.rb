@@ -389,7 +389,7 @@ class Aca::OfficeBooking
                 start_time = Time.parse(start_time.to_s)
                 delete_ews_booking start_time.to_i
             end
-        }.then(proc { 
+        }.then(proc { |count|
             logger.warn { "successfully removed #{count} bookings due to #{reason}" }
             self[:last_meeting_started] = start_time
             self[:meeting_pending] = start_time
