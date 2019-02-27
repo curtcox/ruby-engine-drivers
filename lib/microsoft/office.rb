@@ -731,8 +731,6 @@ class Microsoft::Office
             end
         end
 
-        # Remove me once frontend supports multi-room
-        booking['room_id'] = booking['room_id'][0]
         booking['visitors'] = booking_has_visitors
         booking['old_attendees'] = booking['attendees']
         booking['attendees'] = new_attendees
