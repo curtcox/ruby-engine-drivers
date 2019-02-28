@@ -53,6 +53,7 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     status 'Video Selfview FullScreenMode' => :selfview_fullscreen
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
+    status 'Video Layout LayoutFamily Local' => :video_layout
     status 'Standby State' => :standby
 
     command 'Audio Microphones Mute' => :mic_mute_on
@@ -120,6 +121,10 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             ConnectorId_: (1..5),       # Source can either be specified as the
             Layout_: [:Equal, :PIP],    # physical connector...
             SourceId_: (1..4)           # ...or the logical source ID
+
+    command 'Video Layout LayoutFamily Set' => :video_layout,
+            LayoutFamily: [:Auto, :Equal, :Overlay, :Prominent, :Single],
+            Target_: [:Local, :Remote]
 
     command 'Video Selfview Set' => :selfview,
             Mode_: [:On, :Off],
