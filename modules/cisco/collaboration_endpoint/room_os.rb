@@ -295,7 +295,11 @@ class Cisco::CollaborationEndpoint::RoomOs
                 :success
             else
                 error = response.dig :CommandResponse, :Status
-                logger.error "#{error[:Reason]} (#{error[:XPath]})"
+                if error
+                    logger.error "#{error[:Reason]} (#{error[:XPath]})"
+                else
+                    logger.error "bad response: #{response[:CommandResponse]}"
+                end
                 :abort
             end
         end
