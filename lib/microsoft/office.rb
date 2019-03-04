@@ -805,7 +805,7 @@ class Microsoft::Office
         responses = []
         all_endpoints.each_slice(slice_size).with_index do |endpoints, ind|
             query = {
-                '$top': 200,
+                '$top': 10000,
                 startDateTime: start_param,
                 endDateTime: end_param,
             }
