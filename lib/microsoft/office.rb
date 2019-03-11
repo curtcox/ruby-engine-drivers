@@ -641,6 +641,7 @@ class Microsoft::Office
             booking['food_ordered'] = booking_info[:food_ordered] if booking_info.key?(:food_ordered)
             booking['walk_in'] = booking_info[:walk_in] if booking_info.key?(:walk_in)
             booking['event'] = booking_info[:event] if booking_info.key?(:event)
+            booking['check_ins'] = booking_info[:check_ins] if booking_info.key?(:check_ins)
         end
 
 
@@ -757,6 +758,7 @@ class Microsoft::Office
             booking['food_ordered'] = booking_info[:food_ordered] if booking_info.key?(:food_ordered)
             booking['walk_in'] = booking_info[:walk_in] if booking_info.key?(:walk_in)
             booking['event'] = booking_info[:event] if booking_info.key?(:event)
+            booking['check_ins'] = booking_info[:check_ins] if booking_info.key?(:check_ins)
         end
 
 
