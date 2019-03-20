@@ -58,6 +58,14 @@ class Aca::Tracking::PeopleCounter
     end
 
     def count_changed(new_count)
+        # Prevent overlapping processing
+        if @processing
+            @was_updated = true
+            @adjusted_count = new_count
+            return new_count
+        end
+
+        @processing = true
         new_count = 0 if new_count == -1
         return if self[:todays_bookings].nil? || self[:todays_bookings].empty?
         # Check the current meeting
@@ -84,6 +92,17 @@ class Aca::Tracking::PeopleCounter
         # Save it back
         current_dataset.save!
         new_count
+    ensure
+        if @was_updated
+            # Prevent spamming of this function
+            schedule.in(3000) do
+                @processing = false
+                @was_updated = false
+                count_changed(@adjusted_count)
+            end
+        else
+            @processing = false
+        end
     end
 
     def create_dataset(count, booking)
