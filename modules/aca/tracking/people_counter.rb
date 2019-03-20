@@ -70,7 +70,7 @@ class Aca::Tracking::PeopleCounter
         return if self[:todays_bookings].nil? || self[:todays_bookings].empty?
         # Check the current meeting
         current = get_current_booking(self[:todays_bookings])
-        return if current.nil?
+        return unless current && current[:id]
 
         logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
@@ -93,15 +93,15 @@ class Aca::Tracking::PeopleCounter
         current_dataset.save!
         new_count
     ensure
-        if @was_updated
-            # Prevent spamming of this function
-            schedule.in(3000) do
+        schedule.in(5000) do
+            if @was_updated
+                # Prevent spamming of this function
                 @processing = false
                 @was_updated = false
                 count_changed(@adjusted_count)
+            else
+                @processing = false
             end
-        else
-            @processing = false
         end
     end
 
