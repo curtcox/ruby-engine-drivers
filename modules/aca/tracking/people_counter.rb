@@ -37,7 +37,7 @@ class Aca::Tracking::PeopleCounter
                 }
             end
         end
-
+        nil
     end
 
     def get_current_booking(details)
@@ -83,6 +83,7 @@ class Aca::Tracking::PeopleCounter
 
         # Save it back
         current_dataset.save!
+        new_count
     end
 
     def create_dataset(count, booking)
@@ -176,6 +177,7 @@ class Aca::Tracking::PeopleCounter
             self[:todays_bookings] = system[:Bookings][:today]
             booking_changed(self[:todays_bookings])
         }
+        nil
     end
 
     def update_state
