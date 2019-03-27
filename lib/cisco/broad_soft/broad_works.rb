@@ -9,17 +9,7 @@ bw = Cisco::BroadSoft::BroadWorks.new("xsi-events.domain.com", "user@domain.com"
 # Processing events
 Thread.new do
   bw.open_channel do |event|
-    thread.new { bw.acknowledge(event[:event_id]) }
     puts "\n\Processing! #{event}\n\n"
-  end
-end
-
-# Keeping the connection alive
-Thread.new do
-  sleep 8
-  loop do
-    bw.heartbeat
-    sleep 5
   end
 end
 
@@ -47,14 +37,22 @@ class Cisco::BroadSoft::BroadWorks
     @proxy = proxy
     @application_id = application
 
+    @keepalive_active = false
+    @channel_open = false
+    @heartbeat = true
+
     @channel_set_id = SecureRandom.uuid
   end
 
   attr_reader :expires
   attr_reader :channel_id
   attr_reader :channel_set_id
+  attr_reader :channel_open
 
   def open_channel
+    return if @channel_open
+    @channel_open = true
+
     expires = 6.hours.to_i
 
     channel_xml = %(<?xml version="1.0" encoding="utf-8"?>
@@ -70,13 +68,20 @@ class Cisco::BroadSoft::BroadWorks
     conn.body = channel_xml
 
     conn.on_body do |chunk|
+      @heartbeat = false
       event = parse_event(chunk)
       yield event if event
     end
 
+    keepalive
+
     @logger.info "Channel #{@channel_set_id} requested..."
     HTTPI.post(conn)
     @logger.info "Channel #{@channel_set_id} closed..."
+  ensure
+    @channel_open = false
+    # notify of the disconnect
+    yield nil
   end
 
   def heartbeat
@@ -84,7 +89,36 @@ class Cisco::BroadSoft::BroadWorks
     conn.url = "https://#{@domain}/com.broadsoft.xsi-events/v2.0/channel/#{@channel_id}/heartbeat"
     response = HTTPI.put(conn)
     if response.code != 200
-      @logger.warn "heartbeat failed\n#{response.inspect}"
+        if response.code == 404
+            # Seems multiple servers handle requests and not all are aware of channels!
+            # This just desperately tries to hit the right server to keep the channel alive
+            sleep 1
+            heartbeat if @heartbeat && @channel_open
+        else
+            @logger.warn "heartbeat failed\n#{response.inspect}"
+        end
+    end
+  end
+
+  def keepalive
+    return if @keepalive_active
+    @keepalive_active = true
+    @logger.debug "heartbeat starting..."
+    Thread.new do
+      begin
+        loop do
+          @heartbeat = true
+          sleep 6
+          break unless @channel_open
+          heartbeat if @heartbeat
+        end
+      rescue => e
+        @logger.error "error performing heartbeat: #{e.message}"
+      ensure
+        @keepalive_active = false
+        # Ensure this is always running if a channel is open
+        keepalive if @channel_open
+      end
     end
   end
 
@@ -119,16 +153,24 @@ class Cisco::BroadSoft::BroadWorks
         @expires = (xml.xpath("//expires").inner_text.to_i - 5).seconds.from_now
         @logger.info "channel established #{@channel_id}"
         @logger.debug "channel details:\n#{data}"
-        nil
+        {
+          channel_id: @channel_id,
+          event_name: 'new_channel'
+        }
       when 'Event'
         event_data = xml.xpath("//eventData")[0]
-        {
+        event = {
+          channel_id: xml.xpath("//channelId").inner_text,
+          user_id: xml.xpath("//userId").inner_text,
+          subscription_id: xml.xpath("//subscriptionId").inner_text,
           event_id: xml.xpath("//eventID").inner_text,
           event_name: event_data["type"].split(':')[1],
           event_data: event_data
         }
+        Thread.new { acknowledge(event[:event_id]) }
+        event
       else
-        @logger.info "recieved #{response_type} on channel"
+        @logger.debug "recieved #{response_type} on channel"
         nil
       end
     rescue => e
@@ -176,9 +218,16 @@ class Cisco::BroadSoft::BroadWorks
     conn.body = channel_xml
     response = HTTPI.post(conn)
     if response.code == 200
-      # TODO:: extract the subscription ID
+      # extract the subscription ID
+      xml = Nokogiri::XML(response.body)
+      xml.remove_namespaces!
+      xml.xpath("//subscriptionId").inner_text
+    elsif response.code == 404
+      sleep 1
+      get_user_events(group, events) if @channel_open
     else
       @logger.warn "get user events failed\n#{response.inspect}"
+      raise "bad response when requesting events #{response.code}\n#{response.body}"
     end
   end
 
