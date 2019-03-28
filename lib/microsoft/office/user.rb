@@ -24,5 +24,10 @@ class Microsoft::Officenew::User < Microsoft::Officenew::Model
         @client.get_contacts(mailbox: @user['mail'])
     end
 
+    def to_json(options)
+        super(:only => :user)
+    end
+
+
     attr_accessor :user
 end
