@@ -37,6 +37,6 @@ module Microsoft::Officenew::Users
         check_response(request)
 
         # Return the parsed user data
-        JSON.parse(request.body)['value'].map {|u| Microsoft::Officenew::User.new(client: self, user: u)}
+        JSON.parse(request.body)['value'].map {|u| Microsoft::Officenew::User.new(client: self, user: u).user}
     end
 end
