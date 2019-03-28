@@ -121,7 +121,7 @@ module Microsoft::Officenew::Events
                 # end
 
 
-                bookings[i] = Microsoft::Officenew::Event.new(client: self, event: booking, available_to: options[:available_to], available_from: options[:available_from])
+                bookings[i] = Microsoft::Officenew::Event.new(client: self, event: booking, available_to: options[:available_to], available_from: options[:available_from]).event
             end
             bookings_by_room[mailboxes[res['id'].to_i]] = {available: is_available, bookings: bookings}
         end
