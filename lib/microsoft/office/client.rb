@@ -137,8 +137,6 @@ class Microsoft::Officenew::Client
     end
 
     def check_response(response)
-        puts "CHECKING RESPONSE"
-        puts response.body if response.body
         case response.status
         when 200, 201, 204
             return
