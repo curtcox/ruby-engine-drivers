@@ -32,10 +32,6 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         @event = create_aliases(event, ALIAS_FIELDS, NEW_FIELDS, self)
     end
 
-    def get_contacts
-        @client.get_contacts(mailbox: @event['mail'])
-    end
-
     attr_accessor :event, :available_to, :available_from
 
     protected 

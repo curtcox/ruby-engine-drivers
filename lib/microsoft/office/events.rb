@@ -1,6 +1,4 @@
 module Microsoft::Officenew::Events
-
-
     ##
     # For every mailbox (email) passed in, this method will grab all the bookings and, if
     # requested, return the availability of the mailboxes for some time range.
@@ -128,6 +126,25 @@ module Microsoft::Officenew::Events
     end
     
     
+    ##
+    # Create an Office365 event in the mailbox passed in. This may have rooms and other 
+    # attendees associated with it and thus create events in other mailboxes also.
+    # 
+    # @param mailbox [String] The mailbox email in which the event is to be created. This could be a user or a room though is generally a user
+    # @param start_param [Integer] A seconds epoch which denotes the start of the booking
+    # @param end_param [Integer] A seconds epoch which denotes the end of the booking
+    # @option options [Array] :room_emails An array of room resource emails to be added to the booking
+    # @option options [String] :subject A subject for the booking
+    # @option options [String] :description A description to be added to the body of the event
+    # @option options [String] :organizer_name The name of the organizer
+    # @option options [String] :organizer_email The email of the organizer
+    # @option options [Array] :attendees An array of attendees to add in the form { name: <NAME>, email: <EMAIL> }
+    # @option options [String] :recurrence_type The type of recurrence if used. Can be 'daily', 'weekly' or 'monthly'
+    # @option options [Integer] :recurrence_end A seconds epoch denoting the final day of recurrence
+    # @option options [Boolean] :is_private Whether to mark the booking as private or just normal
+    # @option options [String] :timezone The timezone of the booking. This will be overridden by a timezone in the room's settings
+    # @option options [Hash] :extensions A hash holding a list of extensions to be added to the booking
+    # @option options [String] :location The location field to set. This will not be used if a room is passed in
     def create_booking(mailbox:, start_param:, end_param:, options: {})
         default_options = {
             room_emails: [],
@@ -147,7 +164,7 @@ module Microsoft::Officenew::Events
         options = options.reverse_merge(default_options)
 
         # Turn our array of room emails into an array of rooms (ControlSystems)
-        rooms = room_emails.map { |r_id| Orchestrator::ControlSystem.find_by_email(r_id) }
+        rooms = options[:room_emails].map { |r_id| Orchestrator::ControlSystem.find_by_email(r_id) }
 
         # Get the timezones out of the room's zone if it has any
         timezone = get_timezone(rooms[0]) if rooms.present?
@@ -170,11 +187,34 @@ module Microsoft::Officenew::Events
         )
 
         # Make the request and check the response
-        request = graph_request(request_method: 'post', endpoint: "/v1.0/users/#{mailbox}/events", data: event_json)
+        puts "ABOUT TO MAKE GRAPH REQUEST TO CREATE BOOKING"
+        puts "DATA IS "
+        puts event_json
+        puts '-----'
+        request = graph_request(request_method: 'post', endpoints: ["/v1.0/users/#{mailbox}/events"], data: event_json)
         check_response(request)
 
     end
 
+    ##
+    # Update an Office365 event with the relevant booking ID and in the mailbox passed in.
+    # 
+    # @param booking_id [String] The ID of the booking which is to be updated
+    # @param mailbox [String] The mailbox email in which the event is to be created. This could be a user or a room though is generally a user
+    # @option options [Integer] :start_param A seconds epoch which denotes the start of the booking
+    # @option options [Integer] :end_param A seconds epoch which denotes the end of the booking
+    # @option options [Array] :room_emails An array of room resource emails to be added to the booking
+    # @option options [String] :subject A subject for the booking
+    # @option options [String] :description A description to be added to the body of the event
+    # @option options [String] :organizer_name The name of the organizer
+    # @option options [String] :organizer_email The email of the organizer
+    # @option options [Array] :attendees An array of attendees to add in the form { name: <NAME>, email: <EMAIL> }
+    # @option options [String] :recurrence_type The type of recurrence if used. Can be 'daily', 'weekly' or 'monthly'
+    # @option options [Integer] :recurrence_end A seconds epoch denoting the final day of recurrence
+    # @option options [Boolean] :is_private Whether to mark the booking as private or just normal
+    # @option options [String] :timezone The timezone of the booking. This will be overridden by a timezone in the room's settings
+    # @option options [Hash] :extensions A hash holding a list of extensions to be added to the booking
+    # @option options [String] :location The location field to set. This will not be used if a room is passed in
     def update_booking(booking_id:, mailbox:, options: {})
         default_options = {
             start_param: nil,
@@ -219,14 +259,14 @@ module Microsoft::Officenew::Events
         )
 
         # Make the request and check the response
-        request = graph_request(request_method: 'patch', endpoint: "/v1.0/users/#{mailbox}/events/#{booking_id}", data: event_json)
+        request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}/events/#{booking_id}"], data: event_json)
         check_response(request)
         request
     end
 
     protected
 
-    def create_event_json(subject: nil, body: nil, start_param: nil, end_param: nil, timezone: nil, rooms: [], location: nil, attendees: nil, organizer_name: nil, organizer_email: nil, recurrence_type: nil, recurrence_end: nil, is_private: false)
+    def create_event_json(subject: nil, body: nil, start_param: nil, end_param: nil, timezone: nil, rooms: [], location: nil, attendees: nil, organizer_name: nil, organizer_email: nil, recurrence_type: nil, recurrence_end: nil, extensions: {}, is_private: false)
         # Put the attendees into the MS Graph expeceted format
         attendees.map! do |a|
             attendee_type = ( a[:optional] ? "optional" : "required" )
@@ -253,12 +293,12 @@ module Microsoft::Officenew::Events
         }
 
         event_json[:start] = {
-            dateTime: start_param,
+            dateTime: ActiveSupport::TimeZone.new(timezone).at(start_param),
             timeZone: timezone
         } if start_param
 
         event_json[:end] = {
-            dateTime: end_param,
+            dateTime: ActiveSupport::TimeZone.new(timezone).at(end_param),
             timeZone: timezone
         } if end_param
 
@@ -269,9 +309,19 @@ module Microsoft::Officenew::Events
         event_json[:organizer] = {
             emailAddress: {
                 address: organizer_email,
-                name: organizer_name
+                name: (organizer_name || organizer_email)
             }
-        } if organizer
+        } if organizer_email
+
+
+        ext = {
+            "@odata.type": "microsoft.graph.openTypeExtension",
+            "extensionName": "Com.Acaprojects.Extensions"
+        }
+        extensions.each do |ext_key, ext_value|
+            ext[ext_key] = ext_value
+        end
+        event[:extensions] = exts
 
         event[:recurrence] = {
             pattern: {
@@ -287,6 +337,7 @@ module Microsoft::Officenew::Events
         } if recurrence_type
 
         event_json.reject!{|k,v| v.nil?} 
+        event_json
     end
 
 
