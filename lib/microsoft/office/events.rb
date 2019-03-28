@@ -40,9 +40,9 @@ module Microsoft::Officenew::Events
     #   }
     def get_bookings(mailboxes:, options:{})
         default_options = {
-            created_from: nil,
-            start_param: nil,
-            end_param: nil,
+            created_from: nil,  
+            bookings_from: nil,
+            bookings_to: nil,
             available_from: nil,
             available_to: nil,
             ignore_bookings: [],
@@ -55,14 +55,17 @@ module Microsoft::Officenew::Events
         mailboxes = Array(mailboxes)
 
         # We need at least one of these params
-        if options[:start_param].nil? && options[:available_from].nil? && options[:created_from].nil?
-            raise "either start_param, available_from or created_from is required"
+        if options[:bookings_from].nil? && options[:available_from].nil? && options[:created_from].nil?
+            raise "either bookings_from, available_from or created_from is required"
         end
 
-        # If there is no params to get bookings for, set those based on availability params
-        if options[:available_from].present? && options[:start_param].nil? 
-             options[:start_param] = options[:available_from]
-             options[:end_param] = options[:available_to]
+        # If there is no params to get bookings for, set those based on availability params and vice versa
+        if options[:available_from].present? && options[:bookings_from].nil? 
+             options[:bookings_from] = options[:available_from]
+             options[:bookings_to] = options[:available_to]
+        elsif options[:bookings_from].present? && options[:available_from].nil? 
+             options[:available_from] = options[:bookings_from]
+             options[:available_to] = options[:bookings_to]
         end
 
         # If we are using created_from then we cannot use the calendarView and must use events
@@ -81,8 +84,8 @@ module Microsoft::Officenew::Events
                 '$top': 10000
             }
             # Add the relevant query params
-            query[:startDateTime] = graph_date(options[:start_param]) if options[:start_param]
-            query[:endDateTime] = graph_date(options[:end_param]) if options[:end_param]
+            query[:startDateTime] = graph_date(options[:bookings_from]) if options[:bookings_from]
+            query[:endDateTime] = graph_date(options[:bookings_to]) if options[:bookings_to]
             query[:'$filter'] = "createdDateTime gt #{created_from}" if options[:created_from]
             query[:'$expand'] = "extensions($filter=id eq '#{options[:extension_name]}')" if options[:extension_name]
 
