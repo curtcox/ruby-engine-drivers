@@ -42,6 +42,8 @@ class Cisco::BroadSoft::BroadWorks
     @heartbeat = true
 
     @channel_set_id = SecureRandom.uuid
+
+    @buffer = String.new
   end
 
   attr_reader :expires
@@ -92,7 +94,7 @@ class Cisco::BroadSoft::BroadWorks
         if response.code == 404
             # Seems multiple servers handle requests and not all are aware of channels!
             # This just desperately tries to hit the right server to keep the channel alive
-            sleep 1
+            sleep 0.7
             heartbeat if @heartbeat && @channel_open
         else
             @logger.warn "heartbeat failed\n#{response.inspect}"
@@ -142,7 +144,13 @@ class Cisco::BroadSoft::BroadWorks
   end
 
   def parse_event(data)
+    @buffer << data
+    data = @buffer
+
+    # Check if valid XML with our current buffer
     xml = Nokogiri::XML(data)
+    return unless xml.errors.empty?
+    @buffer = String.new
     xml.remove_namespaces!
 
     begin
