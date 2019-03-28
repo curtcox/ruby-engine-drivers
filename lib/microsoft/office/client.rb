@@ -92,10 +92,6 @@ class Microsoft::Officenew::Client
     # The helper method that abstracts calls to graph API. This method allows for both single requests and 
     # bulk requests using the $batch endpoint.
     def graph_request(request_method:, endpoints:, data:nil, query:{}, headers:{}, bulk: false)
-        puts "HIT GRAPH REQUEST"
-        puts "DATA IS"
-        puts data
-        puts '------'
         if bulk
             uv_request_method = :post
             graph_path = "#{@graph_domain}/v1.0/$batch"
