@@ -118,14 +118,14 @@ class Microsoft::Officenew::Client
     end
 
     def graph_date(date)
-        Time.at(date).utc.iso8601.split("+")[0]
+        Time.at(date.to_i).utc.iso8601.split("+")[0]
     end
 
     def log_graph_request(request_method, data, query, headers, graph_path, endpoints=nil)
         STDERR.puts "--------------NEW GRAPH REQUEST------------"
         STDERR.puts "#{request_method} to #{graph_path}"
         STDERR.puts "Data:"
-        STDERR.puts data if data
+        STDERR.puts data.to_json if data
         STDERR.puts "Query:"
         STDERR.puts query if query
         STDERR.puts "Headers:"

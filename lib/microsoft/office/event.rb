@@ -2,6 +2,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
 
     # These are the fields which we just want to alias or pull out of the O365 model without any processing
     ALIAS_FIELDS = {
+        'id' => 'id',
         'start' => 'start',
         'end' => 'end',
         'subject' => 'subject',
@@ -16,6 +17,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         { new_key: 'end_epoch', method: 'datestring_to_epoch', model_params:['end'] },
         { new_key: 'room_ids', method: 'set_room_id', model_params:['attendees'] },
         { new_key: 'attendees', method: 'format_attendees', model_params:['attendees', 'organizer'] },
+        { new_key: 'organizer', method: 'set_organizer', model_params:['organizer'] },
         { new_key: 'is_free', method: 'check_availability', model_params:['start', 'end'], passed_params: ['available_to', 'available_from'] }
     ]
 
@@ -52,6 +54,10 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         room_ids
     end
 
+    def set_organizer(organizer)
+        { name: organizer['emailAddress']['name'], email: organizer['emailAddress']['address']}
+    end
+
     def format_attendees(attendees, organizer)
         internal_domains = [::Mail::Address.new(organizer['emailAddress']['address']).domain]
         new_attendees = []
@@ -78,6 +84,9 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
     end
 
     def check_availability(start_param, end_param, available_from, available_to)
+        # If there's no availability required just return nil
+        return true if available_from.nil?
+
         booking_start = ActiveSupport::TimeZone.new(start_param['timeZone']).parse(start_param['dateTime']).to_i
         booking_end = ActiveSupport::TimeZone.new(end_param['timeZone']).parse(end_param['dateTime']).to_i
         

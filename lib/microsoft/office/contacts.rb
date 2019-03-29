@@ -13,4 +13,49 @@ module Microsoft::Officenew::Contacts
         check_response(request)
         JSON.parse(request.body)['value'].map {|c| Microsoft::Officenew::Contact.new(client: self, contact: c)}
     end
+
+    ##
+    # Add a new contact to the passed in mailbox.
+    # 
+    # @param mailbox [String] The mailbox email to which we will save the new contact
+    # @param email [String] The email of the new contact
+    # @param first_name [String] The first name of the new contact
+    # @param last_name [String] The last name of the new contact
+    # @option options [String] :phone The phone number of the new contact
+    # @option options [String] :organisation The organisation of the new contact
+    # @option options [String] :title The title of the new contact
+    def create_contact(mailbox:, email:, first_name:, last_name:, options:{})
+        default_options = {
+            phone: nil,
+            organisation: nil,
+            title: nil,
+            other: {}
+        }
+        # Merge in our default options with those passed in
+        options = options.reverse_merge(default_options)
+
+        # This data is required so add it unconditionally
+        contact_data = {
+            givenName: first_name,
+            surname: last_name,
+            emailAddresses: [{
+                address: email,
+                name: "#{first_name} #{last_name}"
+            }]
+        }
+
+        # Only add these fields if passed in
+        contact_data[:title] = options[:title] if options[:title]
+        contact_data[:businessPhones] = [ options[:phone] ] if options[:phone]
+        contact_data[:companyName] = options[:organisation] if options[:organisation]
+
+        # Add any fields that we haven't specified explicitly
+        options[:other].each do |field, value|
+            contact_data[field.to_sym] = value
+        end
+
+        # Make the request and return the result
+        request = graph_request(request_method: 'post', endpoint: "/v1.0/users/#{mailbox}/contacts", data: contact_data)
+        check_response(request)
+        J
 end

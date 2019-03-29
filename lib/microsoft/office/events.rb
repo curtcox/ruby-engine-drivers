@@ -153,11 +153,9 @@ module Microsoft::Officenew::Events
             room_emails: [],
             subject: "Meeting",
             description: nil,
-            organizer_name: nil,
-            organizer_email: mailbox,
+            organizer: { name: nil, email: mailbox },
             attendees: [],
-            recurrence_type: nil,
-            recurrence_end: nil,
+            recurrence: nil,
             is_private: false,
             timezone: 'UTC',
             extensions: {},
@@ -182,10 +180,8 @@ module Microsoft::Officenew::Events
             timezone: (timezone || "UTC"),
             location: options[:location],
             attendees: options[:attendees],
-            organizer_name: options[:organizer_name],
-            organizer_email: options[:organizer_email],
-            recurrence_type: options[:recurrence_type],
-            recurrence_end: options[:recurrence_end],
+            organizer: options[:organizer],
+            recurrence: options[:recurrence],
             is_private: options[:is_private]
         )
 
@@ -196,7 +192,7 @@ module Microsoft::Officenew::Events
         puts '-----'
         request = graph_request(request_method: 'post', endpoints: ["/v1.0/users/#{mailbox}/events"], data: event_json)
         check_response(request)
-
+        Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body)).event
     end
 
     ##
@@ -264,12 +260,12 @@ module Microsoft::Officenew::Events
         # Make the request and check the response
         request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}/events/#{booking_id}"], data: event_json)
         check_response(request)
-        request
+        Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body)).event
     end
 
     protected
 
-    def create_event_json(subject: nil, body: nil, start_param: nil, end_param: nil, timezone: nil, rooms: [], location: nil, attendees: nil, organizer_name: nil, organizer_email: nil, recurrence_type: nil, recurrence_end: nil, extensions: {}, is_private: false)
+    def create_event_json(subject: nil, body: nil, start_param: nil, end_param: nil, timezone: nil, rooms: [], location: nil, attendees: nil, organizer_name: nil, organizer:nil, recurrence: nil, extensions: {}, is_private: false)
         # Put the attendees into the MS Graph expeceted format
         attendees.map! do |a|
             attendee_type = ( a[:optional] ? "optional" : "required" )
@@ -311,10 +307,10 @@ module Microsoft::Officenew::Events
 
         event_json[:organizer] = {
             emailAddress: {
-                address: organizer_email,
-                name: (organizer_name || organizer_email)
+                address: organizer[:email],
+                name: organizer[:email] || organizer[:email]
             }
-        } if organizer_email
+        } if organizer
 
 
         ext = {
@@ -324,20 +320,20 @@ module Microsoft::Officenew::Events
         extensions.each do |ext_key, ext_value|
             ext[ext_key] = ext_value
         end
-        event[:extensions] = exts
+        event_json[:extensions] = [ext]
 
-        event[:recurrence] = {
+        event_json[:recurrence] = {
             pattern: {
-                type: recurrence_type,
+                type: recurrence[:type],
                 interval: 1,
                 daysOfWeek: [epoch_in_timezone(start_param, timezone).strftime("%A")]
             },
             range: {
                 type: 'endDate',
                 startDate: epoch_in_timezone(start_param, timezone).strftime("%F"),
-                endDate: epoch_in_timezone(recurrence_end, timezone).strftime("%F")
+                endDate: epoch_in_timezone(recurrence[:end], timezone).strftime("%F")
             }
-        } if recurrence_type
+        } if recurrence
 
         event_json.reject!{|k,v| v.nil?} 
         event_json
