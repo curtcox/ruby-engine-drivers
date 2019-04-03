@@ -57,5 +57,5 @@ module Microsoft::Officenew::Contacts
         # Make the request and return the result
         request = graph_request(request_method: 'post', endpoint: "/v1.0/users/#{mailbox}/contacts", data: contact_data)
         check_response(request)
-        J
+    end
 end
