@@ -1006,7 +1006,7 @@ class Microsoft::Office
     end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_update
-    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Australia/Sydney', endpoint_override:nil)
+    def update_booking(booking_id:, room_id:, start_param:nil, end_param:nil, subject:nil, description:nil, attendees:nil, current_user:nil, timezone:'Australia/Sydney', endpoint_override:nil, extensions:nil)
         # We will always need a room and endpoint passed in
         room = Orchestrator::ControlSystem.find_by_email(room_id) || Orchestrator::ControlSystem.find(room_id)
 
@@ -1076,6 +1076,20 @@ class Microsoft::Office
             },
             type: 'resource'
         })
+
+        exts = []
+        extensions.each do |extension|
+            ext = {
+                "@odata.type": "microsoft.graph.openTypeExtension",
+                "extensionName": extension[:name]
+            }
+            extension[:values].each do |ext_key, ext_value|
+                ext[ext_key] = ext_value
+            end
+            exts.push(ext)
+        end
+        event[:extensions] = exts
+
 
         event = event.to_json
 
