@@ -110,18 +110,8 @@ module Microsoft::Officenew::Events
             is_available = true
             # Go through each booking and extract more info from it
             bookings.each_with_index do |booking, i|
-                # # Check if the bookings fall inside the availability window
-                # booking = check_availability(booking, options[:available_from], options[:available_to], mailboxes[res['id']])
-                # # Alias a bunch of fields we use to follow our naming convention
-                # booking = alias_fields(booking)
-                # # Set the attendees as internal or external and alias their fields too
-                # bookings[i] = set_attendees(booking)
-                # if bookings[i]['free'] == false && !options[:ignore_bookings].include?(bookings[i]['icaluid'])
-                #     is_available = false
-                # end
-
-
                 bookings[i] = Microsoft::Officenew::Event.new(client: self, event: booking, available_to: options[:available_to], available_from: options[:available_from]).event
+                is_available = false if !bookings[i]['is_free'] && !options[:ignore_bookings].include?(bookings[i]['id'])
             end
             bookings_by_room[mailboxes[res['id'].to_i]] = {available: is_available, bookings: bookings}
         end
@@ -248,17 +238,11 @@ module Microsoft::Officenew::Events
             check_response(request)
             ext_data = JSON.parse(request.body)
         end
-        puts "GOT EXT DATA:"
-        puts ext_data.inspect
 
         # Make the request and check the response
         request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}/events/#{booking_id}"], data: event_json)
         check_response(request)
-        puts "----"
-        puts "EVENT WITHOUT EXT:"
-        puts JSON.parse(request.body)
-        puts "EVENT WITH EXT"
-        puts JSON.parse(request.body).merge({extensions: [ext_data]})
+ 
         Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body).merge({'extensions' => [ext_data]})).event
     end
 

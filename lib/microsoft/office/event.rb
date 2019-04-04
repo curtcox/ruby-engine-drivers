@@ -20,7 +20,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         { new_key: 'room_emails', method: 'set_room_id', model_params:['attendees'] },
         { new_key: 'attendees', method: 'format_attendees', model_params:['attendees', 'organizer'] },
         { new_key: 'organizer', method: 'set_organizer', model_params:['organizer'] },
-        { new_key: 'is_free', method: 'check_availability', model_params:['start', 'end'], passed_params: ['available_to', 'available_from'] }
+        { new_key: 'is_free', method: 'check_availability', model_params:['start', 'end'], passed_params: ['available_from', 'available_to'] }
     ]
 
     (hash_to_reduced_array(ALIAS_FIELDS) + NEW_FIELDS.map{|v| v[:new_key]}).each do |field|

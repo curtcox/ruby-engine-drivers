@@ -44,8 +44,8 @@ class Microsoft::Officenew::Client
             app_token_url:,
             app_scope:,
             graph_domain:,
-            save_token:,
-            get_token:
+            save_token: Proc.new{ |token| User.bucket.set("office-token", token) },
+            get_token: Proc.new{ User.bucket.get("office-token", quiet: true) }
         )
         @client_id = client_id
         @client_secret = client_secret
