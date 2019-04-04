@@ -11,7 +11,7 @@ module Microsoft::Officenew::Contacts
         endpoint = "/v1.0/users/#{mailbox}/contacts"
         request = graph_request(request_method: 'get', endpoints: [endpoint], query: query_params)
         check_response(request)
-        JSON.parse(request.body)['value'].map {|c| Microsoft::Officenew::Contact.new(client: self, contact: c)}
+        JSON.parse(request.body)['value'].map {|c| Microsoft::Officenew::Contact.new(client: self, contact: c).contact}
     end
 
     ##
@@ -55,7 +55,21 @@ module Microsoft::Officenew::Contacts
         end
 
         # Make the request and return the result
-        request = graph_request(request_method: 'post', endpoint: "/v1.0/users/#{mailbox}/contacts", data: contact_data)
+        request = graph_request(request_method: 'post', endpoints: ["/v1.0/users/#{mailbox}/contacts"], data: contact_data)
         check_response(request)
+        Microsoft::Officenew::Contact.new(client: self, contact: JSON.parse(request.body)).contact
     end
+
+    ##
+    # Delete a new contact from the passed in mailbox.
+    # 
+    # @param mailbox [String] The mailbox email which contains the contact to delete
+    # @param contact_id [String] The ID of the contact to be deleted
+    def delete_contact(mailbox:, contact_id:)
+        endpoint = "/v1.0/users/#{mailbox}/contacts/#{contact_id}"
+        request = graph_request(request_method: 'delete', endpoints: [endpoint])
+        check_response(request)
+        200
+    end
+
 end
