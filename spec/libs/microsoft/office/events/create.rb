@@ -6,7 +6,7 @@ require 'uv-rays'
 require 'microsoft/office/client'
 
 
-describe "office365 events" do
+describe "office365 event creation" do
     before :each do
         @office_credentials = {
             client_id: ENV['OFFICE_CLIENT_ID'],
