@@ -1,4 +1,5 @@
 require 'active_support/time'
+require 'oauth2'
 require 'microsoft/officenew'
 require 'microsoft/office/model'
 require 'microsoft/office/user'
@@ -42,7 +43,9 @@ class Microsoft::Officenew::Client
             app_site:,
             app_token_url:,
             app_scope:,
-            graph_domain:
+            graph_domain:,
+            save_token:,
+            get_token:
         )
         @client_id = client_id
         @client_secret = client_secret
@@ -50,6 +53,8 @@ class Microsoft::Officenew::Client
         @app_token_url = app_token_url
         @app_scope = app_scope
         @graph_domain = graph_domain
+        @get_token = get_token
+        @save_token = save_token
         oauth_options = { site: @app_site,  token_url: @app_token_url }
         oauth_options[:connection_opts] = { proxy: @internet_proxy } if @internet_proxy
         @graph_client ||= OAuth2::Client.new(
@@ -67,7 +72,8 @@ class Microsoft::Officenew::Client
     # grabs a new token and stores it along with the expiry date.
     def graph_token
         # Check if we have a token in couchbase
-        token = User.bucket.get("office-token", quiet: true)
+        # token = User.bucket.get("office-token", quiet: true)
+        token = @get_token.call
 
         # If we don't have a token
         if token.nil? || token[:expiry] <= Time.now.to_i
@@ -80,7 +86,8 @@ class Microsoft::Officenew::Client
                 token: new_token.token,
                 expiry: Time.now.to_i + new_token.expires_in,
             }
-            User.bucket.set("office-token", new_token_model)
+            @save_token.call(new_token_model)
+            # User.bucket.set("office-token", new_token_model)
             return new_token.token
         else
             # Otherwise, use the existing token

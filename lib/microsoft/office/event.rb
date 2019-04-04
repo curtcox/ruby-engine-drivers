@@ -1,3 +1,4 @@
+require 'mail'
 class Microsoft::Officenew::Event < Microsoft::Officenew::Model
 
     # These are the fields which we just want to alias or pull out of the O365 model without any processing
@@ -6,6 +7,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         'start' => 'start',
         'end' => 'end',
         'subject' => 'subject',
+        'body' => {'content' => 'body'},
         'attendees' => 'old_attendees',
         'iCalUId' => 'icaluid',
         'showAs' => 'show_as',
@@ -15,7 +17,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
     NEW_FIELDS = [
         { new_key: 'start_epoch', method: 'datestring_to_epoch', model_params:['start'] },
         { new_key: 'end_epoch', method: 'datestring_to_epoch', model_params:['end'] },
-        { new_key: 'room_ids', method: 'set_room_id', model_params:['attendees'] },
+        { new_key: 'room_emails', method: 'set_room_id', model_params:['attendees'] },
         { new_key: 'attendees', method: 'format_attendees', model_params:['attendees', 'organizer'] },
         { new_key: 'organizer', method: 'set_organizer', model_params:['organizer'] },
         { new_key: 'is_free', method: 'check_availability', model_params:['start', 'end'], passed_params: ['available_to', 'available_from'] }
@@ -31,7 +33,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         @client = client
         @available_to = available_to
         @available_from = available_from
-        @event = create_aliases(event, ALIAS_FIELDS, NEW_FIELDS, self)
+        @event = get_extensions(create_aliases(event, ALIAS_FIELDS, NEW_FIELDS, self), event)
     end
 
     attr_accessor :event, :available_to, :available_from
@@ -40,6 +42,19 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
 
     def datestring_to_epoch(date_object)
         ActiveSupport::TimeZone.new(date_object['timeZone']).parse(date_object['dateTime']).to_i
+    end
+
+    def get_extensions(new_event, old_event)
+        if old_event.key?('extensions')
+            old_event['extensions'].each do |ext|
+                if ext['id'] == "Microsoft.OutlookServices.OpenTypeExtension.Com.Acaprojects.Extensions"
+                    ext.each do |ext_key, ext_val|
+                        new_event[ext_key] = ext_val if !['@odata.type', '@odata.context', 'id','extensionName'].include?(ext_key)
+                    end
+                end
+            end
+        end
+        new_event
     end
 
     def set_room_id(attendees)
@@ -78,7 +93,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
                 visitor: is_visitor,
                 organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
             }
-            new_attendees.push(attendee_object)
+            new_attendees.push(attendee_object) if attendee['type'] != 'resource'
         end
         new_attendees
     end

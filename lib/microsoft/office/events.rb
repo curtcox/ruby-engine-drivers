@@ -150,7 +150,7 @@ module Microsoft::Officenew::Events
     # @option options [String] :location The location field to set. This will not be used if a room is passed in
     def create_booking(mailbox:, start_param:, end_param:, options: {})
         default_options = {
-            room_emails: [],
+            rooms: [],
             subject: "Meeting",
             description: nil,
             organizer: { name: nil, email: mailbox },
@@ -164,32 +164,23 @@ module Microsoft::Officenew::Events
         # Merge in our default options with those passed in
         options = options.reverse_merge(default_options)
 
-        # Turn our array of room emails into an array of rooms (ControlSystems)
-        rooms = options[:room_emails].map { |r_id| Orchestrator::ControlSystem.find_by_email(r_id) }
-
-        # Get the timezones out of the room's zone if it has any
-        timezone = get_timezone(rooms[0]) if rooms.present?
-
         # Create the JSON body for our event
         event_json = create_event_json(
             subject: options[:subject],
             body: options[:description],
-            rooms: rooms,
+            rooms: options[:rooms],
             start_param: start_param,
             end_param: end_param,
-            timezone: (timezone || "UTC"),
+            timezone: options[:timezone],
             location: options[:location],
-            attendees: options[:attendees],
+            attendees: options[:attendees].dup,
             organizer: options[:organizer],
             recurrence: options[:recurrence],
+            extensions: options[:extensions],
             is_private: options[:is_private]
         )
 
         # Make the request and check the response
-        puts "ABOUT TO MAKE GRAPH REQUEST TO CREATE BOOKING"
-        puts "DATA IS "
-        puts event_json
-        puts '-----'
         request = graph_request(request_method: 'post', endpoints: ["/v1.0/users/#{mailbox}/events"], data: event_json)
         check_response(request)
         Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body)).event
@@ -218,14 +209,12 @@ module Microsoft::Officenew::Events
         default_options = {
             start_param: nil,
             end_param: nil,
-            room_emails: [],
+            rooms: [],
             subject: "Meeting",
             description: nil,
-            organizer_name: nil,
-            organizer_email: mailbox,
+            organizer: { name: nil, email: mailbox },
             attendees: [],
-            recurrence_type: nil,
-            recurrence_end: nil,
+            recurrence: nil,
             is_private: false,
             timezone: 'UTC',
             extensions: {},
@@ -234,33 +223,55 @@ module Microsoft::Officenew::Events
         # Merge in our default options with those passed in
         options = options.reverse_merge(default_options)
 
-        # Turn our array of room emails into an array of rooms (ControlSystems)
-        rooms = room_emails.map { |r_id| Orchestrator::ControlSystem.find_by_email(r_id) }
-
-        # Get the timezones out of the room's zone if it has any
-        timezone = get_timezone(rooms[0]) if rooms.present?
-
         # Create the JSON body for our event
         event_json = create_event_json(
             subject: options[:subject],
             body: options[:description],
-            rooms: rooms,
+            rooms: options[:rooms],
             start_param: options[:start_param],
             end_param: options[:end_param],
-            timezone: (timezone || "UTC"),
+            timezone: options[:timezone],
             location: options[:location],
-            attendees: options[:attendees],
-            organizer_name: options[:organizer_name],
-            organizer_email: options[:organizer_email],
-            recurrence_type: options[:recurrence_type],
-            recurrence_end: options[:recurrence_end],
+            attendees: options[:attendees].dup,
+            organizer: options[:organizer],
+            recurrence: options[:recurrence],
+            extensions: options[:extensions],
             is_private: options[:is_private]
         )
+
+        # If extensions exist we must make a separate request to add them
+        if options[:extensions].present?
+            options[:extensions] = options[:extensions].dup
+            options[:extensions]["@odata.type"] = "microsoft.graph.openTypeExtension"
+            options[:extensions]["extensionName"] = "Com.Acaprojects.Extensions"
+            request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}/events/#{booking_id}/extensions/Microsoft.OutlookServices.OpenTypeExtension.Com.Acaprojects.Extensions"], data: options[:extensions])
+            check_response(request)
+            ext_data = JSON.parse(request.body)
+        end
+        puts "GOT EXT DATA:"
+        puts ext_data.inspect
 
         # Make the request and check the response
         request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}/events/#{booking_id}"], data: event_json)
         check_response(request)
-        Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body)).event
+        puts "----"
+        puts "EVENT WITHOUT EXT:"
+        puts JSON.parse(request.body)
+        puts "EVENT WITH EXT"
+        puts JSON.parse(request.body).merge({extensions: [ext_data]})
+        Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body).merge({'extensions' => [ext_data]})).event
+    end
+
+    ##
+    # Delete a booking from the passed in mailbox.
+    # 
+    # @param mailbox [String] The mailbox email which contains the booking to delete
+    # @param booking_id [String] The ID of the booking to be deleted
+    def delete_booking(mailbox:, booking_id:)
+        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
+        request = graph_request(request_method: 'delete', endpoints: [endpoint])
+        check_response(request)
+        200
     end
 
     protected
@@ -274,11 +285,11 @@ module Microsoft::Officenew::Events
 
         # Add each room to the attendees array
         rooms.each do |room|
-            attendees.push({ type: "resource", emailAddress: { address: room.email, name: room.name } })
+            attendees.push({ type: "resource", emailAddress: { address: room[:email], name: room[:name] } })
         end
 
         # If we have rooms then build the location from that, otherwise use the passed in value
-        event_location = rooms.map{ |room| room.name }.join(" and ")
+        event_location = rooms.map{ |room| room[:name] }.join(" and ")
         event_location = ( event_location.present? ? event_location : location )
 
         event_json = {}
@@ -339,16 +350,5 @@ module Microsoft::Officenew::Events
         event_json
     end
 
-
-    def get_timezone(room)
-        timezone = nil
-        room.zones.each do |zone_id|
-            zone = Orchestrator::Zone.find(zone_id)
-            if zone.settings.key?("timezone")
-                timezone = zone.settings['timezone']
-            end
-        end
-        timezone
-    end
 
 end
