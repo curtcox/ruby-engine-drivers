@@ -115,6 +115,7 @@ class Aca::ExchangeBooking
         self[:booking_min_duration] = setting(:booking_min_duration)
         self[:booking_disable_future] = setting(:booking_disable_future)
         self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
         self[:hide_all_day_bookings] = setting(:hide_all_day_bookings)
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
@@ -383,7 +384,7 @@ class Aca::ExchangeBooking
         define_setting(:last_meeting_started, meeting_ref)
     end
 
-    def cancel_meeting(start_time)
+    def cancel_meeting(start_time, reason = "timeout")
         task {
             if start_time.class == Integer
                 delete_ews_booking (start_time / 1000).to_i
@@ -393,7 +394,7 @@ class Aca::ExchangeBooking
                 delete_ews_booking start_time.to_i
             end
         }.then(proc { |count|
-            logger.debug { "successfully removed #{count} bookings" }
+            logger.warn { "successfully removed #{count} bookings due to #{reason}" }
 
             self[:last_meeting_started] = 0
             self[:meeting_pending] = 0
@@ -674,7 +675,7 @@ class Aca::ExchangeBooking
             meeting_time = Time.parse(meeting.ews_item[:start][:text])
 
             # Remove any meetings that match the start time provided
-            if meeting_time.to_i == delete_at                
+            if meeting_time.to_i == delete_at
                 # new_booking = meeting.update_item!({ end: Time.now.utc.iso8601.chop })
 
                 meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
@@ -760,6 +761,7 @@ class Aca::ExchangeBooking
                                     self[:skype_meeting_pending] = true
                                 end
                                 set_skype_url = false
+                                self[:skype_meeting_address] = links[0]
                                 system[:Skype].set_uri(links[0]) if skype_exists
                             end
                         end
@@ -784,7 +786,12 @@ class Aca::ExchangeBooking
             # Prevent connections handing with TIME_WAIT
             # cli.ews.connection.httpcli.reset_all
 
-            subject = item[:subject][:text]
+            if ["Private", "Confidential"].include?(meeting.sensitivity)
+                subject = meeting.sensitivity
+            else
+                subject = item[:subject][:text]
+            end
+
             {
                 :Start => start,
                 :End => ending,

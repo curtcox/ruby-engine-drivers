@@ -110,22 +110,51 @@ class Aca::OfficeBooking
         self[:touch_enabled] = setting(:touch_enabled) || false
         self[:name] = self[:room_name] = setting(:room_name) || system.name
 
+        self[:name] = self[:room_name] = setting(:room_name) || system.name
+        self[:touch_enabled] = setting(:touch_enabled) || false
+        self[:arrow_direction] = setting(:arrow_direction)
+        self[:hearing_assistance] = setting(:hearing_assistance)
+        self[:timeline_start] = setting(:timeline_start)
+        self[:timeline_end] = setting(:timeline_end)
+        self[:title] = setting(:title)
+        self[:description] = setting(:description)
+        self[:icon] = setting(:icon)
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
+
+        self[:timeout] = setting(:timeout)
+        self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
         self[:booking_controls] = setting(:booking_controls)
         self[:booking_catering] = setting(:booking_catering)
         self[:booking_hide_details] = setting(:booking_hide_details)
         self[:booking_hide_availability] = setting(:booking_hide_availability)
         self[:booking_hide_user] = setting(:booking_hide_user)
+        self[:booking_hide_modal] = setting(:booking_hide_modal)
+        self[:booking_hide_title] = setting(:booking_hide_title)
         self[:booking_hide_description] = setting(:booking_hide_description)
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
+        self[:booking_set_host] = setting(:booking_set_host)
+        self[:booking_set_title] = setting(:booking_set_title)
+        self[:booking_set_ext] = setting(:booking_set_ext)
+        self[:booking_search_user] = setting(:booking_search_user)
+        self[:booking_disable_future] = setting(:booking_disable_future)
+        self[:booking_min_duration] = setting(:booking_min_duration)
+        self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:booking_duration_step] = setting(:booking_duration_step)
         self[:booking_endable] = setting(:booking_endable)
-        self[:timeout] = setting(:timeout)
+        self[:booking_ask_cancel] = setting(:booking_ask_cancel)
+        self[:booking_ask_end] = setting(:booking_ask_end)
+        self[:booking_default_title] = setting(:booking_default_title)
+        self[:booking_select_free] = setting(:booking_select_free)
+        self[:booking_hide_all] = setting(:booking_hide_all) || false
+        self[:hide_all] = setting(:booking_hide_all) || false # for backwards compatibility only
 
         # Skype join button available 2min before the start of a meeting
         @skype_start_offset = setting(:skype_start_offset) || 120
+        @skype_check_offset = setting(:skype_check_offset) || 380 # 5min + 20 seconds
 
         # Skype join button not available in the last 8min of a meeting
         @skype_end_offset = setting(:skype_end_offset) || 480
+        @force_skype_extract = setting(:force_skype_extract)
 
         # Because restarting the modules results in a 'swipe' of the last read card
         ignore_first_swipe = true
@@ -152,7 +181,7 @@ class Aca::OfficeBooking
         # Do we want to use exchange web services to manage bookings
         if CAN_OFFICE
             logger.debug "Setting OFFICE"
-            @office_organiser_location = setting(:office_organiser_location) 
+            @office_organiser_location = setting(:office_organiser_location)
             @office_client_id = setting(:office_client_id)
             @office_secret = setting(:office_secret)
             @office_scope = setting(:office_scope)
@@ -326,6 +355,15 @@ class Aca::OfficeBooking
     def fetch_bookings(*args)
         # Make the request
         response = @client.get_bookings_by_user(user_id: @office_room, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)[:bookings]
+        real_room = Orchestrator::ControlSystem.find(system.id)
+        if real_room.settings.key?('linked_rooms')
+            real_room.settings['linked_rooms'].each do |linked_room_id|
+                linked_room = Orchestrator::ControlSystem.find_by_id(linked_room_id)
+                if linked_room
+                    response += @client.get_bookings_by_user(user_id: linked_room.email, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)[:bookings]
+                end
+            end
+        end
         self[:today] = todays_bookings(response, @office_organiser_location)
     end
 
@@ -342,18 +380,24 @@ class Aca::OfficeBooking
         define_setting(:last_meeting_started, meeting_ref)
     end
 
-    def cancel_meeting(start_time)
-        if start_time.class == Integer
-            delete_ews_booking (start_time / 1000).to_i
-        else
-            # Converts to time object regardless of start_time being string or time object
-            start_time = Time.parse(start_time.to_s)
-            delete_ews_booking start_time.to_i
-        end
-        self[:last_meeting_started] = start_time
-        self[:meeting_pending] = start_time
-        self[:meeting_ending] = false
-        self[:meeting_pending_notice] = false
+    def cancel_meeting(start_time, reason = "timeout")
+        task {
+            if start_time.class == Integer
+                delete_ews_booking (start_time / 1000).to_i
+            else
+                # Converts to time object regardless of start_time being string or time object
+                start_time = Time.parse(start_time.to_s)
+                delete_ews_booking start_time.to_i
+            end
+        }.then(proc { |count|
+            logger.warn { "successfully removed #{count} bookings due to #{reason}" }
+            self[:last_meeting_started] = start_time
+            self[:meeting_pending] = start_time
+            self[:meeting_ending] = false
+            self[:meeting_pending_notice] = false
+            fetch_bookings
+            true
+        })
     end
 
     # If last meeting started !== meeting pending then
@@ -403,7 +447,7 @@ class Aca::OfficeBooking
         req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.to_i
         req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.to_i
 
-       
+
         # TODO:: Catch error for booking failure
         begin
             id = make_office_booking req_params
@@ -413,7 +457,7 @@ class Aca::OfficeBooking
             raise e
         end
 
-        
+
         logger.debug { "successfully created booking: #{id}" }
         "Ok"
     end
@@ -586,7 +630,7 @@ class Aca::OfficeBooking
             self[:today].each_with_index do |booking, i|
                 booking_start_object = Time.parse(booking[:Start])
                 if delete_at_object.to_i == booking_start_object.to_i
-                    response = @client.delete_booking(booking_id: booking[:id], current_user: system)
+                    response = @client.delete_booking(booking_id: booking[:id], mailbox: system.email)
                     if response == 200
                         count += 1
                         self[:today].delete(i)
@@ -601,12 +645,54 @@ class Aca::OfficeBooking
 
     def todays_bookings(response, office_organiser_location)
         results = []
-        response.each{|booking| 
-            # start_time = Time.parse(booking['start']['dateTime']).utc.iso8601[0..18] + 'Z'
-            # end_time = Time.parse(booking['end']['dateTime']).utc.iso8601[0..18] + 'Z'
+
+        set_skype_url = true if @force_skype_extract
+        now_int = Time.now.to_i
+
+        response.each{ |booking|
             if booking['start'].key?("timeZone")
-                start_time = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc.iso8601
-                end_time = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['end']['dateTime']).utc.iso8601
+                real_start = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['start']['dateTime']).utc
+                real_end = ActiveSupport::TimeZone.new(booking['start']['timeZone']).parse(booking['end']['dateTime']).utc
+                start_time = real_start.iso8601
+                end_time = real_end.iso8601
+            else
+                # TODO:: this needs review. Does MS ever respond without a timeZone?
+                real_start = Time.parse(booking['start']['dateTime']).utc
+                real_end = Time.parse(booking['end']['dateTime']).utc
+                start_time = real_start.iso8601[0..18] + 'Z'
+                end_time = real_end.iso8601[0..18] + 'Z'
+            end
+
+            #logger.debug { "\n\ninspecting booking:\n#{booking.inspect}\n\n" }
+            # Get body data: booking['body'].values.join("")
+
+            # Extract the skype meeting URL
+            if set_skype_url
+                start_integer = real_start.to_i - @skype_check_offset
+                join_integer = real_start.to_i - @skype_start_offset
+                end_integer = real_end.to_i - @skype_end_offset
+
+                if now_int > start_integer && now_int < end_integer && booking['body']
+                    body = booking['body'].values.join('')
+                    match = body.match(/\"pexip\:\/\/(.+?)\"/)
+                    if match
+                        set_skype_url = false
+                        self[:pexip_meeting_uid] = start_integer
+                        self[:pexip_meeting_address] = match[1]
+                    else
+                        links = URI.extract(body).select { |url| url.start_with?('https://meet.lync') }
+                        if links[0].present?
+                            if now_int > join_integer
+                                self[:can_join_skype_meeting] = true
+                                self[:skype_meeting_pending] = true
+                            else
+                                self[:skype_meeting_pending] = true
+                            end
+                            set_skype_url = false
+                            self[:skype_meeting_address] = links[0]
+                        end
+                    end
+                end
             end
 
             if office_organiser_location == 'attendees'
@@ -620,11 +706,11 @@ class Aca::OfficeBooking
                 # Grab the organiser
                 organizer = booking['organizer']['name']
             end
-            
+
             subject = booking['subject']
             if booking.key?('sensitivity') && ['private','confidential'].include?(booking['sensitivity'])
-                organizer = ""
-                subject = ""
+                organizer = "Private"
+                subject = "Private"
             end
 
             results.push({
@@ -642,7 +728,7 @@ class Aca::OfficeBooking
     def log(msg)
         STDERR.puts msg
         logger.info msg
-        STDERR.flush 
+        STDERR.flush
     end
     # =======================================
 end

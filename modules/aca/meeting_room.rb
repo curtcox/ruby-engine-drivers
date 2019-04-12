@@ -25,6 +25,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:vc_show_pres_layout] = setting(:vc_show_pres_layout)
             self[:hide_vc_sources] = setting(:hide_vc_sources)
             self[:mics_mutes] = setting(:mics_mutes)
+            self[:doors] = setting(:doors)
             @confidence_monitor = setting(:confidence_monitor)
 
             # Get any default settings

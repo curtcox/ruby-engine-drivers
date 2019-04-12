@@ -17,12 +17,13 @@ class Qsc::QSysCamera
 
     def on_update
         @mod_id = setting(:driver) || :Mixer
-        @component = setting(:component)
+        @ids = setting(:ids)
+        self[:no_discrete_zoom] = true
     end
 
     def power(state)
-        powered = is_affirmative?(state)
-        camera.mute('toggle_privacy', state, @component)
+        state = is_affirmative?(state)
+        camera.mute(@ids[:power], state)
     end
 
     def adjust_tilt(direction)
@@ -30,12 +31,12 @@ class Qsc::QSysCamera
 
         case direction
         when :down
-            camera.mute('tilt_down', true, @component)
+            camera.mute(@ids[:tilt_down], true)
         when :up
-            camera.mute('tilt_up', true, @component)
+            camera.mute(@ids[:tilt_up], true)
         else # stop
-            camera.mute('toggle_privacy', false, @component)
-            camera.mute('tilt_down', false, @component)
+            camera.mute(@ids[:tilt_up], false)
+            camera.mute(@ids[:tilt_down], false)
         end
     end
 
@@ -44,17 +45,34 @@ class Qsc::QSysCamera
 
         case direction
         when :right
-            camera.mute('pan_right', true, @component)
+            camera.mute(@ids[:pan_right], true)
         when :left
-            camera.mute('pan_left', true, @component)
+            camera.mute(@ids[:pan_left], true)
         else # stop
-            camera.mute('pan_right', false, @component)
-            camera.mute('pan_left', false, @component)
+            camera.mute(@ids[:pan_right], false)
+            camera.mute(@ids[:pan_left], false)
         end
     end
 
     def home
-        camera.component_trigger(@component, 'preset_home_load')
+        camera.trigger(@ids[:preset_home_load])
+    end
+
+    def preset(presetName)
+        home
+    end
+
+    def zoom(direction)
+      direction = direction.to_sym
+      case direction
+      when :in
+        camera.mute(@ids[:zoom_in], true)
+      when :out
+        camera.mute(@ids[:zoom_out], true)
+      else #stop
+        camera.mute(@ids[:zoom_in], false)
+        camera.mute(@ids[:zoom_out], false)
+      end
     end
 
     protected

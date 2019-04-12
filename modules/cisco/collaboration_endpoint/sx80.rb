@@ -13,7 +13,7 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     description <<~DESC
         Control of Cisco SX80 devices.
 
-        API access requires a local user with the 'integrator' role to be
+        API access requires a local user with the 'admin' role to be
         created on the codec.
     DESC
 
@@ -32,12 +32,14 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
         end
 
         self[:calls] = {}
+        self[:in_call] = false
         register_feedback '/Status/Call' do |call|
             calls = self[:calls].deep_merge call
             calls.reject! do |_, props|
                 props[:status] == :Idle || props.include?(:ghost)
             end
             self[:calls] = calls
+            self[:in_call] = calls.present?
         end
     end
 
@@ -84,9 +86,9 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     command 'Call Disconnect' => :hangup, CallId_: Integer
 
     command 'Call DTMFSend' => :dtmf_send,
-           CallId: (0..65534),
-           DTMFString: String
-    
+            DTMFString: String,
+            CallId_: (0..65534)
+
     command 'Dial' => :dial,
             Number:  String,
             Protocol_: [:H320, :H323, :Sip, :Spark],

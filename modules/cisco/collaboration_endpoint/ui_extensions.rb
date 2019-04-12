@@ -8,19 +8,6 @@ module Cisco::CollaborationEndpoint; end
 module Cisco::CollaborationEndpoint::UiExtensions
     include ::Cisco::CollaborationEndpoint::Xapi::Mapper
 
-    module Hooks
-        def connected
-            super
-            register_feedback '/Event/UserInterface/Extensions/Widget/Action' do |action|
-                logger.debug action
-            end
-        end
-    end
-
-    def self.included(base)
-        base.prepend Hooks
-    end
-
     command 'UserInterface Message Alert Clear' => :msg_alert_clear
     command 'UserInterface Message Alert Display' => :msg_alert,
             Text: String,
@@ -62,7 +49,9 @@ module Cisco::CollaborationEndpoint::UiExtensions
         end
     end
 
-    protected
+    def ui_extensions_deploy(id, xml_def)
+        send_xcommand 'UserInterface Extensions Set', xml_def, ConfigId: id
+    end
 
     def ui_extensions_list
         send_xcommand 'UserInterface Extensions List'

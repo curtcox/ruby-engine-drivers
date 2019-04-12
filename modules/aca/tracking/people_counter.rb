@@ -37,7 +37,7 @@ class Aca::Tracking::PeopleCounter
                 }
             end
         end
-        
+        nil
     end
 
     def get_current_booking(details)
@@ -50,7 +50,7 @@ class Aca::Tracking::PeopleCounter
             meeting_end = Time.at(meeting[:end_epoch]).to_i
 
             # If it's past the start time and before the end time
-            if start_time >= meeting_start && start_time < meeting_end 
+            if start_time >= meeting_start && start_time < meeting_end
                current = meeting
             end
         end
@@ -58,12 +58,20 @@ class Aca::Tracking::PeopleCounter
     end
 
     def count_changed(new_count)
+        # Prevent overlapping processing
+        if @processing
+            @was_updated = true
+            @adjusted_count = new_count
+            return new_count
+        end
+
+        @processing = true
         new_count = 0 if new_count == -1
         return if self[:todays_bookings].nil? || self[:todays_bookings].empty?
         # Check the current meeting
         current = get_current_booking(self[:todays_bookings])
-        return if current.nil?
-        
+        return unless current && current[:id]
+
         logger.info "Count changed: #{new_count} and ID: #{current[:id]}"
 
         # Add the change to the dataset for that meeting
@@ -83,6 +91,18 @@ class Aca::Tracking::PeopleCounter
 
         # Save it back
         current_dataset.save!
+        new_count
+    ensure
+        schedule.in(5000) do
+            if @was_updated
+                # Prevent spamming of this function
+                @processing = false
+                @was_updated = false
+                count_changed(@adjusted_count)
+            else
+                @processing = false
+            end
+        end
     end
 
     def create_dataset(count, booking)
@@ -90,15 +110,16 @@ class Aca::Tracking::PeopleCounter
         dataset = Aca::Tracking::PeopleCount.new
 
         # # Dataset attrs
-        # attribute :room_email,   type: String  
-        # attribute :booking_id,   type: String  
-        # attribute :system_id,    type: String  
-        # attribute :capacity,     type: Integer 
-        # attribute :maximum,      type: Integer 
-        # attribute :average,      type: Integer 
+        # attribute :room_email,   type: String
+        # attribute :booking_id,   type: String
+        # attribute :system_id,    type: String
+        # attribute :capacity,     type: Integer
+        # attribute :maximum,      type: Integer
+        # attribute :average,      type: Integer
         # attribute :median,       type: Integer
         # attribute :organiser,    type: String
-        
+        # attribute :start_time,   type: Integer
+
         dataset.room_email = system.email
         dataset.system_id = system.id
         dataset.capacity = system.capacity
@@ -107,18 +128,19 @@ class Aca::Tracking::PeopleCounter
         dataset.median = count
         dataset.booking_id = booking[:id]
         dataset.organiser = booking[:owner]
+        dataset.start_time = booking[:start]
         return dataset if dataset.save!
     end
 
-    def calculate_average(meeting) 
+    def calculate_average(meeting)
         logger.info "Calculating average for: #{meeting[:id]}"
-        
+
         # Set up our holding vars
         durations = []
         total_duration = 0
 
         # Get the dataset
-        dataset = ::Aca::Tracking::PeopleCount.find_by_id("count-#{meeting[:id]}") 
+        dataset = ::Aca::Tracking::PeopleCount.find_by_id("count-#{meeting[:id]}")
 
         events = dataset.counts.dup
 
@@ -169,11 +191,12 @@ class Aca::Tracking::PeopleCounter
         self[:todays_bookings] = []
         schedule.clear
         logger.info "Starting booking update in 30s"
-        schedule.in('10s') { 
+        schedule.in('10s') {
             logger.info "Grabbing bookings to update"
             self[:todays_bookings] = system[:Bookings][:today]
             booking_changed(self[:todays_bookings])
         }
+        nil
     end
 
     def update_state

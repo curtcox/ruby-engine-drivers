@@ -41,8 +41,10 @@ class Loqit::Lockers
         )
         savon_config = {
             :wsdl => wsdl,
-            :log => log,
-            :log_level => log_level
+            :log => false,
+            :log_level => :debug,
+            :open_timeout => 1,
+            :read_timeout => 1
         }
 
         @client = Savon.client savon_config
@@ -56,6 +58,19 @@ class Loqit::Lockers
                 serialnumber: @serial
             }
         }
+        @queue = Queue.new
+        Thread.new { process_requests! }
+    end
+
+    def new_request(name, *args)
+        thread = Libuv::Reactor.current
+        defer = thread.defer
+        @queue << [defer, name, args]
+        defer.promise.value
+    end
+
+    def new_ruby_request(name, *args, &block)
+        @queue << [block, name, args]
     end
 
     def list_lockers
@@ -70,22 +85,30 @@ class Loqit::Lockers
 
     def list_lockers_detailed(start_number:nil, end_number:nil)
         all_lockers_detailed = []
-        puts "STARTING LOCKER GET"
+
         if start_number
             (start_number.to_i..end_number.to_i).each do |num|
+                # puts "WORKING ON NUMBER: #{num}"
+                # locker_status = new_request('show_locker_status', [num.to_s])
                 all_lockers_detailed.push(self.show_locker_status(num.to_s))
+                # sleep 0.1
             end
         else
             all_lockers = self.list_lockers
-            all_lockers.each_with_index do |locker, ind|
+            all_lockers[0..19].each_with_index do |locker, ind|
+                # puts "WORKING ON NUMBER: #{num}"
+                # locker_status = new_request('show_locker_status', [locker['number']])
                 all_lockers_detailed.push(self.show_locker_status(locker['number']))
+                # sleep 0.1
             end
         end
-        puts "FINISHED LOCKER GET"
         all_lockers_detailed
     end
 
-    def show_locker_status(locker_number)
+    def add_to_queue(locker_number)
+    end
+
+    def show_locker_status(locker_number, retries = 3)
         response = @client.call(:show_locker_status,
             message: {
                 lockerNumber: locker_number,
@@ -94,9 +117,15 @@ class Loqit::Lockers
             soap_header: @header
         ).body[:show_locker_status_response][:return]
         JSON.parse(response)
+    rescue Net::OpenTimeout
+        puts "GOT FAILURE"
+        puts "RETRIES: #{retries}"
+        puts "---------------"
+        retries -= 1
+        retry if retries > 0
     end
 
-    def open_locker(locker_number)   
+    def open_locker(locker_number)
         response = @client.call(:open_locker,
             message: {
                 lockerNumber: locker_number
@@ -106,7 +135,7 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
-    def store_credentials(locker_number, user_pin_code, user_card, test_if_free=false)   
+    def store_credentials(locker_number, user_pin_code, user_card, test_if_free=false)
         payload = {
             lockerNumber: locker_number,
             userPincode: user_pin_code
@@ -120,7 +149,12 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
-    def customer_has_locker(user_card)   
+    # this is untested
+    def clear_credentials(locker_number)
+        store_credentials(locker_number, '', '')
+    end
+
+    def customer_has_locker(user_card)
         response = @client.call(:customer_has_locker,
             message: {
                 lockerNumber: locker_number,
@@ -131,4 +165,18 @@ class Loqit::Lockers
         JSON.parse(response)
     end
 
+     def process_requests!
+        loop do
+            defer, name, args = @queue.pop
+            begin
+                if defer.respond_to? :call
+                    defer.call self.__send__(name, *args)
+                else
+                    defer.resolve self.__send__(name, *args)
+                end
+            rescue => e
+                defer.reject e
+            end
+        end
+    end
 end

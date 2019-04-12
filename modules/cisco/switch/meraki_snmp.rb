@@ -43,7 +43,7 @@ class Cisco::Switch::MerakiSNMP
     def on_load
         # flag to indicate if processing is occuring
         @if_mappings = {}
-        @scheduled_status_query = true
+        # @scheduled_status_query = true
 
         # Interfaces that indicate they have a device connected
         @check_interface = ::Set.new
@@ -95,6 +95,8 @@ class Cisco::Switch::MerakiSNMP
         self[:level] = setting(:level)
 
         @reserve_time = setting(:reserve_time) || 0
+        self[:last_successful_query] ||= 0
+        @temp_last_updated = 0
     end
 
     def on_unload
@@ -269,9 +271,11 @@ class Cisco::Switch::MerakiSNMP
 
         @connected_interfaces = checked
         self[:interfaces] = checked.to_a
-        @scheduled_status_query = checked.empty?
+        # @scheduled_status_query = checked.empty?
         (@check_interface - checked).each { |iface| remove_lookup(iface) }
         self[:reserved] = @reserved_interface.to_a
+
+        self[:last_successful_query] = @temp_last_updated
 
         nil
     end
@@ -319,7 +323,7 @@ class Cisco::Switch::MerakiSNMP
         return :currently_processing if @processing
 
         logger.debug '==> querying interface status <=='
-        @scheduled_status_query = false
+        # @scheduled_status_query = false
 
         client = @client
         if_mappings = @if_mappings
@@ -358,6 +362,7 @@ class Cisco::Switch::MerakiSNMP
             remove_interfaces.each { |iface| remove_reserved(iface) }
             add_interfaces.each { |iface| remove_lookup(iface) }
             self[:reserved] = @reserved_interface.to_a
+            @temp_last_updated = Time.now.to_i
         }.value
     end
 
@@ -368,12 +373,12 @@ class Cisco::Switch::MerakiSNMP
         end
         logger.debug 'Querying for connected devices'
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
-        query_interface_status if @scheduled_status_query
+        query_interface_status # if @scheduled_status_query
         query_snooping_bindings
         rebuild_client
     rescue => e
         rebuild_client
-        @scheduled_status_query = true
+        # @scheduled_status_query = true
         raise e
     end
 
@@ -405,7 +410,7 @@ class Cisco::Switch::MerakiSNMP
             check_reservations if @reserve_time > 0
         end
 
-        schedule.every('10m') { @scheduled_status_query = true }
+        # schedule.every('10m') { @scheduled_status_query = true }
 
         # There is a possibility that these will change on switch reboot
         schedule.every('15m') { @scheduled_if_query = true }

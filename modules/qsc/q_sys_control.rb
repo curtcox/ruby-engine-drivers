@@ -96,24 +96,24 @@ class Qsc::QSysControl
 
     def set_position(control_id, position, ramp_time = nil)
         if ramp_time
-            send("cspr #{control_id} #{position} #{ramp_time}\n", wait: false)
+            send("cspr \"#{control_id}\" #{position} #{ramp_time}\n", wait: false)
             schedule.in(ramp_time * 1000 + 200) do
                 get_status(control_id)
             end
         else
-            send("csp #{control_id} #{position}\n")
+            send("csp \"#{control_id}\" #{position}\n")
         end
     end
 
     def set_value(control_id, value, ramp_time = nil, **options)
         if ramp_time
             options[:wait] = false
-            send("csvr #{control_id} #{value} #{ramp_time}\n", options)
+            send("csvr \"#{control_id}\" #{value} #{ramp_time}\n", options)
             schedule.in(ramp_time * 1000 + 200) do
                 get_status(control_id)
             end
         else
-            send("csv #{control_id} #{value}\n", options)
+            send("csv \"#{control_id}\" #{value}\n", options)
         end
     end
 
@@ -137,7 +137,7 @@ class Qsc::QSysControl
     # Used to trigger dialing etc
     def trigger(action)
         logger.debug { "Sending trigger to Qsys: ct #{action}" }
-        send "ct #{action}\n", wait: false
+        send "ct \"#{action}\"\n", wait: false
     end
     alias preset trigger
 
@@ -181,11 +181,11 @@ class Qsc::QSysControl
     end
 
     def snapshot(name, index, ramp_time = 1.5)
-        send "ssl #{name} #{index} #{ramp_time}\n", wait: false
+        send "ssl \"#{name}\" #{index} #{ramp_time}\n", wait: false
     end
 
     def save_snapshot(name, index)
-        send "sss #{name} #{index}\n", wait: false
+        send "sss \"#{name}\" #{index}\n", wait: false
     end
 
 

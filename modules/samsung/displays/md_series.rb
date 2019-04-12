@@ -98,7 +98,9 @@ DESC
         :net_standby => 0xB5,   # Keep NIC active in standby
         :eco_solution => 0xE6,  # Eco options (auto power off)
         :auto_power => 0x33,
-        :screen_split => 0xB2    # Tri / quad split (larger panels only)
+        :screen_split => 0xB2,  # Tri / quad split (larger panels only)
+        :software_version => 0x0E,
+        :serial_number => 0x0B
     }
     COMMAND.merge!(COMMAND.invert)
 
@@ -143,6 +145,20 @@ DESC
     def unmute
         power(true)
     end
+
+    #check software version
+    def software_version?
+        do_send (:software_version)
+    end
+
+    def serial_number?
+        do_send(:serial_number)
+    end
+
+    # ability to send custom mdc commands via backoffice
+    def custom_mdc (command, value = "")
+        do_send(hex_to_byte(command).bytes[0], hex_to_byte(value).bytes)
+    end 
 
     INPUTS = {
         :vga => 0x14,       # pc in manual
@@ -393,11 +409,17 @@ DESC
             when :screen_split
                 state = value[0]
                 self[:screen_split] = state.positive?
+            when :software_version
+                self[:software_version] = array_to_str(value)
+            when :serial_number
+                self[:serial_number] = array_to_str(value)
+            else
+                logger.debug "Samsung responded with ACK: #{value}"
             end
             :success
 
         when :nak
-            logger.debug "Samsung responded with NAK: #{value}"
+            logger.debug { "Samsung responded with NAK: #{array_to_str(Array(value))}" }
             :failed  # Failed response
 
         else
@@ -441,8 +463,11 @@ DESC
         data << (data.reduce(:+) & 0xFF)              # Add checksum
         data = [0xAA] + data                          # Add header
 
-        logger.debug { "Sending to Samsung: #{array_to_str(data)}" }
+        logger.debug { "Sending to Samsung: #{byte_to_hex(array_to_str(data))}" }
 
-        send(array_to_str(data), options)
+        send(array_to_str(data), options).catch do |reason|
+            disconnect
+            thread.reject(reason)
+        end
     end
 end

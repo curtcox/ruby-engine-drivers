@@ -82,11 +82,11 @@ class Aca::GoogleRefreshBooking
         ews_room: 'room@email.address',
 
         # Optional EWS for creating and removing bookings
-        google_organiser_location: 'attendees'
+        google_organiser_location: 'attendees',
         google_client_id: '',
         google_secret: '',
         google_redirect_uri: '',
-        google_scope: 'https://www.googleapis.com/auth/calendar',
+        google_scope: 'https://www.googleapis.com/auth/calendar'
         # google_scope: ENV['GOOGLE_APP_SCOPE'],
         # google_site: ENV["GOOGLE_APP_SITE"],
         # google_token_url: ENV["GOOGLE_APP_TOKEN_URL"],
@@ -334,7 +334,7 @@ class Aca::GoogleRefreshBooking
 
         authorization = Google::Auth::UserRefreshCredentials.new options
 
-        Calendar = Google::Apis::CalendarV3
+        #Calendar = Google::Apis::CalendarV3
         calendar = Calendar::CalendarService.new
         calendar.authorization = authorization
         events = calendar.list_events(system.email)
