@@ -17,8 +17,6 @@ class Pjlink::Pjlink
     tokenize indicator: "%1", delimiter: "\x0D"
 
     def on_load
-        self[:volume_min] = 0
-        self[:volume_max] = 100
     end
 
     def connected
