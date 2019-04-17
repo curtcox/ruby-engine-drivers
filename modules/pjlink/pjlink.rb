@@ -140,7 +140,7 @@ class Pjlink::Pjlink
     # Update module state based on device feedback
     def update_status(cmd, param)
         case cmd.to_sym
-        when :power,
+        when :power
             case param
             when '0'
               self[:power] = false
