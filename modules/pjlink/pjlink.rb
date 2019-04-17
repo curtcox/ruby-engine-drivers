@@ -160,9 +160,9 @@ class Pjlink::Pjlink
             self[:lamp_status] = split[1] == '1' ? 'on' : 'off'
         when :error_status
             e = {
-              '0': :none,
-              '1': :warning,
-              '2': :error
+              "0": :none,
+              "1": :warning,
+              "2": :error
             }
             fan, lamp, temperature, cover_open, filter, other = param.scan /\w/
             self[:errors] = {
