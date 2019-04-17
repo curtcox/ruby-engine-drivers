@@ -52,7 +52,7 @@ class Pjlink::Projector::Pjlink
     end
 
     def power(state, _ = nil)
-        do_send(COMMANDS[:power], state ? '1' : '0'))
+        do_send(COMMANDS[:power], state ? '1' : '0')
     end
 
     def mute(state = true)
