@@ -21,7 +21,7 @@ class Pjlink::Pjlink
 
     def connected
         poll
-        schedule.every('5s') { poll }
+        schedule.every('10s') { poll }
     end
 
     def disconnected
