@@ -75,16 +75,13 @@ class Pjlink::Pjlink
     end
 
     def poll
-        power? do
-            if self[:power]
-                input?
-                mute?
-                volume?
-            end
-        end
+        power?
+        if self[:power] {
+          input?
+          mute?
+          volume?
+        }
     end
-
-    protected
 
     COMMANDS = {
       power: 'POWR',
@@ -97,10 +94,13 @@ class Pjlink::Pjlink
     LOOKUP_COMMANDS = COMMANDS.invert
 
     COMMANDS.each do |name, pj_cmd|
-      define_method "#{name}?" do
+      define_method :"#{name}?" do
         do_query pj_cmd
       end
     end
+
+
+    protected
 
     def do_query(command, **options)
         cmd = "%1#{command} ?\x0D"
@@ -137,7 +137,19 @@ class Pjlink::Pjlink
     # Update module state based on device feedback
     def update_status(cmd, param)
         case cmd.to_sym
-        when :power, :mute, :audio_mute, :video_mute
+        when :power,
+            case param
+            when 0
+              self[:power] = false
+              self[:power_status] = 'off'
+            when 1
+              self[:power] = true
+              self[:power_status] = 'on'
+            when 2
+              self[:power_status] = 'cooling'
+            when 3
+              self[:power_status] = 'warming'
+        when :mute, :audio_mute, :video_mute
             self[cmd] = param == '1'
         when :volume
             self[:volume] = param.to_i
