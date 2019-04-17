@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 # encoding: ASCII-8BIT
-
 module Pjlink; end
-module Pjlink::Pjlink; end
 
 # Documentation: https://pjlink.jbmia.or.jp/english/data_cl2/PJLink_5-1.pdf
 
