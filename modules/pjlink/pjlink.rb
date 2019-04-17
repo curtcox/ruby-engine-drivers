@@ -86,18 +86,6 @@ class Pjlink::Pjlink
 
     protected
 
-    def received(data, resolve, command)
-        logger.debug { "sent: #{data}" }
-        cmd, param = parse_response(data).values_at(:cmd, :param)
-
-        return :abort if param =~ /^ERR/
-        return :success if param == 'OK'
-
-        update_status(cmd, param)
-        return :success
-    end
-
-
     COMMANDS = {
       power: 'POWR',
       mute: 'AVMT',
@@ -123,12 +111,24 @@ class Pjlink::Pjlink
         cmd = "%1#{command} #{parameter}\x0D"
         send(cmd, options)
     end
+
+    def received(data, resolve, command)
+        logger.debug { "sent: #{data}" }
+        cmd, param = parse_response(data).values_at(:cmd, :param)
+
+        return :abort if param =~ /^ERR/
+        return :success if param == 'OK'
+
+        update_status(cmd, param)
+        return :success
+    end
+
  #      0123456789
- # e.g. %1NAME=Test Projector
+ # e.g. NAME=Test Projector
     def parse_response(byte_str)
         {
-            cmd: COMMANDS[byte_str[2..5]],
-            param: byte_str[7..-1]
+            cmd: COMMANDS[byte_str[0..4]],
+            param: byte_str[5..-1]
         }
     end
 
