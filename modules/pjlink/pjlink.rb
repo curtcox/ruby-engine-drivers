@@ -79,7 +79,8 @@ class Pjlink::Pjlink
           if self[:power]
               input?
               mute?
-              volume?
+              lamp?
+              error_status?
           end
       end
     end
@@ -103,12 +104,14 @@ class Pjlink::Pjlink
     protected
 
     def do_query(command, **options)
-        cmd = "%1#{command} ?\x0D"
         send(cmd, options)
+        cmd = "%1#{command} ?\x0D"
+        logger.debug "sending query to projector: #{cmd}"
     end
 
     def do_send(command, parameter, **options)
         cmd = "%1#{command} #{parameter}\x0D"
+        logger.debug "sending command to projector: #{cmd}"
         send(cmd, options)
     end
 
