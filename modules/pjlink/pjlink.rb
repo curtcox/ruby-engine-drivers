@@ -120,6 +120,7 @@ class Pjlink::Pjlink
         return :success if param == 'OK'
 
         update_status(cmd, param)
+        logger.debug "cmd: #{cmd}, param: #{param}"
         return :success
     end
 
@@ -127,7 +128,7 @@ class Pjlink::Pjlink
  # e.g. NAME=Test Projector
     def parse_response(byte_str)
         {
-            cmd: LOOKUP_COMMANDS[byte_str[0..4]],
+            cmd: LOOKUP_COMMANDS[byte_str[0..4]].to_s,
             param: byte_str[5..-1]
         }
     end
