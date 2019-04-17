@@ -6,7 +6,7 @@ module Pjlink::Pjlink; end
 
 # Documentation: https://pjlink.jbmia.or.jp/english/data_cl2/PJLink_5-1.pdf
 
-class Pjlink::Projector::Pjlink
+class Pjlink::Pjlink
     include ::Orchestrator::Constants
 
     # Discovery Information
