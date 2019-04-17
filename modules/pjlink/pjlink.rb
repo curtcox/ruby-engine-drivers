@@ -130,7 +130,7 @@ class Pjlink::Pjlink
         split = byte_str.split('=')
         {
             cmd: LOOKUP_COMMANDS[split[0]].to_s,
-            param: LOOKUP_COMMANDS[split[1]].to_s
+            param: split[1]
         }
     end
 
