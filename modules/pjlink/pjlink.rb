@@ -127,7 +127,7 @@ class Pjlink::Pjlink
  # e.g. NAME=Test Projector
     def parse_response(byte_str)
         {
-            cmd: COMMANDS[byte_str[0..4]],
+            cmd: LOOKUP_COMMANDS[byte_str[0..4]],
             param: byte_str[5..-1]
         }
     end
