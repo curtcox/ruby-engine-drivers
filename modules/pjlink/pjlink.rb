@@ -142,15 +142,15 @@ class Pjlink::Pjlink
         case cmd.to_sym
         when :power,
             case param
-            when 0
+            when '0'
               self[:power] = false
               self[:power_status] = 'off'
-            when 1
+            when '1'
               self[:power] = true
               self[:power_status] = 'on'
-            when 2
+            when '2'
               self[:power_status] = 'cooling'
-            when 3
+            when '3'
               self[:power_status] = 'warming'
             end
         when :mute, :audio_mute, :video_mute
