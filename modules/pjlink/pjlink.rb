@@ -104,9 +104,9 @@ class Pjlink::Pjlink
     protected
 
     def do_query(command, **options)
-        send(cmd, options)
         cmd = "%1#{command} ?\x0D"
         logger.debug "sending query to projector: #{cmd}"
+        send(cmd, options)
     end
 
     def do_send(command, parameter, **options)
