@@ -45,7 +45,7 @@ class Pjlink::Pjlink
 
     def switch_to(input)
         logger.debug { "requesting to switch to: #{input}" }
-        do_send(COMMANDS[:input], INPUTS[input])
+        do_send(COMMANDS[:input], INPUTS[input.to_sym])
         input?
     end
 
