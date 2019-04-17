@@ -151,9 +151,28 @@ class Pjlink::Pjlink
         when :mute, :audio_mute, :video_mute
             self[cmd] = param == '1'
         when :volume
-            self[:volume] = param.to_i
+            self[cmd] = param.to_i
         when :input
-            self[:input] = LOOKUP_INPUTS[param]
+            self[cmd] = LOOKUP_INPUTS[param]
+        when :lamp
+            split = param.split(' ')
+            self[:lamp_hours] = split[0].to_i
+            self[:lamp_status] = split[1] == '1' ? 'on' : 'off'
+        when :error_status
+            E = {
+              0: :none,
+              1: :warning,
+              2: :error
+            }
+            fan, lamp, temperature, cover_open, filter, other = param.scan /\w/
+            self[:errors] = {
+              fan: E[fan],
+              lamp: E[lamp],
+              temperature: E[temperature],
+              cover_open: E[cover_open],
+              filter: E[filter],
+              other: E[other]
+            }
         end
     end
 end
