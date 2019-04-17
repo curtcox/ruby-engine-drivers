@@ -127,8 +127,8 @@ class Pjlink::Pjlink
  #      0123456789
  # e.g. NAME=Test Projector
     def parse_response(byte_str)
+        split = byte_str.split('=')
         {
-            split = byte_str.split('=')
             cmd: LOOKUP_COMMANDS[split[0]].to_s,
             param: LOOKUP_COMMANDS[split[1]].to_s
         }
