@@ -99,7 +99,6 @@ class Pjlink::Pjlink
       end
     end
 
-
     protected
 
     def do_query(command, **options)
@@ -149,6 +148,7 @@ class Pjlink::Pjlink
               self[:power_status] = 'cooling'
             when 3
               self[:power_status] = 'warming'
+            end
         when :mute, :audio_mute, :video_mute
             self[cmd] = param == '1'
         when :volume
