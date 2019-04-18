@@ -149,7 +149,7 @@ class Pjlink::Pjlink
               self[:power_status] = 'warming'
             end
         when :mute, :audio_mute, :video_mute
-            self[cmd] = param == '1'
+            self[cmd] = param.to_i == 1
         when :volume
             self[cmd] = param.to_i
         when :input
@@ -157,7 +157,7 @@ class Pjlink::Pjlink
         when :lamp
             split = param.split(' ')
             self[:lamp_hours] = split[0].to_i
-            self[:lamp_status] = split[1] == '1' ? 'on' : 'off'
+            self[:lamp_status] = split[1].to_i == 1 ? 'on' : 'off'
         when :error_status
             e = {
               "0": :none,
