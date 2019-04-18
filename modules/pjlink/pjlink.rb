@@ -164,14 +164,14 @@ class Pjlink::Pjlink
               "1": :warning,
               "2": :error
             }
-            fan, lamp, temperature, cover_open, filter, other = param.scan /\w/
+            fan, lamp, temperature, cover_open, filter, other = param.chars.map {|c| c.to_sym}
             self[:errors] = {
-              fan: e[fan.to_sym],
-              lamp: e[lamp.to_sym],
-              temperature: e[temperature.to_sym],
-              cover_open: e[cover_open.to_sym],
-              filter: e[filter.to_sym],
-              other: e[other.to_sym]
+              fan: e[fan],
+              lamp: e[lamp],
+              temperature: e[temperature],
+              cover_open: e[cover_open],
+              filter: e[filter],
+              other: e[other]
             }
         end
     end
