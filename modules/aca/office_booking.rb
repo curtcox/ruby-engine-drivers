@@ -459,6 +459,7 @@ class Aca::OfficeBooking
 
 
         logger.debug { "successfully created booking: #{id}" }
+        fetch_bookings
         "Ok"
     end
 
