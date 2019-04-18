@@ -73,11 +73,14 @@ class Pjlink::Pjlink
     end
 
     def poll
-      power?
-      input?
-      mute?
-      lamp?
-      error_status?
+      power?.finally do
+        if self[:power] {
+          input?
+          mute?
+          lamp?
+          error_status?
+        }
+      end
     end
 
     COMMANDS = {
