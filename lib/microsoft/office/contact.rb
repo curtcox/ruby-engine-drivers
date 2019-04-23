@@ -4,6 +4,7 @@ class Microsoft::Officenew::Contact < Microsoft::Officenew::Model
         'id' => 'id',
         'title' => 'title',
         'mobilePhone' => 'phone',
+        'companyName' => 'organization',
         'displayName' => 'name',
         'personalNotes' => 'notes',
         'emailAddresses' => { 0 => { 'address' => 'email' } }

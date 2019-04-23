@@ -4,7 +4,8 @@ class Microsoft::Officenew::User < Microsoft::Officenew::Model
         'id' => 'id',
         'mobilePhone' => 'phone',
         'displayName' => 'name',
-        'mail' => 'email'
+        'mail' => 'email',
+        'jobTitle' => 'role'
     }
 
     NEW_FIELDS = {}
