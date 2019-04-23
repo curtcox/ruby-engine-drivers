@@ -43,11 +43,13 @@ class Pjlink::Pjlink
 
     def switch_to(input)
         logger.debug { "requesting to switch to: #{input}" }
+        self[:input_target]     = INPUTS[input.to_sym]
         do_send(COMMANDS[:input], INPUTS[input.to_sym])
         input?
     end
 
-    def power(state, _ = nil)
+    def power(state = true, _ = nil)
+        self[:power_target] = state
         do_send(COMMANDS[:power], state ? '1' : '0')
     end
 
@@ -80,6 +82,8 @@ class Pjlink::Pjlink
           lamp?
           error_status?
         end
+        power(self[:power_target]) if self[:power_target] && (self[:power] != self[:power_target])
+        switch_to(self[:input_target]) if self[:input_target] && (self[:input] != self[:input_target])
       end
     end
 
