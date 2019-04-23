@@ -459,7 +459,6 @@ class Aca::OfficeBooking
 
 
         logger.debug { "successfully created booking: #{id}" }
-        fetch_bookings
         "Ok"
     end
 
@@ -612,7 +611,7 @@ class Aca::OfficeBooking
         # Make the request
 
         # response = office_api.post(path: "#{domain}#{endpoint}", body: booking_data, headers: headers).value
-        response = @client.create_booking(room_id: system.id, start_param: start_time, end_param: end_time, subject: subject, current_user: nil)
+        response = @client.create_booking(room_id: system.id, start_param: start_time, end_param: end_time, subject: subject, current_user: {email: organizer, name: organizer})
         STDERR.puts "BOOKING SIP CREATE RESPONSE:"
         STDERR.puts response.inspect
         STDERR.puts response['id']
