@@ -92,6 +92,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
                 email: attendee_email,
                 name: attendee['emailAddress']['name'],
                 visitor: is_visitor,
+                external: is_visitor,
                 organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
             }
             new_attendees.push(attendee_object) if attendee['type'] != 'resource'
