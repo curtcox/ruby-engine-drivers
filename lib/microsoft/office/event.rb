@@ -18,6 +18,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         { new_key: 'start_epoch', method: 'datestring_to_epoch', model_params:['start'] },
         { new_key: 'end_epoch', method: 'datestring_to_epoch', model_params:['end'] },
         { new_key: 'room_emails', method: 'set_room_id', model_params:['attendees'] },
+        { new_key: 'room_id', method: 'set_room_id', model_params:['attendees'] }, # Remove this once frontend is updated
         { new_key: 'attendees', method: 'format_attendees', model_params:['attendees', 'organizer'] },
         { new_key: 'organizer', method: 'set_organizer', model_params:['organizer'] },
         { new_key: 'is_free', method: 'check_availability', model_params:['start', 'end'], passed_params: ['available_from', 'available_to'] }
