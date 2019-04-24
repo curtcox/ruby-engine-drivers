@@ -44,31 +44,31 @@ class Pjlink::Pjlink
     def switch_to(input)
         logger.debug { "requesting to switch to: #{input}" }
         self[:input_target]     = input.to_sym
-        do_send(COMMANDS[:input], INPUTS[input.to_sym])
+        do_send(COMMANDS[:input], INPUTS[input.to_sym], name: :input)
         input?
     end
 
     def power(state = true, _ = nil)
-        self[:power_target] = state
-        do_send(COMMANDS[:power], state ? '1' : '0')
+        #self[:power_target] = state
+        do_send(COMMANDS[:power], state ? '1' : '0', retries: 10, name: :power)
     end
 
     def mute(state = true)
-        do_send(COMMANDS[:mute], state ? '31' : '30')
+        do_send(COMMANDS[:mute], state ? '31' : '30', name: :mute)
     end
     def unmute
         mute false
     end
 
     def video_mute(state = true)
-        do_send(COMMANDS[:mute], state ? '11' : '10')
+        do_send(COMMANDS[:mute], state ? '11' : '10', name: :video_mute)
     end
     def video_unmute
         mute false
     end
 
     def audio_mute(state = true)
-        do_send(COMMANDS[:mute], state ? '21' : '20')
+        do_send(COMMANDS[:mute], state ? '21' : '20', name: :audio_mute)
     end
     def audio_unmute
         mute false
@@ -82,7 +82,7 @@ class Pjlink::Pjlink
           lamp?
           error_status?
         end
-        power(self[:power_target]) if self[:power_target] && (self[:power] != self[:power_target])
+        #power(self[:power_target]) if self[:power_target] && (self[:power] != self[:power_target])
         switch_to(self[:input_target]) if self[:input_target] && (self[:input] != self[:input_target])
       end
     end
