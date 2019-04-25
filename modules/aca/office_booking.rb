@@ -123,6 +123,7 @@ class Aca::OfficeBooking
 
         self[:timeout] = setting(:timeout)
         self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
+        self[:booking_cancel_email_message] = setting(:booking_cancel_email_message)
         self[:booking_controls] = setting(:booking_controls)
         self[:booking_catering] = setting(:booking_catering)
         self[:booking_hide_details] = setting(:booking_hide_details)
@@ -630,7 +631,7 @@ class Aca::OfficeBooking
             self[:today].each_with_index do |booking, i|
                 booking_start_object = Time.parse(booking[:Start])
                 if delete_at_object.to_i == booking_start_object.to_i
-                    response = @client.delete_booking(booking_id: booking[:id], mailbox: system.email)
+                    response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: self[:booking_cancel_email_message])
                     if response == 200
                         count += 1
                         self[:today].delete(i)
