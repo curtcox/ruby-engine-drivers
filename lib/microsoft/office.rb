@@ -456,6 +456,14 @@ class Microsoft::Office
         200
     end
 
+    # https://docs.microsoft.com/en-us/graph/api/event-decline?view=graph-rest-1.0
+    def decline_meeting(booking_id:, mailbox:, comment: )
+        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}/decline"
+        comment = 'The booking was removed from this room as the host did not Start the meeting via the booking panel' if comment.nil?
+        request = graph_request(request_method: 'post', endpoint: endpoint, password: @delegated, data: {comment: comment})
+        check_response(request)
+        200
+    end
 
     # https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/event_delete
     def delete_contact(contact_id:, mailbox:)
