@@ -1,7 +1,7 @@
 module Toshiba; end
 module Toshiba::Display; end
 
-# Documentation: https://aca.im/driver_docs/Toshiba/ESeries1+RS232+v8.pdf
+# Documentation: https://aca.im/driver_docs/Toshiba/ESeries1%20RS232%20v8.pdf
 
 class Toshiba::Display::ESeries
     include ::Orchestrator::Constants
@@ -50,7 +50,9 @@ class Toshiba::Display::ESeries
 
 
     def power(state)
+        self[:power_stable] = false
         promise = if is_affirmative?(state)
+            hard(On) if self[:hard_off]
             self[:power_target] = self[:power] = true
             do_send([0x6B, 0xD9, 0x01, 0x00, 0x20, 0x30, 0x01, 0x00], name: :power)
         else
@@ -60,6 +62,42 @@ class Toshiba::Display::ESeries
 
         define_setting(:power_target, self[:power_target]) if @force_state
         promise
+    end
+
+    def hard(state)
+        # Results in colour bars
+        if is_affirmative?(state)
+            self[:power_stable] = true
+            self[:hard_off] = false
+            schedule.in(30000) {
+                do_send([0xFE, 0xD2, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00])
+                self[:power_stable] = false
+                self[:power_target] = false
+            }
+            do_send([0xBA, 0xD2, 0x01, 0x00, 0x00, 0x60, 0x01, 0x00], name: :hard_off)
+        else
+            self[:power_stable] = false
+            self[:power_target] = false
+            self[:hard_off] = true
+            do_send([0x2A, 0xD3, 0x01, 0x00, 0x00, 0x60, 0x00, 0x00], name: :hard_off)
+        end
+    end
+
+    def monitor(state)
+        if is_affirmative?(state)
+            self[:monitor] = true
+            do_send([0x19, 0xD3, 0x02, 0x00, 0x00, 0x60, 0x02, 0x00], name: :monitor)
+        else
+            self[:monitor] = false
+            do_send([0x19, 0xD3, 0x02, 0x00, 0x00, 0x60, 0x01, 0x00], name: :monitor)
+        end
+    end
+
+    def hard_off?
+        do_send([0x19, 0xD3, 0x02, 0x00, 0x00, 0x60, 0x00, 0x00], {
+            name: :hard_off_query,
+            priority: 0
+        })
     end
 
     def power?(options = {}, &block)
@@ -140,6 +178,7 @@ class Toshiba::Display::ESeries
 
 
     def do_poll
+        hard_off?
         power? do
             if self[:power]
                 audio_mute?
@@ -190,7 +229,7 @@ class Toshiba::Display::ESeries
         # Buffer data if required
         if command && (@buffer.length > 0 || data[0] == "\x1D")
             @buffer << data
-            
+
             if @buffer.length >= 3
                 data = @buffer[0..2]
                 @buffer = String.new(@buffer[3..-1])
@@ -210,7 +249,7 @@ class Toshiba::Display::ESeries
             return :success
         elsif data.length == 1
             # We have an unknown response code
-            return :abort 
+            return :abort
         end
 
         if command
@@ -232,6 +271,20 @@ class Toshiba::Display::ESeries
                 end
             when :power_query
                 self[:power] = data == "\x1D\0\1"
+                if !self[:power_stable] && self[:power] != self[:power_target]
+                    power(self[:power_target])
+                else
+                    self[:power_stable] = true
+                end
+            when :hard_off_query
+                # Power false == hard off true
+                self[:hard_off] = data == "\x1D\0\0"
+                self[:power] = !self[:hard_off]
+                if !self[:power_stable] && self[:power] != self[:power_target]
+                    power(self[:power_target])
+                else
+                    self[:power_stable] = true
+                end
             end
         end
 
