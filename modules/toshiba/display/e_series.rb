@@ -69,10 +69,10 @@ class Toshiba::Display::ESeries
         if is_affirmative?(state)
             self[:power_stable] = true
             self[:hard_off] = false
-            schedule.in(30000) {
+            schedule.in(50000) {
                 do_send([0xFE, 0xD2, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00])
                 self[:power_stable] = false
-                self[:power_target] = false
+                self[:power_target] = true
             }
             do_send([0xBA, 0xD2, 0x01, 0x00, 0x00, 0x60, 0x01, 0x00], name: :hard_off)
         else
@@ -81,6 +81,10 @@ class Toshiba::Display::ESeries
             self[:hard_off] = true
             do_send([0x2A, 0xD3, 0x01, 0x00, 0x00, 0x60, 0x00, 0x00], name: :hard_off)
         end
+    end
+
+    def remove_colour_bars
+      do_send([0xFE, 0xD2, 0x01, 0x00, 0x00, 0x20, 0x00, 0x00])
     end
 
     def monitor(state)
@@ -178,7 +182,6 @@ class Toshiba::Display::ESeries
 
 
     def do_poll
-        hard_off?
         power? do
             if self[:power]
                 audio_mute?
@@ -272,25 +275,26 @@ class Toshiba::Display::ESeries
             when :power_query
                 self[:power] = data == "\x1D\0\1"
                 if !self[:power_stable] && self[:power] != self[:power_target]
-                    power(self[:power_target])
+                    # We won't play around with forced state as feedback is too unreliable
+                    # power(self[:power_target])
                 else
                     self[:power_stable] = true
                 end
-            when :hard_off_query
+            # Toshibas report this as always being off. So need to rely on internal state
+            #when :hard_off_query
                 # Power false == hard off true
-                self[:hard_off] = data == "\x1D\0\0"
-                self[:power] = !self[:hard_off]
-                if !self[:power_stable] && self[:power] != self[:power_target]
-                    power(self[:power_target])
-                else
-                    self[:power_stable] = true
-                end
+                #self[:hard_off] = data == "\x1D\0\0"
+                #self[:power] = !self[:hard_off]
+                #if !self[:power_stable] && self[:power] != self[:power_target]
+               #     power(self[:power_target])
+                #else
+                #    self[:power_stable] = true
+                #end
             end
         end
 
         :success
     end
-
 
     PREFIX = [0xBE, 0xEF, 0x03, 0x06, 0x00]
     def do_send(cmd, options = {})
