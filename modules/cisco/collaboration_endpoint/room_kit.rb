@@ -52,8 +52,10 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
     status 'Conference Presentation Mode' => :presentation
     status 'Peripherals ConnectedDevice' => :peripherals
     status 'Video Selfview Mode' => :selfview
+    status 'Video Selfview FullScreenMode' => :selfview_fullscreen
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
+    status 'Video Layout LayoutFamily Local' => :video_layout
     status 'Standby State' => :standby
 
     command 'Audio Microphones Mute' => :mic_mute_on
@@ -121,6 +123,10 @@ class Cisco::CollaborationEndpoint::RoomKit < Cisco::CollaborationEndpoint::Room
             ConnectorId_: (1..3),       # Source can either be specified as the
             Layout_: [:Equal, :PIP],    # physical connector...
             SourceId_: (1..3)           # ...or the logical source ID
+
+    command 'Video Layout LayoutFamily Set' => :video_layout,
+            LayoutFamily: [:Auto, :Equal, :Overlay, :Prominent, :Single],
+            Target_: [:Local, :Remote]
 
     command 'Video Selfview Set' => :selfview,
             Mode_: [:On, :Off],
