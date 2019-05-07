@@ -1,7 +1,7 @@
 module Nec; end
 module Nec::Projector; end
 
-# Documentation: https://aca.im/driver_docs/NEC/2014+Control_Commands_for_NEC_Projector_rev_3.4.09b.pdf
+# Documentation: https://aca.im/driver_docs/NEC/2014%20Control_Commands_for_NEC_Projector_rev_3.4.09b.pdf
 
 class Nec::Projector::NpSeries
     include ::Orchestrator::Constants

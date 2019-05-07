@@ -18,7 +18,7 @@ Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingCatalyst' do
     # Should have configured the tracking data above
     mock = Aca::Tracking::SwitchPort.find(start_id)
     expect(mock.nil?).to eq false
-    details = status[:"Gi4/1/2"]
+    details = status[:"gi4/1/2"]
     expect(details.delete(:connected_at).is_a?(Integer)).to be(true)
     expect(details).to eq({
         ip: "192.168.1.16", mac: "c4544438e158", connected: true,
