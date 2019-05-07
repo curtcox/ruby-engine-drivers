@@ -9,50 +9,30 @@ require 'aca/trap_dispatcher'
 module Cisco; end
 module Cisco::Switch; end
 
+# The request rate limiter
+load File.join(__dir__, '../meraki_dashboard.rb')
+
 ::Orchestrator::DependencyManager.load('Aca::Tracking::SwitchPort', :model, :force)
 ::Aca::Tracking::SwitchPort.ensure_design_document!
 
-# Run SNMP code on an independent thread pool as SNMP is soo slow
-module Cisco::ThreadPool
-    THREAD_POOL = ::Concurrent::ThreadPoolExecutor.new(
-        min_threads: ::Libuv::Reactor::LIBUV_MIN_POOL,
-        max_threads: ::Libuv::Reactor::LIBUV_MAX_POOL,
-        max_queue: ::Libuv::Reactor::LIBUV_MAX_QUEUE
-    )
-
-    def self.task
-        reactor = ::Libuv::Reactor.current
-        d = reactor.defer
-        THREAD_POOL.post do
-            begin
-                d.resolve(yield)
-            rescue Exception => e
-                d.reject(e)
-            end
-        end
-        promise = d.promise
-        promise
-    end
-end
-
-class Cisco::Switch::SnoopingCatalystSNMP
+class Cisco::Switch::MerakiSNMP
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
     include ::Orchestrator::Security
 
-    descriptive_name 'Cisco Catalyst SNMP IP Snooping'
+    descriptive_name 'Cisco Meraki IP Snooping'
     generic_name :Snooping
     udp_port 161
 
     default_settings({
+        meraki_api_key: '5ec63c3058acd56b4a4',
         building: 'building_code',
         reserve_time: 5.minutes.to_i,
         snmp_options: {
-            version: 1,
+            version: 'v2c',
             community: 'public',
             timeout: 4
         },
-        # Snooping takes ages on large switches
         ignore_macs: {
             "Cisco Phone Dock": "7001b5"
         },
@@ -63,7 +43,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
     def on_load
         # flag to indicate if processing is occuring
         @if_mappings = {}
-        @scheduled_status_query = true
+        # @scheduled_status_query = true
 
         # Interfaces that indicate they have a device connected
         @check_interface = ::Set.new
@@ -105,6 +85,9 @@ class Cisco::Switch::SnoopingCatalystSNMP
         @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
         @temporary = ::Set.new((setting(:temporary_macs) || {}).values)
         @polling_period = setting(:discovery_polling_period) || 90
+
+        @meraki_api = ::Cisco::MerakiDashboard.instance
+        @api_key = setting(:meraki_api_key)
 
         self[:name] = @switch_name = setting(:switch_name)
         self[:ip_address] = @remote_address
@@ -203,121 +186,30 @@ class Cisco::Switch::SnoopingCatalystSNMP
         self[:interfaces] = @connected_interfaces.to_a
     end
 
-    AddressType = {
-        0  => :unknown,
-        1  => :ipv4,
-        2  => :ipv6,
-        3  => :ipv4z,
-        4  => :ipv6z,
-        16 => :dns
-    }.freeze
-
-    AcceptAddress = [:ipv4, :ipv6, :ipv4z, :ipv6z].freeze
-
-    BindingStatus = {
-        1 => :active,
-        2 => :not_in_service,
-        3 => :not_ready,
-        4 => :create_and_go,
-        5 => :create_and_wait,
-        6 => :destroy
-    }.freeze
-
-    # cdsBindingsEntry
-    EntryParts = {
-        '1' => :vlan,        # Cisco has made this not-accessible
-        '2' => :mac_address, # Cisco has made this not-accessible
-        '3' => :addr_type,
-        '4' => :ip_address,
-        '5' => :interface,
-        '6' => :leased_time,    # in seconds
-        '7' => :binding_status, # can set this to destroy to delete entry
-        '8' => :hostname
-    }.freeze
-
-    SnoopingEntry = Struct.new(:id, *EntryParts.values) do
-        def address_type
-            AddressType[self.addr_type]
-        end
-
-        def mac
-            self.mac_address || self.extract_vlan_and_mac.mac_address
-        end
-
-        def get_vlan
-            self.vlan || self.extract_vlan_and_mac.vlan
-        end
-
-        def ip
-            ip_addr = self.ip_address
-            return nil unless ip_addr
-
-            case self.address_type
-            when :ipv4
-                # DISPLAY-HINT "1d.1d.1d.1d"
-                # Example response: "0A B2 C4 45"
-                ip_addr.split(' ').map { |i| i.to_i(16).to_s }.join('.')
-            when :ipv6
-                # DISPLAY-HINT "2x:2x:2x:2x:2x:2x:2x:2x"
-                # IPAddr will present the IPv6 address in it's short form
-                IPAddr.new(ip_addr.gsub(' ', '').scan(/..../).join(':')).to_s
-            end
-        end
-
-        def extract_vlan_and_mac
-            parts = self.id.split('.')
-            self.vlan = parts[0].to_i
-            self.mac_address = parts[1..-1].map { |i| i.to_i.to_s(16).rjust(2, '0') }.join('')
-            self
-        end
-    end
-
-    # A row instance contains the Mac address, IP address type, IP address, VLAN number, interface number, leased time, and status of this instance.
-    # http://www.oidview.com/mibs/9/CISCO-DHCP-SNOOPING-MIB.html
-    # http://www.snmplink.org/OnLineMIB/Cisco/index.html#1634
     def query_snooping_bindings
-        return :not_ready unless @client
+        return :not_ready unless @client && @serial
         return :currently_processing if @processing
 
         logger.debug '==> extracting snooping table <=='
 
-        # Walking cdsBindingsTable
-        client = @client
-        entries = {}
-        @processing = ::Cisco::ThreadPool.task do
-            client.walk(oid: '1.3.6.1.4.1.9.9.380.1.4.1').each do |oid_code, value|
-                part, entry_id = oid_code[28..-1].split('.', 2)
-                next if entry_id.nil?
-
-                entry = entries[entry_id] || SnoopingEntry.new
-                entry.id = entry_id
-                entry.__send__("#{EntryParts[part]}=", value)
-                entries[entry_id] = entry
-            end
-        end
-        @processing.finally {
-            @processing = nil
-            client.close if client != @client
-        }.value
-
-        # Process the bindings
-        entries = entries.values
+        # See: https://dashboard.meraki.com/api_docs#clients
+        entries = @meraki_api.new_request(@api_key, "https://api.meraki.com/api/v0/devices/#{@serial}/clients?timespan=150")
         logger.debug { "found #{entries.length} snooping entries" }
-
-        # Newest lease first
-        entries = entries.reject { |e| e.leased_time.nil? }.sort { |a, b| b.leased_time <=> a.leased_time }
 
         checked = Set.new
         checked_interfaces = Set.new
         entries.each do |entry|
-            interface = @if_mappings[entry.interface]
+            interface = @if_mappings[entry[:switchport].to_i]
 
             next unless @check_interface.include?(interface)
             next if checked_interfaces.include?(interface)
             checked_interfaces << interface
 
-            mac = entry.mac
-            ip = entry.ip
+            mac = entry[:mac]
+            ip = entry[:ip]
+            next unless mac && ip
+            mac = mac.gsub(':', '').downcase
+
             next unless ::IPAddress.valid?(ip)
             next if @ignore_macs.include?(mac[0..5])
 
@@ -377,7 +269,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         @connected_interfaces = checked
         self[:interfaces] = checked.to_a
-        @scheduled_status_query = checked.empty?
+        # @scheduled_status_query = checked.empty?
         (@check_interface - checked).each { |iface| remove_lookup(iface) }
         self[:reserved] = @reserved_interface.to_a
 
@@ -395,11 +287,16 @@ class Cisco::Switch::SnoopingCatalystSNMP
 
         client = @client
         mappings = {}
-        @processing = ::Cisco::ThreadPool.task do
+        serial = nil
+        @processing = task do
             client.walk(oid: '1.3.6.1.2.1.31.1.1.1.1').each do |oid_code, value|
                 oid_code = oid_code[23..-1]
                 mappings[oid_code.to_i] = value.downcase
             end
+
+            # Both 1.3.6.1.2.1.47.1.1.1.1.11.1 and 1.3.6.1.2.1.47.1.1.1.1.11.2000
+            # Seem to hold the serial number
+            serial = client.get(oid: '1.3.6.1.2.1.47.1.1.1.1.11.1').strip
         end
         @processing.finally {
             @processing = nil
@@ -407,6 +304,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
         }
         @processing.then {
             logger.debug { "<== found #{mappings.length} ports ==>" }
+            @serial = self[:serial] = serial if serial
             if mappings.empty?
                 @scheduled_if_query = true
             else
@@ -421,13 +319,13 @@ class Cisco::Switch::SnoopingCatalystSNMP
         return :currently_processing if @processing
 
         logger.debug '==> querying interface status <=='
-        @scheduled_status_query = false
+        # @scheduled_status_query = false
 
         client = @client
         if_mappings = @if_mappings
         remove_interfaces = []
         add_interfaces = []
-        @processing = ::Cisco::ThreadPool.task do
+        @processing = task do
             client.walk(oid: '1.3.6.1.2.1.2.2.1.8').each do |oid_code, value|
                 oid_code = oid_code[20..-1]
                 interface = if_mappings[oid_code.to_i]
@@ -470,12 +368,12 @@ class Cisco::Switch::SnoopingCatalystSNMP
         end
         logger.debug 'Querying for connected devices'
         query_index_mappings if @if_mappings.empty? || @scheduled_if_query
-        query_interface_status if @scheduled_status_query
+        query_interface_status # if @scheduled_status_query
         query_snooping_bindings
         rebuild_client
     rescue => e
         rebuild_client
-        @scheduled_status_query = true
+        # @scheduled_status_query = true
         raise e
     end
 
@@ -507,7 +405,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             check_reservations if @reserve_time > 0
         end
 
-        schedule.every('10m') { @scheduled_status_query = true }
+        # schedule.every('10m') { @scheduled_status_query = true }
 
         # There is a possibility that these will change on switch reboot
         schedule.every('15m') { @scheduled_if_query = true }

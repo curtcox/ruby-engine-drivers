@@ -35,37 +35,57 @@ class Cisco::Switch::SnoopingCatalyst
             ]
         },
         building: 'building_code',
-        reserve_time: 5.minutes.to_i
+        reserve_time: 5.minutes.to_i,
+        ignore_macs: {
+            "Cisco Phone Dock": "7001b5"
+        },
+        temporary_macs: {},
+        discovery_polling_period: 90
     })
 
     def on_load
+        # Interfaces that indicate they have a device connected
         @check_interface = ::Set.new
+
+        # Interfaces that we know are connected to the network
+        @connected_interfaces = ::Set.new
+
         @reserved_interface = ::Set.new
         self[:interfaces] = [] # This will be updated via query
 
-        on_update
+        begin
+            on_update
 
-        # Load the current state of the switch from the database
-        query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(remote_address)
-        query.each do |detail|
-            details = detail.details
-            interface = detail.interface
-            self[interface] = details
+            # Load the current state of the switch from the database
+            query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(@remote_address)
+            query.each do |detail|
+                details = detail.details
+                interface = detail.interface
+                self[interface] = details
 
-            if details.connected
-                @check_interface << interface
-            elsif details.reserved
-                @reserved_interface << interface
+                if details.connected
+                    @check_interface << interface
+                    @connected_interfaces << interface
+                elsif details.reserved
+                    @reserved_interface << interface
+                end
             end
+        rescue => error
+            logger.print_error error, 'loading persisted details'
         end
 
-        self[:interfaces] = @check_interface.to_a
+        self[:interfaces] = @connected_interfaces.to_a
         self[:reserved] = @reserved_interface.to_a
     end
 
     def on_update
+        @remote_address = remote_address.downcase
+        @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
+        @temporary = ::Set.new((setting(:temporary_macs) || {}).values)
+        @polling_period = setting(:discovery_polling_period) || 90
+
         self[:name] = @switch_name = setting(:switch_name)
-        self[:ip_address] = remote_address
+        self[:ip_address] = @remote_address
         self[:building] = setting(:building)
         self[:level] = setting(:level)
 
@@ -75,10 +95,7 @@ class Cisco::Switch::SnoopingCatalyst
 
     def connected
         schedule.in(1000) { query_connected_devices }
-        schedule.every('1m') do
-            query_connected_devices
-            check_reservations if @reserve_time > 0
-        end
+        schedule.every('1m') { query_connected_devices }
     end
 
     def disconnected
@@ -101,17 +118,20 @@ class Cisco::Switch::SnoopingCatalyst
 
     def query_connected_devices
         logger.debug { "Querying for connected devices" }
-        query_interface_status
-        schedule.in(3000) { query_snooping_bindings }
+        query_interface_status.then do
+            schedule.in(3000) do
+                p = query_snooping_bindings
+                p.then { schedule.in(10000) { check_reservations } } if @reserve_time > 0
+            end
+        end
+        nil
     end
 
     def update_reservations
         check_reservations
     end
 
-
     protected
-
 
     def received(data, resolve, command)
         logger.debug { "Switch sent #{data}" }
@@ -126,7 +146,7 @@ class Cisco::Switch::SnoopingCatalyst
         end
 
         # Detect more data available
-        # ==> --More-- 
+        # ==> --More--
         if data =~ /More/
             send(' ', priority: 99, retries: 0)
             return :success
@@ -142,15 +162,20 @@ class Cisco::Switch::SnoopingCatalyst
             interface = normalise(data.split(',')[0].split(/\s/)[-1])
 
             if data =~ /Up:/
-                logger.debug { "Interface Up: #{interface}" }
+                logger.debug { "Notify Up: #{interface}" }
                 remove_reserved(interface)
                 @check_interface << interface
+                @connected_interfaces << interface
 
                 # Delay here is to give the PC some time to negotiate an IP address
                 # schedule.in(3000) { query_snooping_bindings }
             elsif data =~ /Down:/
-                logger.debug { "Interface Down: #{interface}" }
+                logger.debug { "Notify Down: #{interface}" }
+                # We are no longer interested in this interface
+                @connected_interfaces.delete(interface)
+                @check_interface.delete(interface)
                 remove_lookup(interface)
+                self[:reserved] = @reserved_interface.to_a
             end
 
             self[:interfaces] = @check_interface.to_a
@@ -162,6 +187,7 @@ class Cisco::Switch::SnoopingCatalyst
             logger.debug { "Processing #{@snooping.length} bindings" }
 
             checked = Set.new
+            checked_interfaces = Set.new
 
             # Newest lease first
             @snooping.sort! { |a, b| b[0] <=> a[0] }
@@ -169,7 +195,8 @@ class Cisco::Switch::SnoopingCatalyst
             # NOTE:: Same as snooping_catalyst_snmp.rb
             # Ignore any duplicates
             @snooping.each do |lease, mac, ip, interface|
-                next if checked.include?(interface)
+                next if checked_interfaces.include?(interface)
+                checked_interfaces << interface
                 checked << interface
 
                 iface = self[interface] || ::Aca::Tracking::StaticDetails.new
@@ -178,10 +205,10 @@ class Cisco::Switch::SnoopingCatalyst
                     logger.debug { "New connection on #{interface} with #{ip}: #{mac}" }
 
                     # NOTE:: Same as username found
-                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
                     details.connected(mac, @reserve_time, {
                         device_ip: ip,
-                        switch_ip: remote_address,
+                        switch_ip: @remote_address,
                         hostname: @hostname,
                         switch_name: @switch_name,
                         interface: interface
@@ -196,10 +223,10 @@ class Cisco::Switch::SnoopingCatalyst
                         logger.debug { "Found #{username} at #{ip}: #{mac}" }
 
                         # NOTE:: Same as new connection
-                        details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                        details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
                         details.connected(mac, @reserve_time, {
                             device_ip: ip,
-                            switch_ip: remote_address,
+                            switch_ip: @remote_address,
                             hostname: @hostname,
                             switch_name: @switch_name,
                             interface: interface
@@ -211,18 +238,22 @@ class Cisco::Switch::SnoopingCatalyst
 
                 elsif !iface.reserved
                     # We don't know the user who is at this desk...
-                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
                     reserved = details.check_for_user(@reserve_time)
                     self[interface] = details.details if reserved
 
                 elsif iface.clash
                     # There was a reservation clash - is there still a clash?
-                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+                    details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
                     details.check_for_user(@reserve_time)
                     self[interface] = details.details unless details.clash?
                 end
             end
 
+            @connected_interfaces = checked
+            self[:interfaces] = checked.to_a
+            (@check_interface - checked).each { |iface| remove_lookup(iface) }
+            self[:reserved] = @reserved_interface.to_a
             @snooping.clear
 
             return :success
@@ -241,8 +272,7 @@ class Cisco::Switch::SnoopingCatalyst
 
             logger.debug { "Interface Up: #{interface}" }
             remove_reserved(interface)
-            @check_interface << interface.downcase
-            self[:interfaces] = @check_interface.to_a
+            @check_interface << interface
             return :success
 
         elsif entries.include?('notconnect')
@@ -251,8 +281,8 @@ class Cisco::Switch::SnoopingCatalyst
 
             # Delete the lookup records
             logger.debug { "Interface Down: #{interface}" }
+            @check_interface.delete(interface)
             remove_lookup(interface)
-            self[:interfaces] = @check_interface.to_a
             return :success
         end
 
@@ -274,7 +304,7 @@ class Cisco::Switch::SnoopingCatalyst
                     mac = format(mac)
                     ip = entries[1]
 
-                    if ::IPAddress.valid? ip
+                    if ::IPAddress.valid?(ip) && !@ignore_macs.include?(mac[0..5])
                         @snooping << [entries[2].to_i, mac, ip, interface]
                     end
                 end
@@ -292,13 +322,22 @@ class Cisco::Switch::SnoopingCatalyst
     end
 
     def remove_lookup(interface)
-        # We are no longer interested in this interface
-        @check_interface.delete(interface)
-
         # Update the status of the switch port
-        model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+        model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
         if model
-            notify = model.disconnected
+            # Check if MAC address is black listed.
+            # We want to remove the discovery information for the MAC
+            # We also need to prevent it being re-discovered for the polling
+            # period as the next person to connect will be mis-associated
+            # Need to create a database entry for the MAC with a TTL
+            mac = model.mac_address
+            temporary = if (mac && @temporary.include?(mac[0..5]))
+                logger.debug { "removing temporary MAC for #{model.username} with #{model.mac_address} at #{model.desk_id}" }
+                @polling_period
+            else
+                0
+            end
+            notify = model.disconnected(temporary: temporary)
             details = model.details
             self[interface] = details
 
@@ -318,25 +357,25 @@ class Cisco::Switch::SnoopingCatalyst
         self[:reserved] = @reserved_interface.to_a
     end
 
-    def format(mac)
-        mac.gsub(/(0x|[^0-9A-Fa-f])*/, "").downcase
-    end
-
     def check_reservations
         remove = []
 
         # Check if the interfaces are still reserved
         @reserved_interface.each do |interface|
-            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
             remove << interface unless details.reserved?
             self[interface] = details.details
         end
 
         # Remove them from the reserved list if not
-        if remove.present?
-            @reserved_interface -= remove
-            self[:reserved] = @reserved_interface.to_a
-        end
+        return unless remove.present?
+
+        @reserved_interface -= remove
+        self[:reserved] = @reserved_interface.to_a
+    end
+
+    def format(mac)
+        mac.gsub(/(0x|[^0-9A-Fa-f])*/, "").downcase
     end
 
     def normalise(interface)
