@@ -8,6 +8,7 @@ module Cisco::TelePresence::SxSeriesCommon
     end
     
     def on_update
+        @corporate_dir = setting(:use_corporate_directory) || false
         @default_source = setting(:presentation) || 3
         @count = 0
     end
@@ -22,6 +23,7 @@ module Cisco::TelePresence::SxSeriesCommon
         schedule.every('5s') do
             logger.debug "-- Polling Cisco SX"
             call_status
+            video_output_mode?
 
             if @count <= 0
                 mute_status
@@ -107,16 +109,22 @@ module Cisco::TelePresence::SxSeriesCommon
     end
 
     SearchDefaults = {
-        :PhonebookType => :Local, # Should probably make this a setting
+        :PhonebookType => :Local,
         :Limit => 10,
         :ContactType => :Contact,
         :SearchField => :Name
     }
     def search(text, opts = {})
+        opts[:PhonebookType] ||= 'Corporate' if @corporate_dir
         opts = SearchDefaults.merge(opts)
         opts[:SearchString] = text
         command(:phonebook, :search, params(opts), name: :phonebook, max_waits: 400)
     end
+    
+    def clear_search_results
+        self[:search_results] = []
+    end
+
 
     # Options include: auto, custom, equal, fullscreen, overlay, presentationlargespeaker, presentationsmallspeaker, prominent, single, speaker_full
     def layout(mode, target = :local)
@@ -180,12 +188,24 @@ module Cisco::TelePresence::SxSeriesCommon
     end
 
     def select_presentation(index)
-        # NOTE:: Index should be a number
-        command('xConfiguration Video', params({
-            :DefaultPresentationSource => index
+        # NOTE: Index should be a number (generally 1-4)
+        configuration('Video Presentation', params({
+            :DefaultSource => index
         }), name: :select_presentation)
     end
 
+    def video_output_mode(video_mode)
+        # NOTE: video_mode should be "Single" or "Dual" or "Auto"
+        configuration('Video', params({
+            :Monitors => video_mode
+        }), name: :video_output_mode)
+        self[:video_output_mode] = video_mode
+    end
+    
+    def video_output_mode?
+        status 'Video Monitors'
+    end
+    
     # ====================
     # END Common functions
     # ====================
@@ -238,8 +258,24 @@ module Cisco::TelePresence::SxSeriesCommon
             command :FarEndControl, :Camera, :Move, "CallId:#{call_id} Value:#{req}"
         end
     end
-
     
+    def wake(**options)
+        command :Standby, :Deactivate, params(options)
+    end
+
+    def sleep_time(delay = 1)
+        configuration('Standby', params({
+            :Control => 'On'
+        }), name: :standby)
+
+        configuration('Standby', params({
+            :Delay => delay
+        }), name: :standby_delay)
+    end
+
+    def sleep(**options)
+        command :Standby, :Activate, params(options)
+    end
     
     ResponseType = {
         '**' => :complete,
@@ -258,14 +294,21 @@ module Cisco::TelePresence::SxSeriesCommon
                 if @listing_phonebook
                     @listing_phonebook = false
 
-                    # expose results
+                    # expose results, unique every time
+                    if @results.length > 0
+                        @search_count ||= 0
+                        @search_count += 1
+                        @results[0][:count] = @search_count
+                    end
                     self[:search_results] = @results
                 elsif @call_status
                     @call_status[:id] = @last_call_id
                     self[:call_status] = @call_status
                     if @call_status.empty?
+                        self[:incall] = false
                         self[:content_available] = false
                     else
+                        self[:incall] = true
                         content_available?
                         if @call_status[:status] == 'OnHold'
                             self[:presentation] = :none
@@ -277,6 +320,7 @@ module Cisco::TelePresence::SxSeriesCommon
                         self[:previous_call] = self[:call_status][:callbacknumber]
                     end
 
+                    self[:incall] = false
                     self[:call_status] = {}
                     @last_call_id = nil
                     @call_status = nil
@@ -303,7 +347,7 @@ module Cisco::TelePresence::SxSeriesCommon
 
     def process_results(result)
         case result[1].downcase.to_sym
-        when :resultset
+        when :phonebooksearchresult, :resultset
             @listing_phonebook = true
 
             case result[2]
@@ -369,8 +413,13 @@ module Cisco::TelePresence::SxSeriesCommon
                 end
             end
         when :video
-            if result[2] == 'Selfview' && result[3] == 'Mode:'
-                self[:camera_pip] = result[4] == 'On'
+            case result[2] 
+                when 'Monitors:'
+                    self[:video_output_mode] = result[3]
+                when 'Selfview'
+                    if result[3] == 'Mode:'
+                        self[:camera_pip] = (result[4] == 'On')
+                    end
             end
         when :audio
             if result[2] == 'Microphones' && result[3] == 'Mute:'

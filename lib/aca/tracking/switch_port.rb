@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
+# For temporary MAC addresses
+require 'aca/tracking/user_devices'
+
 module Aca; end
 module Aca::Tracking
     class StaticDetails < ::Hash
         [
             :ip, :mac, :connected, :reserved, :reserve_time, :unplug_time,
-            :reserved_by, :clash, :username, :desk_id
+            :reserved_by, :clash, :username, :desk_id, :connected_at
         ].each do |key|
             define_method key do
                 self[key]
@@ -35,9 +38,10 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
     design_document :swport
 
     # Connection details
-    attribute :mac_address, type: String # MAC of the device currently connected to the switch
-    attribute :device_ip,   type: String # IP of the device connected to the switch
-    attribute :username,    type: String # Username of the currently connected user
+    attribute :mac_address,  type: String # MAC of the device currently connected to the switch
+    attribute :device_ip,    type: String # IP of the device connected to the switch
+    attribute :username,     type: String # Username of the currently connected user
+    attribute :connected_at, type: Integer, default: lambda { Time.now }
 
     # Reservation details
     attribute :unplug_time,  type: Integer, default: 0 # Unlug time for timeout
@@ -90,7 +94,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
             reserved = false if other&.id != self.id
         end
 
-        username = self.class.bucket.get("macuser-#{self.mac_address}", quiet: true)
+        username = self.class.bucket.get("macuser-#{mac_address}", quiet: true)
 
         if not reserved
             self.unplug_time = 0
@@ -113,6 +117,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         self.username = username
         self.mac_address = mac_address
         self.assign_attributes(switch_details)
+        self.connected_at = Time.now.to_i
         self.save!(with_cas: true)
 
         reserved
@@ -165,8 +170,30 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         retry
     end
 
-    def disconnected
+    def disconnected(temporary: 0)
         return false unless connected?
+
+        # Is this MAC address a dock that we really want to ignore
+        if temporary > 0
+            mac = self.mac_address
+
+            # Don't blow away reservations if there is a clash
+            if self.reserved_mac == mac
+                self.reserve_time = 0
+                self.reserved_mac = nil
+                self.reserved_by = nil
+            end
+
+            # Block the MAC address from being discovered for a period of time
+            begin
+                self.class.set("temporarily_block_mac-#{self.mac_address}", ttl: temporary)
+                ::Aca::Tracking::UserDevices.with_mac(mac).each do |user|
+                    user.remove(mac)
+                end
+            rescue
+                # this isn't critical so we ignore errors here
+            end
+        end
 
         # Configure pre-defined reservation on disconnect
         now = Time.now.to_i
@@ -201,6 +228,7 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
         d = ::Aca::Tracking::StaticDetails.new
         d.ip = self.device_ip
         d.mac = self.mac_address || self.reserved_mac
+        d.connected_at = self.connected_at
         d.connected = connected?
         d.clash = clash?
 
@@ -226,6 +254,6 @@ class Aca::Tracking::SwitchPort < CouchbaseOrm::Base
 
     before_create :set_id
     def set_id
-        self.id = "swport-#{self.switch_ip}-#{interface}"
+        self.id = "swport-#{self.switch_ip.downcase}-#{interface}"
     end
 end

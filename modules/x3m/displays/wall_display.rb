@@ -1,9 +1,10 @@
-# frozen_string_literal: true, encoding: ASCII-8BIT
+# encoding: ASCII-8BIT
+# frozen_string_literal: true
 
 module X3m; end
 module X3m::Displays; end
 
-# Protocol: https://aca.im/driver_docs/X3M/RS-232+Instructions.pdf
+# Protocol: https://aca.im/driver_docs/X3M/RS-232%20Instructions.pdf
 
 class X3m::Displays::WallDisplay
     include ::Orchestrator::Constants

@@ -25,11 +25,14 @@ class Aca::Tracking::UserDevices < CouchbaseOrm::Base
         return if self.macs.include?(mac)
 
         # Order the list last seen mac first
-        # Limit the number of mac addresses to 5
+        # Limit the number of mac addresses to 10
         self.macs_will_change!
         self.macs.delete(mac)
         self.macs.unshift(mac)
-        self.macs.pop if self.macs.length > 5
+        if self.macs.length > 10
+            oldmac = self.macs.pop
+            self.class.bucket.delete("macuser-#{oldmac}")
+        end
         self.save!
     rescue ::Libcouchbase::Error::KeyExists
         self.reload

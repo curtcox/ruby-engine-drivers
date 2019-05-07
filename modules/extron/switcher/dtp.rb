@@ -24,7 +24,7 @@ module Extron::Switcher; end
 #
 # audio1 => input
 # audio1_muted => true
-# 
+#
 #
 # (Settings)
 # password
@@ -56,8 +56,8 @@ class Extron::Switcher::Dtp < Extron::Base
         map.each do |input, outputs|
             input = input.to_s if input.is_a?(Symbol)
             input = input.to_i if input.is_a?(String)
-            
-            
+
+
             outputs = Array(outputs)
             command = ''
             outputs.each do |output|
@@ -71,7 +71,7 @@ class Extron::Switcher::Dtp < Extron::Base
         map.each do |input, outputs|
             input = input.to_s if input.is_a?(Symbol)
             input = input.to_i if input.is_a?(String)
-            
+
             outputs = Array(outputs)
             command = ''
             outputs.each do |output|
@@ -169,47 +169,57 @@ class Extron::Switcher::Dtp < Extron::Base
     #
     # Output control
     #
-    def mute_audio(group, value = true, index = nil)
+    def mute(group, value = true, index = nil)
         group = index if index
         val = is_affirmative?(value) ? 1 : 0
 
         faders = group.is_a?(Array) ? group : [group]
         faders.each do |fad|
-            do_send("\eD#{fad}*#{val}GRPM", group_type: :mute, wait: true)
+            do_send("\eM#{fad}*#{val}AU", group_type: :mute, wait: true)
         end
         # Response:  GrpmD#{group}*+00001
     end
 
-    def unmute_audio(group, index = nil)
+    def unmute(group, index = nil)
         mute(group, false, index)
         #do_send("\eD#{group}*0GRPM", :group_type => :mute)
         # Response:  GrpmD#{group}*+00000
     end
 
+    def mutes(ids:, muted: true, **_)
+        mute(ids, muted)
+    end
+
     def fader(group, value, index = nil)    # \e == 0x1B == ESC key
         faders = group.is_a?(Array) ? group : [group]
         faders.each do |fad|
-            do_send("\eD#{fad}*#{value}GRPM", group_type: :volume, wait: true)
+            do_send("\eG#{fad}*#{value}AU", group_type: :volume, wait: true)
         end
-        
-        # Response: GrpmD#{group}*#{value}*GRPM
-    end
-    
-    def fader_status(group, type)
-        do_send("\eD#{group}GRPM", group_type: type, wait: true)
-    end
-    
-    def fader_relative(group, value)    # \e == 0x1B == ESC key
-        if value < 0
-            value = -value
-            do_send("\eD#{group}*#{value}-GRPM", wait: true)
-        else
-            do_send("\eD#{group}*#{value}+GRPM", wait: true)
-        end
-        # Response: GrpmD#{group}*#{value}*GRPM
     end
 
+    def faders(ids:, level:, **_)
+        fader(ids, level)
+    end
 
+    def query_fader(groups, type = :volume)
+        Array(groups).each do |group|
+            do_send("\eG#{group}AU", group_type: type, wait: true)
+        end
+    end
+
+    def query_faders(ids:, **_)
+        query_fader(ids)
+    end
+
+    def query_mute(groups, type = :mute)
+        Array(groups).each do |group|
+            do_send("\eM#{group}AU", group_type: type, wait: true)
+        end
+    end
+
+    def query_mutes(ids:, **_)
+        query_mute(ids)
+    end
 
 
     #
@@ -270,9 +280,9 @@ class Extron::Switcher::Dtp < Extron::Base
 
                 # Check for Audio responses
                 case data[0..2].to_sym
-                when :Grp    # Mute or Volume
+                when :DsM    # Mute
                     data = data.split('*')
-                    fader = data[0][5..-1].to_i
+                    fader = data[0][3..-1].to_i
                     value = data[1].to_i
                     logger.debug { "fader #{fader} and value #{value}, command present #{command.present?}" }
 
@@ -281,12 +291,21 @@ class Extron::Switcher::Dtp < Extron::Base
                     elsif command.present? && command[:group_type] == :volume
                         self["fader#{fader}"] = value
                     else
-                        return :failed
+                        self["fader#{fader}_mute"] = value == 1    # 1 == true
                     end
-                when :DsG    # Mic gain
-                    self["mic#{data[7]}_gain"] = data[9..-1].to_i
-                when :DsM    # Mic Mute
-                    self["mic#{data[7]}_mute"] = data[-1] == '1'    # 1 == true
+                when :DsG    # Gain
+                    data = data.split('*')
+                    fader = data[0][3..-1].to_i
+                    value = data[1].to_i
+                    logger.debug { "fader #{fader} and value #{value}, command present #{command.present?}" }
+
+                    if command.present? && command[:group_type] == :mute
+                        self["fader#{fader}_mute"] = value == 1    # 1 == true
+                    elsif command.present? && command[:group_type] == :volume
+                        self["fader#{fader}"] = value
+                    else
+                        self["fader#{fader}"] = value
+                    end
                 when :Rpr    # Preset called
                     logger.debug "Extron DSP called preset #{data[3..-1]}"
                 else
@@ -322,4 +341,3 @@ class Extron::Switcher::Dtp < Extron::Base
         28 => 'Bad filename or file not found'
     }
 end
-

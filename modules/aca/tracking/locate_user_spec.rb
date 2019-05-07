@@ -11,7 +11,7 @@ Orchestrator::Testing.mock_device 'Aca::Tracking::LocateUser' do
     })
 
     # Check MAC address lookup works
-    exec(:lookup, '192.168.1.16', 'stakach')
+    exec(:lookup, ['192.168.1.16', 'stakach'])
     expect(status['192.168.1.16'.to_sym]).to eq('stakach')
     expect(status['c4544438e158'.to_sym]).to eq('stakach')
 
@@ -35,7 +35,7 @@ Orchestrator::Testing.mock_device 'Aca::Tracking::LocateUser' do
     expect(user.class.bucket.get("macuser-c4544438e158", quiet: true)).to be(nil)
 
     # Test Cleanup
-    exec(:lookup, '192.168.1.16', 'stakach')
+    exec(:lookup, ['192.168.1.16', 'stakach'])
     expect(status['192.168.1.16'.to_sym]).to eq('stakach')
     expect(status['c4544438e158'.to_sym]).to eq('stakach')
     expect(user.class.bucket.get("macuser-c4544438e158")).to eq('stakach')

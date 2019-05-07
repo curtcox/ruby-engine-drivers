@@ -18,7 +18,9 @@ Orchestrator::Testing.mock_device 'Cisco::Switch::SnoopingCatalyst' do
     # Should have configured the tracking data above
     mock = Aca::Tracking::SwitchPort.find(start_id)
     expect(mock.nil?).to eq false
-    expect(status[:"Gi4/1/2"]).to eq({
+    details = status[:"gi4/1/2"]
+    expect(details.delete(:connected_at).is_a?(Integer)).to be(true)
+    expect(details).to eq({
         ip: "192.168.1.16", mac: "c4544438e158", connected: true,
         clash: false, reserved: false, username: nil, desk_id: nil
     })
@@ -54,8 +56,10 @@ ISTATUS
 
     # Should have updated this to be offline
     mock = Aca::Tracking::SwitchPort.find(start_id)
-    expect(mock.nil?).to eq false
-    expect(status[:"gi4/1/2"]).to eq({
+    expect(mock.nil?).to be false
+    details = status[:"gi4/1/2"]
+    expect(details.delete(:connected_at).is_a?(Integer)).to be(true)
+    expect(details).to eq({
         ip: nil, mac: nil, connected: false,
         clash: false, reserved: false, username: nil, desk_id: nil
     })

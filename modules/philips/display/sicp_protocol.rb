@@ -1,7 +1,7 @@
 module Philips; end
 module Philips::Display; end
 
-# Documentation: https://aca.im/driver_docs/Philips/The+SICP+Commands+Document+V1.88_20150819.pdf
+# Documentation: https://aca.im/driver_docs/Philips/The%20SICP%20Commands%20Document%20V1.88_20150819.pdf
 
 class Philips::Display::SicpProtocol
     include ::Orchestrator::Constants
@@ -134,7 +134,7 @@ class Philips::Display::SicpProtocol
     Inputs.merge!(Inputs.invert)
 
     def switch_to(input)
-        inp = self[:input] = input.to_sym
+        inp = self[:input] = input.to_s.downcase.to_sym
         do_send Command[:input], Inputs[inp], 0, 1, 0, name: :input
     end
 

@@ -40,7 +40,7 @@ class Cisco::Switch::SnoopingSg
         on_update
 
         # Load the current state of the switch from the database
-        query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(remote_address)
+        query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(@remote_address)
         query.each do |detail|
             details = detail.details
             interface = detail.interface
@@ -58,8 +58,10 @@ class Cisco::Switch::SnoopingSg
     end
 
     def on_update
+        @remote_address = remote_address.downcase
+
         self[:name] = @switch_name = setting(:switch_name)
-        self[:ip_address] = remote_address
+        self[:ip_address] = @remote_address
         self[:building] = setting(:building)
         self[:level] = setting(:level)
 
@@ -100,6 +102,10 @@ class Cisco::Switch::SnoopingSg
         schedule.in(3000) { query_snooping_bindings }
     end
 
+    def update_reservations
+        check_reservations
+    end
+
 
     protected
 
@@ -128,7 +134,7 @@ class Cisco::Switch::SnoopingSg
         # Detect more data available
         # ==> More: <space>,  Quit: q or CTRL+Z, One line: <return>
         if data =~ /More:/
-            send(' ', priority: 99)
+            send(' ', priority: 99, retries: 0)
             return :success
         end
 
@@ -213,10 +219,10 @@ class Cisco::Switch::SnoopingSg
                         if iface.ip != ip || iface.mac != mac
                             logger.debug { "New connection on #{interface} with #{ip}: #{mac}" }
 
-                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
                             reserved = details.connected(mac, @reserve_time, {
                                 device_ip: ip,
-                                switch_ip: remote_address,
+                                switch_ip: @remote_address,
                                 hostname: @hostname,
                                 switch_name: @switch_name,
                                 interface: interface
@@ -225,15 +231,34 @@ class Cisco::Switch::SnoopingSg
                             # ip, mac, reserved?, clash?
                             self[interface] = details.details
 
+                        elsif iface.username.nil?
+                            username = ::Aca::Tracking::SwitchPort.bucket.get("macuser-#{mac}", quiet: true)
+                            if username
+                                logger.debug { "Found #{username} at #{ip}: #{mac}" }
+
+                                # NOTE:: Same as new connection
+                                details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}") || ::Aca::Tracking::SwitchPort.new
+                                reserved = details.connected(mac, @reserve_time, {
+                                    device_ip: ip,
+                                    switch_ip: @remote_address,
+                                    hostname: @hostname,
+                                    switch_name: @switch_name,
+                                    interface: interface
+                                })
+
+                                # ip, mac, reserved?, clash?
+                                self[interface] = details.details
+                            end
+
                         elsif not iface.reserved
                             # We don't know the user who is at this desk...
-                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
                             reserved = details.check_for_user(@reserve_time)
                             self[interface] = details.details if reserved
 
                         elsif iface.clash
                             # There was a reservation clash - is there still a clash?
-                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+                            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
                             reserved = details.check_for_user(@reserve_time)
                             self[interface] = details.details if !details.clash?
                         end
@@ -258,7 +283,7 @@ class Cisco::Switch::SnoopingSg
         @check_interface.delete(interface)
 
         # Update the status of the switch port
-        model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
+        model = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
         if model
             notify = model.disconnected
             details = model.details
@@ -289,11 +314,9 @@ class Cisco::Switch::SnoopingSg
 
         # Check if the interfaces are still reserved
         @reserved_interface.each do |interface|
-            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{remote_address}-#{interface}")
-            if not details.reserved?
-                remove << interface
-                self[interface] = details.details
-            end
+            details = ::Aca::Tracking::SwitchPort.find_by_id("swport-#{@remote_address}-#{interface}")
+            remove << interface unless details.reserved?
+            self[interface] = details.details
         end
 
         # Remove them from the reserved list if not
