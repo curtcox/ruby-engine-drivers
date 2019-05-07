@@ -45,6 +45,7 @@ class Lg::Lcd::ModelLs5
     end
 
     def on_update
+        @rs232 = setting(:rs232_control) || false
         @id_num = setting(:display_id) || 1
         @autoswitch = setting(:autoswitch) || false
         @id = @id_num.to_s.rjust(2, '0')
@@ -79,7 +80,8 @@ class Lg::Lcd::ModelLs5
         wol: 'w',
         no_signal_off: 'g',
         auto_off: 'n',
-        dpm: 'j'
+        dpm: 'j',
+        aspect_ratio: 'c'
     }
     Lookup = Command.invert
 
@@ -87,15 +89,19 @@ class Lg::Lcd::ModelLs5
     def power(state, broadcast = @last_broadcast)
         power_on = is_affirmative?(state)
 
-        # This allows polling 
+        # This allows polling
         @last_broadcast = broadcast if broadcast
         self[:power_target] = power_on
         self[:power_stable] = false
 
-        if self[:connected]
-            mute_display !power_on
+        if power_on
+            if @rs232
+                do_send(Command[:power], 1, name: :power, priority: 99)
+            else
+                wake(broadcast)
+            end
         end
-        wake(broadcast) if power_on
+        mute_display !power_on if self[:connected]
     end
 
     def hard_off
@@ -108,9 +114,12 @@ class Lg::Lcd::ModelLs5
     # NOTE:: We are currently only supporting the PC values here
     Inputs = {
         dvi: 112,
-        hdmi: 160,
-        hdmi2: 161,
-        display_port: 208 
+        hdmi: 0xA0,
+        hdmi_dtv: 0x90,
+        hdmi2: 0xA1,
+        hdmi2_dtv: 0x91,
+        display_port: 0xD0,
+        display_port_dtv: 0xC0
     }
     Inputs.merge!(Inputs.invert)
     def switch_to(source)
@@ -158,10 +167,32 @@ class Lg::Lcd::ModelLs5
         mute_display(false)
     end
 
+    # Set Aspect Ratio
+    Ratios = {
+        square: 0x01,
+        wide: 0x02,
+        zoom: 0x04,
+        scan: 0x09,
+        program: 0x06
+    }
+    Ratios.merge!(Ratios.invert)
+    def aspect_ratio(ratio)
+        val = Ratios[ratio.to_sym]
+        do_send(Command[:aspect_ratio], val, name: :aspect_ratio, delay_on_receive: 1000)
+    end
 
     # Status values we are interested in polling
     def do_poll
-        if self[:connected]
+        if @rs232
+            power?.then do
+                if self[:hard_power]
+                    screen_mute?
+                    input?
+                    volume_mute?
+                    volume?
+                end
+            end
+        elsif self[:connected]
             screen_mute?
 
             if @id_num == 1
@@ -218,12 +249,12 @@ class Lg::Lcd::ModelLs5
         # 5 == 3m
         # 6 == 5m
         # 7 == 10m
-        do_send(Command[:dpm], 4, :f, name: :disable_dpm)
+        do_send(Command[:dpm], time_out.to_i, :f, name: :disable_dpm)
 
         # The action DPM takes needs to be configured using a remote
         # The action should be set to: screen off always
     end
-    
+
     def no_signal_off(enable = false)
         val = is_affirmative?(enable) ? 1 : 0
         do_send(Command[:no_signal_off], val, :f, name: :disable_no_sig_off)
@@ -244,7 +275,7 @@ class Lg::Lcd::ModelLs5
         if mac
             # config is the database model representing this device
             wake_device(mac, broadcast)
-            logger.debug { 
+            logger.debug {
                 info = "Wake on Lan for MAC #{mac}"
                 info << " directed to VLAN #{broadcast}" if broadcast
                 info
@@ -280,7 +311,8 @@ class Lg::Lcd::ModelLs5
 
         case Lookup[cmd]
         when :power
-            self[:power] = resp_value == 1
+            self[:hard_power] = resp_value == 1
+            self[:power] = false if self[:hard_power] == false
         when :input
             self[:input] = Inputs[resp_value] || :unknown
             self[:input_target] = self[:input] if self[:input_target].nil?
@@ -289,6 +321,8 @@ class Lg::Lcd::ModelLs5
             else
                 switch_to(self[:input_target])
             end
+        when :aspect_ratio
+            self[:aspect_ratio] = Ratios[resp_value] || :unknown
         when :screen_mute
             # This indicates power status as hard off we are disconnected
             self[:power] = resp_value != 1
@@ -332,4 +366,3 @@ class Lg::Lcd::ModelLs5
 
 
 end
-

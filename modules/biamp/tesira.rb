@@ -30,22 +30,22 @@ class Biamp::Tesira
         password: 'default'
     })
 
-    
+
     def on_load
         # Implement the Telnet protocol
         new_telnet_client
         config before_buffering: proc { |data|
             @telnet.buffer data
-        }
+        }, wait_ready_timeout: 15000
     end
-    
+
     def on_unload
     end
-    
+
     def on_update
     end
-    
-    
+
+
     def connected
         # Echo off
         echo_off = Protocols::Telnet::IAC + Protocols::Telnet::DONT + Protocols::Telnet::OPT_ECHO
@@ -56,20 +56,20 @@ class Biamp::Tesira
             do_send setting(:password), wait: false, delay: 200, priority: 97
         end
         do_send "SESSION set verbose false", priority: 96
-        
+
         schedule.every('60s') do
             do_send "DEVICE get serialNumber", priority: 0
         end
     end
-    
+
     def disconnected
         # Ensures the buffer is cleared
         new_telnet_client
 
         schedule.clear
     end
-    
-    
+
+
     def preset(number_or_name)
         if number_or_name.is_a? Integer
             do_send "DEVICE recallPreset #{number_or_name}"
@@ -100,14 +100,12 @@ class Biamp::Tesira
     # Who thought having 3 different types was a good idea? FFS
     def mixer(id, inouts, mute = false, type = :matrix)
         value = is_affirmative?(mute)
-        mixer_type = MIXERS[type.to_sym]
+        type = type.to_sym
+        mixer_type = MIXERS[type] || type
 
         if inouts.is_a? Hash
-            inouts.each_key do |input|
-                outputs = inouts[input]
-                outs = outputs.is_a?(Array) ? outputs : [outputs]
-
-                outs.each do |output|
+            inouts.each do |input, out|
+                Array(out).each do |output|
                     do_send build(id, :set, mixer_type, input, output, value)
                 end
             end
@@ -127,18 +125,21 @@ class Biamp::Tesira
     FADERS.merge!(FADERS.invert)
     def fader(fader_id, level, index = 1, type = :fader)
         # value range: -100 ~ 12
-        faders = fader_id.is_a?(Array) ? fader_id : [fader_id]
-        fader_type = FADERS[type.to_sym]
+        type = type.to_sym
+        fader_type = FADERS[type] || type
 
-        faders.each do |fad|
-            do_send build(fader_id, :set, fader_type, index, level), type: :fader
+        indicies = Array(index)
+        Array(fader_id).each do |fad|
+            indicies.each do |i|
+                do_send build(fad, :set, fader_type, i, level), type: :fader
+            end
         end
     end
     # Named params version
     def faders(ids:, level:, index: 1, type: :fader, **_)
         fader(ids, level, index, type)
     end
-    
+
     MUTES = {
         fader: :mute,
         matrix_in: :inputMute,
@@ -147,27 +148,30 @@ class Biamp::Tesira
     MUTES.merge!(MUTES.invert)
     def mute(fader_id, val = true, index = 1, type = :fader)
         value = is_affirmative?(val)
-        mute_type = MUTES[type.to_sym]
+        type = type.to_sym
+        mute_type = MUTES[type] || type
 
-        faders = fader_id.is_a?(Array) ? fader_id : [fader_id]
-        faders.each do |fad|
-            do_send build(fader_id, :set, mute_type, index, value), type: :mute
+        indicies = Array(index)
+        Array(fader_id).each do |fad|
+            indicies.each do |i|
+                do_send build(fad, :set, mute_type, i, value), type: :mute
+            end
         end
     end
     # Named params version
     def mutes(ids:, muted: true, index: 1, type: :fader, **_)
         mute(ids, muted, index, type)
     end
-    
+
     def unmute(fader_id, index = 1, type = :fader)
         mute(fader_id, false, index, type)
     end
 
     def query_fader(fader_id, index = 1, type = :fader)
-        fad = fader_id.is_a?(Array) ? fader_id[0] : fader_id
-        fad_type = FADERS[type.to_sym]
+        type = type.to_sym
+        fad_type = FADERS[type] || type
 
-        do_send build(fader_id, :get, fad_type, index), type: :fader
+        do_send build(Array(fader_id)[0], :get, fad_type, Array(index)[0]), type: :fader
     end
     # Named params version
     def query_faders(ids:, index: 1, type: :fader, **_)
@@ -175,17 +179,17 @@ class Biamp::Tesira
     end
 
     def query_mute(fader_id, index = 1, type = :fader)
-        fad = fader_id.is_a?(Array) ? fader_id[0] : fader_id
-        mute_type = MUTES[type.to_sym]
-        
-        do_send build(fader_id, :get, fad_type, index), type: :mute
+        type = type.to_sym
+        mute_type = MUTES[type] || type
+
+        do_send build(Array(fader_id)[0], :get, mute_type, Array(index)[0]), type: :mute
     end
     # Named params version
     def query_mutes(ids:, index: 1, type: :fader, **_)
         query_mute(ids, index, type)
     end
-    
-    
+
+
     def received(data, resolve, command)
         if data[0] == '-'
             if command
@@ -195,7 +199,7 @@ class Biamp::Tesira
             end
             return :abort
         end
-        
+
         logger.debug { "Tesira responded #{data}" }
         result = Shellwords.split data
 
@@ -226,18 +230,20 @@ class Biamp::Tesira
             # Lets set the variable
             case command[:type]
             when :fader
-                type = FADERS[request[2].to_sym]
+                fad = request[2].to_sym
+                type = FADERS[fad] || fad
                 self["#{type}#{request[0]}_#{request[3]}"] = value
             when :mute
-                type = MUTES[request[2].to_sym]
+                fad = request[2].to_sym
+                type = MUTES[fad] || fad
                 self["#{type}#{request[0]}_#{request[3]}_mute"] = value
             end
         end
-        
+
         return :success
     end
-    
-    
+
+
     protected
 
 
@@ -264,10 +270,9 @@ class Biamp::Tesira
         end
         cmd
     end
-    
+
     def do_send(command, options = {})
         logger.debug { "requesting #{command}" }
         send @telnet.prepare(command), options
     end
 end
-

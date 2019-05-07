@@ -81,7 +81,7 @@ class Cisco::TelePresence::SxTelnet
     def params(opts = {})
         return nil if opts.empty?
 
-        cmd = ''
+        cmd = String.new
         opts.each do |key, value|
             next if value.blank?
             cmd << key.to_s

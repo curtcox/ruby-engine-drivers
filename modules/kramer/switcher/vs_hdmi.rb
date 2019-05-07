@@ -2,7 +2,7 @@ module Kramer; end
 module Kramer::Switcher; end
 
 
-# Documentation: https://aca.im/driver_docs/Kramer/Kramer+protocol+2000+v0.51.pdf
+# Documentation: https://aca.im/driver_docs/Kramer/Kramer%20protocol%202000%20v0.51.pdf
 #
 # NOTE:: These devices should be marked as make and break!
 #

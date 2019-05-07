@@ -105,7 +105,7 @@ class Aca::Joiner
         start_joining
 
         # Ensure all id's are symbols
-        ids.map! {|id| id.to_sym}
+        ids = ids.flatten.map {|id| id.to_sym}
 
         # Grab only valid IDs
         rmset = Set.new(ids) & @rooms
@@ -131,8 +131,8 @@ class Aca::Joiner
         end
         promise.finally do
             self[:is_joined] = true
-            commit_join(:join, @system_id, rooms)
             finish_joining
+            commit_join(:join, @system_id, rooms)
         end
     end
 
@@ -151,8 +151,8 @@ class Aca::Joiner
         # Inform the remote systems
         promise = inform(:unjoin, rooms).finally do
             self[:is_joined] = false
-            commit_join(:unjoin)
             finish_joining
+            commit_join(:unjoin)
         end
         promise
     end
@@ -312,6 +312,9 @@ class Aca::Joiner
         define_setting(:joined, self[:joined])
 
         # Return the list of rooms that need to be unjoined
+        remaining
+    rescue => e
+        logger.print_error e, 'committing join'
         remaining
     end
 

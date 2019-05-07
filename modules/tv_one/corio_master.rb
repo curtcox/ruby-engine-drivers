@@ -1,6 +1,6 @@
 module TvOne; end
 
-# Documentation: https://aca.im/driver_docs/TV+One/CORIOmaster-Commands-v1.7.0.pdf
+# Documentation: https://aca.im/driver_docs/TV%20One/CORIOmaster-Commands-v1.7.0.pdf
 
 class TvOne::CorioMaster
     include ::Orchestrator::Constants    # these provide optional helper methods
