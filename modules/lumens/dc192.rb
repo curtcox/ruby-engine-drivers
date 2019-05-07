@@ -1,6 +1,6 @@
 module Lumens; end
 
-# Documentation: https://aca.im/driver_docs/Lumens/DC192+Protocol.pdf
+# Documentation: https://aca.im/driver_docs/Lumens/DC192%20Protocol.pdf
 
 class Lumens::Dc192
 	include ::Orchestrator::Constants

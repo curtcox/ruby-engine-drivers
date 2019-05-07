@@ -1,8 +1,8 @@
 module Clipsal; end
 
 
-# Documentation: https://aca.im/driver_docs/Clipsal/CBUS+Lighting+Application.pdf
-#  and https://s3-ap-southeast-2.amazonaws.com/aca.im/driver_docs/Clipsal/CBUS+Trigger+Control+Application.pdf
+# Documentation: https://aca.im/driver_docs/Clipsal/CBUS-Lighting-Application.pdf
+#  and https://aca.im/driver_docs/Clipsal/CBUS-Trigger-Control-Application.pdf
 #
 # ACA Recommendations: https://s3-ap-southeast-2.amazonaws.com/aca.im/driver_docs/Clipsal/C-BusLightingSpec.pdf
 
@@ -44,9 +44,11 @@ class Clipsal::CBus
     end
 
     def on_unload
+        
     end
 
     def on_update
+        @trigger_groups = setting(:trigger_groups) || [0xCA]
     end
 
 
@@ -108,10 +110,11 @@ class Clipsal::CBus
         level = level & 0xFF
         application = application & 0xFF
 
-        stop_fading(group)
-        command = [0x05, application, 0x00, rate, group, level]
+        # stop_fading(group)
+        stop_f = cmd_string([0x05, 0x38, 0x00, 0x09, group])
+        command = stop_f + cmd_string([0x05, application, 0x00, rate, group, level])
 
-        do_send(command)
+        send(command, name: "level_#{application}_#{group}")
     end
 
     def stop_fading(group)
@@ -148,10 +151,11 @@ class Clipsal::CBus
     end
 
 
-    def trigger(group, action)
+    def trigger(group, action, application = 0xCA)
         group = group.to_i & 0xFF
         action = action.to_i & 0xFF
-        command = [0x05, 0xCA, 0x00, 0x02, group, action]
+        application = application.to_i & 0xFF
+        command = [0x05, application, 0x00, 0x02, group, action]
 
         self["trigger_group_#{group}"] = action
 
@@ -159,12 +163,16 @@ class Clipsal::CBus
     end
 
 
-    def trigger_kill(group)
+    def trigger_kill(group, application = 0xCA)
         group = group.to_i
 
         group = group & 0xFF
-        command = [0x05, 0xCA, 0x00, 0x01, group]
+        command = [0x05, application, 0x00, 0x01, group]
         do_send(command)
+    end
+
+    def raw(hex)
+        do_send(str_to_array(hex_to_byte(hex)))
     end
 
 
@@ -195,7 +203,7 @@ class Clipsal::CBus
             current = commands.shift
 
             case application
-            when 0xCA            # Trigger group
+            when *@trigger_groups            # Trigger group
                 case current
                 when 0x02            # Trigger Event (ex: 0504CA00 020101 29)
                     self["trigger_group_#{commands.shift}"] = commands.shift    # Action selector
@@ -275,6 +283,10 @@ class Clipsal::CBus
         return (check % 0x100) == 0x00
     end
 
+    def cmd_string(command)
+        string = byte_to_hex(command << checksum(command)).upcase
+        "\\#{string}\r"
+    end
 
     def do_send(command, options = {})
         string = byte_to_hex(command << checksum(command)).upcase

@@ -21,38 +21,49 @@ class Aca::Tracking::DeskManagement
         checkin: {
             level_id: []
         },
-        timezone: 'Singapore' # used for manual desk checkin
+        timezone: 'Singapore', # used for manual desk checkin
+        desk_hold_time: 5.minutes.to_i,
+        desk_reserve_time: 2.hours.to_i,
+        manual_reserve_time: 2.hours.to_i,
+        user_identifier: :login_name  # in user model
     })
 
     def on_load
-        on_update
+        system.load_complete do
+            begin
+                on_update
 
-        # Load any manual check-in data
-        @manual_checkin.each_key do |level|
-            logger.debug { "Loading manual desk check-in details for level #{level}" }
+                # Load any manual check-in data
+                @manual_checkin.each_key do |level|
+                    logger.debug { "Loading manual desk check-in details for level #{level}" }
 
-            query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(level)
-            query.each do |detail|
-                details = detail.details
-                details[:level] = detail.level
-                details[:manual_desk] = true
-                details[:clash] = false
+                    query = ::Aca::Tracking::SwitchPort.find_by_switch_ip(level)
+                    query.each do |detail|
+                        details = detail.details
+                        details[:level] = detail.level
+                        details[:manual_desk] = true
+                        details[:clash] = false
 
-                username = details.username
-                self[username] = details
-                @manual_usage[detail.desk_id] = username
-                @manual_users << username
+                        username = details.username
+                        self[username] = details
+                        @manual_usage[detail.desk_id] = username
+                        @manual_users << username
+                    end
+                end
+
+                # Manual checkout times don't need to be checked very often
+                cleanup_manual_checkins
+            rescue => e
+                logger.print_error e
+            ensure
+                schedule.every('2m') do
+                    cleanup_manual_checkins
+                end
+
+                # Should only call once
+                get_usage
             end
         end
-
-        # Manual checkout times don't need to be checked very often
-        cleanup_manual_checkins
-        schedule.every('2m') do
-            cleanup_manual_checkins
-        end
-
-        # Should only call once
-        get_usage
     end
 
     def on_update
@@ -66,8 +77,18 @@ class Aca::Tracking::DeskManagement
         @switch_mappings = setting(:mappings) || {}
         @desk_mappings = {}
         @switch_mappings.each do |switch_ip, ports|
-            ports.each do |port, desk_id|
-                @desk_mappings[desk_id] = [switch_ip, port]
+            if ports[:multiple_levels]
+                ports.each_value do |desk_mapping|
+                    # ignore the multiple_levels flag
+                    next if desk_mapping == true
+                    desk_mapping.each do |port, desk_id|
+                        @desk_mappings[desk_id] = [switch_ip, port]
+                    end
+                end
+            else
+                ports.each do |port, desk_id|
+                    @desk_mappings[desk_id] = [switch_ip, port]
+                end
             end
         end
 
@@ -93,14 +114,19 @@ class Aca::Tracking::DeskManagement
     # Grab the ownership details of the desk
     #
     # @param desk_id [String] the unique id that represents a desk
-    def desk_details(desk_id)
-        switch_ip, port = @desk_mappings[desk_id]
-        if switch_ip
-            ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.details
-        else # Check for manual checkin
-            username = @manual_usage[desk_id]
-            return nil unless username
-            self[username]
+    def desk_details(*desk_ids)
+        desk_ids.map do |desk_id|
+            switch_ip, port = @desk_mappings[desk_id]
+            if switch_ip
+                ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.details
+            else # Check for manual checkin
+                username = @manual_usage[desk_id]
+                if username
+                    self[username]
+                else
+                    nil
+                end
+            end
         end
     end
 
@@ -275,6 +301,13 @@ class Aca::Tracking::DeskManagement
         self[username] = details
     end
 
+    def early_cancel_reservation(desk_id)
+        switch_ip, port = @desk_mappings[desk_id]
+        ::Aca::Tracking::SwitchPort.find_by_id("swport-#{switch_ip}-#{port}")&.update_reservation(0)
+    rescue => e
+        logger.print_error e, 'removing previous reservation'
+    end
+
     # If people reserve a desk then they may forget to checkout
     #   This cleans up manual reservations when their timeout is expired
     def cleanup_manual_checkins
@@ -310,10 +343,20 @@ class Aca::Tracking::DeskManagement
             mappings = @switch_mappings[ip]
             next unless mappings
 
-            level = switch[:level]
-            ids = desk_ids[level] || []
-            ids.concat(mappings.values)
-            desk_ids[level] = ids
+            if mappings[:multiple_levels]
+                mappings.each do |level, desk_mapping|
+                    # ignore the multiple_levels flag
+                    next if desk_mapping == true
+                    ids = desk_ids[level] || []
+                    ids.concat(desk_mapping.values)
+                    desk_ids[level] = ids
+                end
+            else
+                level = switch[:level]
+                ids = desk_ids[level] || []
+                ids.concat(mappings.values)
+                desk_ids[level] = ids
+            end
         end
 
         # Add any manual checkin desks to the data
@@ -342,6 +385,9 @@ class Aca::Tracking::DeskManagement
                 self[details.reserved_by] = details if details.reserved_by
             end
         end
+    rescue => e
+        logger.print_error e, 'subscribing to unplug events'
+        schedule.in('5s') { subscribe_disconnect }
     end
 
     # Schedules periodic desk usage statistics gathering
@@ -360,24 +406,70 @@ class Aca::Tracking::DeskManagement
 
             # Find the desks in use
             all_switches.each do |switch|
-                apply_mappings(level_data, switch, mappings)
+                switch_ip = switch[:ip_address]
+                map = mappings[switch_ip]
+                if map.nil?
+                    logger.warn "no mappings for switch #{switch_ip}"
+                    next
+                elsif map[:multiple_levels]
+                    map.each do |level_id, desk_mapping|
+                        # ignore the multiple_levels flag
+                        next if desk_mapping == true
+                        apply_mappings(level_data, level_id, switch, switch_ip, desk_mapping)
+                    end
+                else
+                    apply_mappings(level_data, switch[:level], switch, switch_ip, map)
+                end
             end
 
             level_data
         }.then { |levels|
             manual_desk_ids = @manual_usage.keys
+            updated_users = Set.new
 
             # Apply the settings on thread for performance reasons
             levels.each do |level, desks|
                 desks.users.each do |user|
                     username = user.username
                     manual_checkout(self[username]) if @manual_users.include?(username)
-                    self[username] = user
-                    self[user.reserved_by] = user if user.clash
+
+                    # The user might have multiple machines or an existing reservation
+                    if updated_users.include? username
+                        details = self[username]
+                        if !details.connected || details.username != username
+                            early_cancel_reservation(details.desk_id)
+                            self[username] = user
+                        elsif user.connected_at > details.connected_at
+                            # Display the latest connection as the user is most likely at this location
+                            self[username] = user
+                        end
+                        self[user.reserved_by] = user if user.clash
+                    else
+                        self[username] = user
+                        self[user.reserved_by] = user if user.clash
+                        updated_users << username
+                    end
                 end
 
                 desks.reserved_users.each do |user|
-                    self[user.reserved_by] = user
+                    username = user.reserved_by
+                    next unless username
+
+                    # Check for existing reservations that might need to be cancelled
+                    if updated_users.include? username
+                        details = self[username]
+
+                        # This user is already at a desk so this reservation is not required
+                        if details && ((details.connected && details.username == username) || (details.unplug_time >= user.unplug_time))
+                            early_cancel_reservation(user.desk_id)
+                        else # details.unplug_time < user.unplug_time
+                            early_cancel_reservation(details.desk_id)
+                            self[username] = user
+                        end
+                    else
+                        self[username] = user
+                        updated_users << username
+                    end
                 end
 
                 # Map the used manually checked-in desks
@@ -405,21 +497,13 @@ class Aca::Tracking::DeskManagement
     PortUsage = Struct.new(:inuse, :clash, :reserved, :users, :reserved_users, :manual)
 
     # Performs the desk usage statistics gathering
-    def apply_mappings(level_data, switch, mappings)
-        switch_ip = switch[:ip_address]
-        map = mappings[switch_ip]
-        if map.nil?
-            logger.warn "no mappings for switch #{switch_ip}"
-            return
-        end
-
+    def apply_mappings(level_data, level, switch, switch_ip, map)
         # Grab port information
         interfaces = switch[:interfaces]
-        reservations = switch[:reserved]
+        reservations = Array(switch[:reserved])
 
         # Build lookup structures
         building = switch[:building]
-        level = switch[:level]
         port_usage = level_data[level] ||= PortUsage.new([], [], [], [], [])
 
         # Prevent needless lookups
@@ -432,39 +516,35 @@ class Aca::Tracking::DeskManagement
         # Map the ports to desk IDs
         interfaces.each do |port|
             desk_id = map[port]
-            if desk_id
-                details = switch[port]
-                next unless details
+            next unless desk_id
+            details = switch[port]
+            next unless details
 
-                # Configure desk id if not known
-                if details.desk_id != desk_id
-                    details.desk_id = desk_id
-                    ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
-                        doc.dict_upsert(:level, level)
-                        doc.dict_upsert(:desk_id, desk_id)
-                        doc.dict_upsert(:building, building)
-                    end
+            # Configure desk id if not known
+            if details.desk_id != desk_id
+                details.desk_id = desk_id
+                ::User.bucket.subdoc("swport-#{switch_ip}-#{port}") do |doc|
+                    doc.dict_upsert(:level, level)
+                    doc.dict_upsert(:desk_id, desk_id)
+                    doc.dict_upsert(:building, building)
                 end
-
-                inuse << desk_id
-                clash << desk_id if details.clash
-
-                # set the user details
-                users << details if details.username
-            else
-                logger.debug { "Unknown port #{port} - no desk mapping found" }
             end
+
+            inuse << desk_id
+            clash << desk_id if details.clash
+            users << details if details.username
         end
 
         reservations.each do |port|
             desk_id = map[port]
-            if desk_id
+            next unless desk_id
+
+            if reservations.include?(port)
                 reserved << desk_id
 
                 # set the user details (reserved_by must exist to be here)
-                reserved_users << switch[port]
-            else
-                logger.debug { "Unknown port #{port} - no desk mapping found" }
+                details = switch[port]
+                reserved_users << details
             end
         end
 

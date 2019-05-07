@@ -105,7 +105,7 @@ class Aca::Joiner
         start_joining
 
         # Ensure all id's are symbols
-        ids.map! {|id| id.to_sym}
+        ids = ids.flatten.map {|id| id.to_sym}
 
         # Grab only valid IDs
         rmset = Set.new(ids) & @rooms

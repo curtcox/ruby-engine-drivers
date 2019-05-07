@@ -2,7 +2,7 @@ load File.expand_path('../base.rb', File.dirname(__FILE__))
 module Extron::Mixer; end
 
 
-# Documentation: https://aca.im/driver_docs/Extron/Extron+DMP64+DSP.pdf
+# Documentation: https://aca.im/driver_docs/Extron/Extron%20DMP64%20DSP.pdf
 #
 # Volume outputs
 # 60000 == volume 1
@@ -12,14 +12,17 @@ module Extron::Mixer; end
 # 40100 == Mic1
 # 40105 == Mic6
 
+#
+# DsG60003*01048 min vol
+# DsG60003*02048
+#
+
 
 class Extron::Mixer::Dmp64 < Extron::Base
     descriptive_name 'Extron DSP DMP64'
     generic_name :Mixer
 
     def on_load
-        super
-        
         #
         # Setup constants
         #
@@ -27,6 +30,11 @@ class Extron::Mixer::Dmp64 < Extron::Base
         self[:output_volume_min] = 1048
         self[:mic_gain_max] = 2298
         self[:mic_gain_min] = 1698
+        on_update
+    end
+
+    def on_update
+        @mute_indicator, @fader_indicator, @fader_type = setting(:fader_type) || ['D', 'D', 'GRPM']
     end
 
     def call_preset(number)
@@ -37,6 +45,7 @@ class Extron::Mixer::Dmp64 < Extron::Base
         # Response: Rpr#{number}
     end
     alias_method :preset, :call_preset
+    alias_method :trigger, :call_preset
 
     #
     # Input control
@@ -73,7 +82,7 @@ class Extron::Mixer::Dmp64 < Extron::Base
 
         faders = group.is_a?(Array) ? group : [group]
         faders.each do |fad|
-            do_send("\eD#{fad}*#{val}GRPM", group_type: :mute, wait: true)
+            do_send("\e#{@mute_indicator}#{fad}*#{val}#{@fader_type}", group_type: :mute, wait: true)
         end
         # Response:  GrpmD#{group}*+00001
     end
@@ -88,21 +97,21 @@ class Extron::Mixer::Dmp64 < Extron::Base
         # Response:  GrpmD#{group}*+00000
     end
 
-    def fader(group, value, index = nil)    # \e == 0x1B == ESC key
+    def fader(group, value, type = :group)    # \e == 0x1B == ESC key
         faders = group.is_a?(Array) ? group : [group]
         faders.each do |fad|
-            do_send("\eD#{fad}*#{value}GRPM", group_type: :volume, wait: true)
+            do_send("\e#{@fader_indicator}#{fad}*#{value}#{@fader_type}", group_type: :volume, wait: true)
         end
-        
+
         # Response: GrpmD#{group}*#{value}*GRPM
     end
     # Named params version
-    def faders(ids:, level:, **_)
-        fader(ids, level)
+    def faders(ids:, level:, index: :group, **_)
+        fader(ids, level, index)
     end
-    
-    def fader_status(group, type)
-        do_send("\eD#{group}GRPM", group_type: type, wait: true)
+
+    def fader_status(group, type = :group)
+        do_send("\e#{@fader_indicator}#{group}#{@fader_type}", group_type: type, wait: true)
     end
 
 
@@ -127,7 +136,7 @@ class Extron::Mixer::Dmp64 < Extron::Base
     end
 
 
-    
+
     def fader_relative(group, value)    # \e == 0x1B == ESC key
         if value < 0
             value = -value
@@ -151,7 +160,7 @@ class Extron::Mixer::Dmp64 < Extron::Base
             cmd = data[0..2].to_sym
 
             case cmd
-            when :Grp    # Mute or Volume
+            when :Grp, :DsG    # Mute or Volume
                 data = data.split('*')
                 if command.present? && command[:group_type] == :mute
                     self["fader#{data[0][5..-1].to_i}_mute"] = data[1][-1] == '1'    # 1 == true
@@ -161,8 +170,8 @@ class Extron::Mixer::Dmp64 < Extron::Base
                     logger.debug { "DSP response failure as couldn't determine if mute or volume request" }
                     return :ignore
                 end
-            when :DsG    # Mic gain
-                self["mic#{data[7]}_gain"] = data[9..-1].to_i
+            #when :DsG    # Mic gain
+            #   self["mic#{data[7]}_gain"] = data[9..-1].to_i
             when :DsM    # Mic Mute
                 self["mic#{data[7]}_mute"] = data[-1] == '1'    # 1 == true
             when :Rpr    # Preset called
@@ -205,4 +214,3 @@ class Extron::Mixer::Dmp64 < Extron::Base
         28 => 'Bad filename or file not found'
     }
 end
-

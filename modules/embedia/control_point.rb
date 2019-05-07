@@ -1,6 +1,6 @@
 module Embedia; end
 
-# Documentation: https://aca.im/driver_docs/Embedia/Embedia+Control+Point+rev2013.pdf
+# Documentation: https://aca.im/driver_docs/Embedia/Embedia%20Control%20Point%20rev2013.pdf
 # RS232 Gateway. Baud Rate 9600,8,N,1
 
 class Embedia::ControlPoint

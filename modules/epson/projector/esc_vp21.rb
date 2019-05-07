@@ -117,16 +117,16 @@ class Epson::Projector::EscVp21
     #
     # Mute Audio and Video
     #
-    def mute
-        logger.debug "-- epson Proj, requested to mute"
-        do_send(:MUTE, :ON, {:name => :video_mute})    # Audio + Video
+    def mute(state)
+        state = is_affirmative?(state) ? :ON : :OFF
+
+        logger.debug { "-- epson Proj, requested to mute #{state}" }
+        do_send(:MUTE, state, {:name => :video_mute})    # Audio + Video
         do_send(:MUTE) # request status
     end
 
     def unmute
-        logger.debug "-- epson Proj, requested to unmute"
-        do_send(:MUTE, :OFF, {:name => :video_mute})
-        do_send(:MUTE)
+        mute(false)
     end
 
     # Audio mute
