@@ -39,7 +39,7 @@ class Denon::Bluray::Dn500bd
     def connected
         model_information
         do_poll
-        schedule.every('1m') do
+        schedule.every('15s') do
             do_poll
         end
     end
@@ -122,7 +122,14 @@ class Denon::Bluray::Dn500bd
     COMMANDS.each do |command, value|
         define_method command do |**options|
             options[:name] ||= command
-            send_cmd(value, options)
+            send_cmd(value, options).then do |result|
+                @status_sched.cancel if @status_sched
+                @status_sched = schedule.in(3000) do
+                    @status_sched = nil
+                    play_status
+                end
+                result
+            end
         end
     end
 
@@ -131,6 +138,20 @@ class Denon::Bluray::Dn500bd
             options[:status_req] = command
             options[:priority] ||= 0
             send_query(value, options)
+        end
+    end
+
+    def play_status(**options)
+        @play_status_reply = false
+        options[:status_req] = :play_status
+        options[:priority] ||= 0
+        send_query('ST', options).then do |result|
+            if not @play_status_reply
+                self[:playing] = false
+                self[:paused] = false
+            end
+
+            result
         end
     end
 
@@ -175,85 +196,88 @@ class Denon::Bluray::Dn500bd
 
     def received(data, resolve, command)
         logger.debug { "received #{data}" }
+        responses = data.split(/\+|\@/)
 
-        success, resp = data.split('+')
-        return :abort if success == 'nack'
-        return :success unless resp
+        responses.each do |part|
+            next unless part[0] == '0'
+            resp = "@#{part}"
 
-        # Remove the @0
-        resp_value = resp[2..-1]
+            # Remove the @0
+            resp_value = resp[2..-1]
 
-        # Work out the status coming in
-        resp_type = nil
-        STATUS.each do |key, value|
-            resp_type = key if resp_value.start_with?(value)
-        end
+            # Work out the status coming in
+            resp_type = nil
+            STATUS.each do |key, value|
+                resp_type = key if resp_value.start_with?(value)
+            end
 
-        # Notify if the status coming in is unknown
-        if resp_type.nil?
-            logger.debug { "unknown status value for #{resp}" }
-            return :success
-        end
+            # Notify if the status coming in is unknown
+            if resp_type.nil?
+                logger.debug { "unknown status value for #{resp}" }
+                next
+            end
 
-        # Extract the data from the response
-        case resp_type
-        when :play_status
-            state = resp[4..-1].to_sym
-            self[:play_status] = PlayStatus[state]
-            if self[:disc_ready]
-                if state == :PP
-                    self[:playing] = false
-                    self[:paused] = true
+            # Extract the data from the response
+            case resp_type
+            when :play_status
+                state = resp[4..-1].to_sym
+                self[:play_status] = PlayStatus[state]
+                @play_status_reply = true
+                if self[:disc_ready]
+                    if state == :PP
+                        self[:playing] = false
+                        self[:paused] = true
+                    else
+                        self[:playing] = true
+                        self[:paused] = false
+                    end
                 else
-                    self[:playing] = true
+                    self[:playing] = false
                     self[:paused] = false
                 end
+            when :tray_status
+                state = resp[4..-1].to_sym
+                self[:tray_status] = MediaStatus[state]
+                self[:disc_ready] = state == :CI
+                self[:ejected] = state == :TO
+                self[:loading] = state == :TC
+            when :num_tracks
+                state = resp[4..-1]
+                self[:num_tracks] = state == 'UNKN' ? nil : state.to_i
+            when :cur_track
+                state = resp[4..-1]
+                self[:cur_track] = state == 'UNKN' ? nil : state.to_i
+            when :cur_track_time
+                self[:cur_track_min] = resp[4..6].to_i
+                self[:cur_track_sec] = resp[7..8].to_i
+            when :track_artist
+                self[:track_artist] = resp[4..-1]
+            when :track_title
+                self[:track_title] = resp[4..-1]
+            when :track_album
+                self[:track_album] = resp[4..-1]
+            when :elapsed_time
+                state = resp[4..-1]
+                self[:elapsed_hour] = resp[0..2].to_i
+                self[:elapsed_min] = resp[3..4].to_i
+                self[:elapsed_second] = resp[5..-1].to_i
+            when :remaining_time
+                state = resp[4..-1]
+                self[:remaining_hour] = resp[0..2].to_i
+                self[:remaining_min] = resp[3..4].to_i
+                self[:remaining_second] = resp[5..-1].to_i
+            when :media_type
+                self[:media_type] = resp[7..-1]
+            when :audio_format
+                self[:audio_format] = resp[8..-1]
+            when :audio_channels
+                self[:audio_channels] = resp[7..-1]
+            when :model_information
+                self[:model_version] = resp[4..11]
+                self[:model_name] = resp[12..-1]
             else
-                self[:playing] = false
-                self[:paused] = false
+                logger.debug { "unknown response #{data}" }
             end
-        when :tray_status
-            state = resp[4..-1].to_sym
-            self[:tray_status] = MediaStatus[state]
-            self[:disc_ready] = state == :CI
-            self[:ejected] = state == :TO
-            self[:loading] = state == :TC
-        when :num_tracks
-            state = resp[4..-1]
-            self[:num_tracks] = state == 'UNKN' ? nil : state.to_i
-        when :cur_track
-            state = resp[4..-1]
-            self[:cur_track] = state == 'UNKN' ? nil : state.to_i
-        when :cur_track_time
-            self[:cur_track_min] = resp[4..6].to_i
-            self[:cur_track_sec] = resp[7..8].to_i
-        when :track_artist
-            self[:track_artist] = resp[4..-1]
-        when :track_title
-            self[:track_title] = resp[4..-1]
-        when :track_album
-            self[:track_album] = resp[4..-1]
-        when :elapsed_time
-            state = resp[4..-1]
-            self[:elapsed_hour] = resp[0..2].to_i
-            self[:elapsed_min] = resp[3..4].to_i
-            self[:elapsed_second] = resp[5..-1].to_i
-        when :remaining_time
-            state = resp[4..-1]
-            self[:remaining_hour] = resp[0..2].to_i
-            self[:remaining_min] = resp[3..4].to_i
-            self[:remaining_second] = resp[5..-1].to_i
-        when :media_type
-            self[:media_type] = resp[7..-1]
-        when :audio_format
-            self[:audio_format] = resp[8..-1]
-        when :audio_channels
-            self[:audio_channels] = resp[7..-1]
-        when :model_information
-            self[:model_version] = resp[4..11]
-            self[:model_name] = resp[12..-1]
-        else
-            logger.debug { "unknown response #{data}" }
         end
 
         :success

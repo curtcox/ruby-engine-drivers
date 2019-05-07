@@ -4,7 +4,7 @@
 module Sony; end
 module Sony::Display; end
 
-# Documentation: https://aca.im/driver_docs/Sony/sony+bravia+simple+ip+control.pdf
+# Documentation: https://aca.im/driver_docs/Sony/sony%20bravia%20simple%20ip%20control.pdf
 
 class Sony::Display::Bravia
     include ::Orchestrator::Constants
