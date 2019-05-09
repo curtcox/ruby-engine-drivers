@@ -525,6 +525,21 @@ class Aca::ExchangeBooking
         end
     end
 
+    def send_email(title, body, to)
+        task {
+            cli = Viewpoint::EWSClient.new(*@ews_creds)
+            opts = {}
+
+            if @use_act_as
+                opts[:act_as] = @ews_room if @ews_room
+            else
+                cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
+            end
+
+            cli.send_message subject: title, body: body, to_recipients: to
+        }
+    end
+
 
     protected
 
