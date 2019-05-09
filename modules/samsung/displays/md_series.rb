@@ -158,7 +158,33 @@ DESC
     # ability to send custom mdc commands via backoffice
     def custom_mdc (command, value = "")
         do_send(hex_to_byte(command).bytes[0], hex_to_byte(value).bytes)
-    end 
+    end
+
+    def set_timer
+      # set the time on the display
+      time_cmd = 0xA7
+      time_request = []
+      t = Time.now
+      time_request << t.day
+      hour = t.hour
+      ampm = if hour > 12
+        hour = hour - 12
+        0 # pm
+      else
+        1 # am
+      end
+      time_request << hour
+      time_request << t.min
+      time_request << t.month
+      year = t.year.to_s(16).rjust(4, "0")
+      time_request << year[0..1].to_i(16)
+      time_request << year[2..-1].to_i(16)
+      time_request << ampm
+
+      do_send time_cmd, time_request
+      #              on 03:45 am enabled  off 03:30 am enabled  on-everyday  ignore manual  off-everyday  ignore manual  volume 40  input HDMI   holiday apply
+      custom_mdc "A4", "03-2D-01   01         03-1E-01   01         01          80               01           80             28        21          01"
+    end
 
     INPUTS = {
         :vga => 0x14,       # pc in manual
@@ -416,15 +442,14 @@ DESC
             else
                 logger.debug "Samsung responded with ACK: #{value}"
             end
-            :success
 
+            byte_to_hex(response)
         when :nak
-            logger.debug { "Samsung responded with NAK: #{array_to_str(Array(value))}" }
+            logger.warn "Samsung responded with NAK: #{byte_to_hex(Array(value))}"
             :failed  # Failed response
-
         else
-            logger.debug "Samsung aborted with: #{byte_to_hex(array_to_str(value))}"
-            :abort   # unknown result
+            logger.warn "Samsung aborted with: #{byte_to_hex(Array(value))}"
+            byte_to_hex(response)
         end
     end
 
