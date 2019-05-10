@@ -1,116 +1,61 @@
 module Sony; end
 module Sony::Display; end
 
-# Documentation: 
+# Documentation: https://docs.google.com/spreadsheets/d/1F8RyaDqLYlKBT7fHJ_PT7yHwH3vVMZue4zUc5McJVYM/edit?usp=sharing
 
 class Sony::Display::CBX
     include ::Orchestrator::Constants
     include ::Orchestrator::Transcoder
 
-
     # Discovery Information
-    tcp_port 10000
-    descriptive_name 'Sony CBX RS-232 Passthru Module'
+    tcp_port 4999
+    descriptive_name 'Sony CBX Display'
     generic_name :Display
 
-    # Communication settings
-    tokenize indicator: "\x02\x10", callback: :check_complete
-
-
     def on_load
-        self[:power] = false
-        self[:type] = :lcd
+        on_update
     end
 
     def on_update
     end
 
     def connected
-        schedule.every('60s') { do_poll }
+        schedule.every('60s') { power? }
     end
 
     def disconnected
         schedule.clear
     end
 
-    # power device
-    def power(state)
-		state = is_affirmative?(state)
-		self[:power_target] = state
-		power? do
-			if state && !self[:power]		# Request to power on if off
-				self[:stable_state] = false
-				do_send([COMMANDS[:power]], :timeout => 15000, :delay_on_receive => 5000, :name => :power)
-				
-			elsif !state && self[:power]	# Request to power off if on
-				self[:stable_state] = false
-				do_send([COMMANDS[:power]], :timeout => 15000, :delay_on_receive => 5000, :name => :power)
-				self[:frozen] = false
-			end
-		end
-	end
-	
-	def power?(options = {}, &block)
-		options[:emit] = block
-		do_send(STATUS_CODE[:system_status], options)
-	end
-
-    protected
-
-        # category, command
-        COMMANDS = {
-            power_on: [0x00, 0x02, 0x01, 0x8F],
-            power_off: [0x00, 0x02, 0x00, 0x8E],
-            input1: [0x02, 0x03, 0x04, 0x01, 0x96],
-            picture_mute: [0x0D, 0x03, 0x01, 0x00, 0x9D],
-            picture_unmute: [0x0D, 0x03, 0x01, 0x01 0x9E],
-            audio_mute: [0x06, 0x03, 0x01, 0x01, 0x97],
-            audio_unmute: [0x06, 0x03, 0x01, 0x00, 0x96]
-            }
-        COMMANDS.merge!(COMMANDS.invert)
-
-    def do_poll(*args)
-        power?({:priority => 0}) do
-            if self[:power]
-                input1?
-                picture_mute?
-                audio_mute?
-                do_send(:signal_status, {:priority => 0})
-            end
-        end
-    end
-
-    def build_checksum(command)
-        check = 0
-        command.each do |byte|
-            check = (check + byte) & 0xFF
-        end
-        [check]
-    end
-
-    def do_send(command, param = nil, options = {})
-        # Check for missing params
-        if param.is_a? Hash
-            options = param
-            param = nil
-        end
-
-        # Control + Mode
-        if param.nil?
-            options[:name] = command
-            cmd = [0x8C, 0x00] + COMMANDS[command] + [0xFF, 0xFF]
+    #
+    # Power commands
+    #
+    def power(state, opt = nil)
+        if is_affirmative?(state)
+            send("8C 00 00 02 01 8F", hex_string: true)
+            logger.debug "-- sony display requested to power on"
         else
-            options[:name] = :"#{command}_cmd"
-            type = [0x8C, 0x00] + COMMANDS[command]
-            if !param.is_a?(Array)
-                param = [param]
-            end
-            data = [param.length + 1] + param
-            cmd = type + data
+            send("8C 00 00 02 01 8F", hex_string: true)
+            logger.debug "-- sony display requested to power off"
         end
 
-        cmd = cmd + build_checksum(cmd)
+        # Request status update
+        power?
+    end
 
-        send(cmd, options)
+    def power?(options = {})
+        options[:priority] = 0
+        options[:hex_string] = true
+        send("83 00 00 FF FF 81", options)
+    end
+
+    def received(byte_str, resolve, command)        # Data is default received as a string
+        logger.debug { "sony display sent: 0x#{byte_to_hex(byte_str)}" }
+        if byte_str.start_with?("\x70\x0\x0\x1")
+          self[:power] = true
+        elsif byte_str == "\x70\x0\x0\x0\x72"
+          self[:power] = false
+        end
+        :success
     end
 end
