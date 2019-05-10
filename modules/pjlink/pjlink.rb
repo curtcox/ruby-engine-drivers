@@ -19,6 +19,10 @@ class Pjlink::Pjlink
     def on_load
     end
 
+    def on_update
+      self[:power_target_enabled] = setting(:power_target_enabled) || true
+    end
+
     def connected
         poll
         schedule.every('10s') { poll }
@@ -49,7 +53,7 @@ class Pjlink::Pjlink
     end
 
     def power(state = true, _ = nil)
-        #self[:power_target] = state
+        self[:power_target] = state if self[:power_target_enabled]
         do_send(COMMANDS[:power], state ? '1' : '0', retries: 10, name: :power)
     end
 
@@ -82,7 +86,7 @@ class Pjlink::Pjlink
           lamp?
           error_status?
         end
-        #power(self[:power_target]) if self[:power_target] && (self[:power] != self[:power_target])
+        power(self[:power_target]) if self[:power_target_enabled] && !self[:power_target].nil? && (self[:power] != self[:power_target])
         switch_to(self[:input_target]) if self[:input_target] && (self[:input] != self[:input_target])
       end
     end
