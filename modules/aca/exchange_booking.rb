@@ -99,6 +99,8 @@ class Aca::ExchangeBooking
         self[:description] = setting(:description) || nil
         self[:title] = setting(:title) || nil
         self[:timeout] = setting(:timeout) || false
+        self[:booking_endable] = setting(:booking_endable) || false
+        self[:booking_ask_end] = setting(:booking_ask_end) || false
 
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
         self[:booking_controls] = setting(:booking_controls)
@@ -113,9 +115,12 @@ class Aca::ExchangeBooking
         self[:booking_min_duration] = setting(:booking_min_duration)
         self[:booking_disable_future] = setting(:booking_disable_future)
         self[:booking_max_duration] = setting(:booking_max_duration)
+        self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
+        self[:hide_all_day_bookings] = setting(:hide_all_day_bookings)
         self[:timeout] = setting(:timeout)
         self[:arrow_direction] = setting(:arrow_direction)
         self[:icon] = setting(:icon)
+        @hide_all_day_bookings = Boolean(setting(:hide_all_day_bookings))
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
@@ -204,8 +209,12 @@ class Aca::ExchangeBooking
         end
 
         schedule.clear
-        schedule.in(rand(10000)) { fetch_bookings }
-        schedule.every((setting(:update_every) || 120000).to_i + rand(10000)) { fetch_bookings }
+        schedule.in(rand(10000)) {
+            fetch_bookings(true)
+        }
+        schedule.every((setting(:update_every) || 120000).to_i + rand(10000)) {
+            fetch_bookings
+        }
     end
 
 
@@ -349,10 +358,11 @@ class Aca::ExchangeBooking
     # ======================================
     # ROOM BOOKINGS:
     # ======================================
-    def fetch_bookings(*args)
+    def fetch_bookings(first=false)
         logger.debug { "looking up todays emails for #{@ews_room}" }
+        skype_exists = system.exists?(:Skype)
         task {
-            todays_bookings
+            todays_bookings(first, skype_exists)
         }.then(proc { |bookings|
             self[:today] = bookings
             if @check_meeting_ending
@@ -374,7 +384,7 @@ class Aca::ExchangeBooking
         define_setting(:last_meeting_started, meeting_ref)
     end
 
-    def cancel_meeting(start_time)
+    def cancel_meeting(start_time, reason = "timeout")
         task {
             if start_time.class == Integer
                 delete_ews_booking (start_time / 1000).to_i
@@ -384,10 +394,10 @@ class Aca::ExchangeBooking
                 delete_ews_booking start_time.to_i
             end
         }.then(proc { |count|
-            logger.debug { "successfully removed #{count} bookings" }
+            logger.warn { "successfully removed #{count} bookings due to #{reason}" }
 
-            self[:last_meeting_started] = start_time
-            self[:meeting_pending] = start_time
+            self[:last_meeting_started] = 0
+            self[:meeting_pending] = 0
             self[:meeting_ending] = false
             self[:meeting_pending_notice] = false
 
@@ -401,6 +411,7 @@ class Aca::ExchangeBooking
     # If last meeting started !== meeting pending then
     #  we'll show a warning on the in room touch panel
     def set_meeting_pending(meeting_ref)
+        return if self[:last_meeting_started] == meeting_ref
         self[:meeting_ending] = false
         self[:meeting_pending] = meeting_ref
         self[:meeting_pending_notice] = true
@@ -509,7 +520,24 @@ class Aca::ExchangeBooking
         return false unless starting
 
         ending = starting + @extend_meeting_by
-        create_meeting start: starting * 1000, end: ending * 1000, title: @current_meeting_title
+        create_meeting(start: starting * 1000, end: ending * 1000, title: @current_meeting_title).then do
+            start_meeting(starting * 1000)
+        end
+    end
+
+    def send_email(title, body, to)
+        task {
+            cli = Viewpoint::EWSClient.new(*@ews_creds)
+            opts = {}
+
+            if @use_act_as
+                opts[:act_as] = @ews_room if @ews_room
+            else
+                cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @ews_room) if @ews_room
+            end
+
+            cli.send_message subject: title, body: body, to_recipients: to
+        }
     end
 
 
@@ -663,6 +691,8 @@ class Aca::ExchangeBooking
 
             # Remove any meetings that match the start time provided
             if meeting_time.to_i == delete_at
+                # new_booking = meeting.update_item!({ end: Time.now.utc.iso8601.chop })
+
                 meeting.delete!(:recycle, send_meeting_cancellations: 'SendOnlyToAll')
                 count += 1
             end
@@ -672,7 +702,7 @@ class Aca::ExchangeBooking
         count
     end
 
-    def todays_bookings
+    def todays_bookings(first=false, skype_exists=false)
         now = Time.now
         if @timezone
             start  = now.in_time_zone(@timezone).midnight
@@ -683,7 +713,7 @@ class Aca::ExchangeBooking
         end
 
         cli = Viewpoint::EWSClient.new(*@ews_creds)
-        
+
 
         if @use_act_as
             opts = {}
@@ -696,11 +726,11 @@ class Aca::ExchangeBooking
             items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
         end
 
-        skype_exists = set_skype_url = system.exists?(:Skype)
+        set_skype_url = skype_exists
         set_skype_url = true if @force_skype_extract
         now_int = now.to_i
 
-        items.select! { |booking| !booking.cancelled? }
+        # items.select! { |booking| !booking.cancelled? }
         results = items.collect do |meeting|
             item = meeting.ews_item
             start = item[:start][:text]
@@ -716,14 +746,28 @@ class Aca::ExchangeBooking
                 end_integer = real_end.to_i - @skype_end_offset
 
                 if now_int > start_integer && now_int < end_integer
+                    if first
+                        self[:last_meeting_started] = start_integer * 1000
+                    end
                     meeting.get_all_properties!
 
                     if meeting.body
-                        # Lync: <a name="OutJoinLink">
-                        # Skype: <a name="x_OutJoinLink">
-                        body_parts = meeting.body.split('OutJoinLink"')
-                        if body_parts.length > 1
-                            links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
+                        match = meeting.body.match(/\"pexip\:\/\/(.+?)\"/)
+                        if match
+                            set_skype_url = false
+                            self[:pexip_meeting_uid] = start_integer
+                            self[:pexip_meeting_address] = match[1]
+                        else
+                            links = URI.extract(meeting.body).select { |url| url.start_with?('https://meet.lync') }
+                            if links.empty?
+                                # Lync: <a name="OutJoinLink">
+                                # Skype: <a name="x_OutJoinLink">
+                                body_parts = meeting.body.split('OutJoinLink"')
+                                if body_parts.length > 1
+                                    links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
+                                end
+                            end
+
                             if links[0].present?
                                 if now_int > join_integer
                                     self[:can_join_skype_meeting] = true
@@ -732,6 +776,7 @@ class Aca::ExchangeBooking
                                     self[:skype_meeting_pending] = true
                                 end
                                 set_skype_url = false
+                                self[:skype_meeting_address] = links[0]
                                 system[:Skype].set_uri(links[0]) if skype_exists
                             end
                         end
@@ -749,18 +794,18 @@ class Aca::ExchangeBooking
 
             logger.debug { item.inspect }
 
+            if @hide_all_day_bookings
+                next if Time.parse(ending) - Time.parse(start) > 86399
+            end
+
             # Prevent connections handing with TIME_WAIT
             # cli.ews.connection.httpcli.reset_all
 
-            subject = item[:subject]
-
-
-            if ['private', 'confidential'].include?(meeting.sensitivity.downcase) || subject.nil? || subject.empty?
-                subject = "Private"
+            if ["Private", "Confidential"].include?(meeting.sensitivity)
+                subject = meeting.sensitivity
             else
-                subject = subject[:text]
+                subject = item[:subject][:text]
             end
-
 
             {
                 :Start => start,
@@ -773,8 +818,10 @@ class Aca::ExchangeBooking
                 :end_epoch => real_end.to_i
             }
         end
+        results.compact!
 
         if set_skype_url
+            self[:pexip_meeting_address] = nil
             self[:can_join_skype_meeting] = false
             self[:skype_meeting_pending] = false
             system[:Skype].set_uri(nil) if skype_exists
