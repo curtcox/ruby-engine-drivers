@@ -24,14 +24,19 @@ class MessageMedia::SMS
         @password = setting(:password)
     end
 
-    def sms(text, numbers)
+    def sms(text, numbers, source = nil)
         text = text.to_s
         numbers = Array(numbers).map do |number|
-            {
+            message = {
                 content: text,
                 destination_number: number.to_s,
                 format: 'SMS'
             }
+            if source
+                message[:source_number] = source.to_s
+                message[:source_number_type] = "ALPHANUMERIC"
+            end
+            message
         end
 
         post('/v1/messages', body: {
@@ -41,5 +46,13 @@ class MessageMedia::SMS
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
         })
+    end
+
+    def received(data, resolve, command)
+        if data.status == 202
+            :success
+        else
+            :retry
+        end
     end
 end
