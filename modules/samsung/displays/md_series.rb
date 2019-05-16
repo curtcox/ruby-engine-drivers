@@ -182,8 +182,8 @@ DESC
       time_request << ampm
 
       do_send time_cmd, time_request
-      #              on 03:45 am enabled  off 03:30 am enabled  on-everyday  ignore manual  off-everyday  ignore manual  volume 40  input HDMI   holiday apply
-      custom_mdc "A4", "03-2D-01   01         03-1E-01   01         01          80               01           80             28        21          01"
+      #              on 03:45 am enabled  off 03:30 am enabled  on-everyday  ignore manual  off-everyday  ignore manual  volume 15  input HDMI   holiday apply
+      custom_mdc "A4", "03-2D-01   01         03-1E-01   01         01          80               01           80             0f        21          01"
     end
 
     INPUTS = {
