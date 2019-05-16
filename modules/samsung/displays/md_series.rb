@@ -160,7 +160,7 @@ DESC
         do_send(hex_to_byte(command).bytes[0], hex_to_byte(value).bytes)
     end
 
-    def set_timer
+    def set_timer(enable = true, volume = 0)
       # set the time on the display
       time_cmd = 0xA7
       time_request = []
@@ -182,8 +182,11 @@ DESC
       time_request << ampm
 
       do_send time_cmd, time_request
+
+      state = is_affirmative?(enabled) ? '01' : '00'
+      vol = volume.to_s(16).rjust(2, '0')
       #              on 03:45 am enabled  off 03:30 am enabled  on-everyday  ignore manual  off-everyday  ignore manual  volume 15  input HDMI   holiday apply
-      custom_mdc "A4", "03-2D-01   01         03-1E-01   01         01          80               01           80             0f        21          01"
+      custom_mdc "A4", "03-2D-01 #{state}  03-1E-01   #{state}      01          80               01           80          #{vol}        21          01"
     end
 
     INPUTS = {
