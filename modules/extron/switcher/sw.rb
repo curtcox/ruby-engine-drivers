@@ -66,7 +66,7 @@ class Extron::Switcher::Sw < Extron::Base
     end
 
 
-    ERRORS = {
+    ERROR = {
         1 => 'Invalid input channel (out of range)',
         6 => 'Invalid input during auto-input switching',
         10 => 'Invalid command',
