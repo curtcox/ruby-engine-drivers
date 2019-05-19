@@ -30,6 +30,20 @@ class Extron::Switcher::Sw < Extron::Base
         mute_audio false
     end
 
+    def query_sync
+        do_send "\eLS"
+    end
+
+    def query_hdcp
+        do_send "\eHDCP"
+    end
+
+    def connected
+        super
+        query_sync
+        query_hdcp
+    end
+
     def received(data, resolve, command)
         logger.debug { "Extron switcher sent #{data}" }
 
@@ -53,6 +67,8 @@ class Extron::Switcher::Sw < Extron::Base
                 param.split.each_with_index do |state, idx|
                     self[:"input_#{idx + 1}_hdcp"] = state == '1'
                 end
+            when :Ver
+                # Firmware query response from poll - nothing to do...
             when :E
                 code = param.to_i
                 logger.warn(ERROR[code] || "Unknown device error (#{code})")
