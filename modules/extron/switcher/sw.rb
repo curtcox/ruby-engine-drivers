@@ -34,14 +34,9 @@ class Extron::Switcher::Sw < Extron::Base
         do_send "\eLS"
     end
 
-    def query_hdcp
-        do_send "\eHDCP"
-    end
-
     def connected
         super
         query_sync
-        query_hdcp
     end
 
     def received(data, resolve, command)
@@ -60,21 +55,19 @@ class Extron::Switcher::Sw < Extron::Base
             when :Amt
                 self[:audio_muted] = param > '0'
             when :Sig
-                param.split.each_with_index do |state, idx|
+                inputs, outputs = param.split('*')
+                inputs.split.each_with_index do |state, idx|
                     self[:"input_#{idx + 1}_sync"] = state == '1'
                 end
-            when :Hdcp
-                param.split.each_with_index do |state, idx|
-                    self[:"input_#{idx + 1}_hdcp"] = state == '1'
+                outputs.split.each_with_index do |state, idx|
+                    self[:"output_#{idx + 1}_sync"] = state == '1'
                 end
-            when :Ver
-                # Firmware query response from poll - nothing to do...
             when :E
                 code = param.to_i
                 logger.warn(ERROR[code] || "Unknown device error (#{code})")
                 return :failed
             else
-                logger.info("Unhandled device response (#{data})")
+                # Unhandled device response - safe to ignore
             end
         end
 
