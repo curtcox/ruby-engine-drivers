@@ -47,7 +47,7 @@ class Extron::Switcher::Sw < Extron::Base
         else
             response, _, param = data.partition(/(?=\d)/)
 
-            case response.to_sym
+            case response.strip.to_sym
             when :In
                 self[:input] = param.to_i
             when :Vmt
