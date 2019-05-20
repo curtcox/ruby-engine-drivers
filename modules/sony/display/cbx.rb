@@ -24,13 +24,12 @@ class Sony::Display::CBX
     end
 
     def disconnected
-        schedule.clear
     end
 
     #
     # Power commands
     #
-    def power(state, opt = nil)
+    def power(state)
         if is_affirmative?(state)
             send("8C 00 00 02 01 8F", hex_string: true)
             logger.debug "-- sony display requested to power on"
