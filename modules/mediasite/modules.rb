@@ -5,7 +5,9 @@ require 'net/http'
 module Mediasite; end
 
 class Mediasite::Module
-    descriptive_name 'Mediasite'
+    include ::Orchestrator::Constants
+
+    descriptive_name 'Mediasite Recorder'
     generic_name :Recorder
     implements :logic
 
