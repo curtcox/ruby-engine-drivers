@@ -387,19 +387,17 @@ class Aca::ExchangeBooking
     def cancel_meeting(start_time, reason = "timeout")
         task {
             if start_time.class == Integer
-                delete_ews_booking (start_time / 1000).to_i
+                start_time = (start_time / 1000).to_i
+                delete_ews_booking start_time
             else
                 # Converts to time object regardless of start_time being string or time object
-                start_time = Time.parse(start_time.to_s)
-                delete_ews_booking start_time.to_i
+                start_time = Time.parse(start_time.to_s).to_i
+                delete_ews_booking start_time
             end
         }.then(proc { |count|
             logger.warn { "successfully removed #{count} bookings due to #{reason}" }
 
-            self[:last_meeting_started] = 0
-            self[:meeting_pending] = 0
-            self[:meeting_ending] = false
-            self[:meeting_pending_notice] = false
+            start_meeting(start_time * 1000)
 
             fetch_bookings
             true
@@ -660,6 +658,12 @@ class Aca::ExchangeBooking
 
     def delete_ews_booking(delete_at)
         now = Time.now
+        timeout = delete_at + (self[:booking_cancel_timeout] || self[:timeout]) + 120
+        if now.to_i > timeout
+          start_meeting(delete_at * 1000)
+          return 0
+        end
+
         if @timezone
             start  = now.in_time_zone(@timezone).midnight
             ending = now.in_time_zone(@timezone).tomorrow.midnight
