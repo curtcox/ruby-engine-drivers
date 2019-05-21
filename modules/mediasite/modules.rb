@@ -32,6 +32,9 @@ class Mediasite::Module
         end
     end
 
+    def poll
+    end
+
     def get_request(url)
         uri = URI.parse(url)
         request = Net::HTTP::GET.new(URI.parse(uri))
@@ -77,6 +80,18 @@ class Mediasite::Module
         self[:previous_state] = self[:state]
         self[:state] = STATES[response]
     end
+
+=begin
+GET /api/v1/Recorders('id')/CurrentPresentationMetadata
+Metadata for the current recording including title, start datetime, and if a schedule is available, linked modules and presenter names.
+Title - The title of the recording.
+Presenters – A list of presenters associated with the recording.
+Live – Boolean value indicating that it is also being live streamed.
+Dual – Boolean indicating that 2 or more video inputs are being used.
+GET /api/v1/Recorders('id')/TimeRemaining
+Time Remaining – For scheduled recordings, a mechanism to show how long until the current recording completes. (Discussion with UX team required re whether they would prefer XXX seconds or mm:ss format.)
+Basic volume level of current recording. This may be obtained either via the Mediasite API or via QSC.  Further discussion is required to ensure an efficient implementation.  Refer to Potential Constrains section below.
+=end
 
 =begin
 POST /api/v1/CatchDevices('id')/Start
