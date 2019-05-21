@@ -5,22 +5,26 @@ require 'net/http'
 module Mediasite; end
 
 class Mediasite::Module
-  descriptive_name 'Mediasite'
-  generic_name :Recorder
-  implements :logic
+    descriptive_name 'Mediasite'
+    generic_name :Recorder
+    implements :logic
 
-  def on_load
-       on_update
-   end
+    default_settings({
+        url: 'https://alex-dev.deakin.edu.au/Mediasite/',
+        username: 'acaprojects',
+        password: 'WtjtvB439cXdZ4Z3'
+    })
 
-   def on_update
-=begin
-       ret = Net::HTTP.get(URI.parse('https://www.meethue.com/api/nupnp'))
-       parsed = JSON.parse(ret) # parse the JSON string into a usable hash table
-       ip_address = parsed[0]['internalipaddress']
-       @url = "http://#{ip_address}/api/#{setting(:api_key)}/sensors/7"
-       logger.debug { "url is #{@url}" }
-=end
-   end
+    def on_load
 
+        on_update
+    end
+
+    def on_update
+        uri = URI.parse(setting(:url))
+        request = Net::HTTP::GET.new(URI.parse(uri))
+        request.basic_auth(setting(:username), setting(:password))
+        http = Net::HTTP.new(uri.host, uri.port)
+        response = http.request(request)
+    end
 end
