@@ -47,7 +47,7 @@ class Pexip::Management
     end
 
     def get_meeting(meeting)
-        meeting = "/api/admin/configuration/v1/conference/#{meeting}/" if !meeting.to_s.include?("/")
+        meeting = "/api/admin/configuration/v1/conference/#{meeting}/" unless meeting.to_s.include?("/")
 
         get(meeting).path, headers: {
             'Authorization' => [@username, @password],
@@ -65,8 +65,10 @@ class Pexip::Management
         end
     end
 
-    def end_meeting(meeting_id)
-      delete("/api/admin/configuration/v1/conference/#{meeting_id}/", headers: {
+    def end_meeting(meeting)
+      meeting = "/api/admin/configuration/v1/conference/#{meeting}/" unless meeting.to_s.include?("/")
+
+      delete(meeting, headers: {
           'Authorization' => [@username, @password],
           'Content-Type' => 'application/json',
           'Accept' => 'application/json'
