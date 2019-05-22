@@ -26,7 +26,20 @@ class Mediasite::Module
 
     def on_update
         schedule.clear
-        self[:room_name] = setting(:actual_room_name) || system.name
+        self[:room_name] = room_name
+    end
+
+    def room_name
+        setting(:actual_room_name) || system.name
+    end
+
+    def get_device
+        res = get_request('api/v1/Rooms?$top=1000')
+        res['value'].each { |room|
+            if room['name'] == room_name
+                return room['DeviceConfigurations']['DeviceId']
+            end
+        }
     end
 
     def start
@@ -39,25 +52,23 @@ class Mediasite::Module
     end
 
     def get_request(url)
-        uri = URI('https://alex-dev.deakin.edu.au/Mediasite/api/v1/Rooms')
+        uri = URI(setting(:url) + url)
         req = Net::HTTP::Get.new(uri)
         req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
         req['sfapikey'] = api_key
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
-        res = http.request(req)
-        res.body
+        http.request(req).body
     end
 
     def post_request(url)
-        uri = URI('https://alex-dev.deakin.edu.au/Mediasite/api/v1/Rooms')
+        uri = URI(setting(:url) + url)
         req = Net::HTTP::Post.new(uri)
         req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
         req['sfapikey'] = api_key
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
-        res = http.request(req)
-        res.body
+        http.request(req).body
     end
 
     # https://alex.deakin.edu.au/mediasite/api/v1/$metadata#Rooms
