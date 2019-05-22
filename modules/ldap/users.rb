@@ -16,6 +16,7 @@ class LDAP::Users
         host: "ldap.forumsys.com",
         port: 389,
         auth_method: "simple",
+        encryption: nil,
         tree_base: "dc=example,dc=com",
         attributes: ['dn', 'givenName', 'sN', 'mail', 'memberOf', 'telephoneNumber'],
 
@@ -36,6 +37,7 @@ class LDAP::Users
         @host = setting(:host)
         @port = setting(:port)
         @auth_method = (setting(:auth_method) || :simple).to_sym
+        @encryption = setting(:encryption)
         @tree_base = setting(:tree_base)
         @attributes = setting(:attributes)
 
@@ -101,7 +103,8 @@ class LDAP::Users
         @query.each { |attr| users[attr] = [] }
 
         results = task do
-            ldap_con = Net::LDAP.new({
+            opts = {
+              force_no_page: true,
               host: @host,
               port: @port,
               auth: {
@@ -109,7 +112,18 @@ class LDAP::Users
                   username: @username,
                   password: @password
               }
-            })
+            }
+
+            if @encryption
+                opts[:encryption] = {
+                    method: @encryption.to_sym,
+                    tls_options: {
+                        verify_mode: OpenSSL::SSL::VERIFY_NONE
+                    }
+                }
+            end
+
+            ldap_con = Net::LDAP.new(opts)
             op_filter = Net::LDAP::Filter.eq("objectClass", "person")
             ldap_con.search({
                 base: @tree_base,
