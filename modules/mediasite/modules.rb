@@ -13,8 +13,8 @@ class Mediasite::Module
 
     default_settings(
         url: 'https://alex-dev.deakin.edu.au/Mediasite/',
-        username: 'acaprojects',
-        password: 'WtjtvB439cXdZ4Z3',
+        username: 'testapi',
+        password: 'jJ6nP28PE8rr',
         api_key: '6c6f13e0-bab0-4b74-a3fb-1b1ee866ffb8',
         update_every: 1
         # actual_room_name: setting to override room name to search when they mediasite room names don't match up wtih backoffice system names
@@ -26,7 +26,7 @@ class Mediasite::Module
 
     def on_update
         schedule.clear
-        self[:room_name] = setting(:actual_room_name) || ''
+        self[:room_name] = setting(:actual_room_name) || system.name
     end
 
     def start
@@ -66,7 +66,6 @@ class Mediasite::Module
     def get_rooms
         get_request(url + '/api/v1/Room')
     end
-
 
     # State tracking of recording appliance. While there are numerous recorder states (currently 11 different states), we wish to present these as a simplified state set: Offline, Idle, Recording, Paused.
     STATES = {
