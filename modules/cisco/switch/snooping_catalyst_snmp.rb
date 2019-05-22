@@ -410,7 +410,7 @@ class Cisco::Switch::SnoopingCatalystSNMP
             # Need to create a database entry for the MAC with a TTL
             mac = model.mac_address
             temporary = if (mac && @temporary.include?(mac[0..5]))
-                logger.debug { "removing temporary MAC for #{model.username} with #{model.mac_address} at #{model.desk_id}" }
+                logger.info { "removing temporary MAC for #{model.username} with #{model.mac_address} at #{model.desk_id}" }
                 @polling_period
             else
                 0
