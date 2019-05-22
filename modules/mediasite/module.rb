@@ -34,10 +34,12 @@ class Mediasite::Module
     end
 
     def get_device
+        # Use $top=1000 to ensure that all rooms are returned from the api
         res = get_request('api/v1/Rooms?$top=1000')
         res['value'].each { |room|
             if room['name'] == room_name
-                return room['DeviceConfigurations']['DeviceId']
+                self[:device_id] = room['DeviceConfigurations']['DeviceId']
+                break
             end
         }
     end
@@ -124,11 +126,20 @@ POST /api/v1/Recorders('id')/Pause
 POST /api/v1/Recorders('id')/Resume
 =end
     def pause
+        if self[:device_id]
+            post_request("/api/v1/Recorders('#{self[:device_id]}')/Pause")
+        end
     end
 
     def resume
+        if self[:device_id]
+            post_request("/api/v1/Recorders('#{self[:device_id]}')/Resume")
+        end
     end
 
     def stop
+        if self[:device_id]
+            post_request("/api/v1/Recorders('#{self[:device_id]}')/Stop")
+        end
     end
 end
