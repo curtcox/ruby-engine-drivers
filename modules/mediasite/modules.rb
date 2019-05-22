@@ -15,6 +15,7 @@ class Mediasite::Module
         url: 'https://alex-dev.deakin.edu.au/Mediasite/',
         username: 'acaprojects',
         password: 'WtjtvB439cXdZ4Z3',
+        api_key: '6c6f13e0-bab0-4b74-a3fb-1b1ee866ffb8',
         update_every: 1
         # actual_room_name: setting to override room name to search when they mediasite room names don't match up wtih backoffice system names
     )
@@ -38,19 +39,25 @@ class Mediasite::Module
     end
 
     def get_request(url)
-        uri = URI.parse(url)
-        request = Net::HTTP::GET.new(URI.parse(uri))
-        request.basic_auth(setting(:username), setting(:password))
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.request(request)
+        uri = URI('https://alex-dev.deakin.edu.au/Mediasite/api/v1/Rooms')
+        req = Net::HTTP::Get.new(uri)
+        req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
+        req['sfapikey'] = api_key
+        http = Net::HTTP.new(uri.hostname, uri.port)
+        http.use_ssl = true
+        res = http.request(req)
+        res.body
     end
 
     def post_request(url)
-        uri = URI.parse(url)
-        request = Net::HTTP::POST.new(URI.parse(uri))
-        request.basic_auth(setting(:username), setting(:password))
-        http = Net::HTTP.new(uri.host, uri.port)
-        http.request(request)
+        uri = URI('https://alex-dev.deakin.edu.au/Mediasite/api/v1/Rooms')
+        req = Net::HTTP::Post.new(uri)
+        req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
+        req['sfapikey'] = api_key
+        http = Net::HTTP.new(uri.hostname, uri.port)
+        http.use_ssl = true
+        res = http.request(req)
+        res.body
     end
 
     # https://alex.deakin.edu.au/mediasite/api/v1/$metadata#Rooms
