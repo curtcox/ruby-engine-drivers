@@ -28,6 +28,7 @@ class Mediasite::Module
     def on_update
         schedule.clear
         self[:room_name] = room_name
+        self[:device_id] = get_device_id
     end
 
     def room_name
@@ -58,8 +59,7 @@ class Mediasite::Module
         res = get_request('api/v1/Rooms?$top=1000')
         res['value'].each { |room|
             if room['Name'] == room_name
-                self[:device_id] = room['DeviceConfigurations'][0]['DeviceId']
-                break
+                return room['DeviceConfigurations'][0]['DeviceId']
             end
         }
     end
