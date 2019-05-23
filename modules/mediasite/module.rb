@@ -56,7 +56,7 @@ class Mediasite::Module
     def get_request(url)
         uri = URI(setting(:url) + url)
         req = Net::HTTP::Get.new(uri)
-        req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
+        req.basic_auth(setting(:username), setting(:password))
         req['sfapikey'] = setting(:api_key)
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
@@ -66,7 +66,7 @@ class Mediasite::Module
     def post_request(url)
         uri = URI(setting(:url) + url)
         req = Net::HTTP::Post.new(uri)
-        req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
+        req.basic_auth(setting(:username), setting(:password))
         req['sfapikey'] = setting(:api_key)
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
