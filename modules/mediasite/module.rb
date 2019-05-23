@@ -37,8 +37,8 @@ class Mediasite::Module
         # Use $top=1000 to ensure that all rooms are returned from the api
         res = get_request('api/v1/Rooms?$top=1000')
         res['value'].each { |room|
-            if room['name'] == room_name
-                self[:device_id] = room['DeviceConfigurations']['DeviceId']
+            if room['Name'] == room_name
+                self[:device_id] = room['DeviceConfigurations'][0]['DeviceId']
                 break
             end
         }
