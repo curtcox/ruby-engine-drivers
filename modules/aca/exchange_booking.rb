@@ -807,15 +807,17 @@ class Aca::ExchangeBooking
 
             if ["Private", "Confidential"].include?(meeting.sensitivity)
                 subject = meeting.sensitivity
+                booking_owner = "Private"
             else
                 subject = item[:subject][:text]
+                booking_owner = item[:organizer][:elems][0][:mailbox][:elems][0][:name][:text]
             end
 
             {
                 :Start => start,
                 :End => ending,
                 :Subject => subject,
-                :owner => item[:organizer][:elems][0][:mailbox][:elems][0][:name][:text],
+                :owner => booking_owner,
                 :setup => 0,
                 :breakdown => 0,
                 :start_epoch => real_start.to_i,
