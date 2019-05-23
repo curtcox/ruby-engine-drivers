@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'net/http'
+require 'json'
 
 module Mediasite; end
 
@@ -60,7 +61,7 @@ class Mediasite::Module
         req['sfapikey'] = setting(:api_key)
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
-        http.request(req).body
+        JSON.parse(http.request(req).body)
     end
 
     def post_request(url)
@@ -70,7 +71,7 @@ class Mediasite::Module
         req['sfapikey'] = setting(:api_key)
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
-        http.request(req).body
+        JSON.parse(http.request(req).body)
     end
 
     # State tracking of recording appliance. While there are numerous recorder states (currently 11 different states), we wish to present these as a simplified state set: Offline, Idle, Recording, Paused.
