@@ -45,7 +45,9 @@ class Mediasite::Module
     end
 
     def get_request(url)
-        uri = URI(setting(:url) + url)
+        req_url = setting(:url) + url
+        logger.debug(req_url)
+        uri = URI(req_url)
         req = Net::HTTP::Get.new(uri)
         req.basic_auth(setting(:username), setting(:password))
         req['sfapikey'] = setting(:api_key)
@@ -71,7 +73,9 @@ class Mediasite::Module
     end
 
     def post_request(url)
-        uri = URI(setting(:url) + url)
+        req_url = setting(:url) + url
+        logger.debug(req_url)
+        uri = URI(req_url)
         req = Net::HTTP::Post.new(uri)
         req.basic_auth(setting(:username), setting(:password))
         req['sfapikey'] = setting(:api_key)
