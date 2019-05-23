@@ -34,17 +34,6 @@ class Mediasite::Module
         setting(:actual_room_name) || system.name
     end
 
-    def get_device
-        # Use $top=1000 to ensure that all rooms are returned from the api
-        res = get_request('api/v1/Rooms?$top=1000')
-        res['value'].each { |room|
-            if room['Name'] == room_name
-                self[:device_id] = room['DeviceConfigurations'][0]['DeviceId']
-                break
-            end
-        }
-    end
-
     def start
         schedule.every("#{setting(:update_every)}m") do
             state
@@ -62,6 +51,21 @@ class Mediasite::Module
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
         JSON.parse(http.request(req).body)
+    end
+
+    def get_device_id
+        # Use $top=1000 to ensure that all rooms are returned from the api
+        res = get_request('api/v1/Rooms?$top=1000')
+        res['value'].each { |room|
+            if room['Name'] == room_name
+                self[:device_id] = room['DeviceConfigurations'][0]['DeviceId']
+                break
+            end
+        }
+    end
+
+    def get_device
+        get_request("api/v1/Recorders('#{self[:device_id]}')")
     end
 
     def post_request(url)
