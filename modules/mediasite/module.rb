@@ -18,7 +18,7 @@ class Mediasite::Module
         # password:
         # api_key: # sfapikey
         # actual_room_name: setting to override room name to search when they mediasite room names don't match up wtih backoffice system names
-        update_every: 1
+        update_every: 5
     )
 
     def on_load
@@ -29,19 +29,17 @@ class Mediasite::Module
         schedule.clear
         self[:room_name] = room_name
         self[:device_id] = get_device_id
+        poll
     end
 
     def room_name
         setting(:actual_room_name) || system.name
     end
 
-    def start
-        schedule.every("#{setting(:update_every)}m") do
+    def poll
+        schedule.every("#{setting(:update_every)}s") do
             state
         end
-    end
-
-    def poll
     end
 
     def get_request(url)
@@ -88,18 +86,17 @@ class Mediasite::Module
     STATES = {
         'Unknown' => 'Offline',
         'Idle' => 'Idle',
-        'Busy' => 'Recording',
+        'Busy' => 'Idle',
         'RecordStart' => 'Recording',
         'Recording' => 'Recording',
         'RecordEnd' => 'Recording',
-        'Pausing' => 'Recording',
-        'Paused' => 'Recording',
+        'Pausing' => 'Paused',
+        'Paused' => 'Paused',
         'Resuming' => 'Recording',
         'OpeningSession' => 'Recording',
         'ConfiguringDevices' => 'Idle'
     }.freeze
 
-    # GET /api/v1/Recorders('id')/Status
     def state
         res = get_request("/api/v1/Recorders('#{self[:device_id]}')/Status")
         self[:previous_state] = self[:state]
@@ -115,44 +112,19 @@ class Mediasite::Module
         self[:volume] = 0
     end
 
-=begin
-GET /api/v1/Recorders('id')/CurrentPresentationMetadata
-Metadata for the current recording including title, start datetime, and if a schedule is available, linked modules and presenter names.
-Title - The title of the recording.
-Presenters – A list of presenters associated with the recording.
-Live – Boolean value indicating that it is also being live streamed.
-Dual – Boolean indicating that 2 or more video inputs are being used.
-GET /api/v1/Recorders('id')/TimeRemaining
-Time Remaining – For scheduled recordings, a mechanism to show how long until the current recording completes. (Discussion with UX team required re whether they would prefer XXX seconds or mm:ss format.)
-Basic volume level of current recording. This may be obtained either via the Mediasite API or via QSC.  Further discussion is required to ensure an efficient implementation.  Refer to Potential Constrains section below.
-=end
+    def start
+        post_request("/api/v1/Recorders('#{self[:device_id]}')/Start")
+    end
 
-=begin
-POST /api/v1/CatchDevices('id')/Start
-POST /api/v1/CatchDevices('id')/Stop
-POST /api/v1/CatchDevices('id')/Pause
-POST /api/v1/CatchDevices('id')/Resume
-
-POST /api/v1/Recorders('id')/Start
-POST /api/v1/Recorders('id')/Stop
-POST /api/v1/Recorders('id')/Pause
-POST /api/v1/Recorders('id')/Resume
-=end
     def pause
-        if self[:device_id]
-            post_request("/api/v1/Recorders('#{self[:device_id]}')/Pause")
-        end
+        post_request("/api/v1/Recorders('#{self[:device_id]}')/Pause")
     end
 
     def resume
-        if self[:device_id]
-            post_request("/api/v1/Recorders('#{self[:device_id]}')/Resume")
-        end
+        post_request("/api/v1/Recorders('#{self[:device_id]}')/Resume")
     end
 
     def stop
-        if self[:device_id]
-            post_request("/api/v1/Recorders('#{self[:device_id]}')/Stop")
-        end
+        post_request("/api/v1/Recorders('#{self[:device_id]}')/Stop")
     end
 end
