@@ -57,7 +57,7 @@ class Mediasite::Module
         uri = URI(setting(:url) + url)
         req = Net::HTTP::Get.new(uri)
         req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
-        req['sfapikey'] = api_key
+        req['sfapikey'] = setting(:api_key)
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
         http.request(req).body
@@ -67,17 +67,10 @@ class Mediasite::Module
         uri = URI(setting(:url) + url)
         req = Net::HTTP::Post.new(uri)
         req.basic_auth('acaprojects', 'WtjtvB439cXdZ4Z3')
-        req['sfapikey'] = api_key
+        req['sfapikey'] = setting(:api_key)
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
         http.request(req).body
-    end
-
-    # https://alex.deakin.edu.au/mediasite/api/v1/$metadata#Rooms
-    # GET /api/v1/Room
-    # GET /api/v1/Rooms('id')
-    def get_rooms
-        get_request(url + '/api/v1/Room')
     end
 
     # State tracking of recording appliance. While there are numerous recorder states (currently 11 different states), we wish to present these as a simplified state set: Offline, Idle, Recording, Paused.
@@ -97,7 +90,7 @@ class Mediasite::Module
 
     # GET /api/v1/Recorders('id')/Status
     def state(id)
-        response = request(url + "/api/v1/Recorders('#{id}')/Status")
+        response = request(url + "/api/v1/Recorders('#{self[:device_id]}')/Status")
         self[:previous_state] = self[:state]
         self[:state] = STATES[response]
     end
