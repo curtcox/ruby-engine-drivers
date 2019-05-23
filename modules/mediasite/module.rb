@@ -65,7 +65,9 @@ class Mediasite::Module
     end
 
     def get_device
-        get_request("api/v1/Recorders('#{self[:device_id]}')")
+        res = get_request("api/v1/Recorders('#{self[:device_id]}')")
+        logger.debug res
+        res
     end
 
     def post_request(url)
