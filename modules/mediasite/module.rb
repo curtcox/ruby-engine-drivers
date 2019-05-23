@@ -101,9 +101,18 @@ class Mediasite::Module
 
     # GET /api/v1/Recorders('id')/Status
     def state
-        res = request(url + "/api/v1/Recorders('#{self[:device_id]}')/Status")
+        res = get_request("/api/v1/Recorders('#{self[:device_id]}')/Status")
         self[:previous_state] = self[:state]
         self[:state] = STATES[res['RecorderState']]
+        res = get_request("/api/v1/Recorders('#{self[:device_id]}')/CurrentPresentationMetadata")
+        self[:title] = res['Title']
+        self[:presenters] = res['Presenters']
+        self[:live] = false # TODO: found out how to know if recording is being live streamed
+        res = get_request("/api/v1/Recorders('#{self[:device_id]}')/ActiveInputs")
+        self[:dual] = res['ActiveInputs'].size >= 2
+        res = get_request("/api/v1/Recorders('#{self[:device_id]}')/TimeRemaining")
+        self[:time_remaining] = res['SecondsRemaining']
+        self[:volume] = 0
     end
 
 =begin
