@@ -12,12 +12,12 @@ class Mediasite::Module
     implements :logic
 
     default_settings(
-        url: 'https://alex-dev.deakin.edu.au/Mediasite/',
-        username: 'testapi',
-        password: 'jJ6nP28PE8rr',
-        api_key: '6c6f13e0-bab0-4b74-a3fb-1b1ee866ffb8',
-        update_every: 1
+        # url: 'https://alex-dev.deakin.edu.au/Mediasite/' # api url endpoint
+        # username:
+        # password:
+        # api_key: # sfapikey
         # actual_room_name: setting to override room name to search when they mediasite room names don't match up wtih backoffice system names
+        update_every: 1
     )
 
     def on_load
