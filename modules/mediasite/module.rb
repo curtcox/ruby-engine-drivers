@@ -100,10 +100,10 @@ class Mediasite::Module
     }.freeze
 
     # GET /api/v1/Recorders('id')/Status
-    def state(id)
-        response = request(url + "/api/v1/Recorders('#{self[:device_id]}')/Status")
+    def state
+        res = request(url + "/api/v1/Recorders('#{self[:device_id]}')/Status")
         self[:previous_state] = self[:state]
-        self[:state] = STATES[response]
+        self[:state] = STATES[res['RecorderState']]
     end
 
 =begin
