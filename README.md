@@ -1,10 +1,8 @@
-# ACAEngine Modules
+# ACAEngine Drivers
 
-Physical device drivers, service integrations and modular logic for [ACAEngine](https://github.com/acaprojects/ruby-engine).
+Physical device drivers, service integrations and modular logic for [ACAEngine](https://docs.acaengine.com).
 
 ---
-
-If you are getting started head on over to https://developer.acaprojects.com/ to get setup.
 
 For those using these modules, you may find the [docs](https://acaprojects.github.io/aca-device-modules/) of use.
 
