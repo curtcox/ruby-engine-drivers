@@ -124,8 +124,8 @@ class Mediasite::Module
             start_time = ActiveSupport::TimeZone.new('UTC').parse(schedule['StartTime'])
             end_time = ActiveSupport::TimeZone.new('UTC').parse(schedule['EndTime'])
             if start_time <= current_time && current_time <= end_time
-                presentation = get_request(schedule['ScheduleLink'] + "/Presentations")
-                live = presentation['value']['Status'] == 'Live'
+                presentation = get_request(schedule['ScheduleLink'] + '/Presentations')
+                live = presentation['value'][0]['Status'] == 'Live'
                 break;
             end
         }
