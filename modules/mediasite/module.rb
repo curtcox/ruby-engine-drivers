@@ -60,7 +60,7 @@ class Mediasite::Module
 
     def get_device_id
         # Use $top=1000 to ensure that all rooms are returned from the api
-        res = get_request(create_url('api/v1/Rooms?$top=1000'))
+        res = get_request(create_url('/api/v1/Rooms?$top=1000'))
         res['value'].each { |room|
             if room['Name'] == room_name
                 return room['DeviceConfigurations'][0]['DeviceId']
