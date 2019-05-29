@@ -37,6 +37,7 @@ class Mediasite::Module
     end
 
     def poll
+        state
         schedule.every("#{setting(:update_every)}s") do
             state
         end
