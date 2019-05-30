@@ -18,6 +18,7 @@ class Mediasite::Module
         # password:
         # api_key: # sfapikey
         # actual_room_name: setting to override room name to search when they mediasite room names don't match up wtih backoffice system names
+        # recorder_id: # set recorder id manually if needed
         update_every: 5
     )
 
@@ -61,13 +62,19 @@ class Mediasite::Module
 
     def get_device_id
         # Use $top=1000 to ensure that all rooms are returned from the api
-        return '6fde77f222494df1a4a1b988c7982b814e' # only for testing
-        res = get_request(create_url('/api/v1/Rooms?$top=1000'))
-        res['value'].each { |room|
-            if room['Name'] == room_name
-                return room['DeviceConfigurations'][0]['DeviceId']
-            end
-        }
+        device_id = ''
+        if setting(:recorder_id)
+            device_id = setting(:recorder_id)
+        else
+            res = get_request(create_url('/api/v1/Rooms?$top=1000'))
+            res['value'].each { |room|
+                if room['Name'] == room_name
+                    device_id = room['DeviceConfigurations'][0]['DeviceId']
+                    break
+                end
+            }
+        end
+        return device_id
     end
 
     def post_request(url)
