@@ -21,7 +21,7 @@ class Mediasite::Module
         # api_key: # sfapikey
         # actual_room_name: setting to override room name to search when they mediasite room names don't match up wtih backoffice system names
         # recorder_id: # set recorder id manually if needed
-        update_every: 5
+        update_every: 5 # number of seconds to poll recorder state
     )
 
     def on_load
