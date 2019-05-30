@@ -56,6 +56,17 @@ class Mediasite::Module
         JSON.parse(http.request(req).body)
     end
 
+    def post_request(url)
+        req_url = setting(:url) + url
+        uri = URI(req_url)
+        req = Net::HTTP::Post.new(uri)
+        req.basic_auth(setting(:username), setting(:password))
+        req['sfapikey'] = setting(:api_key)
+        http = Net::HTTP.new(uri.hostname, uri.port)
+        http.use_ssl = true
+        http.request(req)
+    end
+
     def create_url(url)
         setting(:url) + url
     end
@@ -75,18 +86,6 @@ class Mediasite::Module
             }
         end
         return device_id
-    end
-
-    def post_request(url)
-        req_url = setting(:url) + url
-        logger.debug(req_url)
-        uri = URI(req_url)
-        req = Net::HTTP::Post.new(uri)
-        req.basic_auth(setting(:username), setting(:password))
-        req['sfapikey'] = setting(:api_key)
-        http = Net::HTTP.new(uri.hostname, uri.port)
-        http.use_ssl = true
-        JSON.parse(http.request(req).body)
     end
 
     # State tracking of recording appliance. While there are numerous recorder states (currently 11 different states), we wish to present these as a simplified state set: Offline, Idle, Recording, Paused.
