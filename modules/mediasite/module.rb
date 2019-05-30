@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Documentation: https://alex.deakin.edu.au/mediasite/api/v1/$metadata#top
+
 require 'net/http'
 require 'json'
 
@@ -65,6 +67,7 @@ class Mediasite::Module
         http = Net::HTTP.new(uri.hostname, uri.port)
         http.use_ssl = true
         http.request(req)
+        :success
     end
 
     def create_url(url)
@@ -85,7 +88,7 @@ class Mediasite::Module
                 end
             }
         end
-        return device_id
+        device_id
     end
 
     # State tracking of recording appliance. While there are numerous recorder states (currently 11 different states), we wish to present these as a simplified state set: Offline, Idle, Recording, Paused.
