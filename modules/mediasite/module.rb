@@ -11,7 +11,7 @@ class Mediasite::Module
     include ::Orchestrator::Constants
 
     descriptive_name 'Mediasite Recorder'
-    generic_name :Recorder
+    generic_name :Capture
     implements :logic
 
     default_settings(
@@ -112,6 +112,7 @@ class Mediasite::Module
         self[:state] = STATES[res['RecorderState']]
 
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/CurrentPresentationMetadata"))
+        self[:current] = res['Title']
         self[:title] = res['Title']
         self[:presenters] = res['Presenters']
 
