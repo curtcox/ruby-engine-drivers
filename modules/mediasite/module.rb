@@ -48,7 +48,7 @@ class Mediasite::Module
 
     def get_request(url)
         req_url = url
-        logger.debug(req_url)
+        #logger.debug(req_url)
         uri = URI(req_url)
         req = Net::HTTP::Get.new(uri)
         req.basic_auth(setting(:username), setting(:password))
@@ -112,7 +112,10 @@ class Mediasite::Module
         self[:state] = STATES[res['RecorderState']]
 
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/CurrentPresentationMetadata"))
-        self[:current] = res['Title']
+        self[:current] = {
+            'start_time' => Time.now,
+            'state' => STATES[res['RecorderState']]
+        }
         self[:title] = res['Title']
         self[:presenters] = res['Presenters']
 
@@ -138,7 +141,7 @@ class Mediasite::Module
             if start_time <= current_time && current_time <= end_time
                 presentation = get_request(schedule['ScheduleLink'] + '/Presentations')
                 live = presentation['value'][0]['Status'] == 'Live'
-                break;
+                break
             end
         }
         live
