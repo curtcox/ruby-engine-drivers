@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Documentation: https://alex.deakin.edu.au/mediasite/api/v1/$metadata#top
+# Documnetation: https://docs.google.com/document/d/18EjSfVSg5FTe0rMsc-Yygb8obcOp7tm5BNmz9OGj21o/edit?usp=sharing
 
 require 'net/http'
 require 'json'
