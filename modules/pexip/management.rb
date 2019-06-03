@@ -22,6 +22,15 @@ class Pexip::Management
         # NOTE:: base URI https://pexip.company.com
         @username = setting(:username)
         @password = setting(:password)
+        proxy = setting(:proxy)
+        if proxy
+            config({
+                proxy: {
+                    host: proxy[:host],
+                    port: proxy[:port]
+                }
+            })
+        end
     end
 
     MeetingTypes = ["conference", "lecture", "two_stage_dialing", "test_call"]

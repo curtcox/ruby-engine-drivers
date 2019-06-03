@@ -8,8 +8,8 @@ class MessageMedia::SMS
 
     # Discovery Information
     implements :service
-    descriptive_name 'MessageMedia SMS service'
-    generic_name :SMS
+    descriptive_name 'Pexip Management API'
+    generic_name :Pexip
 
     # HTTP keepalive
     keepalive false
