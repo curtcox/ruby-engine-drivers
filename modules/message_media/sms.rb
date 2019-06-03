@@ -22,6 +22,15 @@ class MessageMedia::SMS
         # NOTE:: base URI https://api.messagemedia.com
         @username = setting(:username)
         @password = setting(:password)
+        proxy = setting(:proxy)
+        if proxy
+            config({
+                proxy: {
+                    host: proxy[:host],
+                    port: proxy[:port]
+                }
+            })
+        end
     end
 
     def sms(text, numbers, source = nil)
