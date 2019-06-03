@@ -58,7 +58,7 @@ class Pexip::Management
     def get_meeting(meeting)
         meeting = "/api/admin/configuration/v1/conference/#{meeting}/" unless meeting.to_s.include?("/")
 
-        get(meeting).path, headers: {
+        get(meeting, headers: {
             'Authorization' => [@username, @password],
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
