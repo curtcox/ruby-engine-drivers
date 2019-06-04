@@ -94,16 +94,16 @@ class Mediasite::Module
     # State tracking of recording appliance. While there are numerous recorder states (currently 11 different states), we wish to present these as a simplified state set: Offline, Idle, Recording, Paused.
     STATES = {
         'Unknown' => 'Offline',
-        'Idle' => 'Idle',
-        'Busy' => 'Idle',
-        'RecordStart' => 'Recording',
-        'Recording' => 'Recording',
-        'RecordEnd' => 'Recording',
-        'Pausing' => 'Paused',
-        'Paused' => 'Paused',
-        'Resuming' => 'Recording',
-        'OpeningSession' => 'Recording',
-        'ConfiguringDevices' => 'Idle'
+        'Idle' => 'stop',
+        'Busy' => 'stop',
+        'RecordStart' => 'active',
+        'Recording' => 'active',
+        'RecordEnd' => 'active',
+        'Pausing' => 'paused',
+        'Paused' => 'paused',
+        'Resuming' => 'active',
+        'OpeningSession' => 'active',
+        'ConfiguringDevices' => 'stop'
     }.freeze
 
     def state
