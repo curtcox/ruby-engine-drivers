@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Documnetation: https://docs.google.com/document/d/18EjSfVSg5FTe0rMsc-Yygb8obcOp7tm5BNmz9OGj21o/edit?usp=sharing
+# Documentation: https://docs.google.com/document/d/18EjSfVSg5FTe0rMsc-Yygb8obcOp7tm5BNmz9OGj21o/edit?usp=sharing
 
 require 'net/http'
 require 'json'
