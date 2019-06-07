@@ -110,10 +110,6 @@ class Mediasite::Module
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/Status"))
         self[:previous_state] = self[:state]
         self[:state] = res['RecorderState']
-        self[:current] = {
-            'start_time' => Time.now,
-            'state' => STATES[res['RecorderState']]
-        }
 
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/CurrentPresentationMetadata"))
         self[:title] = res['Title']
@@ -141,6 +137,10 @@ class Mediasite::Module
             if start_time <= current_time && current_time <= end_time
                 presentation = get_request(schedule['ScheduleLink'] + '/Presentations')
                 live = presentation['value'][0]['Status'] == 'Live'
+                self[:current] = {
+                    'state' => STATES[self[:state]],
+                    'start_time' => start_time.in_time_zone('Sydney')
+                }
                 break
             end
         }
