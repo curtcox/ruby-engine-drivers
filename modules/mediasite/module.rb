@@ -149,17 +149,21 @@ class Mediasite::Module
 
     def start
         post_request("/api/v1/Recorders('#{self[:device_id]}')/Start")
+        state
     end
 
     def pause
         post_request("/api/v1/Recorders('#{self[:device_id]}')/Pause")
+        state
     end
 
     def resume
         post_request("/api/v1/Recorders('#{self[:device_id]}')/Resume")
+        state
     end
 
     def stop
         post_request("/api/v1/Recorders('#{self[:device_id]}')/Stop")
+        state
     end
 end
