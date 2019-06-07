@@ -109,7 +109,7 @@ class Mediasite::Module
     def state
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/Status"))
         self[:previous_state] = self[:state]
-        self[:state] = STATES[res['RecorderState']]
+        self[:state] = res['RecorderState']
         self[:current] = {
             'start_time' => Time.now,
             'state' => STATES[res['RecorderState']]
