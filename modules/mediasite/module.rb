@@ -110,12 +110,12 @@ class Mediasite::Module
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/Status"))
         self[:previous_state] = self[:state]
         self[:state] = STATES[res['RecorderState']]
-
-        res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/CurrentPresentationMetadata"))
         self[:current] = {
             'start_time' => Time.now,
             'state' => STATES[res['RecorderState']]
         }
+
+        res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/CurrentPresentationMetadata"))
         self[:title] = res['Title']
         self[:presenters] = res['Presenters']
 
