@@ -48,7 +48,7 @@ class Mediasite::Module
 
     def get_request(url)
         req_url = url
-        #logger.debug(req_url)
+        logger.debug(req_url)
         uri = URI(req_url)
         req = Net::HTTP::Get.new(uri)
         req.basic_auth(setting(:username), setting(:password))
