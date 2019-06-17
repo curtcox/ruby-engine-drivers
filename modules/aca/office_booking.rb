@@ -251,8 +251,8 @@ class Aca::OfficeBooking
             if booking[:isAllDay]
                 logger.warn { "RBP>#{@office_room}>CANCEL>ALL_DAY: An All Day booking was NOT deleted, with start time #{delete_start_epoch}" }
             elsif booking[:email] == @office_room  # Bookings owned by the room need to be deleted, not declined
-                # INSERT DELETE BOOKING HERE (not desired for AIA)
-                logger.warn { "RBP>#{@office_room}>CANCEL>ROOM_OWNED: A booking owned by the room was NOT deleted, with start time #{delete_start_epoch}" }
+                response = @client.delete_booking(booking_id: booking[:id], mailbox: system.email)
+                logger.warn { "RBP>#{@office_room}>CANCEL>ROOM_OWNED: A booking owned by the room was deleted, with start time #{delete_start_epoch}" }
             elsif booking_start_epoch == delete_start_epoch
                 # Decline the meeting, with the appropriate message to the booker
                 case reason
