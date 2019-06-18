@@ -86,7 +86,7 @@ class Aca::OfficeBooking
             app_token_url:              @office_token_url       || ENV["OFFICE_TOKEN_URL"],
             app_scope:                  @office_scope           || ENV['OFFICE_SCOPE']          || "https://graph.microsoft.com/.default",
             graph_domain:               ENV['GRAPH_DOMAIN']     || "https://graph.microsoft.com",
-            service_account_email:      @office_user_password   || ENV['OFFICE_ACCOUNT_EMAIL'],
+            service_account_email:      @office_user_email      || ENV['OFFICE_ACCOUNT_EMAIL'],
             service_account_password:   @office_user_password   || ENV['OFFICE_ACCOUNT_PASSWORD'],
             internet_proxy:             @internet_proxy         || ENV['INTERNET_PROXY']
         })
