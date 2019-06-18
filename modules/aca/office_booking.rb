@@ -69,7 +69,6 @@ class Aca::OfficeBooking
         self[:booking_select_free] = setting(:booking_select_free)
         self[:booking_hide_all] = setting(:booking_hide_all) || false
 
-        logger.debug "Setting OFFICE"
         office_client_id = setting(:office_client_id)
         office_secret = setting(:office_secret)
         office_scope = setting(:office_scope)
@@ -79,6 +78,8 @@ class Aca::OfficeBooking
         office_user_password = setting(:office_user_password)
         @office_room = (setting(:office_room) || system.email)
         office_https_proxy = setting(:office_https_proxy)
+
+        logger.debug "RBP>#{@office_room}>INIT: Instantiating o365 Graph API client"
 
         @client = ::Microsoft::Office.new({
             client_id:                  office_client_id       || ENV['OFFICE_CLIENT_ID'],
