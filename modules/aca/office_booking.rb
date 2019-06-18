@@ -33,8 +33,6 @@ class Aca::OfficeBooking
 
         self[:hide_all] = setting(:hide_all) || false
         self[:touch_enabled] = setting(:touch_enabled) || false
-        self[:name] = self[:room_name] = setting(:room_name) || system.name
-        self[:touch_enabled] = setting(:touch_enabled) || false
         self[:arrow_direction] = setting(:arrow_direction)
         self[:hearing_assistance] = setting(:hearing_assistance)
         self[:timeline_start] = setting(:timeline_start)
@@ -44,7 +42,6 @@ class Aca::OfficeBooking
         self[:icon] = setting(:icon)
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
 
-        self[:timeout] = setting(:timeout)
         self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
         self[:booking_cancel_email_message] = setting(:booking_cancel_email_message)
         self[:booking_timeout_email_message] = setting(:booking_timeout_email_message)
@@ -71,7 +68,6 @@ class Aca::OfficeBooking
         self[:booking_default_title] = setting(:booking_default_title)
         self[:booking_select_free] = setting(:booking_select_free)
         self[:booking_hide_all] = setting(:booking_hide_all) || false
-        self[:hide_all] = setting(:booking_hide_all) || false # for backwards compatibility only
 
         logger.debug "Setting OFFICE"
         @office_client_id = setting(:office_client_id)
