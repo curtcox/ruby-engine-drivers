@@ -42,7 +42,7 @@ class Cisco::Cmx
     def perform(query)
         resp = @host.get(path: @path, headers: @headers, query: query).value
 
-        return nil if resp.status == 204
+        return nil if (200...300).include?(resp.status)
         raise "request failed #{resp.status}\n#{resp.body}" unless (200...300).include?(resp.status)
 
         locations = JSON.parse(resp.body, symbolize_names: true)
