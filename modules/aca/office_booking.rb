@@ -70,25 +70,26 @@ class Aca::OfficeBooking
         self[:booking_hide_all] = setting(:booking_hide_all) || false
 
         logger.debug "Setting OFFICE"
-        @office_client_id = setting(:office_client_id)
-        @office_secret = setting(:office_secret)
-        @office_scope = setting(:office_scope)
-        @office_site = setting(:office_site)
-        @office_token_url = setting(:office_token_url)
-        @office_user_email = setting(:office_user_email)
-        @office_user_password = setting(:office_user_password)
+        office_client_id = setting(:office_client_id)
+        office_secret = setting(:office_secret)
+        office_scope = setting(:office_scope)
+        office_site = setting(:office_site)
+        office_token_url = setting(:office_token_url)
+        office_user_email = setting(:office_user_email)
+        office_user_password = setting(:office_user_password)
         @office_room = (setting(:office_room) || system.email)
+        office_https_proxy = setting(:office_https_proxy)
 
         @client = ::Microsoft::Office.new({
-            client_id:                  @office_client_id       || ENV['OFFICE_CLIENT_ID'],
-            client_secret:              @office_secret          || ENV["OFFICE_CLIENT_SECRET"],
-            app_site:                   @office_site            || ENV["OFFICE_SITE"]           || "https://login.microsoftonline.com",
-            app_token_url:              @office_token_url       || ENV["OFFICE_TOKEN_URL"],
-            app_scope:                  @office_scope           || ENV['OFFICE_SCOPE']          || "https://graph.microsoft.com/.default",
-            graph_domain:               ENV['GRAPH_DOMAIN']     || "https://graph.microsoft.com",
-            service_account_email:      @office_user_email      || ENV['OFFICE_ACCOUNT_EMAIL'],
-            service_account_password:   @office_user_password   || ENV['OFFICE_ACCOUNT_PASSWORD'],
-            internet_proxy:             @internet_proxy         || ENV['INTERNET_PROXY']
+            client_id:                  office_client_id       || ENV['OFFICE_CLIENT_ID'],
+            client_secret:              office_secret          || ENV["OFFICE_CLIENT_SECRET"],
+            app_site:                   office_site            || ENV["OFFICE_SITE"]           || "https://login.microsoftonline.com",
+            app_token_url:              office_token_url       || ENV["OFFICE_TOKEN_URL"],
+            app_scope:                  office_scope           || ENV['OFFICE_SCOPE']          || "https://graph.microsoft.com/.default",
+            graph_domain:               ENV['GRAPH_DOMAIN']    || "https://graph.microsoft.com",
+            service_account_email:      office_user_email      || ENV['OFFICE_ACCOUNT_EMAIL'],
+            service_account_password:   office_user_password   || ENV['OFFICE_ACCOUNT_PASSWORD'],
+            internet_proxy:             office_https_proxy     || ENV['INTERNET_PROXY']
         })
 
         self[:last_meeting_started] = setting(:last_meeting_started)
