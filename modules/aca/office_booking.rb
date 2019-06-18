@@ -31,13 +31,13 @@ class Aca::OfficeBooking
         @last_swipe_at = 0
         @use_act_as = setting(:use_act_as)
 
+        self[:room_name] = setting(:room_name) || system.name
         self[:hide_all] = setting(:hide_all) || false
         self[:touch_enabled] = setting(:touch_enabled) || false
         self[:arrow_direction] = setting(:arrow_direction)
         self[:hearing_assistance] = setting(:hearing_assistance)
         self[:timeline_start] = setting(:timeline_start)
         self[:timeline_end] = setting(:timeline_end)
-        self[:title] = setting(:title)
         self[:description] = setting(:description)
         self[:icon] = setting(:icon)
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
