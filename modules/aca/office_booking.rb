@@ -75,13 +75,9 @@ class Aca::OfficeBooking
         @office_scope = setting(:office_scope)
         @office_site = setting(:office_site)
         @office_token_url = setting(:office_token_url)
-        @office_options = setting(:office_options)
         @office_user_email = setting(:office_user_email)
         @office_user_password = setting(:office_user_password)
-        @office_delegated = setting(:office_delegated)
         @office_room = (setting(:office_room) || system.email)
-        @office_connect_type = (setting(:office_connect_type) || :SMTP).to_sym      # supports: SMTP, PSMTP, SID, UPN (user principle name)
-        @timezone = setting(:room_timezone)
 
         @client = ::Microsoft::Office.new({
             client_id:                  @office_client_id       || ENV['OFFICE_CLIENT_ID'],
