@@ -40,10 +40,10 @@ class Microsoft::Officenew::Client
     def initialize(
             client_id:,
             client_secret:,
-            app_site:,
             app_token_url:,
-            app_scope:,
-            graph_domain:,
+            app_site: "https://login.microsoftonline.com",
+            app_scope: "https://graph.microsoft.com/.default",
+            graph_domain: "https://graph.microsoft.com",
             save_token: Proc.new{ |token| User.bucket.set("office-token", token) },
             get_token: Proc.new{ User.bucket.get("office-token", quiet: true) }
         )
