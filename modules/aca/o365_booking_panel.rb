@@ -97,7 +97,7 @@ class Aca::O365BookingPanel
     end
 
     def fetch_bookings(*args)
-        response = @client.get_bookings(mailboxes: [@office_room], options: {bookings_from: Time.now.midnight, bookings_to: Time.now.tomorrow.midnight}).dig(@office_room, :bookings)
+        response = @client.get_bookings(mailboxes: [@office_room], options: {bookings_from: Time.now.midnight.to_i, bookings_to: Time.now.tomorrow.midnight.to_i}).dig(@office_room, :bookings)
         puts "==============================\n#{response}\n==============================="
         self[:today] = expose_bookings(response)
     end
