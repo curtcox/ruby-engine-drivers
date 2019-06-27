@@ -32,14 +32,12 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
         end
 
         self[:calls] = {}
-        self[:in_call] = false
         register_feedback '/Status/Call' do |call|
             calls = self[:calls].deep_merge call
             calls.reject! do |_, props|
                 props[:status] == :Idle || props.include?(:ghost)
             end
             self[:calls] = calls
-            self[:in_call] = calls.present?
         end
     end
 
@@ -52,8 +50,10 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
     status 'Conference Presentation Mode' => :presentation
     status 'Peripherals ConnectedDevice' => :peripherals
     status 'Video Selfview Mode' => :selfview
+    status 'Video Selfview FullScreenMode' => :selfview_fullscreen
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
+    status 'Video Layout LayoutFamily Local' => :video_layout
     status 'Standby State' => :standby
 
     command 'Audio Microphones Mute' => :mic_mute_on
@@ -103,6 +103,8 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             Name_: String,
             TakeSnapshot_: [true, false],
             DefaultPosition_: [true, false]
+    command 'Camera Preset Remove' => :camera_remove_preset,
+            PresetId: (1..35)
 
     command 'Camera PositionReset' => :camera_position_reset,
             CameraId: (1..7),
@@ -121,6 +123,10 @@ class Cisco::CollaborationEndpoint::Sx80 < Cisco::CollaborationEndpoint::RoomOs
             ConnectorId_: (1..5),       # Source can either be specified as the
             Layout_: [:Equal, :PIP],    # physical connector...
             SourceId_: (1..4)           # ...or the logical source ID
+
+    command 'Video Layout LayoutFamily Set' => :video_layout,
+            LayoutFamily: [:Auto, :Equal, :Overlay, :Prominent, :Single],
+            Target_: [:Local, :Remote]
 
     command 'Video Selfview Set' => :selfview,
             Mode_: [:On, :Off],

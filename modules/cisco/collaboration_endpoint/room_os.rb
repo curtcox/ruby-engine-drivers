@@ -295,7 +295,11 @@ class Cisco::CollaborationEndpoint::RoomOs
                 :success
             else
                 error = response.dig :CommandResponse, :Status
-                logger.error "#{error[:Reason]} (#{error[:XPath]})"
+                if error
+                    logger.error "#{error[:Reason]} (#{error[:XPath]})"
+                else
+                    logger.error "bad response: #{response[:CommandResponse]}"
+                end
                 :abort
             end
         end
@@ -373,14 +377,24 @@ class Cisco::CollaborationEndpoint::RoomOs
     def do_send(command, multiline_body = nil, **options)
         request_id = generate_request_uuid
 
-        if multiline_body
-            multiline_body += "\n" unless multiline_body.end_with? "\n"
-            multiline_body << ".\n"
-        end
-
-        request = "#{command} | resultId=\"#{request_id}\"\n#{multiline_body}"
+        request = "#{command} | resultId=\"#{request_id}\"\n"
 
         logger.debug { "-> #{request}" }
+
+        if multiline_body
+            # Command header
+            send request, wait: false
+
+            # Multiline body
+            # Note: somewhere in the comms stack outgoing commands appear to be
+            # truncated around 4Kb.
+            multiline_body.scan(/.{1,4000}/).each do |chunk|
+                send chunk, wait: false
+            end
+
+            # Multiline body terminator
+            request = "\n.\n"
+        end
 
         send request, **options do |response, defer, cmd|
             received response, defer, cmd do |json|

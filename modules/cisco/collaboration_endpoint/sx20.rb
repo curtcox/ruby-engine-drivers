@@ -48,6 +48,7 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
     status 'Conference Presentation Mode' => :presentation
     status 'Peripherals ConnectedDevice' => :peripherals
     status 'Video Selfview Mode' => :selfview
+    status 'Video Selfview FullScreenMode' => :selfview_fullscreen
     status 'Video Input' => :video_input
     status 'Video Output' => :video_output
     status 'Standby State' => :standby
@@ -96,6 +97,8 @@ class Cisco::CollaborationEndpoint::Sx20 < Cisco::CollaborationEndpoint::RoomOs
             Name_: String,
             TakeSnapshot_: [true, false],
             DefaultPosition_: [true, false]
+    command 'Camera Preset Remove' => :camera_remove_preset,
+            PresetId: (1..35)
 
     command 'Camera PositionReset' => :camera_position_reset,
             CameraId: (1..2),

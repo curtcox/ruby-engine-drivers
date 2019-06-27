@@ -168,6 +168,11 @@ class Aca::Router
         device_chain
     end
 
+    # Check if a source can be routed to a specific sink.
+    def path_exists_between?(source, sink)
+        paths[sink].distance_to[source].finite?
+    end
+
 
     # ------------------------------
     # Internals
@@ -321,7 +326,7 @@ class Aca::Router
             if mod.nil? && single_source
 
         fail_with['already on correct input'] \
-            if edge.nx1? && mod && mod[:input] == edge.input && !force
+            if edge.nx1? && !mod.nil? && mod[:input] == edge.input && !force
 
         fail_with['has an incompatible api, but only a single input defined'] \
             if edge.nx1? && !mod.respond_to?(:switch_to) && single_source

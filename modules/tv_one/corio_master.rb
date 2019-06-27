@@ -75,15 +75,15 @@ class TvOne::CorioMaster
 
     def switch(signal_map)
         interactions = signal_map.flat_map do |slot, windows|
-            Array(windows).map do |id|
-                id = id.to_s[/\d+/].to_i unless id.is_a? Integer
-                window id, 'Input', slot
-            end
+            Array(windows).map { |id| window id, 'Input', slot }
         end
-        thread.finally(*interactions)
+
+        thread.finally interactions
     end
 
     def window(id, property, value)
+        id = id.to_s[/\d+/].to_i unless id.is_a? Integer
+
         set("Window#{id}.#{property}", value).then do
             self[:windows] = (self[:windows] || {}).deep_merge(
                 :"window#{id}" => { property.downcase.to_sym => value }

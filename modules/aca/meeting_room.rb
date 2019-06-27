@@ -26,6 +26,7 @@ class Aca::MeetingRoom < Aca::Joiner
             self[:hide_vc_sources] = setting(:hide_vc_sources)
             self[:mics_mutes] = setting(:mics_mutes)
             self[:doors] = setting(:doors)
+            self[:help_options] = setting(:help_options)
             @confidence_monitor = setting(:confidence_monitor)
 
             # Get any default settings
@@ -244,6 +245,31 @@ class Aca::MeetingRoom < Aca::Joiner
         vc_sources
     end
 
+    def request_help(issue)
+        now = Time.now.to_i
+        booking = system[:Bookings]
+        todays = booking[:today]
+
+        current = nil
+        Time.zone = "UTC"
+        todays.each do |booking|
+            starting = Time.zone.parse(booking[:Start]).to_i
+            ending = Time.zone.parse(booking[:End]).to_i
+            if now >= starting && now < ending
+                current = booking
+                break;
+            end
+        end
+
+        if current
+            message = "Issue in #{self[:name]}\n#{current[:owner]} requires help with #{issue}"
+        else
+            message = "Issue in #{self[:name]}\nUser requires help with #{issue}"
+        end
+
+        # help_email: ["array.of@.email.addresses"]
+        booking.send_email("Issue in #{self[:name]}", message, setting(:help_email))
+    end
 
     #
     # SOURCE SWITCHING
@@ -513,7 +539,7 @@ class Aca::MeetingRoom < Aca::Joiner
             mode_outs = mode[:outputs] || {}
             difference = mode_outs.keys - default_outs.keys
 
-            if mode[:outputs_clobber] 
+            if mode[:outputs_clobber]
               self[:outputs] = ActiveSupport::HashWithIndifferentAccess.new.deep_merge(mode_outs)
             else
                self[:outputs] = ActiveSupport::HashWithIndifferentAccess.new.deep_merge(mode_outs.merge(default_outs))
@@ -755,7 +781,7 @@ class Aca::MeetingRoom < Aca::Joiner
         end
 
         switch_mode(@defaults[:shutdown_mode]) if @defaults[:shutdown_mode]
-        
+
         self[:vc_content_source] = nil
         shutdown_vc
 
@@ -885,13 +911,13 @@ class Aca::MeetingRoom < Aca::Joiner
     #
     # MISC FUNCTIONS
     #
-    
+
     def shutdown_vc
         vidconf = system[:VidConf]
         vidconf.call('disconnect')
         vc_mute true
     end
-    
+
     def init_vc
         system[:VidConf].clear_search_results
         system[:VidConf].wake
@@ -953,7 +979,7 @@ class Aca::MeetingRoom < Aca::Joiner
             inp = src[:input]
             out = src[:output]
             system[:Switcher].switch({inp => out}) if inp && out
-            
+
             # Enable or disable Cisco Speakertrack for this camera
             speaker_track_setting = src[:auto_camera] # true/false/nil. When nil, no command is sent
             system[:VidConf].speaker_track(speaker_track_setting) unless speaker_track_setting.nil?
