@@ -1,13 +1,14 @@
 # encoding: ASCII-8BIT
 require 'faraday'
 require 'uv-rays'
-require 'microsoft/office'
+require 'microsoft/officenew'
+require 'microsoft/office/client'
 Faraday.default_adapter = :libuv
 
 module Aca; end
-class Aca::OfficeBooking
+class Aca::O365BookingPanel
     include ::Orchestrator::Constants
-    descriptive_name 'Deprecated Office365 Room Booking Panel Logic'
+    descriptive_name 'Office365 Room Booking Panel Logic'
     generic_name :Bookings
     implements :logic
 
@@ -81,16 +82,10 @@ class Aca::OfficeBooking
 
         logger.debug "RBP>#{@office_room}>INIT: Instantiating o365 Graph API client"
 
-        @client = ::Microsoft::Office.new({
+        @client = ::Microsoft::Officenew::Client.new({
             client_id:                  office_client_id       || ENV['OFFICE_CLIENT_ID'],
             client_secret:              office_secret          || ENV["OFFICE_CLIENT_SECRET"],
-            app_site:                   office_site            || ENV["OFFICE_SITE"]           || "https://login.microsoftonline.com",
-            app_token_url:              office_token_url       || ENV["OFFICE_TOKEN_URL"],
-            app_scope:                  office_scope           || ENV['OFFICE_SCOPE']          || "https://graph.microsoft.com/.default",
-            graph_domain:               ENV['GRAPH_DOMAIN']    || "https://graph.microsoft.com",
-            service_account_email:      office_user_email      || ENV['OFFICE_ACCOUNT_EMAIL'],
-            service_account_password:   office_user_password   || ENV['OFFICE_ACCOUNT_PASSWORD'],
-            internet_proxy:             office_https_proxy     || ENV['INTERNET_PROXY']
+            app_token_url:              office_token_url       || ENV["OFFICE_TOKEN_URL"]
         })
 
         self[:last_meeting_started] = setting(:last_meeting_started)
@@ -102,7 +97,8 @@ class Aca::OfficeBooking
     end
 
     def fetch_bookings(*args)
-        response = @client.get_bookings_by_user(user_id: @office_room, start_param: Time.now.midnight, end_param: Time.now.tomorrow.midnight)[:bookings]
+        response = @client.get_bookings(mailboxes: [@office_room], options: {bookings_from: Time.now.midnight.to_i, bookings_to: Time.now.tomorrow.midnight.to_i}).dig(@office_room, :bookings)
+        puts "==============================\n#{response}\n==============================="
         self[:today] = expose_bookings(response)
     end
 
