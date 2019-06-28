@@ -1,0 +1,2552 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Qsc::QSysRemote
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Qsc::QSysRemote";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (Q)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Qsc.html" title="Qsc (module)">Qsc</a></span></span>
+     &raquo; 
+    <span class="title">QSysRemote</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Qsc::QSysRemote
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Qsc::QSysRemote</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/qsc/q_sys_remote.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://aca.im/driver_docs/QSC/QRCDocumentation.pdf">aca.im/driver_docs/QSC/QRCDocumentation.pdf</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="JsonRpcVer-constant" class="">JsonRpcVer =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2.0</span><span class='tstring_end'>&#39;</span></span></pre></dd>
+      
+        <dt id="Errors-constant" class="">Errors =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='op'>-</span><span class='int'>32700</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Parse error. Invalid JSON was received by the server.</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='op'>-</span><span class='int'>32600</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Invalid request. The JSON sent is not a valid Request object.</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='op'>-</span><span class='int'>32601</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Method not found.</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='op'>-</span><span class='int'>32602</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Invalid params.</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='op'>-</span><span class='int'>32603</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Server error.</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+
+    <span class='int'>2</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Invalid Page Request ID</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>3</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Bad Page Request - could not create the requested Page Request</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>4</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Missing file</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>5</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Change Groups exhausted</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>6</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unknown change croup</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>7</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unknown component name</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>8</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Unknown control</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>9</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Illegal mixer channel index</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='int'>10</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Logon required</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="Faders-constant" class="">Faders =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>matrix_in:</span> <span class='lbrace'>{</span>
+        <span class='label'>type:</span> <span class='symbol'>:&quot;Mixer.SetInputGain&quot;</span><span class='comma'>,</span>
+        <span class='label'>pri:</span> <span class='symbol'>:Inputs</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>matrix_out:</span> <span class='lbrace'>{</span>
+        <span class='label'>type:</span> <span class='symbol'>:&quot;Mixer.SetOutputGain&quot;</span><span class='comma'>,</span>
+        <span class='label'>pri:</span> <span class='symbol'>:Outputs</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>matrix_crosspoint:</span> <span class='lbrace'>{</span>
+        <span class='label'>type:</span> <span class='symbol'>:&quot;Mixer.SetCrossPointGain&quot;</span><span class='comma'>,</span>
+        <span class='label'>pri:</span> <span class='symbol'>:Inputs</span><span class='comma'>,</span>
+        <span class='label'>sec:</span> <span class='symbol'>:Outputs</span>
+    <span class='rbrace'>}</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="Mutes-constant" class="">Mutes =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>matrix_in:</span> <span class='lbrace'>{</span>
+        <span class='label'>type:</span> <span class='symbol'>:&quot;Mixer.SetInputMute&quot;</span><span class='comma'>,</span>
+        <span class='label'>pri:</span> <span class='symbol'>:Inputs</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>matrix_out:</span> <span class='lbrace'>{</span>
+        <span class='label'>type:</span> <span class='symbol'>:&quot;Mixer.SetOutputMute&quot;</span><span class='comma'>,</span>
+        <span class='label'>pri:</span> <span class='symbol'>:Outputs</span>
+    <span class='rbrace'>}</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="DECODE_OPTIONS-constant" class="">DECODE_OPTIONS =
+          <div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>RESPONSE PROCESSING</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>symbolize_names:</span> <span class='kw'>true</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#auto_poll_change_group-instance_method" title="#auto_poll_change_group (instance method)">#<strong>auto_poll_change_group</strong>(group_id, every, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Where every is the number of seconds between polls.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#change_group_add_component-instance_method" title="#change_group_add_component (instance method)">#<strong>change_group_add_component</strong>(group_id, component_name, *controls, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#change_group_add_controls-instance_method" title="#change_group_add_controls (instance method)">#<strong>change_group_add_controls</strong>(group_id, *controls, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>————- Change Groups ————-.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#change_group_remove_controls-instance_method" title="#change_group_remove_controls (instance method)">#<strong>change_group_remove_controls</strong>(group_id, *controls, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#clear_change_group-instance_method" title="#clear_change_group (instance method)">#<strong>clear_change_group</strong>(group_id, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Removes all controls from change group.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#component_get-instance_method" title="#component_get (instance method)">#<strong>component_get</strong>(name, *controls, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>—————— COMPONENT CONTROLS ——————.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#component_set-instance_method" title="#component_set (instance method)">#<strong>component_set</strong>(name, value, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#component_trigger-instance_method" title="#component_trigger (instance method)">#<strong>component_trigger</strong>(component, trigger, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#control_get-instance_method" title="#control_get (instance method)">#<strong>control_get</strong>(*names, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#control_set-instance_method" title="#control_set (instance method)">#<strong>control_set</strong>(name, value, ramp = nil, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>—————- CONTROL CONTROLS —————-.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#destroy_change_group-instance_method" title="#destroy_change_group (instance method)">#<strong>destroy_change_group</strong>(group_id, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Removes the change group.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fader-instance_method" title="#fader (instance method)">#<strong>fader</strong>(fader_id, level, component = nil, type = :fader, use_value: false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>——————— COMPATIBILITY METHODS ———————.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#faders-instance_method" title="#faders (instance method)">#<strong>faders</strong>(ids:, level:, index: nil, type: :fader, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_components-instance_method" title="#get_components (instance method)">#<strong>get_components</strong>(**options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_status-instance_method" title="#get_status (instance method)">#<strong>get_status</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#logon-instance_method" title="#logon (instance method)">#<strong>logon</strong>(username = setting(:username), password = setting(:password))  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#matrix_fader-instance_method" title="#matrix_fader (instance method)">#<strong>matrix_fader</strong>(name, level, index, type = :matrix_out, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#matrix_faders-instance_method" title="#matrix_faders (instance method)">#<strong>matrix_faders</strong>(ids:, level:, index:, type: :matrix_out, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Named params version.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#matrix_mute-instance_method" title="#matrix_mute (instance method)">#<strong>matrix_mute</strong>(name, value, index, type = :matrix_out, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#matrix_mutes-instance_method" title="#matrix_mutes (instance method)">#<strong>matrix_mutes</strong>(ids:, muted: true, index:, type: :matrix_out, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Named params version.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mixer-instance_method" title="#mixer (instance method)">#<strong>mixer</strong>(name, inouts, mute = false, *_, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>————– MIXER CONTROLS ————–.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute-instance_method" title="#mute (instance method)">#<strong>mute</strong>(fader_id, value = true, component = nil, type = :fader)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mutes-instance_method" title="#mutes (instance method)">#<strong>mutes</strong>(ids:, muted: true, index: nil, type: :fader, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#no_op-instance_method" title="#no_op (instance method)">#<strong>no_op</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#poll_change_group-instance_method" title="#poll_change_group (instance method)">#<strong>poll_change_group</strong>(group_id, **options)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns values for all the controls.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_fader-instance_method" title="#query_fader (instance method)">#<strong>query_fader</strong>(fader_id, component = nil, type = :fader)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_faders-instance_method" title="#query_faders (instance method)">#<strong>query_faders</strong>(ids:, index: nil, type: :fader, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_mute-instance_method" title="#query_mute (instance method)">#<strong>query_mute</strong>(fader_id, component = nil, type = :fader)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_mutes-instance_method" title="#query_mutes (instance method)">#<strong>query_mutes</strong>(ids:, index: nil, type: :fader, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(data, resolve, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unmute-instance_method" title="#unmute (instance method)">#<strong>unmute</strong>(fader_id, component = nil, type = :fader)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="auto_poll_change_group-instance_method">
+  
+    #<strong>auto_poll_change_group</strong>(group_id, every, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Where every is the number of seconds between polls</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+201
+202
+203
+204
+205
+206
+207
+208</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 201</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_auto_poll_change_group'>auto_poll_change_group</span><span class='lparen'>(</span><span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span> <span class='id identifier rubyid_every'>every</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Id</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span>
+        <span class='symbol'>:Rate</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_every'>every</span>
+    <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:wait</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;ChangeGroup.AutoPoll&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='id identifier rubyid_params'>params</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="change_group_add_component-instance_method">
+  
+    #<strong>change_group_add_component</strong>(group_id, component_name, *controls, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_change_group_add_component'>change_group_add_component</span><span class='lparen'>(</span><span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span> <span class='id identifier rubyid_component_name'>component_name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_controls'>controls</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_controls'>controls</span><span class='period'>.</span><span class='id identifier rubyid_collect!'>collect!</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_ctrl'>ctrl</span><span class='op'>|</span>
+        <span class='lbrace'>{</span>
+            <span class='symbol'>:Name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_ctrl'>ctrl</span>
+        <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;ChangeGroup.AddComponentControl&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Id</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span>
+        <span class='symbol'>:Component</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span>
+            <span class='symbol'>:Name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_component_name'>component_name</span><span class='comma'>,</span>
+            <span class='symbol'>:Controls</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_controls'>controls</span>
+        <span class='rbrace'>}</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="change_group_add_controls-instance_method">
+  
+    #<strong>change_group_add_controls</strong>(group_id, *controls, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>Change Groups</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+151
+152
+153
+154
+155
+156
+157
+158</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 151</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_change_group_add_controls'>change_group_add_controls</span><span class='lparen'>(</span><span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_controls'>controls</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Id</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span>
+        <span class='symbol'>:Controls</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_controls'>controls</span>
+    <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;ChangeGroup.AddControl&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='id identifier rubyid_params'>params</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="change_group_remove_controls-instance_method">
+  
+    #<strong>change_group_remove_controls</strong>(group_id, *controls, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+160
+161
+162
+163
+164
+165
+166
+167</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 160</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_change_group_remove_controls'>change_group_remove_controls</span><span class='lparen'>(</span><span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_controls'>controls</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Id</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span>
+        <span class='symbol'>:Controls</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_controls'>controls</span>
+    <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;ChangeGroup.Remove&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='id identifier rubyid_params'>params</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="clear_change_group-instance_method">
+  
+    #<strong>clear_change_group</strong>(group_id, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Removes all controls from change group</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+196
+197
+198</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 196</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_clear_change_group'>clear_change_group</span><span class='lparen'>(</span><span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;ChangeGroup.Clear&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span><span class='symbol'>:Id</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_group_id'>group_id</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="component_get-instance_method">
+  
+    #<strong>component_get</strong>(name, *controls, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>COMPONENT CONTROLS</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 112</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_component_get'>component_get</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid_controls'>controls</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='comment'># Example usage:
+</span>    <span class='comment'># component_get &#39;My AMP&#39;, &#39;ent.xfade.gain&#39;, &#39;ent.xfade.gain2&#39;
+</span>    <span class='id identifier rubyid_controls'>controls</span> <span class='op'>=</span> <span class='id identifier rubyid_controls'>controls</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span>
+    <span class='id identifier rubyid_controls'>controls</span><span class='period'>.</span><span class='id identifier rubyid_collect!'>collect!</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_ctrl'>ctrl</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='symbol'>:Name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_ctrl'>ctrl</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;Component.Get&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+        <span class='symbol'>:Controls</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_controls'>controls</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="component_set-instance_method">
+  
+    #<strong>component_set</strong>(name, value, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 124</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_component_set'>component_set</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='comment'># Example usage:
+</span>    <span class='comment'># component_set &#39;My APM&#39;, { :Name =&gt; &#39;ent.xfade.gain&#39;, :Value =&gt; -100 }, {...}
+</span>    <span class='id identifier rubyid_values'>values</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_value'>value</span><span class='rbracket'>]</span>
+    <span class='comment'># NOTE:: Can&#39;t use Array() helper on hashes as they are converted to arrays.
+</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;Component.Set&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+        <span class='symbol'>:Controls</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_values'>values</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="component_trigger-instance_method">
+  
+    #<strong>component_trigger</strong>(component, trigger, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+136
+137
+138
+139
+140
+141</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 136</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_component_trigger'>component_trigger</span><span class='lparen'>(</span><span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_trigger'>trigger</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;Component.Trigger&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_component'>component</span><span class='comma'>,</span>
+        <span class='symbol'>:Controls</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='lbrace'>{</span> <span class='symbol'>:Name</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_trigger'>trigger</span> <span class='rbrace'>}</span><span class='rbracket'>]</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>20s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Maintaining Connection</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_no_op'>no_op</span>
+    <span class='kw'>end</span>
+
+    <span class='ivar'>@id</span> <span class='op'>=</span> <span class='int'>0</span>
+
+    <span class='id identifier rubyid_logon'>logon</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="control_get-instance_method">
+  
+    #<strong>control_get</strong>(*names, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+104
+105
+106</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 104</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_control_get'>control_get</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_names'>names</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;Control.Get&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='id identifier rubyid_names'>names</span><span class='period'>.</span><span class='id identifier rubyid_flatten'>flatten</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="control_set-instance_method">
+  
+    #<strong>control_set</strong>(name, value, ramp = nil, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>CONTROL CONTROLS</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+94
+95
+96
+97
+98
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 94</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_control_set'>control_set</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_ramp'>ramp</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Name</span> <span class='op'>=&gt;</span>  <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+        <span class='symbol'>:Value</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='symbol'>:Ramp</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_ramp'>ramp</span> <span class='kw'>if</span> <span class='id identifier rubyid_ramp'>ramp</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;Control.Set&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='id identifier rubyid_params'>params</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="destroy_change_group-instance_method">
+  
+    #<strong>destroy_change_group</strong>(group_id, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Removes the change group</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+191
+192
+193</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 191</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_destroy_change_group'>destroy_change_group</span><span class='lparen'>(</span><span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;ChangeGroup.Destroy&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span><span class='symbol'>:Id</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_group_id'>group_id</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65
+66
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='comment'>#
+</span>    <span class='comment'># Disconnected may be called without calling connected
+</span>    <span class='comment'>#    Hence the check if timer is nil here
+</span>    <span class='comment'>#
+</span>    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="fader-instance_method">
+  
+    #<strong>fader</strong>(fader_id, level, component = nil, type = :fader, use_value: false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>COMPATIBILITY METHODS</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 307</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fader'>fader</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:fader</span><span class='comma'>,</span> <span class='label'>use_value:</span> <span class='kw'>false</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_faders'>faders</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_component'>component</span>
+        <span class='kw'>if</span> <span class='ivar'>@db_based_faders</span> <span class='op'>||</span> <span class='id identifier rubyid_use_value'>use_value</span>
+            <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>/</span> <span class='float'>10.0</span> <span class='kw'>if</span> <span class='ivar'>@integer_faders</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_use_value'>use_value</span>
+            <span class='id identifier rubyid_fads'>fads</span> <span class='op'>=</span> <span class='id identifier rubyid_faders'>faders</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_fad'>fad</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>Name:</span> <span class='id identifier rubyid_fad'>fad</span><span class='comma'>,</span> <span class='label'>Value:</span> <span class='id identifier rubyid_level'>level</span><span class='rbrace'>}</span> <span class='rbrace'>}</span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_f'>to_f</span> <span class='op'>/</span> <span class='float'>1000.0</span> <span class='kw'>if</span> <span class='ivar'>@integer_faders</span>
+            <span class='id identifier rubyid_fads'>fads</span> <span class='op'>=</span> <span class='id identifier rubyid_faders'>faders</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_fad'>fad</span><span class='op'>|</span> <span class='lbrace'>{</span><span class='label'>Name:</span> <span class='id identifier rubyid_fad'>fad</span><span class='comma'>,</span> <span class='label'>Position:</span> <span class='id identifier rubyid_level'>level</span><span class='rbrace'>}</span> <span class='rbrace'>}</span>
+        <span class='kw'>end</span>
+        <span class='id identifier rubyid_component_set'>component_set</span><span class='lparen'>(</span><span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_fads'>fads</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>level_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_faders'>faders</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+            <span class='id identifier rubyid_component_get'>component_get</span><span class='lparen'>(</span><span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_faders'>faders</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>10</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_reqs'>reqs</span> <span class='op'>=</span> <span class='id identifier rubyid_faders'>faders</span><span class='period'>.</span><span class='id identifier rubyid_collect'>collect</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_fad'>fad</span><span class='op'>|</span> <span class='id identifier rubyid_control_set'>control_set</span><span class='lparen'>(</span><span class='id identifier rubyid_fad'>fad</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>level_</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_fad'>fad</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_reqs'>reqs</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_control_get'>control_get</span><span class='lparen'>(</span><span class='id identifier rubyid_faders'>faders</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>10</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="faders-instance_method">
+  
+    #<strong>faders</strong>(ids:, level:, index: nil, type: :fader, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+326
+327
+328</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 326</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_faders'>faders</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>level:</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='symbol'>:fader</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_fader'>fader</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_components-instance_method">
+  
+    #<strong>get_components</strong>(**options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+143
+144
+145</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 143</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_components'>get_components</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;Component.GetComponents&quot;</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_status-instance_method">
+  
+    #<strong>get_status</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 76</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_status'>get_status</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:StatusGet</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="logon-instance_method">
+  
+    #<strong>logon</strong>(username = setting(:username), password = setting(:password))  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+80
+81
+82
+83
+84
+85
+86
+87
+88</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 80</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_logon'>logon</span><span class='lparen'>(</span><span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:username</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='id identifier rubyid_password'>password</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:password</span><span class='rparen'>)</span><span class='rparen'>)</span>
+    <span class='comment'># Don&#39;t login if there is no username or password set
+</span>    <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_username'>username</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='label'>cmd:</span> <span class='symbol'>:Logon</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:User</span> <span class='op'>=&gt;</span>  <span class='id identifier rubyid_username'>username</span><span class='comma'>,</span>
+        <span class='symbol'>:Password</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_password'>password</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>99</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="matrix_fader-instance_method">
+  
+    #<strong>matrix_fader</strong>(name, level, index, type = :matrix_out, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 245</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_matrix_fader'>matrix_fader</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:matrix_out</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_info'>info</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#Faders-constant" title="Qsc::QSysRemote::Faders (constant)">Faders</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_type'>type</span><span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Mixer</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+        <span class='symbol'>:Value</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_level'>level</span>
+    <span class='rbrace'>}</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:sec</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:pri</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:sec</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:pri</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='id identifier rubyid_params'>params</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="matrix_faders-instance_method">
+  
+    #<strong>matrix_faders</strong>(ids:, level:, index:, type: :matrix_out, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Named params version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+264
+265
+266</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 264</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_matrix_faders'>matrix_faders</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>level:</span><span class='comma'>,</span> <span class='label'>index:</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='symbol'>:matrix_out</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_fader'>fader</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="matrix_mute-instance_method">
+  
+    #<strong>matrix_mute</strong>(name, value, index, type = :matrix_out, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 279</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_matrix_mute'>matrix_mute</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:matrix_out</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_info'>info</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#Mutes-constant" title="Qsc::QSysRemote::Mutes (constant)">Mutes</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_type'>type</span><span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_params'>params</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+        <span class='symbol'>:Mixer</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+        <span class='symbol'>:Value</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_value'>value</span>
+    <span class='rbrace'>}</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:sec</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:pri</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:sec</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_params'>params</span><span class='lbracket'>[</span><span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:pri</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_index'>index</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='id identifier rubyid_info'>info</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='id identifier rubyid_params'>params</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="matrix_mutes-instance_method">
+  
+    #<strong>matrix_mutes</strong>(ids:, muted: true, index:, type: :matrix_out, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Named params version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+298
+299
+300</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 298</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_matrix_mutes'>matrix_mutes</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>muted:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>index:</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='symbol'>:matrix_out</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_muted'>muted</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mixer-instance_method">
+  
+    #<strong>mixer</strong>(name, inouts, mute = false, *_, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>MIXER CONTROLS</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 214</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mixer'>mixer</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_inouts'>inouts</span><span class='comma'>,</span> <span class='id identifier rubyid_mute'>mute</span> <span class='op'>=</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid__'>_</span><span class='comma'>,</span>  <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='comment'># Example usage:
+</span>    <span class='comment'># mixer &#39;Parade&#39;, {1 =&gt; [2,3,4], 3 =&gt; 6}, true
+</span>
+    <span class='id identifier rubyid_inouts'>inouts</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_input'>input</span><span class='comma'>,</span> <span class='id identifier rubyid_outputs'>outputs</span><span class='op'>|</span>
+        <span class='id identifier rubyid_outs'>outs</span> <span class='op'>=</span> <span class='id identifier rubyid_outputs'>outputs</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span> <span class='op'>==</span> <span class='const'>Array</span> <span class='op'>?</span> <span class='id identifier rubyid_outputs'>outputs</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_outputs'>outputs</span><span class='rbracket'>]</span>
+
+        <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;Mixer.SetCrossPointMute&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span>
+            <span class='symbol'>:Mixer</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_name'>name</span><span class='comma'>,</span>
+            <span class='symbol'>:Inputs</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='comma'>,</span>
+            <span class='symbol'>:Outputs</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_outputs'>outputs</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+            <span class='symbol'>:Value</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_mute'>mute</span>
+        <span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute-instance_method">
+  
+    #<strong>mute</strong>(fader_id, value = true, component = nil, type = :fader)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+330
+331
+332
+333</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 330</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:fader</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_fader'>fader</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='label'>use_value:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mutes-instance_method">
+  
+    #<strong>mutes</strong>(ids:, muted: true, index: nil, type: :fader, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+335
+336
+337</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 335</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mutes'>mutes</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>muted:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='symbol'>:fader</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_muted'>muted</span><span class='comma'>,</span> <span class='id identifier rubyid_index'>index</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="no_op-instance_method">
+  
+    #<strong>no_op</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+72
+73
+74</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 72</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_no_op'>no_op</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='label'>cmd:</span> <span class='symbol'>:NoOp</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+43
+44
+45</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 43</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='ivar'>@db_based_faders</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:db_based_faders</span><span class='rparen'>)</span>
+    <span class='ivar'>@integer_faders</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:integer_faders</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="poll_change_group-instance_method">
+  
+    #<strong>poll_change_group</strong>(group_id, **options)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns values for all the controls</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+186
+187
+188</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 186</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_poll_change_group'>poll_change_group</span><span class='lparen'>(</span><span class='id identifier rubyid_group_id'>group_id</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_next_id'>next_id</span><span class='comma'>,</span> <span class='label'>cmd:</span> <span class='symbol'>:&quot;ChangeGroup.Poll&quot;</span><span class='comma'>,</span> <span class='label'>params:</span> <span class='lbrace'>{</span><span class='symbol'>:Id</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_group_id'>group_id</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_fader-instance_method">
+  
+    #<strong>query_fader</strong>(fader_id, component = nil, type = :fader)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+343
+344
+345
+346
+347
+348
+349
+350
+351</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 343</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_fader'>query_fader</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:fader</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_faders'>faders</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='rparen'>)</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_component'>component</span>
+        <span class='id identifier rubyid_component_get'>component_get</span><span class='lparen'>(</span><span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_faders'>faders</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_control_get'>control_get</span><span class='lparen'>(</span><span class='id identifier rubyid_faders'>faders</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_faders-instance_method">
+  
+    #<strong>query_faders</strong>(ids:, index: nil, type: :fader, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+353
+354
+355</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 353</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_faders'>query_faders</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='symbol'>:fader</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_query_fader'>query_fader</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_mute-instance_method">
+  
+    #<strong>query_mute</strong>(fader_id, component = nil, type = :fader)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+357
+358
+359</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 357</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_mute'>query_mute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:fader</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_query_fader'>query_fader</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_mutes-instance_method">
+  
+    #<strong>query_mutes</strong>(ids:, index: nil, type: :fader, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+361
+362
+363</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 361</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_mutes'>query_mutes</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>index:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>type:</span> <span class='symbol'>:fader</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_query_fader'>query_fader</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(data, resolve, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 373</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>QSys sent: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#DECODE_OPTIONS-constant" title="Qsc::QSysRemote::DECODE_OPTIONS (constant)">DECODE_OPTIONS</a></span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='const'>JSON</span><span class='period'>.</span><span class='id identifier rubyid_pretty_generate'>pretty_generate</span><span class='lparen'>(</span><span class='id identifier rubyid_response'>response</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_err'>err</span> <span class='op'>=</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_err'>err</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Error code </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_err'>err</span><span class='lbracket'>[</span><span class='symbol'>:code</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> - </span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#Errors-constant" title="Qsc::QSysRemote::Errors (constant)">Errors</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_err'>err</span><span class='lbracket'>[</span><span class='symbol'>:code</span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_err'>err</span><span class='lbracket'>[</span><span class='symbol'>:message</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>return</span> <span class='symbol'>:abort</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='symbol'>:result</span><span class='rbracket'>]</span>
+    <span class='kw'>case</span> <span class='id identifier rubyid_result'>result</span>
+    <span class='kw'>when</span> <span class='const'>Hash</span>
+        <span class='id identifier rubyid_controls'>controls</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:Controls</span><span class='rbracket'>]</span>
+
+        <span class='kw'>if</span> <span class='id identifier rubyid_controls'>controls</span>
+            <span class='comment'># Probably Component.Get
+</span>            <span class='id identifier rubyid_process'>process</span><span class='lparen'>(</span><span class='id identifier rubyid_controls'>controls</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:Name</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='kw'>elsif</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:Platform</span><span class='rbracket'>]</span>
+            <span class='comment'># StatusGet
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:platform</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:Platform</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:state</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:State</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:design_name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:DesignName</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:design_code</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:DesignCode</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:is_redundant</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:IsRedundant</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:is_emulator</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:IsEmulator</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:status</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='symbol'>:Status</span><span class='rbracket'>]</span>
+        <span class='kw'>end</span>
+    <span class='kw'>when</span> <span class='const'>Array</span>
+        <span class='comment'># Control.Get
+</span>        <span class='id identifier rubyid_process'>process</span><span class='lparen'>(</span><span class='id identifier rubyid_result'>result</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>return</span> <span class='symbol'>:success</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unmute-instance_method">
+  
+    #<strong>unmute</strong>(fader_id, component = nil, type = :fader)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+339
+340
+341</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/qsc/q_sys_remote.rb', line 339</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unmute'>unmute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:fader</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_component'>component</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:34 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

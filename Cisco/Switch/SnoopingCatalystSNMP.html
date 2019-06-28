@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Cisco::Switch::SnoopingCatalystSNMP
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Cisco::Switch::SnoopingCatalystSNMP";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Cisco.html" title="Cisco (module)">Cisco</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Switch.html" title="Cisco::Switch (module)">Switch</a></span></span>
+     &raquo; 
+    <span class="title">SnoopingCatalystSNMP</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Cisco::Switch::SnoopingCatalystSNMP
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Cisco::Switch::SnoopingCatalystSNMP</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Security, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/cisco/switch/snooping_catalyst_snmp.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="SnoopingCatalystSNMP/SnoopingEntry.html" title="Cisco::Switch::SnoopingCatalystSNMP::SnoopingEntry (class)">SnoopingEntry</a></span>
+    
+  
+</p>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="AddressType-constant" class="">AddressType =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='int'>0</span>  <span class='op'>=&gt;</span> <span class='symbol'>:unknown</span><span class='comma'>,</span>
+    <span class='int'>1</span>  <span class='op'>=&gt;</span> <span class='symbol'>:ipv4</span><span class='comma'>,</span>
+    <span class='int'>2</span>  <span class='op'>=&gt;</span> <span class='symbol'>:ipv6</span><span class='comma'>,</span>
+    <span class='int'>3</span>  <span class='op'>=&gt;</span> <span class='symbol'>:ipv4z</span><span class='comma'>,</span>
+    <span class='int'>4</span>  <span class='op'>=&gt;</span> <span class='symbol'>:ipv6z</span><span class='comma'>,</span>
+    <span class='int'>16</span> <span class='op'>=&gt;</span> <span class='symbol'>:dns</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="AcceptAddress-constant" class="">AcceptAddress =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbracket'>[</span><span class='symbol'>:ipv4</span><span class='comma'>,</span> <span class='symbol'>:ipv6</span><span class='comma'>,</span> <span class='symbol'>:ipv4z</span><span class='comma'>,</span> <span class='symbol'>:ipv6z</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="BindingStatus-constant" class="">BindingStatus =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='int'>1</span> <span class='op'>=&gt;</span> <span class='symbol'>:active</span><span class='comma'>,</span>
+    <span class='int'>2</span> <span class='op'>=&gt;</span> <span class='symbol'>:not_in_service</span><span class='comma'>,</span>
+    <span class='int'>3</span> <span class='op'>=&gt;</span> <span class='symbol'>:not_ready</span><span class='comma'>,</span>
+    <span class='int'>4</span> <span class='op'>=&gt;</span> <span class='symbol'>:create_and_go</span><span class='comma'>,</span>
+    <span class='int'>5</span> <span class='op'>=&gt;</span> <span class='symbol'>:create_and_wait</span><span class='comma'>,</span>
+    <span class='int'>6</span> <span class='op'>=&gt;</span> <span class='symbol'>:destroy</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="EntryParts-constant" class="">EntryParts =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>cdsBindingsEntry</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:vlan</span><span class='comma'>,</span>        <span class='comment'># Cisco has made this not-accessible
+</span>    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:mac_address</span><span class='comma'>,</span> <span class='comment'># Cisco has made this not-accessible
+</span>    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:addr_type</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>4</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:ip_address</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>5</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:interface</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>6</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:leased_time</span><span class='comma'>,</span>    <span class='comment'># in seconds
+</span>    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>7</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:binding_status</span><span class='comma'>,</span> <span class='comment'># can set this to destroy to delete entry
+</span>    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>8</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:hostname</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#check_link_state-instance_method" title="#check_link_state (instance method)">#<strong>check_link_state</strong>(pdu)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#hostname_resolution-instance_method" title="#hostname_resolution (instance method)">#<strong>hostname_resolution</strong>(ip)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#is_processing%3F-instance_method" title="#is_processing? (instance method)">#<strong>is_processing?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_trap-instance_method" title="#on_trap (instance method)">#<strong>on_trap</strong>(ifIndex, state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>The SNMP trap handler will notify of changes in interface state.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_unload-instance_method" title="#on_unload (instance method)">#<strong>on_unload</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_connected_devices-instance_method" title="#query_connected_devices (instance method)">#<strong>query_connected_devices</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_index_mappings-instance_method" title="#query_index_mappings (instance method)">#<strong>query_index_mappings</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Index short name lookup ifName: 1.3.6.1.2.1.31.1.1.1.1.xx  (where xx is the
+ifIndex).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_interface_status-instance_method" title="#query_interface_status (instance method)">#<strong>query_interface_status</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>ifOperStatus: 1.3.6.1.2.1.2.2.1.8.xx == up(1), down(2), testing(3).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_snooping_bindings-instance_method" title="#query_snooping_bindings (instance method)">#<strong>query_snooping_bindings</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A row instance contains the Mac address, IP address type, IP address, VLAN
+number, interface number, leased time, and status of this instance.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_reservations-instance_method" title="#update_reservations (instance method)">#<strong>update_reservations</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="check_link_state-instance_method">
+  
+    #<strong>check_link_state</strong>(pdu)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 145</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_link_state'>check_link_state</span><span class='lparen'>(</span><span class='id identifier rubyid_pdu'>pdu</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>community mismatch: trap </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pdu'>pdu</span><span class='period'>.</span><span class='id identifier rubyid_community'>community</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_content'> != </span><span class='embexpr_beg'>#{</span><span class='ivar'>@community</span><span class='period'>.</span><span class='id identifier rubyid_inspect'>inspect</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='ivar'>@community</span> <span class='op'>==</span> <span class='id identifier rubyid_pdu'>pdu</span><span class='period'>.</span><span class='id identifier rubyid_community'>community</span>
+
+    <span class='comment'># Looks like: http://www.alvestrand.no/objectid/1.3.6.1.2.1.2.2.1.html
+</span>    <span class='comment'># &lt;NETSNMP::PDU:0x007ffed43bb1b0 @version=0, @community=&quot;public&quot;,
+</span>    <span class='comment'>#   @error_status=0, @error_index=3, @type=4, @varbinds=[
+</span>    <span class='comment'>#       #&lt;NETSNMP::Varbind:0x007ffed43bb048 @oid=&quot;1.3.6.1.2.1.2.2.1.1.26&quot;, @type=nil, @value=26&gt;, (ifEntry)
+</span>    <span class='comment'>#       #&lt;NETSNMP::Varbind:0x007ffed43bae68 @oid=&quot;1.3.6.1.2.1.2.2.1.2.26&quot;, @type=nil, @value=&quot;GigabitEthernet1/0/19&quot;&gt;,
+</span>    <span class='comment'>#       #&lt;NETSNMP::Varbind:0x007ffed43bacb0 @oid=&quot;1.3.6.1.2.1.2.2.1.3.26&quot;, @type=nil, @value=6&gt;,  (port type 6 == ethernet)
+</span>    <span class='comment'>#       #&lt;NETSNMP::Varbind:0x007ffed43baad0 @oid=&quot;1.3.6.1.4.1.9.2.2.1.1.20.26&quot;, @type=nil, @value=&quot;up&quot;&gt;
+</span>    <span class='comment'>#   ], @request_id=1&gt;
+</span>
+    <span class='id identifier rubyid_ifIndex'>ifIndex</span> <span class='op'>=</span> <span class='kw'>nil</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>nil</span>
+    <span class='id identifier rubyid_pdu'>pdu</span><span class='period'>.</span><span class='id identifier rubyid_varbinds'>varbinds</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_var'>var</span><span class='op'>|</span>
+        <span class='id identifier rubyid_oid'>oid</span> <span class='op'>=</span> <span class='id identifier rubyid_var'>var</span><span class='period'>.</span><span class='id identifier rubyid_oid'>oid</span>
+        <span class='comment'># 1.3.6.1.2.1.2.2.1 == ifEntry
+</span>        <span class='kw'>if</span> <span class='id identifier rubyid_oid'>oid</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.3.6.1.2.1.2.2.1.1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+            <span class='comment'># port description
+</span>            <span class='id identifier rubyid_ifIndex'>ifIndex</span> <span class='op'>=</span> <span class='id identifier rubyid_var'>var</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+        <span class='kw'>elsif</span> <span class='id identifier rubyid_oid'>oid</span><span class='period'>.</span><span class='id identifier rubyid_start_with?'>start_with?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.3.6.1.4.1.9.2.2.1.1.20</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+            <span class='comment'># port state
+</span>            <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_var'>var</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_ifIndex'>ifIndex</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_state'>state</span>
+        <span class='kw'>if</span> <span class='ivar'>@processing</span>
+            <span class='ivar'>@processing</span><span class='period'>.</span><span class='id identifier rubyid_finally'>finally</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_on_trap'>on_trap</span><span class='lparen'>(</span><span class='id identifier rubyid_ifIndex'>ifIndex</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_on_trap'>on_trap</span><span class='lparen'>(</span><span class='id identifier rubyid_ifIndex'>ifIndex</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="hostname_resolution-instance_method">
+  
+    #<strong>hostname_resolution</strong>(ip)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 134</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_hostname_resolution'>hostname_resolution</span><span class='lparen'>(</span><span class='id identifier rubyid_ip'>ip</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_td'>td</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'>TrapDispatcher</span><span class='period'>.</span><span class='id identifier rubyid_instance'>instance</span>
+    <span class='id identifier rubyid_td'>td</span><span class='period'>.</span><span class='id identifier rubyid_ignore'>ignore</span><span class='lparen'>(</span><span class='ivar'>@resolved_ip</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@resolved_ip</span>
+    <span class='ivar'>@resolved_ip</span> <span class='op'>=</span> <span class='id identifier rubyid_ip'>ip</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Registering for trap notifications from </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ip'>ip</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_td'>td</span><span class='period'>.</span><span class='id identifier rubyid_register'>register</span><span class='lparen'>(</span><span class='id identifier rubyid_thread'>thread</span><span class='comma'>,</span> <span class='id identifier rubyid_logger'>logger</span><span class='comma'>,</span> <span class='id identifier rubyid_ip'>ip</span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_pdu'>pdu</span><span class='op'>|</span> <span class='id identifier rubyid_check_link_state'>check_link_state</span><span class='lparen'>(</span><span class='id identifier rubyid_pdu'>pdu</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_new_client'>new_client</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="is_processing?-instance_method">
+  
+    #<strong>is_processing?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+130
+131
+132</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 130</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_is_processing?'>is_processing?</span>
+    <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>IP resolved to </span><span class='embexpr_beg'>#{</span><span class='ivar'>@resolved_ip</span><span class='embexpr_end'>}</span><span class='tstring_content'>\ntransport online </span><span class='embexpr_beg'>#{</span><span class='op'>!</span><span class='op'>!</span><span class='ivar'>@client</span><span class='embexpr_end'>}</span><span class='tstring_content'>\nprocessing </span><span class='embexpr_beg'>#{</span><span class='op'>!</span><span class='op'>!</span><span class='ivar'>@processing</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='comment'># flag to indicate if processing is occuring
+</span>    <span class='ivar'>@if_mappings</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='ivar'>@scheduled_status_query</span> <span class='op'>=</span> <span class='kw'>true</span>
+
+    <span class='comment'># Interfaces that indicate they have a device connected
+</span>    <span class='ivar'>@check_interface</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+
+    <span class='comment'># Interfaces that we know are connected to the network
+</span>    <span class='ivar'>@connected_interfaces</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+
+    <span class='ivar'>@reserved_interface</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:interfaces</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='comment'># This will be updated via query
+</span>
+    <span class='kw'>begin</span>
+        <span class='id identifier rubyid_on_update'>on_update</span>
+
+        <span class='comment'># Load the current state of the switch from the database
+</span>        <span class='id identifier rubyid_query'>query</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_switch_ip'>find_by_switch_ip</span><span class='lparen'>(</span><span class='ivar'>@remote_address</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_detail'>detail</span><span class='op'>|</span>
+            <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='id identifier rubyid_detail'>detail</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span>
+            <span class='id identifier rubyid_interface'>interface</span> <span class='op'>=</span> <span class='id identifier rubyid_detail'>detail</span><span class='period'>.</span><span class='id identifier rubyid_interface'>interface</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface'>interface</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span>
+
+            <span class='kw'>if</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_connected'>connected</span>
+                <span class='ivar'>@check_interface</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+                <span class='ivar'>@connected_interfaces</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+            <span class='kw'>elsif</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_reserved'>reserved</span>
+                <span class='ivar'>@reserved_interface</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+            <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>rescue</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_error'>error</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_print_error'>print_error</span> <span class='id identifier rubyid_error'>error</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>loading persisted details</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:interfaces</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@connected_interfaces</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:reserved</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@reserved_interface</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_trap-instance_method">
+  
+    #<strong>on_trap</strong>(ifIndex, state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>The SNMP trap handler will notify of changes in interface state</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 181</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_trap'>on_trap</span><span class='lparen'>(</span><span class='id identifier rubyid_ifIndex'>ifIndex</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_interface'>interface</span> <span class='op'>=</span> <span class='ivar'>@if_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_ifIndex'>ifIndex</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_interface'>interface</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Notify: no interface found for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ifIndex'>ifIndex</span><span class='embexpr_end'>}</span><span class='tstring_content'> - </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_state'>state</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='kw'>return</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>case</span> <span class='id identifier rubyid_state'>state</span>
+    <span class='kw'>when</span> <span class='symbol'>:up</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Notify Up: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_remove_reserved'>remove_reserved</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+        <span class='ivar'>@check_interface</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+        <span class='ivar'>@connected_interfaces</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+    <span class='kw'>when</span> <span class='symbol'>:down</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Notify Down: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='comment'># We are no longer interested in this interface
+</span>        <span class='ivar'>@connected_interfaces</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+        <span class='ivar'>@check_interface</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_remove_lookup'>remove_lookup</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:reserved</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@reserved_interface</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:interfaces</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@connected_interfaces</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_unload-instance_method">
+  
+    #<strong>on_unload</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 117</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_unload'>on_unload</span>
+    <span class='kw'>if</span> <span class='ivar'>@processing</span>
+        <span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='ivar'>@client</span>
+        <span class='ivar'>@processing</span><span class='period'>.</span><span class='id identifier rubyid_finally'>finally</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_close'>close</span> <span class='rbrace'>}</span>
+    <span class='kw'>else</span>
+        <span class='ivar'>@client</span><span class='op'>&amp;.</span><span class='id identifier rubyid_close'>close</span>
+    <span class='kw'>end</span>
+    <span class='ivar'>@client</span> <span class='op'>=</span> <span class='kw'>nil</span>
+
+    <span class='id identifier rubyid_td'>td</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'>TrapDispatcher</span><span class='period'>.</span><span class='id identifier rubyid_instance'>instance</span>
+    <span class='id identifier rubyid_td'>td</span><span class='period'>.</span><span class='id identifier rubyid_ignore'>ignore</span><span class='lparen'>(</span><span class='ivar'>@resolved_ip</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@resolved_ip</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='id identifier rubyid_new_client'>new_client</span> <span class='kw'>if</span> <span class='ivar'>@resolved_ip</span>
+    <span class='ivar'>@remote_address</span> <span class='op'>=</span> <span class='id identifier rubyid_remote_address'>remote_address</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
+    <span class='ivar'>@ignore_macs</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:ignore_macs</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='rparen'>)</span>
+    <span class='ivar'>@temporary</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='lparen'>(</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:temporary_macs</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span><span class='rparen'>)</span>
+    <span class='ivar'>@polling_period</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:discovery_polling_period</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>90</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@switch_name</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:switch_name</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:ip_address</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@remote_address</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:building</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:building</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:level</span><span class='rparen'>)</span>
+
+    <span class='ivar'>@reserve_time</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:reserve_time</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>0</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_connected_devices-instance_method">
+  
+    #<strong>query_connected_devices</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+466
+467
+468
+469
+470
+471
+472
+473
+474
+475
+476
+477
+478
+479
+480</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 466</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_connected_devices'>query_connected_devices</span>
+    <span class='kw'>if</span> <span class='ivar'>@processing</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Skipping device query... busy processing</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>return</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Querying for connected devices</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_query_index_mappings'>query_index_mappings</span> <span class='kw'>if</span> <span class='ivar'>@if_mappings</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span> <span class='op'>||</span> <span class='ivar'>@scheduled_if_query</span>
+    <span class='id identifier rubyid_query_interface_status'>query_interface_status</span> <span class='kw'>if</span> <span class='ivar'>@scheduled_status_query</span>
+    <span class='id identifier rubyid_query_snooping_bindings'>query_snooping_bindings</span>
+    <span class='id identifier rubyid_rebuild_client'>rebuild_client</span>
+<span class='kw'>rescue</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+    <span class='id identifier rubyid_rebuild_client'>rebuild_client</span>
+    <span class='ivar'>@scheduled_status_query</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='id identifier rubyid_e'>e</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_index_mappings-instance_method">
+  
+    #<strong>query_index_mappings</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Index short name lookup ifName: 1.3.6.1.2.1.31.1.1.1.1.xx  (where xx is the
+ifIndex)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 389</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_index_mappings'>query_index_mappings</span>
+    <span class='kw'>return</span> <span class='symbol'>:not_ready</span> <span class='kw'>unless</span> <span class='ivar'>@client</span>
+    <span class='kw'>return</span> <span class='symbol'>:currently_processing</span> <span class='kw'>if</span> <span class='ivar'>@processing</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>==&gt; mapping ifIndex to port names &lt;==</span><span class='tstring_end'>&#39;</span></span>
+    <span class='ivar'>@scheduled_if_query</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='ivar'>@client</span>
+    <span class='id identifier rubyid_mappings'>mappings</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='ivar'>@processing</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Cisco.html" title="Cisco (module)">Cisco</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../ThreadPool.html" title="Cisco::ThreadPool (module)">ThreadPool</a></span></span><span class='period'>.</span><span class='id identifier rubyid_task'><span class='object_link'><a href="../ThreadPool.html#task-class_method" title="Cisco::ThreadPool.task (method)">task</a></span></span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_walk'>walk</span><span class='lparen'>(</span><span class='label'>oid:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.3.6.1.2.1.31.1.1.1.1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_oid_code'>oid_code</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+            <span class='id identifier rubyid_oid_code'>oid_code</span> <span class='op'>=</span> <span class='id identifier rubyid_oid_code'>oid_code</span><span class='lbracket'>[</span><span class='int'>23</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_mappings'>mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_oid_code'>oid_code</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='ivar'>@processing</span><span class='period'>.</span><span class='id identifier rubyid_finally'>finally</span> <span class='lbrace'>{</span>
+        <span class='ivar'>@processing</span> <span class='op'>=</span> <span class='kw'>nil</span>
+        <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_close'>close</span> <span class='kw'>if</span> <span class='id identifier rubyid_client'>client</span> <span class='op'>!=</span> <span class='ivar'>@client</span>
+    <span class='rbrace'>}</span>
+    <span class='ivar'>@processing</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='lbrace'>{</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;== found </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_mappings'>mappings</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'> ports ==&gt;</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_mappings'>mappings</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+            <span class='ivar'>@scheduled_if_query</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='kw'>else</span>
+            <span class='ivar'>@if_mappings</span> <span class='op'>=</span> <span class='id identifier rubyid_mappings'>mappings</span>
+        <span class='kw'>end</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_interface_status-instance_method">
+  
+    #<strong>query_interface_status</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>ifOperStatus: 1.3.6.1.2.1.2.2.1.8.xx == up(1), down(2), testing(3)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429
+430
+431
+432
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446
+447
+448
+449
+450
+451
+452
+453
+454
+455
+456
+457
+458
+459
+460
+461
+462
+463
+464</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 419</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_interface_status'>query_interface_status</span>
+    <span class='kw'>return</span> <span class='symbol'>:not_ready</span> <span class='kw'>unless</span> <span class='ivar'>@client</span>
+    <span class='kw'>return</span> <span class='symbol'>:currently_processing</span> <span class='kw'>if</span> <span class='ivar'>@processing</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>==&gt; querying interface status &lt;==</span><span class='tstring_end'>&#39;</span></span>
+    <span class='ivar'>@scheduled_status_query</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='ivar'>@client</span>
+    <span class='id identifier rubyid_if_mappings'>if_mappings</span> <span class='op'>=</span> <span class='ivar'>@if_mappings</span>
+    <span class='id identifier rubyid_remove_interfaces'>remove_interfaces</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_add_interfaces'>add_interfaces</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='ivar'>@processing</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Cisco.html" title="Cisco (module)">Cisco</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../ThreadPool.html" title="Cisco::ThreadPool (module)">ThreadPool</a></span></span><span class='period'>.</span><span class='id identifier rubyid_task'><span class='object_link'><a href="../ThreadPool.html#task-class_method" title="Cisco::ThreadPool.task (method)">task</a></span></span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_walk'>walk</span><span class='lparen'>(</span><span class='label'>oid:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.3.6.1.2.1.2.2.1.8</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_oid_code'>oid_code</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+            <span class='id identifier rubyid_oid_code'>oid_code</span> <span class='op'>=</span> <span class='id identifier rubyid_oid_code'>oid_code</span><span class='lbracket'>[</span><span class='int'>20</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_interface'>interface</span> <span class='op'>=</span> <span class='id identifier rubyid_if_mappings'>if_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_oid_code'>oid_code</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rbracket'>]</span>
+
+            <span class='kw'>next</span> <span class='kw'>unless</span> <span class='id identifier rubyid_interface'>interface</span>
+
+            <span class='kw'>case</span> <span class='id identifier rubyid_value'>value</span>
+            <span class='kw'>when</span> <span class='int'>1</span> <span class='comment'># up
+</span>                <span class='kw'>next</span> <span class='kw'>if</span> <span class='ivar'>@check_interface</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+                <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Interface Up: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+                <span class='id identifier rubyid_remove_interfaces'>remove_interfaces</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+                <span class='ivar'>@check_interface</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+            <span class='kw'>when</span> <span class='int'>2</span> <span class='comment'># down
+</span>                <span class='kw'>next</span> <span class='kw'>unless</span> <span class='ivar'>@check_interface</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+                <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Interface Down: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+                <span class='comment'># We are no longer interested in this interface
+</span>                <span class='ivar'>@check_interface</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+                <span class='id identifier rubyid_add_interfaces'>add_interfaces</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+            <span class='kw'>else</span>
+                <span class='kw'>next</span>
+            <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='ivar'>@processing</span><span class='period'>.</span><span class='id identifier rubyid_finally'>finally</span> <span class='lbrace'>{</span>
+        <span class='ivar'>@processing</span> <span class='op'>=</span> <span class='kw'>nil</span>
+        <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_close'>close</span> <span class='kw'>if</span> <span class='id identifier rubyid_client'>client</span> <span class='op'>!=</span> <span class='ivar'>@client</span>
+    <span class='rbrace'>}</span>
+    <span class='ivar'>@processing</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='lbrace'>{</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&lt;== finished querying interfaces ==&gt;</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_remove_interfaces'>remove_interfaces</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_iface'>iface</span><span class='op'>|</span> <span class='id identifier rubyid_remove_reserved'>remove_reserved</span><span class='lparen'>(</span><span class='id identifier rubyid_iface'>iface</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_add_interfaces'>add_interfaces</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_iface'>iface</span><span class='op'>|</span> <span class='id identifier rubyid_remove_lookup'>remove_lookup</span><span class='lparen'>(</span><span class='id identifier rubyid_iface'>iface</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:reserved</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@reserved_interface</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_snooping_bindings-instance_method">
+  
+    #<strong>query_snooping_bindings</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>A row instance contains the Mac address, IP address type, IP address, VLAN
+number, interface number, leased time, and status of this instance. <a
+href="http://www.oidview.com/mibs/9/CISCO-DHCP-SNOOPING-MIB.html">www.oidview.com/mibs/9/CISCO-DHCP-SNOOPING-MIB.html</a>
+<a
+href="http://www.snmplink.org/OnLineMIB/Cisco/index.html#1634">www.snmplink.org/OnLineMIB/Cisco/index.html#1634</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 278</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_snooping_bindings'>query_snooping_bindings</span>
+    <span class='kw'>return</span> <span class='symbol'>:not_ready</span> <span class='kw'>unless</span> <span class='ivar'>@client</span>
+    <span class='kw'>return</span> <span class='symbol'>:currently_processing</span> <span class='kw'>if</span> <span class='ivar'>@processing</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>==&gt; extracting snooping table &lt;==</span><span class='tstring_end'>&#39;</span></span>
+
+    <span class='comment'># Walking cdsBindingsTable
+</span>    <span class='id identifier rubyid_client'>client</span> <span class='op'>=</span> <span class='ivar'>@client</span>
+    <span class='id identifier rubyid_entries'>entries</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='ivar'>@processing</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Cisco.html" title="Cisco (module)">Cisco</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../ThreadPool.html" title="Cisco::ThreadPool (module)">ThreadPool</a></span></span><span class='period'>.</span><span class='id identifier rubyid_task'><span class='object_link'><a href="../ThreadPool.html#task-class_method" title="Cisco::ThreadPool.task (method)">task</a></span></span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_walk'>walk</span><span class='lparen'>(</span><span class='label'>oid:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1.3.6.1.4.1.9.9.380.1.4.1</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_oid_code'>oid_code</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='op'>|</span>
+            <span class='id identifier rubyid_part'>part</span><span class='comma'>,</span> <span class='id identifier rubyid_entry_id'>entry_id</span> <span class='op'>=</span> <span class='id identifier rubyid_oid_code'>oid_code</span><span class='lbracket'>[</span><span class='int'>28</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rparen'>)</span>
+            <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_entry_id'>entry_id</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+            <span class='id identifier rubyid_entry'>entry</span> <span class='op'>=</span> <span class='id identifier rubyid_entries'>entries</span><span class='lbracket'>[</span><span class='id identifier rubyid_entry_id'>entry_id</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='const'><span class='object_link'><a href="SnoopingCatalystSNMP/SnoopingEntry.html" title="Cisco::Switch::SnoopingCatalystSNMP::SnoopingEntry (class)">SnoopingEntry</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+            <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span> <span class='op'>=</span> <span class='id identifier rubyid_entry_id'>entry_id</span>
+            <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid___send__'>__send__</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#EntryParts-constant" title="Cisco::Switch::SnoopingCatalystSNMP::EntryParts (constant)">EntryParts</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_part'>part</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>=</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+            <span class='id identifier rubyid_entries'>entries</span><span class='lbracket'>[</span><span class='id identifier rubyid_entry_id'>entry_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_entry'>entry</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+    <span class='ivar'>@processing</span><span class='period'>.</span><span class='id identifier rubyid_finally'>finally</span> <span class='lbrace'>{</span>
+        <span class='ivar'>@processing</span> <span class='op'>=</span> <span class='kw'>nil</span>
+        <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_close'>close</span> <span class='kw'>if</span> <span class='id identifier rubyid_client'>client</span> <span class='op'>!=</span> <span class='ivar'>@client</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span>
+
+    <span class='comment'># Process the bindings
+</span>    <span class='id identifier rubyid_entries'>entries</span> <span class='op'>=</span> <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_values'>values</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>found </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='embexpr_end'>}</span><span class='tstring_content'> snooping entries</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='comment'># Newest lease first
+</span>    <span class='id identifier rubyid_entries'>entries</span> <span class='op'>=</span> <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_reject'>reject</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='period'>.</span><span class='id identifier rubyid_leased_time'>leased_time</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='comma'>,</span> <span class='id identifier rubyid_b'>b</span><span class='op'>|</span> <span class='id identifier rubyid_b'>b</span><span class='period'>.</span><span class='id identifier rubyid_leased_time'>leased_time</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_leased_time'>leased_time</span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_checked'>checked</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_checked_interfaces'>checked_interfaces</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_entries'>entries</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_entry'>entry</span><span class='op'>|</span>
+        <span class='id identifier rubyid_interface'>interface</span> <span class='op'>=</span> <span class='ivar'>@if_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_interface'>interface</span><span class='rbracket'>]</span>
+
+        <span class='kw'>next</span> <span class='kw'>unless</span> <span class='ivar'>@check_interface</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+        <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_checked_interfaces'>checked_interfaces</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_interface'>interface</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_checked_interfaces'>checked_interfaces</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+
+        <span class='id identifier rubyid_mac'>mac</span> <span class='op'>=</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_mac'>mac</span>
+        <span class='id identifier rubyid_ip'>ip</span> <span class='op'>=</span> <span class='id identifier rubyid_entry'>entry</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span>
+        <span class='kw'>next</span> <span class='kw'>unless</span> <span class='op'>::</span><span class='const'>IPAddress</span><span class='period'>.</span><span class='id identifier rubyid_valid?'>valid?</span><span class='lparen'>(</span><span class='id identifier rubyid_ip'>ip</span><span class='rparen'>)</span>
+        <span class='kw'>next</span> <span class='kw'>if</span> <span class='ivar'>@ignore_macs</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_mac'>mac</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>5</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+        <span class='id identifier rubyid_checked'>checked</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_interface'>interface</span>
+
+        <span class='comment'># NOTE:: Same as snooping_catalyst.rb
+</span>        <span class='id identifier rubyid_iface'>iface</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface'>interface</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>StaticDetails</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+
+        <span class='kw'>if</span> <span class='id identifier rubyid_iface'>iface</span><span class='period'>.</span><span class='id identifier rubyid_ip'>ip</span> <span class='op'>!=</span> <span class='id identifier rubyid_ip'>ip</span> <span class='op'>||</span> <span class='id identifier rubyid_iface'>iface</span><span class='period'>.</span><span class='id identifier rubyid_mac'>mac</span> <span class='op'>!=</span> <span class='id identifier rubyid_mac'>mac</span>
+            <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>New connection on </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_content'> with </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ip'>ip</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_mac'>mac</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+            <span class='comment'># NOTE:: Same as username found
+</span>            <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='ivar'>@remote_address</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+            <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_connected'>connected</span><span class='lparen'>(</span><span class='id identifier rubyid_mac'>mac</span><span class='comma'>,</span> <span class='ivar'>@reserve_time</span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                <span class='label'>device_ip:</span> <span class='id identifier rubyid_ip'>ip</span><span class='comma'>,</span>
+                <span class='label'>switch_ip:</span> <span class='ivar'>@remote_address</span><span class='comma'>,</span>
+                <span class='label'>hostname:</span> <span class='ivar'>@hostname</span><span class='comma'>,</span>
+                <span class='label'>switch_name:</span> <span class='ivar'>@switch_name</span><span class='comma'>,</span>
+                <span class='label'>interface:</span> <span class='id identifier rubyid_interface'>interface</span>
+            <span class='rbrace'>}</span><span class='rparen'>)</span>
+
+            <span class='comment'># ip, mac, reserved?, clash?
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface'>interface</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span>
+
+        <span class='kw'>elsif</span> <span class='id identifier rubyid_iface'>iface</span><span class='period'>.</span><span class='id identifier rubyid_username'>username</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+            <span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_bucket'>bucket</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>macuser-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_mac'>mac</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>quiet:</span> <span class='kw'>true</span><span class='rparen'>)</span>
+            <span class='kw'>if</span> <span class='id identifier rubyid_username'>username</span>
+                <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Found </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_username'>username</span><span class='embexpr_end'>}</span><span class='tstring_content'> at </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_ip'>ip</span><span class='embexpr_end'>}</span><span class='tstring_content'>: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_mac'>mac</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+                <span class='comment'># NOTE:: Same as new connection
+</span>                <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='ivar'>@remote_address</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+                <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_connected'>connected</span><span class='lparen'>(</span><span class='id identifier rubyid_mac'>mac</span><span class='comma'>,</span> <span class='ivar'>@reserve_time</span><span class='comma'>,</span> <span class='lbrace'>{</span>
+                    <span class='label'>device_ip:</span> <span class='id identifier rubyid_ip'>ip</span><span class='comma'>,</span>
+                    <span class='label'>switch_ip:</span> <span class='ivar'>@remote_address</span><span class='comma'>,</span>
+                    <span class='label'>hostname:</span> <span class='ivar'>@hostname</span><span class='comma'>,</span>
+                    <span class='label'>switch_name:</span> <span class='ivar'>@switch_name</span><span class='comma'>,</span>
+                    <span class='label'>interface:</span> <span class='id identifier rubyid_interface'>interface</span>
+                <span class='rbrace'>}</span><span class='rparen'>)</span>
+
+                <span class='comment'># ip, mac, reserved?, clash?
+</span>                <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface'>interface</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span>
+            <span class='kw'>end</span>
+
+        <span class='kw'>elsif</span> <span class='op'>!</span><span class='id identifier rubyid_iface'>iface</span><span class='period'>.</span><span class='id identifier rubyid_reserved'>reserved</span>
+            <span class='comment'># We don&#39;t know the user who is at this desk...
+</span>            <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='ivar'>@remote_address</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+            <span class='id identifier rubyid_reserved'>reserved</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_check_for_user'>check_for_user</span><span class='lparen'>(</span><span class='ivar'>@reserve_time</span><span class='rparen'>)</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface'>interface</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span> <span class='kw'>if</span> <span class='id identifier rubyid_reserved'>reserved</span>
+
+        <span class='kw'>elsif</span> <span class='id identifier rubyid_iface'>iface</span><span class='period'>.</span><span class='id identifier rubyid_clash'>clash</span>
+            <span class='comment'># There was a reservation clash - is there still a clash?
+</span>            <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca/Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='ivar'>@remote_address</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_interface'>interface</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+            <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_check_for_user'>check_for_user</span><span class='lparen'>(</span><span class='ivar'>@reserve_time</span><span class='rparen'>)</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_interface'>interface</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span> <span class='kw'>unless</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_clash?'>clash?</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='ivar'>@connected_interfaces</span> <span class='op'>=</span> <span class='id identifier rubyid_checked'>checked</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:interfaces</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_checked'>checked</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+    <span class='ivar'>@scheduled_status_query</span> <span class='op'>=</span> <span class='id identifier rubyid_checked'>checked</span><span class='period'>.</span><span class='id identifier rubyid_empty?'>empty?</span>
+    <span class='lparen'>(</span><span class='ivar'>@check_interface</span> <span class='op'>-</span> <span class='id identifier rubyid_checked'>checked</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_iface'>iface</span><span class='op'>|</span> <span class='id identifier rubyid_remove_lookup'>remove_lookup</span><span class='lparen'>(</span><span class='id identifier rubyid_iface'>iface</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:reserved</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@reserved_interface</span><span class='period'>.</span><span class='id identifier rubyid_to_a'>to_a</span>
+
+    <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="update_reservations-instance_method">
+  
+    #<strong>update_reservations</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+482
+483
+484</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/switch/snooping_catalyst_snmp.rb', line 482</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_update_reservations'>update_reservations</span>
+    <span class='id identifier rubyid_check_reservations'>check_reservations</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:42 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

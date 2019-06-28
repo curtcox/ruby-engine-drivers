@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Aca::Tracking::DeskManagement
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Aca::Tracking::DeskManagement";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (D)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span>
+     &raquo; 
+    <span class="title">DeskManagement</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Aca::Tracking::DeskManagement
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Aca::Tracking::DeskManagement</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/aca/tracking/desk_management.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Defined Under Namespace</h2>
+<p class="children">
+  
+    
+  
+    
+      <strong class="classes">Classes:</strong> <span class='object_link'><a href="DeskManagement/PortUsage.html" title="Aca::Tracking::DeskManagement::PortUsage (class)">PortUsage</a></span>
+    
+  
+</p>
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#cancel_reservation-instance_method" title="#cancel_reservation (instance method)">#<strong>cancel_reservation</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Adjusts the reservation time to 0 - effectively freeing the desk.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#desk_details-instance_method" title="#desk_details (instance method)">#<strong>desk_details</strong>(*desk_ids)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Grab the ownership details of the desk.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#desk_usage-instance_method" title="#desk_usage (instance method)">#<strong>desk_usage</strong>(level)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Grab the list of desk ids in use on a floor.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#force_checkout-instance_method" title="#force_checkout (instance method)">#<strong>force_checkout</strong>(desk_id)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>For use with sensor systems.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_manual_usage-instance_method" title="#get_manual_usage (instance method)">#<strong>get_manual_usage</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#manual_checkin-instance_method" title="#manual_checkin (instance method)">#<strong>manual_checkin</strong>(desk_id, level_id = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>For desks that use sensors or require users to manually reserve.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reserve_desk-instance_method" title="#reserve_desk (instance method)">#<strong>reserve_desk</strong>(time = nil)  &#x21d2; false, ... </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Grabs the current user from the websocket connection If the user has a desk
+reserved, then they can reserve their desk.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="cancel_reservation-instance_method">
+  
+    #<strong>cancel_reservation</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Adjusts the reservation time to 0 - effectively freeing the desk</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+205
+206
+207</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 205</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_cancel_reservation'>cancel_reservation</span>
+    <span class='id identifier rubyid_reserve_desk'>reserve_desk</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="desk_details-instance_method">
+  
+    #<strong>desk_details</strong>(*desk_ids)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Grab the ownership details of the desk</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>desk_id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the unique id that represents a desk</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 117</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_desk_details'>desk_details</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_desk_ids'>desk_ids</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_desk_ids'>desk_ids</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='op'>|</span>
+        <span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span> <span class='op'>=</span> <span class='ivar'>@desk_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_switch_ip'>switch_ip</span>
+            <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_port'>port</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_details'>details</span>
+        <span class='kw'>else</span> <span class='comment'># Check for manual checkin
+</span>            <span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='ivar'>@manual_usage</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span>
+            <span class='kw'>if</span> <span class='id identifier rubyid_username'>username</span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_username'>username</span><span class='rbracket'>]</span>
+            <span class='kw'>else</span>
+                <span class='kw'>nil</span>
+            <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="desk_usage-instance_method">
+  
+    #<strong>desk_usage</strong>(level)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Grab the list of desk ids in use on a floor</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>level</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the level id of the floor</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+110
+111
+112</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 110</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_desk_usage'>desk_usage</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+    <span class='lparen'>(</span><span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_level'>level</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_level'>level</span><span class='embexpr_end'>}</span><span class='tstring_content'>:reserved</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="force_checkout-instance_method">
+  
+    #<strong>force_checkout</strong>(desk_id)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>For use with sensor systems</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>desk_id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the unique id that represents a desk</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+279
+280
+281
+282
+283</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 279</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_force_checkout'>force_checkout</span><span class='lparen'>(</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='ivar'>@manual_usage</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span>
+    <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_username'>username</span>
+    <span class='id identifier rubyid_manual_checkout'>manual_checkout</span><span class='lparen'>(</span><span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_username'>username</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_manual_usage-instance_method">
+  
+    #<strong>get_manual_usage</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+200
+201
+202</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 200</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_manual_usage'>get_manual_usage</span>
+    <span class='ivar'>@manual_usage</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="manual_checkin-instance_method">
+  
+    #<strong>manual_checkin</strong>(desk_id, level_id = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>For desks that use sensors or require users to manually reserve</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>desk_id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the unique id that represents a desk</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>level_id</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the level id of the floor - saves processing if you have it handy</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 213</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_manual_checkin'>manual_checkin</span><span class='lparen'>(</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='comma'>,</span> <span class='id identifier rubyid_level_id'>level_id</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>desk </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> does not support manual check-in</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='ivar'>@manual_desks</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span><span class='lparen'>(</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>desk </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> already in use</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='ivar'>@manual_usage</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+    <span class='comment'># Grab user details if they are available
+</span>    <span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='kw'>nil</span>
+    <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='id identifier rubyid_current_user'>current_user</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_user'>user</span>
+        <span class='comment'># Cancel any other desk that has been reserved
+</span>        <span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid___send__'>__send__</span><span class='lparen'>(</span><span class='ivar'>@user_identifier</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_cancel_reservation'>cancel_reservation</span> <span class='kw'>if</span> <span class='id identifier rubyid_username'>username</span><span class='period'>.</span><span class='id identifier rubyid_present?'>present?</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Find the level if this was unknown
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_level_id'>level_id</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='ivar'>@manual_checkin</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='id identifier rubyid_desks'>desks</span><span class='op'>|</span>
+            <span class='kw'>if</span> <span class='id identifier rubyid_desks'>desks</span><span class='period'>.</span><span class='id identifier rubyid_include?'>include?</span> <span class='id identifier rubyid_desk_id'>desk_id</span>
+                <span class='id identifier rubyid_level_id'>level_id</span> <span class='op'>=</span> <span class='id identifier rubyid_level'>level</span>
+                <span class='kw'>break</span>
+            <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_tracker'>tracker</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_level_id'>level_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='op'>||</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+    <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_reserved_by'>reserved_by</span> <span class='op'>=</span> <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='id identifier rubyid_username'>username</span> <span class='kw'>if</span> <span class='id identifier rubyid_username'>username</span>
+
+    <span class='comment'># Reserve for the remainder of the day
+</span>    <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span> <span class='op'>=</span> <span class='ivar'>@timezone</span>
+    <span class='id identifier rubyid_time'>time</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_zone'>zone</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span>
+    <span class='id identifier rubyid_now'>now</span> <span class='op'>=</span> <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_connected_at'>connected_at</span> <span class='op'>=</span> <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_unplug_time'>unplug_time</span> <span class='op'>=</span> <span class='id identifier rubyid_time'>time</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+
+    <span class='kw'>if</span> <span class='ivar'>@manual_reserve_time</span> <span class='op'>==</span> <span class='int'>0</span>
+        <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_reserve_time'>reserve_time</span> <span class='op'>=</span> <span class='id identifier rubyid_time'>time</span><span class='period'>.</span><span class='id identifier rubyid_tomorrow'>tomorrow</span><span class='period'>.</span><span class='id identifier rubyid_midnight'>midnight</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>-</span> <span class='id identifier rubyid_now'>now</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_reserve_time'>reserve_time</span> <span class='op'>=</span> <span class='ivar'>@manual_reserve_time</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># To set the ID correctly
+</span>    <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_switch_ip'>switch_ip</span> <span class='op'>=</span> <span class='id identifier rubyid_level_id'>level_id</span>
+    <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_desk_id'>desk_id</span> <span class='op'>=</span> <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_interface'>interface</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_id'>desk_id</span>
+    <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_reserved_mac'>reserved_mac</span> <span class='op'>=</span> <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_mac_address'>mac_address</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_id'>desk_id</span>
+    <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_device_ip'>device_ip</span> <span class='op'>=</span> <span class='id identifier rubyid_username'>username</span> <span class='comment'># Used for API lookup
+</span>    <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_save!'>save!</span>
+
+    <span class='comment'># Update the details to indicate that this is a manual desk
+</span>    <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='id identifier rubyid_tracker'>tracker</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span>
+    <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_level_id'>level_id</span>
+    <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:connected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:manual_desk</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:clash</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+    <span class='comment'># Configure the desk to look occupied on the map
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_username'>username</span>
+        <span class='ivar'>@manual_usage</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_username'>username</span>
+        <span class='ivar'>@manual_users</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_username'>username</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_username'>username</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span>
+    <span class='kw'>else</span>
+        <span class='comment'># If we don&#39;t know the user we just want the desk to look busy
+</span>        <span class='ivar'>@manual_usage</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_id'>desk_id</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='id identifier rubyid_system'>system</span><span class='period'>.</span><span class='id identifier rubyid_load_complete'>load_complete</span> <span class='kw'>do</span>
+        <span class='kw'>begin</span>
+            <span class='id identifier rubyid_on_update'>on_update</span>
+
+            <span class='comment'># Load any manual check-in data
+</span>            <span class='ivar'>@manual_checkin</span><span class='period'>.</span><span class='id identifier rubyid_each_key'>each_key</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_level'>level</span><span class='op'>|</span>
+                <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Loading manual desk check-in details for level </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_level'>level</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+                <span class='id identifier rubyid_query'>query</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_switch_ip'>find_by_switch_ip</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+                <span class='id identifier rubyid_query'>query</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_detail'>detail</span><span class='op'>|</span>
+                    <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='id identifier rubyid_detail'>detail</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span>
+                    <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_detail'>detail</span><span class='period'>.</span><span class='id identifier rubyid_level'>level</span>
+                    <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:manual_desk</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+                    <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:clash</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+                    <span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span><span class='period'>.</span><span class='id identifier rubyid_username'>username</span>
+                    <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_username'>username</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span>
+                    <span class='ivar'>@manual_usage</span><span class='lbracket'>[</span><span class='id identifier rubyid_detail'>detail</span><span class='period'>.</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_username'>username</span>
+                    <span class='ivar'>@manual_users</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_username'>username</span>
+                <span class='kw'>end</span>
+            <span class='kw'>end</span>
+
+            <span class='comment'># Manual checkout times don&#39;t need to be checked very often
+</span>            <span class='id identifier rubyid_cleanup_manual_checkins'>cleanup_manual_checkins</span>
+        <span class='kw'>rescue</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_e'>e</span>
+            <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_print_error'>print_error</span> <span class='id identifier rubyid_e'>e</span>
+        <span class='kw'>ensure</span>
+            <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2m</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+                <span class='id identifier rubyid_cleanup_manual_checkins'>cleanup_manual_checkins</span>
+            <span class='kw'>end</span>
+
+            <span class='comment'># Should only call once
+</span>            <span class='id identifier rubyid_get_usage'>get_usage</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 69</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:hold_time</span><span class='rbracket'>]</span>    <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:desk_hold_time</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>5</span><span class='period'>.</span><span class='id identifier rubyid_minutes'>minutes</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:reserve_time</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@desk_reserve_time</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:desk_reserve_time</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>2</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:manual_reserve_time</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@manual_reserve_time</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:manual_reserve_time</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>2</span><span class='period'>.</span><span class='id identifier rubyid_hours'>hours</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+    <span class='ivar'>@user_identifier</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:user_identifier</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='symbol'>:login_name</span>
+    <span class='ivar'>@timezone</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:timezone</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>UTC</span><span class='tstring_end'>&#39;</span></span>
+
+    <span class='comment'># { &quot;switch_ip&quot;: { &quot;port_id&quot;: &quot;desk_id&quot; } }
+</span>    <span class='ivar'>@switch_mappings</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:mappings</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='ivar'>@desk_mappings</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='ivar'>@switch_mappings</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='comma'>,</span> <span class='id identifier rubyid_ports'>ports</span><span class='op'>|</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_ports'>ports</span><span class='lbracket'>[</span><span class='symbol'>:multiple_levels</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_ports'>ports</span><span class='period'>.</span><span class='id identifier rubyid_each_value'>each_value</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_desk_mapping'>desk_mapping</span><span class='op'>|</span>
+                <span class='comment'># ignore the multiple_levels flag
+</span>                <span class='kw'>next</span> <span class='kw'>if</span> <span class='id identifier rubyid_desk_mapping'>desk_mapping</span> <span class='op'>==</span> <span class='kw'>true</span>
+                <span class='id identifier rubyid_desk_mapping'>desk_mapping</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_port'>port</span><span class='comma'>,</span> <span class='id identifier rubyid_desk_id'>desk_id</span><span class='op'>|</span>
+                    <span class='ivar'>@desk_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='rbracket'>]</span>
+                <span class='kw'>end</span>
+            <span class='kw'>end</span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_ports'>ports</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_port'>port</span><span class='comma'>,</span> <span class='id identifier rubyid_desk_id'>desk_id</span><span class='op'>|</span>
+                <span class='ivar'>@desk_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span><span class='rbracket'>]</span>
+            <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># { level_id: [&quot;desk_id1&quot;, &quot;desk_id2&quot;, ...] }
+</span>    <span class='ivar'>@manual_checkin</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:checkin</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='ivar'>@manual_usage</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span> <span class='comment'># desk_id =&gt; username
+</span>    <span class='ivar'>@manual_users</span> <span class='op'>=</span> <span class='const'>Set</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span>
+
+    <span class='comment'># Bind to all the switches for disconnect notifications
+</span>    <span class='ivar'>@subscriptions</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+    <span class='ivar'>@subscriptions</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_ref'>ref</span><span class='op'>|</span> <span class='id identifier rubyid_unsubscribe'>unsubscribe</span><span class='lparen'>(</span><span class='id identifier rubyid_ref'>ref</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+    <span class='ivar'>@subscriptions</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+    <span class='id identifier rubyid_subscribe_disconnect'>subscribe_disconnect</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reserve_desk-instance_method">
+  
+    #<strong>reserve_desk</strong>(time = nil)  &#x21d2; <tt>false</tt>, ... 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Grabs the current user from the websocket connection If the user has a desk
+reserved, then they can reserve their desk</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>time</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>the reserve time in seconds from the unplug time</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>false</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if reservation successful</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>true</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if reservation failed - timeout had elapsed</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>nil</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if manual check-out successful</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>if there was an error 1: if the username is unknown 2: if there is no
+reservation to update 3: if the desk ID is unknown for this IP port 4: if
+reserved by someone else</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/tracking/desk_management.rb', line 145</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reserve_desk'>reserve_desk</span><span class='lparen'>(</span><span class='id identifier rubyid_time'>time</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_user'>user</span> <span class='op'>=</span> <span class='id identifier rubyid_current_user'>current_user</span>
+    <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>User not found</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_user'>user</span>
+
+    <span class='id identifier rubyid_username'>username</span> <span class='op'>=</span> <span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid___send__'>__send__</span><span class='lparen'>(</span><span class='ivar'>@user_identifier</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_username'>username</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>no username defined for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'> (</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_user'>user</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>return</span> <span class='int'>1</span> <span class='comment'># no user
+</span>    <span class='kw'>end</span>
+    <span class='id identifier rubyid_desk_details'>desk_details</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_username'>username</span><span class='rbracket'>]</span>
+    <span class='kw'>return</span> <span class='int'>2</span> <span class='kw'>unless</span> <span class='id identifier rubyid_desk_details'>desk_details</span> <span class='comment'># no reservation to update
+</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_desk_details'>desk_details</span><span class='lbracket'>[</span><span class='symbol'>:manual_desk</span><span class='rbracket'>]</span>
+        <span class='kw'>return</span> <span class='int'>2</span> <span class='kw'>unless</span> <span class='id identifier rubyid_desk_details'>desk_details</span><span class='lbracket'>[</span><span class='symbol'>:connected</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_details'>desk_details</span><span class='lbracket'>[</span><span class='symbol'>:level</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_desk_id'>desk_id</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_details'>desk_details</span><span class='lbracket'>[</span><span class='symbol'>:desk_id</span><span class='rbracket'>]</span>
+
+        <span class='comment'># reserved_by = @manual_usage[desk_id]
+</span>        <span class='comment'># return 4 unless reserved_by == username
+</span>
+        <span class='id identifier rubyid_reservation'>reservation</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_level'>level</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Mapping error. Reservation for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_desk_id'>desk_id</span><span class='embexpr_end'>}</span><span class='tstring_content'> can&#39;t be found in the database</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_reservation'>reservation</span>
+
+        <span class='id identifier rubyid_time'>time</span> <span class='op'>||=</span> <span class='ivar'>@manual_reserve_time</span>
+        <span class='id identifier rubyid_time'>time</span> <span class='op'>=</span> <span class='id identifier rubyid_time'>time</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_time'>time</span> <span class='op'>==</span> <span class='int'>0</span>
+            <span class='id identifier rubyid_manual_checkout'>manual_checkout</span><span class='lparen'>(</span><span class='id identifier rubyid_desk_details'>desk_details</span><span class='rparen'>)</span>
+            <span class='kw'>false</span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_reserved'>reserved</span> <span class='op'>=</span> <span class='id identifier rubyid_reservation'>reservation</span><span class='period'>.</span><span class='id identifier rubyid_update_reservation'>update_reservation</span><span class='lparen'>(</span><span class='id identifier rubyid_time'>time</span><span class='rparen'>)</span>
+            <span class='id identifier rubyid_desk_details'>desk_details</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_details'>desk_details</span><span class='period'>.</span><span class='id identifier rubyid_dup'>dup</span>
+            <span class='id identifier rubyid_desk_details'>desk_details</span><span class='lbracket'>[</span><span class='symbol'>:reserve_time</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_time'>time</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_username'>username</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_details'>desk_details</span>
+            <span class='op'>!</span><span class='id identifier rubyid_reserved'>reserved</span>
+        <span class='kw'>end</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_time'>time</span> <span class='op'>||=</span> <span class='ivar'>@desk_reserve_time</span>
+        <span class='id identifier rubyid_location'>location</span> <span class='op'>=</span> <span class='id identifier rubyid_desk_details'>desk_details</span><span class='lbracket'>[</span><span class='symbol'>:desk_id</span><span class='rbracket'>]</span>
+        <span class='kw'>return</span> <span class='int'>3</span> <span class='kw'>unless</span> <span class='id identifier rubyid_location'>location</span> <span class='comment'># desk ID unknown for this IP port
+</span>
+        <span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='comma'>,</span> <span class='id identifier rubyid_port'>port</span> <span class='op'>=</span> <span class='ivar'>@desk_mappings</span><span class='lbracket'>[</span><span class='id identifier rubyid_location'>location</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_reservation'>reservation</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../Tracking.html" title="Aca::Tracking (module)">Tracking</a></span></span><span class='op'>::</span><span class='const'>SwitchPort</span><span class='period'>.</span><span class='id identifier rubyid_find_by_id'>find_by_id</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>swport-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_port'>port</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Mapping error. Desk </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_location'>location</span><span class='embexpr_end'>}</span><span class='tstring_content'> can&#39;t be found on the switch </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_switch_ip'>switch_ip</span><span class='embexpr_end'>}</span><span class='tstring_content'>-</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_port'>port</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>unless</span> <span class='id identifier rubyid_reservation'>reservation</span>
+        <span class='kw'>return</span> <span class='int'>4</span> <span class='kw'>unless</span> <span class='id identifier rubyid_reservation'>reservation</span><span class='period'>.</span><span class='id identifier rubyid_reserved_by'>reserved_by</span> <span class='op'>==</span> <span class='id identifier rubyid_username'>username</span> <span class='comment'># reserved by someone else
+</span>
+        <span class='comment'># falsy values == success and truthy values == failure
+</span>        <span class='id identifier rubyid_reserved'>reserved</span> <span class='op'>=</span> <span class='id identifier rubyid_reservation'>reservation</span><span class='period'>.</span><span class='id identifier rubyid_update_reservation'>update_reservation</span><span class='lparen'>(</span><span class='id identifier rubyid_time'>time</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_details'>details</span> <span class='op'>=</span> <span class='id identifier rubyid_reservation'>reservation</span><span class='period'>.</span><span class='id identifier rubyid_details'>details</span>
+        <span class='id identifier rubyid_details'>details</span><span class='lbracket'>[</span><span class='symbol'>:released_at</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='kw'>if</span> <span class='id identifier rubyid_time'>time</span> <span class='op'>==</span> <span class='int'>0</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_username'>username</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_details'>details</span>
+        <span class='id identifier rubyid_system'>system</span><span class='period'>.</span><span class='id identifier rubyid_all'>all</span><span class='lparen'>(</span><span class='symbol'>:Snooping</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_update_reservations'>update_reservations</span> <span class='kw'>if</span> <span class='id identifier rubyid_reserved'>reserved</span>
+        <span class='op'>!</span><span class='id identifier rubyid_reserved'>reserved</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:40 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

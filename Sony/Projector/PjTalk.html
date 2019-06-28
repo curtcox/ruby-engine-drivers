@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Sony::Projector::PjTalk
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Sony::Projector::PjTalk";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Sony.html" title="Sony (module)">Sony</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Projector.html" title="Sony::Projector (module)">Projector</a></span></span>
+     &raquo; 
+    <span class="title">PjTalk</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Sony::Projector::PjTalk
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Sony::Projector::PjTalk</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/sony/projector/pj_talk.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://aca.im/driver_docs/Sony/Sony_Q004_R1_protocol.pdf">aca.im/driver_docs/Sony/Sony_Q004_R1_protocol.pdf</a></p>
+
+<pre class="code ruby"><code class="ruby">also https://aca.im/driver_docs/Sony/TCP_CMDs.pdf</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="INPUTS-constant" class="">INPUTS =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Input selection</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='symbol'>:vga</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='int'>0x00</span><span class='comma'>,</span> <span class='int'>0x03</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='symbol'>:dvi</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='int'>0x00</span><span class='comma'>,</span> <span class='int'>0x04</span><span class='rbracket'>]</span><span class='comma'>,</span>
+    <span class='symbol'>:hdmi</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='int'>0x00</span><span class='comma'>,</span> <span class='int'>0x05</span><span class='rbracket'>]</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="ERRORS-constant" class="">ERRORS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='int'>0x00</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>No Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='int'>0x01</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Lamp Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='int'>0x02</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Fan Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='int'>0x04</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Cover Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='int'>0x08</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Temperature Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='int'>0x10</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>D5V Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='int'>0x20</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Power Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span><span class='comma'>,</span>
+    <span class='int'>0x40</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Warning Error</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#input%3F-instance_method" title="#input? (instance method)">#<strong>input?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#lamp_time%3F-instance_method" title="#lamp_time? (instance method)">#<strong>lamp_time?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute-instance_method" title="#mute (instance method)">#<strong>mute</strong>(val = true)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Mute Audio and Video.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute%3F-instance_method" title="#mute? (instance method)">#<strong>mute?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power-instance_method" title="#power (instance method)">#<strong>power</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Power commands.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power%3F-instance_method" title="#power? (instance method)">#<strong>power?</strong>(options = {}, &amp;block)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(byte_str, resolve, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Data is default received as a string.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#switch_to-instance_method" title="#switch_to (instance method)">#<strong>switch_to</strong>(input)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unmute-instance_method" title="#unmute (instance method)">#<strong>unmute</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+40
+41
+42</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 40</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>60s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_do_poll'>do_poll</span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="input?-instance_method">
+  
+    #<strong>input?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+94
+95
+96</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 94</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_input?'>input?</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:get</span><span class='comma'>,</span> <span class='symbol'>:input</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:priority</span> <span class='op'>=&gt;</span> <span class='int'>0</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="lamp_time?-instance_method">
+  
+    #<strong>lamp_time?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 98</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_lamp_time?'>lamp_time?</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:get</span><span class='comma'>,</span> <span class='symbol'>:lamp_timer</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:priority</span> <span class='op'>=&gt;</span> <span class='int'>0</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute-instance_method">
+  
+    #<strong>mute</strong>(val = true)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Mute Audio and Video</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+106
+107
+108
+109
+110
+111</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 106</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- sony projector, requested to mute</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_actual'>actual</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='lbracket'>[</span><span class='int'>0x00</span><span class='comma'>,</span> <span class='int'>0x01</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='int'>0x00</span><span class='comma'>,</span> <span class='int'>0x00</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:set</span><span class='comma'>,</span> <span class='symbol'>:mute</span><span class='comma'>,</span> <span class='id identifier rubyid_actual'>actual</span><span class='comma'>,</span> <span class='label'>delay_on_receive:</span> <span class='int'>500</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute?-instance_method">
+  
+    #<strong>mute?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+118
+119
+120</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 118</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute?'>mute?</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:get</span><span class='comma'>,</span> <span class='symbol'>:mute</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:priority</span> <span class='op'>=&gt;</span> <span class='int'>0</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 22</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:brightness_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x00</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:brightness_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x64</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:contrast_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x00</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:contrast_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x64</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:type</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='symbol'>:projector</span>
+
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36
+37</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 34</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='comment'># Default community value is SONY - can be changed in displays settings
+</span>    <span class='ivar'>@community</span> <span class='op'>=</span> <span class='id identifier rubyid_str_to_array'>str_to_array</span><span class='lparen'>(</span><span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:community</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SONY</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power-instance_method">
+  
+    #<strong>power</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Power commands</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power'>power</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:set</span><span class='comma'>,</span> <span class='symbol'>:power_on</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:power</span><span class='comma'>,</span> <span class='label'>delay_on_receive:</span> <span class='int'>3000</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- sony display requested to power on</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:set</span><span class='comma'>,</span> <span class='symbol'>:power_off</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:power</span><span class='comma'>,</span> <span class='label'>delay_on_receive:</span> <span class='int'>3000</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- sony display requested to power off</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Request status update
+</span>    <span class='id identifier rubyid_power?'>power?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power?-instance_method">
+  
+    #<strong>power?</strong>(options = {}, &amp;block)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power?'>power?</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:emit</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_block'>block</span> <span class='kw'>if</span> <span class='id identifier rubyid_block_given?'>block_given?</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:priority</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:get</span><span class='comma'>,</span> <span class='symbol'>:power_status</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(byte_str, resolve, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Data is default received as a string</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 155</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_byte_str'>byte_str</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>        <span class='comment'># Data is default received as a string
+</span>    <span class='comment'># Remove community string (useless)
+</span>    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sony proj sent: 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_byte_to_hex'>byte_to_hex</span><span class='lparen'>(</span><span class='id identifier rubyid_byte_str'>byte_str</span><span class='lbracket'>[</span><span class='int'>4</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_str_to_array'>str_to_array</span><span class='lparen'>(</span><span class='id identifier rubyid_byte_str'>byte_str</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_pjt_command'>pjt_command</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>5</span><span class='op'>..</span><span class='int'>6</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_pjt_length'>pjt_length</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>7</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_pjt_data'>pjt_data</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>8</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>4</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='int'>0x01</span>
+        <span class='kw'>case</span> <span class='const'>COMMANDS</span><span class='lbracket'>[</span><span class='id identifier rubyid_pjt_command'>pjt_command</span><span class='rbracket'>]</span>
+        <span class='kw'>when</span> <span class='symbol'>:power_on</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>On</span>
+        <span class='kw'>when</span> <span class='symbol'>:power_off</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>Off</span>
+        <span class='kw'>when</span> <span class='symbol'>:lamp_timer</span>
+            <span class='comment'># Two bytes converted to a 16bit integer
+</span>            <span class='comment'># Response looks like: 0x01 01 13 (02 03) &lt;- lamp hours
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:lamp_usage</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_array_to_str'>array_to_str</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>2</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_unpack'>unpack</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>n</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+        <span class='kw'>else</span>
+            <span class='comment'># Same switch however now we know there is data
+</span>            <span class='kw'>if</span> <span class='id identifier rubyid_pjt_length'>pjt_length</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_pjt_length'>pjt_length</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+                <span class='kw'>case</span> <span class='const'>COMMANDS</span><span class='lbracket'>[</span><span class='id identifier rubyid_pjt_command'>pjt_command</span><span class='rbracket'>]</span>
+                <span class='kw'>when</span> <span class='symbol'>:power_status</span>
+                    <span class='kw'>case</span> <span class='id identifier rubyid_pjt_data'>pjt_data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+                    <span class='kw'>when</span> <span class='int'>0</span><span class='comma'>,</span> <span class='int'>8</span>
+                        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:warming</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:cooling</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+                    <span class='kw'>when</span> <span class='int'>1</span><span class='comma'>,</span> <span class='int'>2</span>
+                        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:cooling</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+                        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:warming</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+                    <span class='kw'>when</span> <span class='int'>3</span>
+                        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+                        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:warming</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:cooling</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+                    <span class='kw'>when</span> <span class='int'>4</span><span class='comma'>,</span> <span class='int'>5</span><span class='comma'>,</span> <span class='int'>6</span><span class='comma'>,</span> <span class='int'>7</span>
+                        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:cooling</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+                        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:warming</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+                    <span class='kw'>end</span>
+
+                    <span class='kw'>if</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:warming</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:cooling</span><span class='rbracket'>]</span>
+                        <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_in'>in</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>10s</span><span class='tstring_end'>&#39;</span></span> <span class='kw'>do</span>
+                            <span class='id identifier rubyid_power?'>power?</span>
+                        <span class='kw'>end</span>
+                    <span class='kw'>end</span>
+                <span class='kw'>when</span> <span class='symbol'>:mute</span>
+                    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_pjt_data'>pjt_data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='int'>1</span>
+                <span class='kw'>when</span> <span class='symbol'>:input</span>
+                    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:input</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#INPUTS-constant" title="Sony::Projector::PjTalk::INPUTS (constant)">INPUTS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_pjt_data'>pjt_data</span><span class='rbracket'>]</span>
+                <span class='kw'>when</span> <span class='symbol'>:contrast</span><span class='comma'>,</span> <span class='symbol'>:brightness</span><span class='comma'>,</span> <span class='symbol'>:color</span><span class='comma'>,</span> <span class='symbol'>:hue</span><span class='comma'>,</span> <span class='symbol'>:sharpness</span>
+                    <span class='kw'>self</span><span class='lbracket'>[</span><span class='const'>COMMANDS</span><span class='lbracket'>[</span><span class='id identifier rubyid_pjt_command'>pjt_command</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_pjt_data'>pjt_data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+                <span class='kw'>when</span> <span class='symbol'>:error_status</span>
+
+                <span class='kw'>end</span>
+            <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>else</span>
+        <span class='comment'># Command failed..
+</span>        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:last_error</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_pjt_data'>pjt_data</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Command </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pjt_command'>pjt_command</span><span class='embexpr_end'>}</span><span class='tstring_content'> failed with Major 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_byte_to_hex'>byte_to_hex</span><span class='lparen'>(</span><span class='id identifier rubyid_pjt_data'>pjt_data</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'> and Minor 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_byte_to_hex'>byte_to_hex</span><span class='lparen'>(</span><span class='id identifier rubyid_pjt_data'>pjt_data</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='kw'>return</span> <span class='symbol'>:abort</span>
+    <span class='kw'>end</span>
+
+    <span class='symbol'>:success</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="switch_to-instance_method">
+  
+    #<strong>switch_to</strong>(input)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86
+87
+88
+89
+90
+91
+92</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 84</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_switch_to'>switch_to</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+    <span class='kw'>return</span> <span class='kw'>unless</span> <span class='const'><span class='object_link'><a href="#INPUTS-constant" title="Sony::Projector::PjTalk::INPUTS (constant)">INPUTS</a></span></span><span class='period'>.</span><span class='id identifier rubyid_has_key?'>has_key?</span> <span class='id identifier rubyid_input'>input</span>
+    
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='symbol'>:set</span><span class='comma'>,</span> <span class='symbol'>:input</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#INPUTS-constant" title="Sony::Projector::PjTalk::INPUTS (constant)">INPUTS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_input'>input</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='label'>delay_on_receive:</span> <span class='int'>500</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- sony projector, requested to switch to: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_input'>input</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    
+    <span class='id identifier rubyid_input?'>input?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unmute-instance_method">
+  
+    #<strong>unmute</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+113
+114
+115
+116</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sony/projector/pj_talk.rb', line 113</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unmute'>unmute</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- sony projector, requested to unmute</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='kw'>false</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:38 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

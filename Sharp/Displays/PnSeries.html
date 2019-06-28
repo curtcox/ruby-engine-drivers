@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Sharp::Displays::PnSeries
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Sharp::Displays::PnSeries";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Sharp.html" title="Sharp (module)">Sharp</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Displays.html" title="Sharp::Displays (module)">Displays</a></span></span>
+     &raquo; 
+    <span class="title">PnSeries</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Sharp::Displays::PnSeries
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Sharp::Displays::PnSeries</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/sharp/displays/pn_series.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://aca.im/driver_docs/Sharp/pnl601b.pdf">aca.im/driver_docs/Sharp/pnl601b.pdf</a></p>
+
+<pre class="code ruby"><code class="ruby">also https://aca.im/driver_docs/Sharp/PN_L802B_operation_guide.pdf</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="INPUTS-constant" class="">INPUTS =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Input selection</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='symbol'>:dvi</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0001</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>1</span> <span class='op'>=&gt;</span> <span class='symbol'>:dvi</span><span class='comma'>,</span>
+    <span class='symbol'>:hdmi</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0010</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>10</span> <span class='op'>=&gt;</span> <span class='symbol'>:hdmi</span><span class='comma'>,</span>
+    <span class='symbol'>:hdmi2</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0013</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>13</span> <span class='op'>=&gt;</span> <span class='symbol'>:hdmi2</span><span class='comma'>,</span>
+    <span class='symbol'>:hdmi3</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0018</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>18</span> <span class='op'>=&gt;</span> <span class='symbol'>:hdmi3</span><span class='comma'>,</span>
+    <span class='symbol'>:display_port</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0014</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>14</span> <span class='op'>=&gt;</span> <span class='symbol'>:display_port</span><span class='comma'>,</span>
+    <span class='symbol'>:vga</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0002</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span> <span class='op'>=&gt;</span> <span class='symbol'>:vga</span><span class='comma'>,</span>
+    <span class='symbol'>:vga2</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0016</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>16</span> <span class='op'>=&gt;</span> <span class='symbol'>:vga2</span><span class='comma'>,</span>
+    <span class='symbol'>:component</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS0003</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>3</span> <span class='op'>=&gt;</span> <span class='symbol'>:component</span><span class='comma'>,</span>
+    <span class='symbol'>:unknown</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INPS????</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="AUDIO-constant" class="">AUDIO =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='symbol'>:audio1</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASDP   2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:audio2</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASDP   3</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:dvi</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASDP   1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:dvi_alt</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASDA   1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:hdmi</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASHP   0</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:hdmi_3mm</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASHP   1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:hdmi_rca</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASHP   2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:vga</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASAP   1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='symbol'>:component</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ASCA   1</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#auto_adjust-instance_method" title="#auto_adjust (instance method)">#<strong>auto_adjust</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Auto adjust.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#brightness-instance_method" title="#brightness (instance method)">#<strong>brightness</strong>(val)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Value based set parameter.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#contrast-instance_method" title="#contrast (instance method)">#<strong>contrast</strong>(val)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#do_poll-instance_method" title="#do_poll (instance method)">#<strong>do_poll</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute-instance_method" title="#mute (instance method)">#<strong>mute</strong>(state = true)  &#x21d2; Object </a>
+    
+
+    
+      (also: #mute_audio)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Called on module load complete    Alternatively you can use initialize
+however will    not have access to settings and this is called    soon
+afterwards.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power-instance_method" title="#power (instance method)">#<strong>power</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Power commands.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power%3F-instance_method" title="#power? (instance method)">#<strong>power?</strong>(options = {}, &amp;block)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power_state%3F-instance_method" title="#power_state? (instance method)">#<strong>power_state?</strong>(options = {}, &amp;block)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(data, resolve, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>LCD Response code.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reset-instance_method" title="#reset (instance method)">#<strong>reset</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Resets the brightness and contrast settings.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#switch_audio-instance_method" title="#switch_audio (instance method)">#<strong>switch_audio</strong>(input)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#switch_to-instance_method" title="#switch_to (instance method)">#<strong>switch_to</strong>(input)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unmute-instance_method" title="#unmute (instance method)">#<strong>unmute</strong>  &#x21d2; Object </a>
+    
+
+    
+      (also: #unmute_audio)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#volume-instance_method" title="#volume (instance method)">#<strong>volume</strong>(val)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="auto_adjust-instance_method">
+  
+    #<strong>auto_adjust</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Auto adjust</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_auto_adjust'>auto_adjust</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>AGIN   1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='symbol'>:timeout</span> <span class='op'>=&gt;</span> <span class='int'>20000</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="brightness-instance_method">
+  
+    #<strong>brightness</strong>(val)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Value based set parameter</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+177
+178
+179
+180
+181
+182
+183
+184
+185</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 177</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_brightness'>brightness</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='int'>31</span> <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>&gt;</span> <span class='int'>31</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='int'>0</span> <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VLMP</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>+=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45
+46
+47
+48
+49
+50
+51
+52
+53</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='comment'># Will be sent after login is requested (config - wait ready)
+</span>    <span class='id identifier rubyid_send_credentials'>send_credentials</span>
+
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>60s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Polling Display</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="contrast-instance_method">
+  
+    #<strong>contrast</strong>(val)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 187</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_contrast'>contrast</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='int'>60</span> <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>&gt;</span> <span class='int'>60</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='int'>0</span> <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>*</span> <span class='int'>2</span> <span class='kw'>if</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:input</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:vga</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:dbl_contrast</span><span class='rbracket'>]</span>     <span class='comment'># See sharp Manual
+</span>
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CONT</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>+=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55
+56
+57
+58
+59
+60
+61</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='comment'>#
+</span>    <span class='comment'># Disconnected may be called without calling connected
+</span>    <span class='comment'>#    Hence the check if timer is nil here
+</span>    <span class='comment'>#
+</span>    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="do_poll-instance_method">
+  
+    #<strong>do_poll</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 307</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='id identifier rubyid_power_state?'>power_state?</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span>
+
+        <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>==</span> <span class='const'>On</span>
+            <span class='id identifier rubyid_model_number'>model_number</span> <span class='kw'>if</span> <span class='op'>!</span><span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:model_number</span><span class='rbracket'>]</span> <span class='comment'># only query the model number if we don&#39;t already have it
+</span>            <span class='id identifier rubyid_power_on_delay'>power_on_delay</span>
+            <span class='comment'>#video_input
+</span>            <span class='comment'>#audio_input
+</span>            <span class='id identifier rubyid_mute_status'>mute_status</span>
+            <span class='id identifier rubyid_volume_status'>volume_status</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute-instance_method">
+  
+    #<strong>mute</strong>(state = true)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='mute_audio-instance_method'>mute_audio</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+218
+219
+220
+221
+222
+223
+224
+225</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 218</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state_actual'>state_actual</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>MUTE   </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_state_actual'>state_actual</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute_status'>mute_status</span><span class='lparen'>(</span><span class='int'>50</span><span class='rparen'>)</span>    <span class='comment'># High priority mute status
+</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, requested to mute </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_state'>state</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Called on module load complete</p>
+
+<pre class="code ruby"><code class="ruby"><span class='const'>Alternatively</span> <span class='id identifier rubyid_you'>you</span> <span class='id identifier rubyid_can'>can</span> <span class='id identifier rubyid_use'>use</span> <span class='id identifier rubyid_initialize'>initialize</span> <span class='id identifier rubyid_however'>however</span> <span class='id identifier rubyid_will'>will</span>
+<span class='kw'>not</span> <span class='id identifier rubyid_have'>have</span> <span class='id identifier rubyid_access'>access</span> <span class='id identifier rubyid_to'>to</span> <span class='id identifier rubyid_settings'>settings</span> <span class='kw'>and</span> <span class='id identifier rubyid_this'>this</span> <span class='id identifier rubyid_is'>is</span> <span class='id identifier rubyid_called'>called</span>
+<span class='id identifier rubyid_soon'>soon</span> <span class='id identifier rubyid_afterwards'>afterwards</span>
+</code></pre>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+30
+31
+32</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 30</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 34</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:volume_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:volume_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>31</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:brightness_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:brightness_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>31</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:contrast_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:contrast_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>60</span>    <span class='comment'># multiply by two when VGA selected
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:dbl_contrast</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:model_number</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power-instance_method">
+  
+    #<strong>power</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Power commands</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power'>power</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_delay'>delay</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power_on_delay</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='int'>5000</span>
+
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>==</span> <span class='const'>Off</span>
+            <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>POWR   1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:timeout</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_delay'>delay</span> <span class='op'>+</span> <span class='int'>15000</span><span class='comma'>,</span> <span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='symbol'>:POWR</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:warming</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>On</span>
+            <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, requested to power on</span><span class='tstring_end'>&quot;</span></span>
+
+            <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>POWR????</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:timeout</span> <span class='op'>=&gt;</span> <span class='int'>10000</span><span class='comma'>,</span> <span class='symbol'>:value_ret_only</span> <span class='op'>=&gt;</span> <span class='symbol'>:POWR</span><span class='rbrace'>}</span><span class='rparen'>)</span>    <span class='comment'># clears warming
+</span>        <span class='kw'>end</span>
+    <span class='kw'>else</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span> <span class='op'>==</span> <span class='const'>On</span>
+            <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>POWR   0</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:timeout</span> <span class='op'>=&gt;</span> <span class='int'>15000</span><span class='comma'>,</span> <span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='symbol'>:POWR</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>Off</span>
+            <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, requested to power off</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_mute_status'>mute_status</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_volume_status'>volume_status</span><span class='lparen'>(</span><span class='int'>0</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power?-instance_method">
+  
+    #<strong>power?</strong>(options = {}, &amp;block)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+93
+94
+95</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 93</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power?'>power?</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power_state?-instance_method">
+  
+    #<strong>power_state?</strong>(options = {}, &amp;block)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+98
+99
+100
+101
+102</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 98</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power_state?'>power_state?</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:emit</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_block'>block</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='id identifier rubyid_options'>options</span><span class='period'>.</span><span class='id identifier rubyid_merge!'>merge!</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='symbol'>:timeout</span> <span class='op'>=&gt;</span> <span class='int'>10000</span><span class='comma'>,</span> <span class='symbol'>:value_ret_only</span> <span class='op'>=&gt;</span> <span class='symbol'>:POWR</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>POWR????</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(data, resolve, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>LCD Response code</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 236</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>        <span class='comment'># Data is default received as a string
+</span>    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, received: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>nil</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Password:OK</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Password:Login incorrect</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sharp LCD, bad login or logged off. Attempting login..</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_in'>in</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>5s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+            <span class='id identifier rubyid_send_credentials'>send_credentials</span>
+        <span class='kw'>end</span>
+        <span class='kw'>return</span> <span class='kw'>true</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>OK</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>return</span> <span class='kw'>true</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>WAIT</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, wait</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>return</span> <span class='kw'>nil</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ERR</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, error</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>return</span> <span class='kw'>false</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;</span> <span class='int'>8</span>        <span class='comment'># Out of order send?
+</span>            <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_info'>info</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sharp sent out of order response: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+            <span class='kw'>return</span> <span class='symbol'>:fail</span>        <span class='comment'># this will be ignored
+</span>        <span class='kw'>end</span>
+        <span class='id identifier rubyid_command'>command</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>3</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+        <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>4</span><span class='op'>..</span><span class='int'>7</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='id identifier rubyid_command'>command</span> <span class='op'>=</span> <span class='id identifier rubyid_command'>command</span><span class='lbracket'>[</span><span class='symbol'>:value_ret_only</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='id identifier rubyid_command'>command</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>setting value ret: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_command'>command</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>case</span> <span class='id identifier rubyid_command'>command</span>
+        <span class='kw'>when</span> <span class='symbol'>:POWR</span> <span class='comment'># Power status
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:warming</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+        <span class='kw'>when</span> <span class='symbol'>:INPS</span> <span class='comment'># Input status
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:input</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#INPUTS-constant" title="Sharp::Displays::PnSeries::INPUTS (constant)">INPUTS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_value'>value</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, input </span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#INPUTS-constant" title="Sharp::Displays::PnSeries::INPUTS (constant)">INPUTS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_value'>value</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> == </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='kw'>when</span> <span class='symbol'>:VOLM</span> <span class='comment'># Volume status
+</span>            <span class='kw'>if</span> <span class='kw'>not</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:audio_mute</span><span class='rbracket'>]</span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:volume</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+            <span class='kw'>end</span>
+        <span class='kw'>when</span> <span class='symbol'>:MUTE</span> <span class='comment'># Mute status
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:audio_mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>==</span> <span class='int'>1</span>
+            <span class='kw'>if</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span> <span class='op'>==</span> <span class='int'>1</span><span class='rparen'>)</span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:volume</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+            <span class='kw'>else</span>
+                <span class='id identifier rubyid_volume_status'>volume_status</span><span class='lparen'>(</span><span class='int'>90</span><span class='rparen'>)</span>    <span class='comment'># high priority
+</span>            <span class='kw'>end</span>
+        <span class='kw'>when</span> <span class='symbol'>:CONT</span> <span class='comment'># Contrast status
+</span>            <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>/</span> <span class='int'>2</span> <span class='kw'>if</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:input</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:vga</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:dbl_contrast</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:contrast</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+        <span class='kw'>when</span> <span class='symbol'>:VLMP</span> <span class='comment'># brightness status
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:brightness</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+        <span class='kw'>when</span> <span class='symbol'>:PWOD</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power_on_delay</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+        <span class='kw'>when</span> <span class='symbol'>:INF1</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:model_number</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+            <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, model number </span><span class='embexpr_beg'>#{</span><span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:model_number</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+            <span class='id identifier rubyid_determine_contrast_mode'>determine_contrast_mode</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>return</span> <span class='kw'>true</span> <span class='comment'># Command success?
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reset-instance_method">
+  
+    #<strong>reset</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Resets the brightness and contrast settings</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reset'>reset</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ARST   2</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="switch_audio-instance_method">
+  
+    #<strong>switch_audio</strong>(input)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 152</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_switch_audio'>switch_audio</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span> <span class='op'>==</span> <span class='const'>String</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:audio</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span>
+
+    <span class='id identifier rubyid_resp'>resp</span> <span class='op'>=</span> <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#AUDIO-constant" title="Sharp::Displays::PnSeries::AUDIO (constant)">AUDIO</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_input'>input</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='symbol'>:audio</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute_status'>mute_status</span><span class='lparen'>(</span><span class='int'>40</span><span class='rparen'>)</span>        <span class='comment'># higher status than polling commands - lower than input switching
+</span>    <span class='comment'>#volume_status(40)    # Mute response requests volume
+</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, requested to switch audio to: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_input'>input</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_resp'>resp</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="switch_to-instance_method">
+  
+    #<strong>switch_to</strong>(input)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 127</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_switch_to'>switch_to</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span> <span class='op'>==</span> <span class='const'>String</span>
+
+    <span class='comment'>#self[:target_input] = input
+</span>    <span class='id identifier rubyid_resp'>resp</span> <span class='op'>=</span> <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#INPUTS-constant" title="Sharp::Displays::PnSeries::INPUTS (constant)">INPUTS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_input'>input</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:timeout</span> <span class='op'>=&gt;</span> <span class='int'>20000</span><span class='comma'>,</span> <span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='symbol'>:input</span><span class='comma'>,</span> <span class='symbol'>:delay</span> <span class='op'>=&gt;</span> <span class='int'>2000</span><span class='rbrace'>}</span><span class='rparen'>)</span>    <span class='comment'># does an auto adjust on switch to vga
+</span>    <span class='comment'>#video_input(0)    # high level command
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:input</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span>
+    <span class='id identifier rubyid_brightness_status'>brightness_status</span><span class='lparen'>(</span><span class='int'>40</span><span class='rparen'>)</span>        <span class='comment'># higher status than polling commands - lower than input switching (vid then audio is common)
+</span>    <span class='id identifier rubyid_contrast_status'>contrast_status</span><span class='lparen'>(</span><span class='int'>40</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Sharp LCD, requested to switch to: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_input'>input</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_resp'>resp</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unmute-instance_method">
+  
+    #<strong>unmute</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='unmute_audio-instance_method'>unmute_audio</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+228
+229
+230</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 228</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unmute'>unmute</span>
+    <span class='id identifier rubyid_mute'>mute</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="volume-instance_method">
+  
+    #<strong>volume</strong>(val)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/sharp/displays/pn_series.rb', line 199</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_volume'>volume</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='int'>31</span> <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>&gt;</span> <span class='int'>31</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='int'>0</span> <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VOLM</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>+=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='ivar'>@vol_status</span><span class='period'>.</span><span class='id identifier rubyid_cancel'>cancel</span> <span class='kw'>if</span> <span class='ivar'>@vol_status</span>
+    <span class='ivar'>@vol_status</span> <span class='op'>=</span> <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_in'>in</span><span class='lparen'>(</span><span class='int'>2000</span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='ivar'>@vol_status</span> <span class='op'>=</span> <span class='kw'>nil</span>
+        <span class='id identifier rubyid_volume_status'>volume_status</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:volume</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:audio_mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:39 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

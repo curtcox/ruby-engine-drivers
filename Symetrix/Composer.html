@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Symetrix::Composer
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Symetrix::Composer";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (C)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Symetrix.html" title="Symetrix (module)">Symetrix</a></span></span>
+     &raquo; 
+    <span class="title">Composer</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Symetrix::Composer
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Symetrix::Composer</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/symetrix/composer.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://aca.im/driver_docs/Symetrix/SymNet_Composer_control_prot_2.0.pdf">aca.im/driver_docs/Symetrix/SymNet_Composer_control_prot_2.0.pdf</a>
+Protocol 2 - supports both TCP and UDP operations port 48631</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#enable_push-instance_method" title="#enable_push (instance method)">#<strong>enable_push</strong>(state = true, low = nil, high = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fader-instance_method" title="#fader (instance method)">#<strong>fader</strong>(fader_id, level, *_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>For compatibility with other modules.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#faders-instance_method" title="#faders (instance method)">#<strong>faders</strong>(ids:, level:, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Named params version.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#flash_leds-instance_method" title="#flash_leds (instance method)">#<strong>flash_leds</strong>(cycles = 8, options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Flashes the LEDS on the front of the unit.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_control_value-instance_method" title="#get_control_value (instance method)">#<strong>get_control_value</strong>(id, type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute-instance_method" title="#mute (instance method)">#<strong>mute</strong>(fader_id, val = true, *_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mutes-instance_method" title="#mutes (instance method)">#<strong>mutes</strong>(ids:, muted: true, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Named params version.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#nop-instance_method" title="#nop (instance method)">#<strong>nop</strong>(options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_unload-instance_method" title="#on_unload (instance method)">#<strong>on_unload</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#preset-instance_method" title="#preset (instance method)">#<strong>preset</strong>(number)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#push-instance_method" title="#push (instance method)">#<strong>push</strong>(low = nil, high = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>disables push.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#push_clear-instance_method" title="#push_clear (instance method)">#<strong>push_clear</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Don&#39;t send any values until next change.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#push_interval-instance_method" title="#push_interval (instance method)">#<strong>push_interval</strong>(val = 100)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Val == milliseconds.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#push_refresh-instance_method" title="#push_refresh (instance method)">#<strong>push_refresh</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Send all values again.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#push_threshold-instance_method" title="#push_threshold (instance method)">#<strong>push_threshold</strong>(value, type = :METER)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Alternative Type is: PARAMETER.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_fader-instance_method" title="#query_fader (instance method)">#<strong>query_fader</strong>(fader_id, *_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_faders-instance_method" title="#query_faders (instance method)">#<strong>query_faders</strong>(ids:, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Named params version.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_mute-instance_method" title="#query_mute (instance method)">#<strong>query_mute</strong>(fader_id, *_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#query_mutes-instance_method" title="#query_mutes (instance method)">#<strong>query_mutes</strong>(ids:, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Named params version.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reboot-instance_method" title="#reboot (instance method)">#<strong>reboot</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(data, resolve, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#set_control_value-instance_method" title="#set_control_value (instance method)">#<strong>set_control_value</strong>(id, value, type)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Note: Mutes are 0 (off) or 65535 (on).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unmute-instance_method" title="#unmute (instance method)">#<strong>unmute</strong>(fader_id, *_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 36</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>EH</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='comment'># Echo off
+</span>    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SQ</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='comment'># Quiet mode on
+</span>    <span class='id identifier rubyid_push_threshold'>push_threshold</span><span class='lparen'>(</span><span class='int'>65535</span><span class='comma'>,</span> <span class='symbol'>:METER</span><span class='rparen'>)</span> <span class='comment'># Never send us meter values
+</span>    <span class='id identifier rubyid_push_threshold'>push_threshold</span><span class='lparen'>(</span><span class='int'>1</span><span class='comma'>,</span> <span class='symbol'>:PARAMETER</span><span class='rparen'>)</span> <span class='comment'># Always send us data values
+</span>    <span class='id identifier rubyid_enable_push'>enable_push</span>
+    <span class='id identifier rubyid_push'>push</span>  <span class='comment'># Push all value changes
+</span>    
+    <span class='comment'># Maintain the connection
+</span>    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>60s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_nop'>nop</span><span class='lparen'>(</span><span class='lbrace'>{</span> <span class='label'>priority:</span> <span class='int'>0</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="enable_push-instance_method">
+  
+    #<strong>enable_push</strong>(state = true, low = nil, high = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+64
+65
+66
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 64</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_enable_push'>enable_push</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_low'>low</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_high'>high</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PU</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_low'>low</span><span class='comma'>,</span> <span class='id identifier rubyid_high'>high</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="fader-instance_method">
+  
+    #<strong>fader</strong>(fader_id, level, *_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>For compatibility with other modules</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+144
+145
+146
+147
+148
+149</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 144</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fader'>fader</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_faders'>faders</span> <span class='op'>=</span> <span class='id identifier rubyid_fader_id'>fader_id</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_fader_id'>fader_id</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_faders'>faders</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_fad'>fad</span><span class='op'>|</span>
+        <span class='id identifier rubyid_set_control_value'>set_control_value</span><span class='lparen'>(</span><span class='id identifier rubyid_fad'>fad</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='symbol'>:fader</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="faders-instance_method">
+  
+    #<strong>faders</strong>(ids:, level:, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Named params version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+151
+152
+153</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 151</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_faders'>faders</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>level:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_fader'>fader</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="flash_leds-instance_method">
+  
+    #<strong>flash_leds</strong>(cycles = 8, options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Flashes the LEDS on the front of the unit</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+60
+61
+62</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 60</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_flash_leds'>flash_leds</span><span class='lparen'>(</span><span class='id identifier rubyid_cycles'>cycles</span> <span class='op'>=</span> <span class='int'>8</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>FU</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_cycles'>cycles</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_control_value-instance_method">
+  
+    #<strong>get_control_value</strong>(id, type)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+108
+109
+110
+111
+112
+113
+114
+115</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 108</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_control_value'>get_control_value</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+    <span class='ivar'>@type_lookup</span><span class='lbracket'>[</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span>
+
+    <span class='comment'># NOTE:: There is also a GS command however it doesn&#39;t
+</span>    <span class='comment'>#         return a control ID with the response
+</span>    <span class='comment'># Returns: id value
+</span>    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>GS2</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute-instance_method">
+  
+    #<strong>mute</strong>(fader_id, val = true, *_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+155
+156
+157
+158
+159
+160
+161
+162</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 155</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_actual'>actual</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>?</span> <span class='int'>65535</span> <span class='op'>:</span> <span class='int'>0</span>
+
+    <span class='id identifier rubyid_faders'>faders</span> <span class='op'>=</span> <span class='id identifier rubyid_fader_id'>fader_id</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_fader_id'>fader_id</span> <span class='op'>:</span> <span class='lbracket'>[</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_faders'>faders</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_fad'>fad</span><span class='op'>|</span>
+        <span class='id identifier rubyid_set_control_value'>set_control_value</span><span class='lparen'>(</span><span class='id identifier rubyid_fad'>fad</span><span class='comma'>,</span> <span class='id identifier rubyid_actual'>actual</span><span class='comma'>,</span> <span class='symbol'>:mute</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mutes-instance_method">
+  
+    #<strong>mutes</strong>(ids:, muted: true, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Named params version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+164
+165
+166</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 164</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mutes'>mutes</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>muted:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_muted'>muted</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="nop-instance_method">
+  
+    #<strong>nop</strong>(options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_nop'>nop</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>NOP</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 23</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='ivar'>@type_lookup</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_unload-instance_method">
+  
+    #<strong>on_unload</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_unload'>on_unload</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+30
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 30</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:fader_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:fader_min</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>0</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:fader_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:fader_max</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>65535</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="preset-instance_method">
+  
+    #<strong>preset</strong>(number)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_preset'>preset</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>LP</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="push-instance_method">
+  
+    #<strong>push</strong>(low = nil, high = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>disables push</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 88</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_low'>low</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_high'>high</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PUE</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_low'>low</span><span class='comma'>,</span> <span class='id identifier rubyid_high'>high</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="push_clear-instance_method">
+  
+    #<strong>push_clear</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Don&#39;t send any values until next change</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 103</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_push_clear'>push_clear</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PUC</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="push_interval-instance_method">
+  
+    #<strong>push_interval</strong>(val = 100)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Val == milliseconds</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+78
+79
+80</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 78</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_push_interval'>push_interval</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='int'>100</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PUI</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="push_refresh-instance_method">
+  
+    #<strong>push_refresh</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Send all values again</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 98</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_push_refresh'>push_refresh</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PUR</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="push_threshold-instance_method">
+  
+    #<strong>push_threshold</strong>(value, type = :METER)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Alternative Type is: PARAMETER</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+83
+84
+85</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 83</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_push_threshold'>push_threshold</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:METER</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PUT</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='comma'>,</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='int'>65535</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_fader-instance_method">
+  
+    #<strong>query_fader</strong>(fader_id, *_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+172
+173
+174
+175
+176</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 172</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_fader'>query_fader</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_fad'>fad</span> <span class='op'>=</span> <span class='id identifier rubyid_fader_id'>fader_id</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_fader_id'>fader_id</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='id identifier rubyid_fader_id'>fader_id</span>
+
+    <span class='id identifier rubyid_get_control_value'>get_control_value</span><span class='lparen'>(</span><span class='id identifier rubyid_fad'>fad</span><span class='comma'>,</span> <span class='symbol'>:fader</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_faders-instance_method">
+  
+    #<strong>query_faders</strong>(ids:, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Named params version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+178
+179
+180</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 178</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_faders'>query_faders</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_query_fader'>query_fader</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_mute-instance_method">
+  
+    #<strong>query_mute</strong>(fader_id, *_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+182
+183
+184
+185
+186</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 182</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_mute'>query_mute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_fad'>fad</span> <span class='op'>=</span> <span class='id identifier rubyid_fader_id'>fader_id</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Array</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id identifier rubyid_fader_id'>fader_id</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>:</span> <span class='id identifier rubyid_fader_id'>fader_id</span>
+    
+    <span class='id identifier rubyid_get_control_value'>get_control_value</span><span class='lparen'>(</span><span class='id identifier rubyid_fad'>fad</span><span class='comma'>,</span> <span class='symbol'>:mute</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="query_mutes-instance_method">
+  
+    #<strong>query_mutes</strong>(ids:, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Named params version</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+188
+189
+190</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 188</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_query_mutes'>query_mutes</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_query_mute'>query_mute</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reboot-instance_method">
+  
+    #<strong>reboot</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+69
+70
+71</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 69</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reboot'>reboot</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>R!</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(data, resolve, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 193</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>received </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='kw'>return</span> <span class='symbol'>:success</span> <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ACK</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>return</span> <span class='symbol'>:abort</span> <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>NAK</span><span class='tstring_end'>&#39;</span></span>
+    
+    <span class='comment'># Can be space or equals sign
+</span>    <span class='id identifier rubyid_resp'>resp</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_resp'>resp</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='int'>1</span>
+        <span class='id identifier rubyid_process_reponse'>process_reponse</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_resp'>resp</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_resp'>resp</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>=</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_process_reponse'>process_reponse</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_resp'>resp</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_resp'>resp</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='int'>1</span>
+    <span class='kw'>end</span>
+    
+    <span class='kw'>return</span> <span class='symbol'>:success</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="set_control_value-instance_method">
+  
+    #<strong>set_control_value</strong>(id, value, type)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Note: Mutes are 0 (off) or 65535 (on)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 118</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_set_control_value'>set_control_value</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span><span class='rparen'>)</span>
+    <span class='ivar'>@type_lookup</span><span class='lbracket'>[</span><span class='id identifier rubyid_id'>id</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_type'>type</span>
+    <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='int'>65535</span><span class='rparen'>)</span>
+
+    <span class='comment'># Inline response processing is easiest
+</span>    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>CS</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='op'>|</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ACK</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>if</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>==</span> <span class='symbol'>:mute</span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:&quot;fader</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_content'>_mute</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>==</span> <span class='int'>65535</span>
+            <span class='kw'>else</span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:&quot;fader</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_id'>id</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
+            <span class='kw'>end</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>else</span>
+            <span class='comment'># Delegate if the reponse wasn&#39;t for us
+</span>            <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+
+            <span class='comment'># and ignore
+</span>            <span class='symbol'>:ignore</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unmute-instance_method">
+  
+    #<strong>unmute</strong>(fader_id, *_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+168
+169
+170</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/symetrix/composer.rb', line 168</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unmute'>unmute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='op'>*</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_fader_id'>fader_id</span><span class='comma'>,</span> <span class='kw'>false</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:35 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Kramer::Switcher::Protocol3000
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Kramer::Switcher::Protocol3000";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Kramer.html" title="Kramer (module)">Kramer</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Switcher.html" title="Kramer::Switcher (module)">Switcher</a></span></span>
+     &raquo; 
+    <span class="title">Protocol3000</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Kramer::Switcher::Protocol3000
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Kramer::Switcher::Protocol3000</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/kramer/switcher/protocol3000.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://aca.im/driver_docs/Kramer/protocol_3000_2.10_user.pdf">aca.im/driver_docs/Kramer/protocol_3000_2.10_user.pdf</a></p>
+<dl class="rdoc-list note-list"><dt>NOTE
+<dd>
+<p>These devices should be marked as make and break!</p>
+</dd></dl>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><div id="subclasses">
+  <h2>Direct Known Subclasses</h2>
+  <p class="children"><span class='object_link'><a href="Presentation.html" title="Kramer::Switcher::Presentation (class)">Presentation</a></span></p>
+</div>
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="ROUTE_TYPES-constant" class="">ROUTE_TYPES =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>video:</span> <span class='int'>1</span><span class='comma'>,</span>
+    <span class='label'>audio:</span> <span class='int'>2</span><span class='comma'>,</span>
+    <span class='label'>usb:</span> <span class='int'>3</span><span class='comma'>,</span>
+    <span class='label'>audio_video:</span> <span class='int'>12</span><span class='comma'>,</span>
+    <span class='label'>video_usb:</span> <span class='int'>13</span><span class='comma'>,</span>
+    <span class='label'>audio_video_usb:</span> <span class='int'>123</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="CMDS-constant" class="">CMDS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>info:</span> <span class='symbol'>:&quot;INFO-IO?&quot;</span><span class='comma'>,</span>
+    <span class='label'>login:</span> <span class='symbol'>:&quot;LOGIN&quot;</span><span class='comma'>,</span>
+    <span class='label'>route:</span> <span class='symbol'>:&quot;ROUTE&quot;</span><span class='comma'>,</span>
+    <span class='label'>switch:</span> <span class='symbol'>:&quot;AV&quot;</span><span class='comma'>,</span>
+    <span class='label'>switch_audio:</span> <span class='symbol'>:&quot;AUD&quot;</span><span class='comma'>,</span>
+    <span class='label'>switch_video:</span> <span class='symbol'>:&quot;VID&quot;</span><span class='comma'>,</span>
+    <span class='label'>audio_mute:</span> <span class='symbol'>:&quot;MUTE&quot;</span><span class='comma'>,</span>
+    <span class='label'>video_mute:</span> <span class='symbol'>:&quot;VMUTE&quot;</span><span class='comma'>,</span>
+    <span class='label'>help:</span> <span class='symbol'>:HELP</span><span class='comma'>,</span>
+    <span class='label'>model:</span> <span class='symbol'>:&quot;MODEL?&quot;</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#help-instance_method" title="#help (instance method)">#<strong>help</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#model-instance_method" title="#model (instance method)">#<strong>model</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute_audio-instance_method" title="#mute_audio (instance method)">#<strong>mute_audio</strong>(out, state = true)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute_video-instance_method" title="#mute_video (instance method)">#<strong>mute_video</strong>(out, state = true)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(data, resolve, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#route-instance_method" title="#route (instance method)">#<strong>route</strong>(map, type = :audio_video)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#switch_audio-instance_method" title="#switch_audio (instance method)">#<strong>switch_audio</strong>(map, out = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#switch_video-instance_method" title="#switch_video (instance method)">#<strong>switch_video</strong>(map, out = nil)  &#x21d2; Object </a>
+    
+
+    
+      (also: #switch)
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unmute_audio-instance_method" title="#unmute_audio (instance method)">#<strong>unmute_audio</strong>(out)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unmute_video-instance_method" title="#unmute_video (instance method)">#<strong>unmute_video</strong>(out)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 36</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='comment'>#
+</span>    <span class='comment'># Get current state of the switcher
+</span>    <span class='comment'>#
+</span>    <span class='id identifier rubyid_protocol_handshake'>protocol_handshake</span>
+    <span class='id identifier rubyid_login'>login</span>
+    <span class='id identifier rubyid_get_machine_info'>get_machine_info</span>
+
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1m</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Kramer Maintaining Connection</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>MODEL?</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:priority</span> <span class='op'>=&gt;</span> <span class='int'>0</span><span class='rbrace'>}</span><span class='rparen'>)</span>    <span class='comment'># Low priority poll to maintain connection
+</span>    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+50
+51
+52</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 50</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="help-instance_method">
+  
+    #<strong>help</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 119</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_help'>help</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:help</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="model-instance_method">
+  
+    #<strong>model</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+123
+124
+125</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 123</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_model'>model</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:model</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute_audio-instance_method">
+  
+    #<strong>mute_audio</strong>(out, state = true)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+106
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 106</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute_audio'>mute_audio</span><span class='lparen'>(</span><span class='id identifier rubyid_out'>out</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:audio_mute</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_out'>out</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute_video-instance_method">
+  
+    #<strong>mute_video</strong>(out, state = true)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+101
+102
+103
+104</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 101</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute_video'>mute_video</span><span class='lparen'>(</span><span class='id identifier rubyid_out'>out</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:video_mute</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_out'>out</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+24
+25
+26</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 24</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+28
+29
+30
+31
+32
+33
+34</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 28</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='ivar'>@device_id</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:kramer_id</span><span class='rparen'>)</span>
+    <span class='ivar'>@destination</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='ivar'>@device_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>@</span><span class='tstring_end'>&quot;</span></span> <span class='kw'>if</span> <span class='ivar'>@device_id</span>
+
+    <span class='ivar'>@login_level</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:kramer_login</span><span class='rparen'>)</span>
+    <span class='ivar'>@password</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:kramer_password</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='ivar'>@login_level</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(data, resolve, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 128</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Kramer sent </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    
+    <span class='comment'># Extract and check the machine number if we&#39;ve defined it
+</span>    <span class='id identifier rubyid_components'>components</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>@</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_components'>components</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='int'>1</span>
+        <span class='id identifier rubyid_machine'>machine</span> <span class='op'>=</span> <span class='id identifier rubyid_components'>components</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+        <span class='kw'>if</span> <span class='ivar'>@device_id</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_machine'>machine</span> <span class='op'>!=</span> <span class='ivar'>@device_id</span>
+            <span class='kw'>return</span> <span class='symbol'>:ignore</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_components'>components</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_strip'>strip</span>
+    <span class='id identifier rubyid_components'>components</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>\s+|,</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='id identifier rubyid_components'>components</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_args'>args</span> <span class='op'>=</span> <span class='id identifier rubyid_components'>components</span><span class='lbracket'>[</span><span class='int'>1</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_pop'>pop</span> <span class='kw'>if</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>OK</span><span class='tstring_end'>&#39;</span></span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>OK</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>return</span> <span class='symbol'>:success</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_cmd'>cmd</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ERR</span><span class='tstring_end'>&#39;</span></span> <span class='op'>||</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ERR</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_cmd'>cmd</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>ERR</span><span class='tstring_end'>&#39;</span></span>
+            <span class='id identifier rubyid_error'>error</span> <span class='op'>=</span> <span class='id identifier rubyid_cmd'>cmd</span><span class='lbracket'>[</span><span class='int'>3</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_errfor'>errfor</span> <span class='op'>=</span> <span class='kw'>nil</span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_error'>error</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>3</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_errfor'>errfor</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> on </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_cmd'>cmd</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>end</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Kramer command error </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_error'>error</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_errfor'>errfor</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:last_error</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_error'>error</span>
+        <span class='kw'>return</span> <span class='symbol'>:abort</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Kramer cmd: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_cmd'>cmd</span><span class='embexpr_end'>}</span><span class='tstring_content'>, args: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_args'>args</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='kw'>case</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_cmd'>cmd</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:info</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:video_inputs</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:video_outputs</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>3</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+    <span class='kw'>when</span> <span class='symbol'>:route</span>
+        <span class='comment'># response looks like ~01@ROUTE 12,1,4 OK
+</span>        <span class='id identifier rubyid_layer'>layer</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='id identifier rubyid_dest'>dest</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='id identifier rubyid_src'>src</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:&quot;#{</span><span class='const'><span class='object_link'><a href="#ROUTE_TYPES-constant" title="Kramer::Switcher::Protocol3000::ROUTE_TYPES (constant)">ROUTE_TYPES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_layer'>layer</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dest'>dest</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_src'>src</span>
+
+    <span class='kw'>when</span> <span class='symbol'>:switch</span><span class='comma'>,</span> <span class='symbol'>:switch_audio</span><span class='comma'>,</span> <span class='symbol'>:switch_video</span>
+        <span class='comment'># return string like &quot;in&gt;out,in&gt;out,in&gt;out OK&quot;
+</span>
+        <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:av</span>
+        <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:audio</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_cmd'>cmd</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:switch_audio</span>
+        <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:video</span> <span class='kw'>if</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_cmd'>cmd</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:switch_video</span>
+
+        <span class='id identifier rubyid_args'>args</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_map'>map</span><span class='op'>|</span>
+            <span class='id identifier rubyid_inout'>inout</span> <span class='op'>=</span> <span class='id identifier rubyid_map'>map</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>&gt;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:&quot;#{</span><span class='id identifier rubyid_type'>type</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inout'>inout</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_inout'>inout</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>end</span>
+    <span class='kw'>when</span> <span class='symbol'>:audio_mute</span>
+        <span class='comment'># Response looks like: ~01@VMUTE 1,0 OK
+</span>        <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_mute'>mute</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:&quot;audio</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_output'>output</span><span class='embexpr_end'>}</span><span class='tstring_content'>_muted</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_mute'>mute</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>when</span> <span class='symbol'>:video_mute</span>
+        <span class='id identifier rubyid_output'>output</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_mute'>mute</span> <span class='op'>=</span> <span class='id identifier rubyid_args'>args</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:&quot;video</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_output'>output</span><span class='embexpr_end'>}</span><span class='tstring_content'>_muted</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_mute'>mute</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+    
+    <span class='kw'>return</span> <span class='symbol'>:success</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="route-instance_method">
+  
+    #<strong>route</strong>(map, type = :audio_video)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 88</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_route'>route</span><span class='lparen'>(</span><span class='id identifier rubyid_map'>map</span><span class='comma'>,</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='symbol'>:audio_video</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_map'>map</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_input'>input</span><span class='comma'>,</span> <span class='id identifier rubyid_outputs'>outputs</span><span class='op'>|</span>
+        <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>Symbol</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_input'>input</span> <span class='op'>=</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='kw'>if</span> <span class='id identifier rubyid_input'>input</span><span class='period'>.</span><span class='id identifier rubyid_is_a?'>is_a?</span><span class='lparen'>(</span><span class='const'>String</span><span class='rparen'>)</span>
+
+        <span class='id identifier rubyid_outputs'>outputs</span> <span class='op'>=</span> <span class='const'>Array</span><span class='lparen'>(</span><span class='id identifier rubyid_outputs'>outputs</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_outputs'>outputs</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_output'>output</span><span class='op'>|</span>
+            <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:route</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='const'><span class='object_link'><a href="#ROUTE_TYPES-constant" title="Kramer::Switcher::Protocol3000::ROUTE_TYPES (constant)">ROUTE_TYPES</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_type'>type</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_output'>output</span><span class='comma'>,</span> <span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="switch_audio-instance_method">
+  
+    #<strong>switch_audio</strong>(map, out = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+72
+73
+74
+75</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 72</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_switch_audio'>switch_audio</span><span class='lparen'>(</span><span class='id identifier rubyid_map'>map</span><span class='comma'>,</span> <span class='id identifier rubyid_out'>out</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_map'>map</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='id identifier rubyid_map'>map</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_out'>out</span><span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_out'>out</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:switch_audio</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_build_switch_data'>build_switch_data</span><span class='lparen'>(</span><span class='id identifier rubyid_map'>map</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="switch_video-instance_method">
+  
+    #<strong>switch_video</strong>(map, out = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+    <span class="aliases">Also known as:
+    <span class="names"><span id='switch-instance_method'>switch</span></span>
+    </span>
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+65
+66
+67
+68</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 65</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_switch_video'>switch_video</span><span class='lparen'>(</span><span class='id identifier rubyid_map'>map</span><span class='comma'>,</span> <span class='id identifier rubyid_out'>out</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_map'>map</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='id identifier rubyid_map'>map</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_out'>out</span><span class='rbrace'>}</span> <span class='kw'>if</span> <span class='id identifier rubyid_out'>out</span>
+    <span class='id identifier rubyid_do_send'>do_send</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#CMDS-constant" title="Kramer::Switcher::Protocol3000::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:switch_video</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_build_switch_data'>build_switch_data</span><span class='lparen'>(</span><span class='id identifier rubyid_map'>map</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unmute_audio-instance_method">
+  
+    #<strong>unmute_audio</strong>(out)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+115
+116
+117</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 115</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unmute_audio'>unmute_audio</span><span class='lparen'>(</span><span class='id identifier rubyid_out'>out</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute_audio'>mute_audio</span> <span class='id identifier rubyid_out'>out</span><span class='comma'>,</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unmute_video-instance_method">
+  
+    #<strong>unmute_video</strong>(out)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+111
+112
+113</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/kramer/switcher/protocol3000.rb', line 111</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unmute_video'>unmute_video</span><span class='lparen'>(</span><span class='id identifier rubyid_out'>out</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute_video'>mute_video</span> <span class='id identifier rubyid_out'>out</span><span class='comma'>,</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:40 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

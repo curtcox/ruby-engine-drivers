@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Amx::AcendoVibe
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Amx::AcendoVibe";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (A)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Amx.html" title="Amx (module)">Amx</a></span></span>
+     &raquo; 
+    <span class="title">AcendoVibe</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Amx::AcendoVibe
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Amx::AcendoVibe</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Security, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/amx/acendo_vibe.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://aca.im/driver_docs/AMX/AMX-Acendo-Vibe.pdf">aca.im/driver_docs/AMX/AMX-Acendo-Vibe.pdf</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="CMDS-constant" class="">CMDS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>mic_mute:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audmic/state</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>auto_switch:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audio/autoswitch</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>default_volume:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audio/defvolume</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>gain:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audio/gain/level</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>gain_mode:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audio/gain/mode</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>source:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audio/source</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>mute:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audio/state</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>volume:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/audio/volume</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>battery:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/battery/state</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>bluetooth_enabled:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/bluetooth/state</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>bluetooth_status:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/bluetooth/connstate</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>camera_state:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/camera/state</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>model:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/system/model</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>system_name:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/system/name</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>version:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/system/version</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>usb_status:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/usbup/status</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>occupancy_sensitivity:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>occupancy/sensitivity</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>occupancy:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/occupancy/internal/state</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#auto_switch-instance_method" title="#auto_switch (instance method)">#<strong>auto_switch</strong>(enable)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#bluetooth_enabled-instance_method" title="#bluetooth_enabled (instance method)">#<strong>bluetooth_enabled</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#bluetooth_update-instance_method" title="#bluetooth_update (instance method)">#<strong>bluetooth_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default_volume-instance_method" title="#default_volume (instance method)">#<strong>default_volume</strong>(level)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#display-instance_method" title="#display (instance method)">#<strong>display</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>AVC-5100 Only:.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#fader-instance_method" title="#fader (instance method)">#<strong>fader</strong>(id, level)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#firmware_update-instance_method" title="#firmware_update (instance method)">#<strong>firmware_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#gain-instance_method" title="#gain (instance method)">#<strong>gain</strong>(level)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#gain_mode-instance_method" title="#gain_mode (instance method)">#<strong>gain_mode</strong>(fixed)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mic_mute-instance_method" title="#mic_mute (instance method)">#<strong>mic_mute</strong>(muted = true)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mic_unmute-instance_method" title="#mic_unmute (instance method)">#<strong>mic_unmute</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mute-instance_method" title="#mute (instance method)">#<strong>mute</strong>(id, muted = true)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#mutes-instance_method" title="#mutes (instance method)">#<strong>mutes</strong>(ids:, muted: true, **_)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#occupancy_sensitivity-instance_method" title="#occupancy_sensitivity (instance method)">#<strong>occupancy_sensitivity</strong>(setting)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pair-instance_method" title="#pair (instance method)">#<strong>pair</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reboot-instance_method" title="#reboot (instance method)">#<strong>reboot</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(response, resolve, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ring_led-instance_method" title="#ring_led (instance method)">#<strong>ring_led</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#ring_led_colour-instance_method" title="#ring_led_colour (instance method)">#<strong>ring_led_colour</strong>(red, green, blue)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#source-instance_method" title="#source (instance method)">#<strong>source</strong>(input)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>aux, bluetooth, hdmi, optical or usb.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#system_name-instance_method" title="#system_name (instance method)">#<strong>system_name</strong>(name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unmute-instance_method" title="#unmute (instance method)">#<strong>unmute</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#unpair-instance_method" title="#unpair (instance method)">#<strong>unpair</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#volume-instance_method" title="#volume (instance method)">#<strong>volume</strong>(level)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="auto_switch-instance_method">
+  
+    #<strong>auto_switch</strong>(enable)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+92
+93
+94
+95</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 92</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_auto_switch'>auto_switch</span><span class='lparen'>(</span><span class='id identifier rubyid_enable'>enable</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_enable'>enable</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>on</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>off</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:auto_switch</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="bluetooth_enabled-instance_method">
+  
+    #<strong>bluetooth_enabled</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+126
+127
+128
+129</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 126</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_bluetooth_enabled'>bluetooth_enabled</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>on</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>off</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:bluetooth_enabled</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="bluetooth_update-instance_method">
+  
+    #<strong>bluetooth_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+149
+150
+151</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 149</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_bluetooth_update'>bluetooth_update</span>
+    <span class='id identifier rubyid_exec'>exec</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/system/firmware/update/bt</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+28
+29
+30
+31
+32
+33</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 28</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>20s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Maintaining connection..</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_battery?'>battery?</span> <span class='label'>priority:</span> <span class='int'>0</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="default_volume-instance_method">
+  
+    #<strong>default_volume</strong>(level)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+97
+98
+99
+100</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 97</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_default_volume'>default_volume</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='int'>100</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:default_volume</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+35
+36
+37</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 35</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="display-instance_method">
+  
+    #<strong>display</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>AVC-5100 Only:</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+159
+160
+161
+162</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 159</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_display'>display</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>on</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>off</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_set'>set</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/display/state</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="fader-instance_method">
+  
+    #<strong>fader</strong>(id, level)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 117</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_fader'>fader</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_volume'>volume</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_id'>id</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>mic</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="firmware_update-instance_method">
+  
+    #<strong>firmware_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+145
+146
+147</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 145</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_firmware_update'>firmware_update</span>
+    <span class='id identifier rubyid_exec'>exec</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/system/firmware/update</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="gain-instance_method">
+  
+    #<strong>gain</strong>(level)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+102
+103
+104
+105</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 102</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_gain'>gain</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='int'>100</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:gain</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="gain_mode-instance_method">
+  
+    #<strong>gain_mode</strong>(fixed)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+107
+108
+109
+110</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 107</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_gain_mode'>gain_mode</span><span class='lparen'>(</span><span class='id identifier rubyid_fixed'>fixed</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_fixed'>fixed</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>fixed</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>var</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:gain_mode</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mic_mute-instance_method">
+  
+    #<strong>mic_mute</strong>(muted = true)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+66
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 66</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mic_mute'>mic_mute</span><span class='lparen'>(</span><span class='id identifier rubyid_muted'>muted</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_muted'>muted</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>muted</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>normal</span><span class='tstring_end'>&#39;</span></span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:mic_mute</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mic_unmute-instance_method">
+  
+    #<strong>mic_unmute</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+71
+72
+73</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 71</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mic_unmute'>mic_unmute</span>
+    <span class='id identifier rubyid_mic_mute'>mic_mute</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mute-instance_method">
+  
+    #<strong>mute</strong>(id, muted = true)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+79
+80
+81
+82
+83
+84
+85
+86</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 79</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='id identifier rubyid_muted'>muted</span> <span class='op'>=</span> <span class='kw'>true</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_muted'>muted</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>muted</span><span class='tstring_end'>&#39;</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>normal</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_id'>id</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>mic</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_mic_mute'>mic_mute</span><span class='lparen'>(</span><span class='id identifier rubyid_muted'>muted</span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:mute</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="mutes-instance_method">
+  
+    #<strong>mutes</strong>(ids:, muted: true, **_)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+75
+76
+77</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 75</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_mutes'>mutes</span><span class='lparen'>(</span><span class='label'>ids:</span><span class='comma'>,</span> <span class='label'>muted:</span> <span class='kw'>true</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid__'>_</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_mute'>mute</span><span class='lparen'>(</span><span class='id identifier rubyid_ids'>ids</span><span class='comma'>,</span> <span class='id identifier rubyid_muted'>muted</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="occupancy_sensitivity-instance_method">
+  
+    #<strong>occupancy_sensitivity</strong>(setting)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+164
+165
+166
+167</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 164</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_occupancy_sensitivity'>occupancy_sensitivity</span><span class='lparen'>(</span><span class='id identifier rubyid_setting'>setting</span><span class='rparen'>)</span>
+    <span class='comment'># Valid values: off, low, medium or high
+</span>    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:occupancy_sensitivity</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_setting'>setting</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+21
+22
+23</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 21</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+25
+26</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 25</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pair-instance_method">
+  
+    #<strong>pair</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+131
+132
+133</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 131</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pair'>pair</span>
+    <span class='id identifier rubyid_exec'>exec</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/bluetooth/pairing</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>pair</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reboot-instance_method">
+  
+    #<strong>reboot</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+153
+154
+155</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 153</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reboot'>reboot</span>
+    <span class='id identifier rubyid_exec'>exec</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/system/reboot</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(response, resolve, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 179</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_response'>response</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Soundbar sent </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_response'>response</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_shellsplit'>shellsplit</span>
+
+    <span class='comment'># Process events
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>event</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>case</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>mic_mute</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:mic_mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>mic_unmute</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:mic_mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>spkr_mute</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>spkr_unmute</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>src_change_audio</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>vol_change</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:volume</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>usb_conn</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:usb_connected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>usb_dis</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:usb_connected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>hdmi_conn</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:hdmi_connected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>hdmi_dis</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:hdmi_connected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>vacancy_det</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:presence_detected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>occupancy_det</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:presence_detected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+        <span class='kw'>end</span>
+        <span class='kw'>return</span> <span class='symbol'>:ignore</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Remove the @
+</span>    <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>1</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+
+    <span class='comment'># Check for errors
+</span>    <span class='kw'>if</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unsupported</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span> <span class='id identifier rubyid_response'>response</span>
+        <span class='kw'>return</span> <span class='symbol'>:abort</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_type'>type</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>error</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_error'>error</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Error </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> for command: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>1</span><span class='op'>..</span><span class='op'>-</span><span class='int'>2</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'> </span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>return</span> <span class='symbol'>:abort</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Process responses
+</span>    <span class='id identifier rubyid_path'>path</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_arg'>arg</span> <span class='op'>=</span> <span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+
+    <span class='comment'># ignore echos
+</span>    <span class='kw'>return</span> <span class='kw'>unless</span> <span class='id identifier rubyid_data'>data</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;</span> <span class='int'>2</span>
+
+    <span class='kw'>case</span> <span class='id identifier rubyid_path'>path</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>audmic</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:mic_mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:fadermic_mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>muted</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>audio</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>case</span> <span class='id identifier rubyid_path'>path</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>autoswitch</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:auto_switch</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>on</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>defvolume</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:default_volume</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>gain</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>if</span> <span class='id identifier rubyid_path'>path</span><span class='lbracket'>[</span><span class='int'>3</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>level</span><span class='tstring_end'>&#39;</span></span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:gain</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+            <span class='kw'>else</span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:gain_mode</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span>
+            <span class='kw'>end</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>source</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>state</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:muted</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:faderoutput_mute</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>muted</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>volume</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:volume</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:faderoutput</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>end</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>battery</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:battery</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bluetooth</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_path'>path</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>connstate</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:bluetooth</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span>
+        <span class='kw'>else</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:bluetooth_enabled</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>on</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>end</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>camera</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:camera</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>system</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_path'>path</span><span class='lbracket'>[</span><span class='int'>2</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_arg'>arg</span>
+    <span class='kw'>when</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>usbup</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:usb_status</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_arg'>arg</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>connected</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='symbol'>:success</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ring_led-instance_method">
+  
+    #<strong>ring_led</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+174
+175
+176
+177</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 174</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ring_led'>ring_led</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='comment'># state = off, on or pulsing
+</span>    <span class='id identifier rubyid_set'>set</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/ringleds/state</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="ring_led_colour-instance_method">
+  
+    #<strong>ring_led_colour</strong>(red, green, blue)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+169
+170
+171
+172</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 169</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_ring_led_colour'>ring_led_colour</span><span class='lparen'>(</span><span class='id identifier rubyid_red'>red</span><span class='comma'>,</span> <span class='id identifier rubyid_green'>green</span><span class='comma'>,</span> <span class='id identifier rubyid_blue'>blue</span><span class='rparen'>)</span>
+    <span class='comment'># 0..255
+</span>    <span class='id identifier rubyid_set'>set</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/ringleds/color</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_red'>red</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_green'>green</span><span class='embexpr_end'>}</span><span class='tstring_content'>:</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_blue'>blue</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="source-instance_method">
+  
+    #<strong>source</strong>(input)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>aux, bluetooth, hdmi, optical or usb</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+113
+114
+115</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 113</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_source'>source</span><span class='lparen'>(</span><span class='id identifier rubyid_input'>input</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:source</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_input'>input</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="system_name-instance_method">
+  
+    #<strong>system_name</strong>(name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+139
+140
+141</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 139</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_system_name'>system_name</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:system_name</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unmute-instance_method">
+  
+    #<strong>unmute</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 88</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unmute'>unmute</span>
+    <span class='id identifier rubyid_mute'>mute</span> <span class='kw'>false</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="unpair-instance_method">
+  
+    #<strong>unpair</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+135
+136
+137</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 135</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_unpair'>unpair</span>
+    <span class='id identifier rubyid_exec'>exec</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>/bluetooth/pairing</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>unpair</span><span class='tstring_end'>&#39;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="volume-instance_method">
+  
+    #<strong>volume</strong>(level)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123
+124</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/amx/acendo_vibe.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_volume'>volume</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='int'>100</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_set'>set</span> <span class='const'><span class='object_link'><a href="#CMDS-constant" title="Amx::AcendoVibe::CMDS (constant)">CMDS</a></span></span><span class='lbracket'>[</span><span class='symbol'>:volume</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:33 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

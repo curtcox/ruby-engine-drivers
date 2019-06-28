@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Panasonic::Camera::He50
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Panasonic::Camera::He50";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (H)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Panasonic.html" title="Panasonic (module)">Panasonic</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Camera.html" title="Panasonic::Camera (module)">Camera</a></span></span>
+     &raquo; 
+    <span class="title">He50</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Panasonic::Camera::He50
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Panasonic::Camera::He50</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/panasonic/camera/he50.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://aca.im/driver_docs/Panasonic/Camera%20Specifications%20V1.03E.pdf">aca.im/driver_docs/Panasonic/Camera%20Specifications%20V1.03E.pdf</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="RESP-constant" class="">RESP =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>power:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>p</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>installation:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>iNS</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+
+    <span class='label'>pantilt:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>aPC</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>joystick:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>pTS</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>limit:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>lC</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+
+    <span class='label'>zoom:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>axz|gz</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>manual_zoom:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>zS</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>link_zoom:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>sWZ</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+
+    <span class='label'>focus:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>axf|gf</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>manual_focus:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>fS</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+    <span class='label'>auto_focus:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>d1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span>
+
+    <span class='label'>iris:</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>axi|gi</span><span class='regexp_end'>/</span></span><span class='comma'>,</span>
+    <span class='label'>auto_iris:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>d3</span><span class='tstring_end'>&#39;</span></span>
+<span class='rbrace'>}</span></pre></dd>
+      
+        <dt id="LIMITS-constant" class="">LIMITS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>up:</span> <span class='int'>1</span><span class='comma'>,</span>
+    <span class='label'>down:</span> <span class='int'>2</span><span class='comma'>,</span>
+    <span class='label'>left:</span> <span class='int'>3</span><span class='comma'>,</span>
+    <span class='label'>right:</span> <span class='int'>4</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#adjust_pan-instance_method" title="#adjust_pan (instance method)">#<strong>adjust_pan</strong>(direction)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#adjust_tilt-instance_method" title="#adjust_tilt (instance method)">#<strong>adjust_tilt</strong>(direction)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#adjust_zoom-instance_method" title="#adjust_zoom (instance method)">#<strong>adjust_zoom</strong>(direction)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#auto_focus-instance_method" title="#auto_focus (instance method)">#<strong>auto_focus</strong>(state = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#auto_iris-instance_method" title="#auto_iris (instance method)">#<strong>auto_iris</strong>(state = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#focus-instance_method" title="#focus (instance method)">#<strong>focus</strong>(pos = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#installation-instance_method" title="#installation (instance method)">#<strong>installation</strong>(pos = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#iris-instance_method" title="#iris (instance method)">#<strong>iris</strong>(level = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#joystick-instance_method" title="#joystick (instance method)">#<strong>joystick</strong>(pan_speed, tilt_speed, ignore_invert = false)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#limit-instance_method" title="#limit (instance method)">#<strong>limit</strong>(direction, state = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#link_zoom-instance_method" title="#link_zoom (instance method)">#<strong>link_zoom</strong>(state = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Link pantilt speed to zoom.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#manual_focus-instance_method" title="#manual_focus (instance method)">#<strong>manual_focus</strong>(speed)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#manual_zoom-instance_method" title="#manual_zoom (instance method)">#<strong>manual_zoom</strong>(speed, priority: 50)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pantilt-instance_method" title="#pantilt (instance method)">#<strong>pantilt</strong>(pan = nil, tilt = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power-instance_method" title="#power (instance method)">#<strong>power</strong>(state = nil, &amp;blk)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Responds with: 0 == standby 1 == power on 3 == powering on.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#preset-instance_method" title="#preset (instance method)">#<strong>preset</strong>(name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Recall a preset from the database.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#save_preset-instance_method" title="#save_preset (instance method)">#<strong>save_preset</strong>(name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#stop-instance_method" title="#stop (instance method)">#<strong>stop</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#zoom-instance_method" title="#zoom (instance method)">#<strong>zoom</strong>(pos = nil)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="adjust_pan-instance_method">
+  
+    #<strong>adjust_pan</strong>(direction)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 227</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_adjust_pan'>adjust_pan</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='int'>0x50</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>right</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>+=</span> <span class='int'>20</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>left</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>-=</span> <span class='int'>25</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_joystick'>joystick</span><span class='lparen'>(</span><span class='id identifier rubyid_speed'>speed</span><span class='comma'>,</span> <span class='int'>0x50</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="adjust_tilt-instance_method">
+  
+    #<strong>adjust_tilt</strong>(direction)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 214</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_adjust_tilt'>adjust_tilt</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_direction'>direction</span> <span class='op'>=</span> <span class='id identifier rubyid_actual_direction'>actual_direction</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='int'>0x50</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>down</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>+=</span> <span class='int'>20</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>up</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>-=</span> <span class='int'>25</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_joystick'>joystick</span><span class='lparen'>(</span><span class='int'>0x50</span><span class='comma'>,</span> <span class='id identifier rubyid_speed'>speed</span><span class='comma'>,</span> <span class='symbol'>:invert_applied</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="adjust_zoom-instance_method">
+  
+    #<strong>adjust_zoom</strong>(direction)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 238</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_adjust_zoom'>adjust_zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_direction'>direction</span> <span class='op'>=</span> <span class='id identifier rubyid_direction'>direction</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
+    <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='int'>0x50</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>in</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>+=</span> <span class='int'>5</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>out</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>-=</span> <span class='int'>30</span>
+    <span class='kw'>end</span>
+    <span class='id identifier rubyid_manual_zoom'>manual_zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_speed'>speed</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="auto_focus-instance_method">
+  
+    #<strong>auto_focus</strong>(state = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 339</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_auto_focus'>auto_focus</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>D1</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='comma'>,</span> <span class='symbol'>:auto_focus</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:auto_focus</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:auto_focus</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="auto_iris-instance_method">
+  
+    #<strong>auto_iris</strong>(state = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 372</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_auto_iris'>auto_iris</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>D3</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='comma'>,</span> <span class='symbol'>:auto_iris</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:auto_iris</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:auto_iris</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+55
+56
+57
+58</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 55</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>60s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='id identifier rubyid_do_poll'>do_poll</span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_do_poll'>do_poll</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="focus-instance_method">
+  
+    #<strong>focus</strong>(pos = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 310</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_focus'>focus</span><span class='lparen'>(</span><span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>AXF</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_pos'>pos</span>
+        <span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_pos'>pos</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:focus_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:focus_min</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>3</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>GF</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='id identifier rubyid_cmd'>cmd</span><span class='comma'>,</span> <span class='id identifier rubyid_pos'>pos</span><span class='comma'>,</span> <span class='symbol'>:focus</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:focus</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:focus</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="installation-instance_method">
+  
+    #<strong>installation</strong>(pos = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 111</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_installation'>installation</span><span class='lparen'>(</span><span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_pos'>pos</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span> <span class='op'>==</span> <span class='symbol'>:desk</span> <span class='op'>?</span> <span class='int'>0</span> <span class='op'>:</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_pos'>pos</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>INS</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_pos'>pos</span><span class='comma'>,</span> <span class='symbol'>:installation</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:installation</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:installation</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span> <span class='op'>?</span> <span class='symbol'>:desk</span> <span class='op'>:</span> <span class='symbol'>:ceiling</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="iris-instance_method">
+  
+    #<strong>iris</strong>(level = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 352</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_iris'>iris</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>AXI</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_level'>level</span>
+        <span class='id identifier rubyid_level'>level</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_level'>level</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_min</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>3</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>GI</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='id identifier rubyid_cmd'>cmd</span><span class='comma'>,</span> <span class='id identifier rubyid_level'>level</span><span class='comma'>,</span> <span class='symbol'>:iris</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:iris</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>2</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
+            <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>==</span> <span class='int'>4</span>
+                <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:auto_iris</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span>
+            <span class='kw'>end</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="joystick-instance_method">
+  
+    #<strong>joystick</strong>(pan_speed, tilt_speed, ignore_invert = false)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 166</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_joystick'>joystick</span><span class='lparen'>(</span><span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='comma'>,</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='comma'>,</span> <span class='id identifier rubyid_ignore_invert'>ignore_invert</span> <span class='op'>=</span> <span class='kw'>false</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>||=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_center</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>||=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_center</span><span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_left_max'>left_max</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_left</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_right_max'>right_max</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_right</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+    <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+
+    <span class='kw'>if</span> <span class='ivar'>@invert</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id identifier rubyid_ignore_invert'>ignore_invert</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>!=</span> <span class='int'>0x50</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>&lt;</span> <span class='int'>0x50</span>
+            <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>=</span> <span class='int'>0x50</span> <span class='op'>+</span> <span class='lparen'>(</span><span class='int'>0x50</span> <span class='op'>-</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='rparen'>)</span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>=</span> <span class='int'>0x50</span> <span class='op'>-</span> <span class='lparen'>(</span><span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>-</span> <span class='int'>0x50</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='comma'>,</span> <span class='id identifier rubyid_right_max'>right_max</span><span class='comma'>,</span> <span class='id identifier rubyid_left_max'>left_max</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='comma'>,</span> <span class='id identifier rubyid_right_max'>right_max</span><span class='comma'>,</span> <span class='id identifier rubyid_left_max'>left_max</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_is_centered'>is_centered</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>50</span><span class='tstring_end'>&#39;</span></span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>50</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_is_centered'>is_centered</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_is_centered'>is_centered</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:retries</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>4</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:priority</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>99</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:clear_queue</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:retries</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>1</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sending camera: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='semicolon'>;</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>PTS</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:joystick</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:joystick</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='id identifier rubyid_comp'>comp</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>.{2}</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_com'>com</span><span class='op'>|</span> <span class='id identifier rubyid_comp'>comp</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_com'>com</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_pan</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_comp'>comp</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_tilt</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_comp'>comp</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="limit-instance_method">
+  
+    #<strong>limit</strong>(direction, state = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 254</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_limit'>limit</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_dir'>dir</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#LIMITS-constant" title="Panasonic::Camera::He50::LIMITS (constant)">LIMITS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_direction'>direction</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_set'>set</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>LC</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dir'>dir</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_state'>state</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:limit</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:limit</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:&quot;limit_</span><span class='embexpr_beg'>#{</span><span class='const'><span class='object_link'><a href="#LIMITS-constant" title="Panasonic::Camera::He50::LIMITS (constant)">LIMITS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_val'>val</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="link_zoom-instance_method">
+  
+    #<strong>link_zoom</strong>(state = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Link pantilt speed to zoom</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 297</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_link_zoom'>link_zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span> <span class='comment'># Link pantilt speed to zoom
+</span>    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SWZ</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='comma'>,</span> <span class='symbol'>:link_zoom</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:link_zoom</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:link_zoom</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>1</span><span class='tstring_end'>&#39;</span></span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="manual_focus-instance_method">
+  
+    #<strong>manual_focus</strong>(speed)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 327</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_manual_focus'>manual_focus</span><span class='lparen'>(</span><span class='id identifier rubyid_speed'>speed</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_speed'>speed</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_right</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_left</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>F</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_speed'>speed</span><span class='comma'>,</span> <span class='symbol'>:manual_focus</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:manual_focus</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:manual_focus</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="manual_zoom-instance_method">
+  
+    #<strong>manual_zoom</strong>(speed, priority: 50)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 285</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_manual_zoom'>manual_zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_speed'>speed</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>50</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_speed'>speed</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_right</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_left</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Z</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_speed'>speed</span><span class='comma'>,</span> <span class='symbol'>:manual_zoom</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='id identifier rubyid_priority'>priority</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:manual_zoom</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:manual_zoom</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 23</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0xD2F5</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x2D08</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_center</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x7FFF</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x8E38</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x5556</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_center</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x7FFF</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_left</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x01</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_right</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x99</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_center</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x50</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0xFFF</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x555</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:focus_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0xFFF</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:focus_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x555</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0xFFF</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0x555</span>
+
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50
+51
+52
+53</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:inverted</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@invert</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:invert</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='kw'>false</span>
+
+    <span class='comment'># {near: {zoom: val, pan: val, tilt: val}}
+</span>    <span class='ivar'>@presets</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:presets</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:presets</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@presets</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pantilt-instance_method">
+  
+    #<strong>pantilt</strong>(pan = nil, tilt = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 123</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pantilt'>pantilt</span><span class='lparen'>(</span><span class='id identifier rubyid_pan'>pan</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='id identifier rubyid_tilt'>tilt</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='kw'>unless</span> <span class='id identifier rubyid_pan'>pan</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='id identifier rubyid_pan'>pan</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_pan'>pan</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_min</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_tilt'>tilt</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_tilt'>tilt</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_min</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>APC</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_pan'>pan</span><span class='embexpr_end'>}</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_tilt'>tilt</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:pantilt</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:pantilt</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='id identifier rubyid_comp'>comp</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_scan'>scan</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>.{4}</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_com'>com</span><span class='op'>|</span> <span class='id identifier rubyid_comp'>comp</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_com'>com</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_comp'>comp</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_comp'>comp</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power-instance_method">
+  
+    #<strong>power</strong>(state = nil, &amp;blk)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Responds with: 0 == standby 1 == power on 3 == powering on</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 93</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power'>power</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_state'>state</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='int'>0</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_state'>state</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+    <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:emit</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_blk'>blk</span> <span class='kw'>if</span> <span class='id identifier rubyid_blk'>blk</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:delay</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>6000</span> <span class='kw'>if</span> <span class='id identifier rubyid_state'>state</span>
+
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera requested power </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_state'>state</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>O</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_state'>state</span><span class='comma'>,</span> <span class='symbol'>:power</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:power</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="preset-instance_method">
+  
+    #<strong>preset</strong>(name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Recall a preset from the database</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 142</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_preset'>preset</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_values'>values</span> <span class='op'>=</span> <span class='ivar'>@presets</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_values'>values</span>
+        <span class='id identifier rubyid_pantilt'>pantilt</span><span class='lparen'>(</span><span class='id identifier rubyid_values'>values</span><span class='lbracket'>[</span><span class='symbol'>:pan</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_values'>values</span><span class='lbracket'>[</span><span class='symbol'>:tilt</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_zoom'>zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_values'>values</span><span class='lbracket'>[</span><span class='symbol'>:zoom</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='kw'>true</span>
+    <span class='kw'>else</span>
+        <span class='kw'>false</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="save_preset-instance_method">
+  
+    #<strong>save_preset</strong>(name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 153</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_save_preset'>save_preset</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_pantilt'>pantilt</span>
+    <span class='id identifier rubyid_zoom'>zoom</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='ivar'>@presets</span><span class='lbracket'>[</span><span class='id identifier rubyid_name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbrace'>{</span>
+            <span class='label'>zoom:</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>pan:</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>tilt:</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt</span><span class='rbracket'>]</span>
+        <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_define_setting'>define_setting</span><span class='lparen'>(</span><span class='symbol'>:presets</span><span class='comma'>,</span> <span class='ivar'>@presets</span><span class='rparen'>)</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:presets</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@presets</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="stop-instance_method">
+  
+    #<strong>stop</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+249
+250
+251
+252</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 249</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_stop'>stop</span>
+    <span class='id identifier rubyid_manual_zoom'>manual_zoom</span><span class='lparen'>(</span><span class='int'>0x50</span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>100</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_joystick'>joystick</span><span class='lparen'>(</span><span class='int'>0x50</span><span class='comma'>,</span> <span class='int'>0x50</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="zoom-instance_method">
+  
+    #<strong>zoom</strong>(pos = nil)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/panasonic/camera/he50.rb', line 268</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_zoom'>zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>AXZ</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_pos'>pos</span>
+        <span class='id identifier rubyid_pos'>pos</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_pos'>pos</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_min</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_upcase'>upcase</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>3</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>GZ</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_req'>req</span><span class='lparen'>(</span><span class='id identifier rubyid_cmd'>cmd</span><span class='comma'>,</span> <span class='id identifier rubyid_pos'>pos</span><span class='comma'>,</span> <span class='symbol'>:zoom</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='op'>|</span>
+        <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_extract'>extract</span><span class='lparen'>(</span><span class='symbol'>:zoom</span><span class='comma'>,</span> <span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='rparen'>)</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_val'>val</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
+            <span class='symbol'>:success</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:37 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

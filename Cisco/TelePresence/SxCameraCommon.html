@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: Cisco::TelePresence::SxCameraCommon
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Cisco::TelePresence::SxCameraCommon";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (S)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Cisco.html" title="Cisco (module)">Cisco</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../TelePresence.html" title="Cisco::TelePresence (module)">TelePresence</a></span></span>
+     &raquo; 
+    <span class="title">SxCameraCommon</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: Cisco::TelePresence::SxCameraCommon
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+  <dl>
+    <dt>Included in:</dt>
+    <dd><span class='object_link'><a href="SxCamera.html" title="Cisco::TelePresence::SxCamera (class)">SxCamera</a></span>, <span class='object_link'><a href="SxCameraSsh.html" title="Cisco::TelePresence::SxCameraSsh (class)">SxCameraSsh</a></span></dd>
+  </dl>
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/cisco/tele_presence/sx_camera_common.rb</dd>
+  </dl>
+  
+</div>
+
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="IsResponse-constant" class="">IsResponse =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>*s</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="IsComplete-constant" class="">IsComplete =
+          
+        </dt>
+        <dd><pre class="code"><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>**</span><span class='tstring_end'>&#39;</span></span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#adjust_pan-instance_method" title="#adjust_pan (instance method)">#<strong>adjust_pan</strong>(direction)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#adjust_tilt-instance_method" title="#adjust_tilt (instance method)">#<strong>adjust_tilt</strong>(direction)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#autofocus-instance_method" title="#autofocus (instance method)">#<strong>autofocus</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected%3F-instance_method" title="#connected? (instance method)">#<strong>connected?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>————— STATUS REQUESTS —————.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#do_poll-instance_method" title="#do_poll (instance method)">#<strong>do_poll</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#flipped%3F-instance_method" title="#flipped? (instance method)">#<strong>flipped?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#home-instance_method" title="#home (instance method)">#<strong>home</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#joystick-instance_method" title="#joystick (instance method)">#<strong>joystick</strong>(pan_speed, tilt_speed)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#manufacturer%3F-instance_method" title="#manufacturer? (instance method)">#<strong>manufacturer?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#model%3F-instance_method" title="#model? (instance method)">#<strong>model?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pan-instance_method" title="#pan (instance method)">#<strong>pan</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pantilt-instance_method" title="#pantilt (instance method)">#<strong>pantilt</strong>(pan, tilt)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Absolute position.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#pantilt%3F-instance_method" title="#pantilt? (instance method)">#<strong>pantilt?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power-instance_method" title="#power (instance method)">#<strong>power</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power%3F-instance_method" title="#power? (instance method)">#<strong>power?</strong>(options = nil, &amp;block)  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#preset-instance_method" title="#preset (instance method)">#<strong>preset</strong>(name)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>——————————— Preset Management ———————————.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#recall_position-instance_method" title="#recall_position (instance method)">#<strong>recall_position</strong>(number)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Recall a preset from the camera.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(data, resolve, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#save_position-instance_method" title="#save_position (instance method)">#<strong>save_position</strong>(number)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#tilt-instance_method" title="#tilt (instance method)">#<strong>tilt</strong>(value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#zoom-instance_method" title="#zoom (instance method)">#<strong>zoom</strong>(position)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#zoom%3F-instance_method" title="#zoom? (instance method)">#<strong>zoom?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="adjust_pan-instance_method">
+  
+    #<strong>adjust_pan</strong>(direction)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 215</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_adjust_pan'>adjust_pan</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>right</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='int'>1</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>left</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_joystick'>joystick</span><span class='lparen'>(</span><span class='id identifier rubyid_speed'>speed</span><span class='comma'>,</span> <span class='int'>0</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="adjust_tilt-instance_method">
+  
+    #<strong>adjust_tilt</strong>(direction)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 204</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_adjust_tilt'>adjust_tilt</span><span class='lparen'>(</span><span class='id identifier rubyid_direction'>direction</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>down</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_direction'>direction</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>up</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_speed'>speed</span> <span class='op'>=</span> <span class='int'>1</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_joystick'>joystick</span><span class='lparen'>(</span><span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_speed'>speed</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="autofocus-instance_method">
+  
+    #<strong>autofocus</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+79
+80
+81</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 79</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_autofocus'>autofocus</span>
+    <span class='id identifier rubyid_command'>command</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera TriggerAutofocus CameraId:</span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 39</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+
+    <span class='kw'>super</span>
+
+    <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>30s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>-- Polling Camera</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connected?-instance_method">
+  
+    #<strong>connected?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>STATUS REQUESTS</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+273
+274
+275</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 273</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected?'>connected?</span>
+    <span class='id identifier rubyid_status'>status</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera </span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_content'> Connected</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:connected?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53
+54
+55
+56
+57</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 51</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>false</span>
+
+    <span class='kw'>super</span>
+
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="do_poll-instance_method">
+  
+    #<strong>do_poll</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+299
+300
+301
+302
+303
+304
+305
+306</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 299</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='id identifier rubyid_connected?'>connected?</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='kw'>if</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:connected</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_zoom?'>zoom?</span>
+            <span class='id identifier rubyid_pantilt?'>pantilt?</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="flipped?-instance_method">
+  
+    #<strong>flipped?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+294
+295
+296</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 294</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_flipped?'>flipped?</span>
+    <span class='id identifier rubyid_status'>status</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera </span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_content'> Flip</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:flipped?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="home-instance_method">
+  
+    #<strong>home</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+70
+71
+72
+73
+74
+75
+76
+77</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 70</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_home'>home</span>
+    <span class='comment'># command(&quot;Camera PositionReset CameraId:#{@index}&quot;, name: :preset).then do
+</span>    <span class='comment'># Preset1 is a better home as it will usually pointed to a default position wheras PositionReset may not be a userfull view
+</span>    <span class='id identifier rubyid_recall_position'>recall_position</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_autofocus'>autofocus</span>
+        <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="joystick-instance_method">
+  
+    #<strong>joystick</strong>(pan_speed, tilt_speed)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 134</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_joystick'>joystick</span><span class='lparen'>(</span><span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='comma'>,</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_left_max'>left_max</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_left</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_right_max'>right_max</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_right</span><span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='id identifier rubyid_right_max'>right_max</span><span class='comma'>,</span> <span class='id identifier rubyid_left_max'>left_max</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='id identifier rubyid_right_max'>right_max</span><span class='comma'>,</span> <span class='id identifier rubyid_left_max'>left_max</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_is_centered'>is_centered</span> <span class='op'>=</span> <span class='kw'>false</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>==</span> <span class='int'>0</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>==</span> <span class='int'>0</span>
+        <span class='id identifier rubyid_is_centered'>is_centered</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='symbol'>:joystick</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_is_centered'>is_centered</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:retries</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>5</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:priority</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>99</span>      <span class='comment'># Make sure it is executed asap
+</span>        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:clear_queue</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span> <span class='comment'># Stop executing other commands
+</span>
+        <span class='comment'># Request the current position once the stop command
+</span>        <span class='comment'># has run, we are clearing the queue so we use promises to
+</span>        <span class='comment'># ensure the pantilt command is executed
+</span>        <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Camera Ramp</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+            <span class='symbol'>:CameraId</span> <span class='op'>=&gt;</span> <span class='ivar'>@index</span><span class='comma'>,</span>
+            <span class='symbol'>:Pan</span> <span class='op'>=&gt;</span> <span class='symbol'>:stop</span><span class='comma'>,</span>
+            <span class='symbol'>:Tilt</span> <span class='op'>=&gt;</span> <span class='symbol'>:stop</span>
+        <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+            <span class='id identifier rubyid_autofocus'>autofocus</span>
+            <span class='id identifier rubyid_pantilt?'>pantilt?</span>
+        <span class='kw'>end</span>
+    <span class='kw'>else</span>
+        <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:retries</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+        
+        <span class='comment'># Calculate direction
+</span>        <span class='id identifier rubyid_dir_hori'>dir_hori</span> <span class='op'>=</span> <span class='symbol'>:stop</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+            <span class='id identifier rubyid_dir_hori'>dir_hori</span> <span class='op'>=</span> <span class='symbol'>:right</span>
+        <span class='kw'>elsif</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+            <span class='id identifier rubyid_dir_hori'>dir_hori</span> <span class='op'>=</span> <span class='symbol'>:left</span>
+        <span class='kw'>end</span>
+        
+        <span class='id identifier rubyid_dir_vert'>dir_vert</span> <span class='op'>=</span> <span class='symbol'>:stop</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+            <span class='id identifier rubyid_dir_vert'>dir_vert</span> <span class='op'>=</span> <span class='symbol'>:up</span>
+        <span class='kw'>elsif</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+            <span class='id identifier rubyid_dir_vert'>dir_vert</span> <span class='op'>=</span> <span class='symbol'>:down</span>
+        <span class='kw'>end</span>
+
+        <span class='comment'># Find the absolute speed
+</span>        <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>*</span> <span class='op'>-</span><span class='int'>1</span> <span class='kw'>if</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+        <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>=</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>*</span> <span class='op'>-</span><span class='int'>1</span> <span class='kw'>if</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span> <span class='op'>&lt;</span> <span class='int'>0</span>
+
+        <span class='comment'># Build the request
+</span>        <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera Ramp CameraId:</span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_dir_hori'>dir_hori</span> <span class='op'>==</span> <span class='symbol'>:stop</span>
+            <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Pan:stop</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='symbol'>:Pan</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_dir_hori'>dir_hori</span><span class='comma'>,</span> <span class='symbol'>:PanSpeed</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_pan_speed'>pan_speed</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+
+        <span class='kw'>if</span> <span class='id identifier rubyid_dir_vert'>dir_vert</span> <span class='op'>==</span> <span class='symbol'>:stop</span>
+            <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Tilt:stop</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>else</span>
+            <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='symbol'>:Tilt</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_dir_vert'>dir_vert</span><span class='comma'>,</span> <span class='symbol'>:TiltSpeed</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_tilt_speed'>tilt_speed</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+        <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='op'>*</span><span class='id identifier rubyid_cmd'>cmd</span><span class='comma'>,</span> <span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="manufacturer?-instance_method">
+  
+    #<strong>manufacturer?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+286
+287
+288</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 286</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_manufacturer?'>manufacturer?</span>
+    <span class='id identifier rubyid_status'>status</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera </span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_content'> Manufacturer</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:manufacturer?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="model?-instance_method">
+  
+    #<strong>model?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+290
+291
+292</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 290</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_model?'>model?</span>
+    <span class='id identifier rubyid_status'>status</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera </span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_content'> Model</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:model?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 3</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='comment'># Constants that are made available to interfaces
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_speed_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>15</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_speed_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>1</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_speed_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>15</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_speed_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>1</span>
+
+    <span class='comment'># Pan speeds are insane, so we need to keep these values low.
+</span>    <span class='comment'># In fact we may be forced to use an up down left right key pad
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_left</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>3</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_right</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>3</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:joy_center</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>65535</span>    <span class='comment'># Right
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>65535</span>   <span class='comment'># Left
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_center</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>65535</span>   <span class='comment'># UP
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>65535</span>  <span class='comment'># Down
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_center</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>17284</span> <span class='comment'># 65535
+</span>    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+
+    <span class='kw'>super</span>
+
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32
+33
+34
+35
+36
+37</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+    <span class='ivar'>@presets</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:presets</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:presets</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@presets</span><span class='period'>.</span><span class='id identifier rubyid_keys'>keys</span>
+
+    <span class='ivar'>@index</span> <span class='op'>=</span> <span class='id identifier rubyid_setting'>setting</span><span class='lparen'>(</span><span class='symbol'>:camera_index</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='int'>1</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:camera_index</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@index</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pan-instance_method">
+  
+    #<strong>pan</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 100</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pan'>pan</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_pan'>pan</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_min</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Camera PositionSet</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+        <span class='symbol'>:CameraId</span> <span class='op'>=&gt;</span> <span class='ivar'>@index</span><span class='comma'>,</span>
+        <span class='symbol'>:Pan</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_pan'>pan</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:pan</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_pan'>pan</span>
+        <span class='id identifier rubyid_autofocus'>autofocus</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pantilt-instance_method">
+  
+    #<strong>pantilt</strong>(pan, tilt)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Absolute position</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 85</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pantilt'>pantilt</span><span class='lparen'>(</span><span class='id identifier rubyid_pan'>pan</span><span class='comma'>,</span> <span class='id identifier rubyid_tilt'>tilt</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_pan'>pan</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_pan'>pan</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan_min</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_tilt'>tilt</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_tilt'>tilt</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_min</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Camera PositionSet</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+        <span class='symbol'>:CameraId</span> <span class='op'>=&gt;</span> <span class='ivar'>@index</span><span class='comma'>,</span>
+        <span class='symbol'>:Pan</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_pan'>pan</span><span class='comma'>,</span>
+        <span class='symbol'>:Tilt</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_tilt'>tilt</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:pantilt</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:pan</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_pan'>pan</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_tilt'>tilt</span>
+        <span class='id identifier rubyid_autofocus'>autofocus</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="pantilt?-instance_method">
+  
+    #<strong>pantilt?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+277
+278
+279
+280</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 277</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_pantilt?'>pantilt?</span>
+    <span class='id identifier rubyid_status'>status</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera </span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_content'> Position Pan</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:pan?</span>
+    <span class='id identifier rubyid_status'>status</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera </span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_content'> Position Tilt</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:tilt?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power-instance_method">
+  
+    #<strong>power</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+60
+61
+62</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 60</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power'>power</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span>  <span class='comment'># Here for compatibility with other camera modules
+</span><span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power?-instance_method">
+  
+    #<strong>power?</strong>(options = nil, &amp;block)  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+64
+65
+66
+67</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 64</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power?'>power?</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span> <span class='kw'>unless</span> <span class='id identifier rubyid_block'>block</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="preset-instance_method">
+  
+    #<strong>preset</strong>(name)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    <hr>
+
+<p>Preset Management</p>
+<hr>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 230</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_preset'>preset</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_name_sym'>name_sym</span> <span class='op'>=</span> <span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+    <span class='id identifier rubyid_values'>values</span> <span class='op'>=</span> <span class='ivar'>@presets</span><span class='lbracket'>[</span><span class='id identifier rubyid_name_sym'>name_sym</span><span class='rbracket'>]</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_values'>values</span>
+        <span class='id identifier rubyid_pantilt'>pantilt</span><span class='lparen'>(</span><span class='id identifier rubyid_values'>values</span><span class='lbracket'>[</span><span class='symbol'>:pan</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_values'>values</span><span class='lbracket'>[</span><span class='symbol'>:tilt</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='id identifier rubyid_zoom'>zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_values'>values</span><span class='lbracket'>[</span><span class='symbol'>:zoom</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='kw'>true</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_name_sym'>name_sym</span> <span class='op'>==</span> <span class='symbol'>:default</span>
+        <span class='id identifier rubyid_home'>home</span>
+    <span class='kw'>else</span>
+        <span class='kw'>false</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="recall_position-instance_method">
+  
+    #<strong>recall_position</strong>(number)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Recall a preset from the camera</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 246</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_recall_position'>recall_position</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_number'>number</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='int'>15</span><span class='comma'>,</span> <span class='int'>1</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Camera PositionActivateFromPreset</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+        <span class='symbol'>:CameraId</span> <span class='op'>=&gt;</span> <span class='ivar'>@index</span><span class='comma'>,</span>
+        <span class='symbol'>:PresetId</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_number'>number</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:preset</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_autofocus'>autofocus</span>
+        <span class='id identifier rubyid_do_poll'>do_poll</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(data, resolve, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 311</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Cam sent </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_data'>data</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_result'>result</span> <span class='op'>=</span> <span class='const'>Shellwords</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span> <span class='id identifier rubyid_data'>data</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#IsComplete-constant" title="Cisco::TelePresence::SxCameraCommon::IsComplete (constant)">IsComplete</a></span></span>
+            <span class='kw'>return</span> <span class='symbol'>:success</span>
+        <span class='kw'>elsif</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='const'><span class='object_link'><a href="#IsResponse-constant" title="Cisco::TelePresence::SxCameraCommon::IsResponse (constant)">IsResponse</a></span></span>
+            <span class='kw'>return</span> <span class='symbol'>:ignore</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'><span class='object_link'><a href="#IsResponse-constant" title="Cisco::TelePresence::SxCameraCommon::IsResponse (constant)">IsResponse</a></span></span>
+        <span class='id identifier rubyid_type'>type</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='int'>3</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span>
+
+        <span class='kw'>case</span> <span class='id identifier rubyid_type'>type</span>
+        <span class='kw'>when</span> <span class='symbol'>:position</span>
+            <span class='comment'># Tilt: Pan: Zoom: etc so we massage to our desired status variables
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='int'>4</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span><span class='period'>.</span><span class='id identifier rubyid_gsub'>gsub</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>:</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_sym'>to_sym</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span>
+        <span class='kw'>when</span> <span class='symbol'>:connected</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:connected</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>true</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>when</span> <span class='symbol'>:model</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:model</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+        <span class='kw'>when</span> <span class='symbol'>:manufacturer</span>
+            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:manufacturer</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span>
+        <span class='kw'>when</span> <span class='symbol'>:flip</span>
+            <span class='comment'># Can be auto/on/off
+</span>            <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:flip</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_result'>result</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_downcase'>downcase</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>off</span><span class='tstring_end'>&#39;</span></span>
+        <span class='kw'>end</span>
+
+        <span class='kw'>return</span> <span class='symbol'>:ignore</span>
+    <span class='kw'>end</span>
+    
+    <span class='kw'>return</span> <span class='symbol'>:success</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="save_position-instance_method">
+  
+    #<strong>save_position</strong>(number)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+258
+259
+260
+261
+262
+263
+264
+265</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 258</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_save_position'>save_position</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_number'>number</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_number'>number</span><span class='comma'>,</span> <span class='int'>15</span><span class='comma'>,</span> <span class='int'>1</span><span class='rparen'>)</span>
+    
+    <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Camera Preset Store</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+        <span class='symbol'>:CameraId</span> <span class='op'>=&gt;</span> <span class='ivar'>@index</span><span class='comma'>,</span>
+        <span class='symbol'>:PresetId</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_number'>number</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="tilt-instance_method">
+  
+    #<strong>tilt</strong>(value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 111</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_tilt'>tilt</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_tilt'>tilt</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt_min</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Camera PositionSet</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+        <span class='symbol'>:CameraId</span> <span class='op'>=&gt;</span> <span class='ivar'>@index</span><span class='comma'>,</span>
+        <span class='symbol'>:Tilt</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_tilt'>tilt</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:tilt</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:tilt</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_tilt'>tilt</span>
+        <span class='id identifier rubyid_autofocus'>autofocus</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="zoom-instance_method">
+  
+    #<strong>zoom</strong>(position)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 122</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_zoom'>zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_min</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_command'>command</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>Camera PositionSet</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_params'>params</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+        <span class='symbol'>:CameraId</span> <span class='op'>=&gt;</span> <span class='ivar'>@index</span><span class='comma'>,</span>
+        <span class='symbol'>:Zoom</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_val'>val</span>
+    <span class='rbrace'>}</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:zoom</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_then'>then</span> <span class='kw'>do</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
+        <span class='id identifier rubyid_autofocus'>autofocus</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="zoom?-instance_method">
+  
+    #<strong>zoom?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+282
+283
+284</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/cisco/tele_presence/sx_camera_common.rb', line 282</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_zoom?'>zoom?</span>
+    <span class='id identifier rubyid_status'>status</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Camera </span><span class='embexpr_beg'>#{</span><span class='ivar'>@index</span><span class='embexpr_end'>}</span><span class='tstring_content'> Position Zoom</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:zoom?</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:31 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Module: X3m::Displays::WallDisplay::Protocol
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "X3m::Displays::WallDisplay::Protocol";
+  relpath = '../../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../../_index.html">Index (P)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../../X3m.html" title="X3m (module)">X3m</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Displays.html" title="X3m::Displays (module)">Displays</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../WallDisplay.html" title="X3m::Displays::WallDisplay (class)">WallDisplay</a></span></span>
+     &raquo; 
+    <span class="title">Protocol</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Module: X3m::Displays::WallDisplay::Protocol
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/x3m/displays/wall_display.rb</dd>
+  </dl>
+  
+</div>
+
+
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="Util-constant" class="">Util =
+          
+        </dt>
+        <dd><pre class="code"><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../../X3m.html" title="X3m (module)">X3m</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../../Displays.html" title="X3m::Displays (module)">Displays</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="../WallDisplay.html" title="X3m::Displays::WallDisplay (class)">WallDisplay</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Util.html" title="X3m::Displays::WallDisplay::Util (module)">Util</a></span></span></pre></dd>
+      
+        <dt id="MARKER-constant" class="">MARKER =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>SOH:</span> <span class='int'>0x01</span><span class='comma'>,</span>
+    <span class='label'>STX:</span> <span class='int'>0x02</span><span class='comma'>,</span>
+    <span class='label'>ETX:</span> <span class='int'>0x03</span><span class='comma'>,</span>
+    <span class='label'>delimiter:</span> <span class='int'>0x0d</span><span class='comma'>,</span>
+    <span class='label'>reserved:</span> <span class='int'>0x30</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_freeze'>freeze</span></pre></dd>
+      
+        <dt id="MONITOR_ID-constant" class="">MONITOR_ID =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_bidirectional'>bidirectional</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+    <span class='label'>all:</span> <span class='int'>0x2a</span>
+<span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_merge'>merge</span><span class='lparen'>(</span>
+    <span class='const'>Hash</span><span class='lbracket'>[</span><span class='lparen'>(</span><span class='int'>1</span><span class='op'>..</span><span class='int'>9</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span><span class='lparen'>(</span><span class='int'>0x41</span><span class='op'>..</span><span class='int'>0x49</span><span class='rparen'>)</span><span class='rbracket'>]</span>
+<span class='rparen'>)</span><span class='rparen'>)</span></pre></dd>
+      
+        <dt id="MESSAGE_SENDER-constant" class="">MESSAGE_SENDER =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_bidirectional'>bidirectional</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+    <span class='label'>pc:</span> <span class='int'>0x30</span>
+<span class='rbrace'>}</span><span class='rparen'>)</span></pre></dd>
+      
+        <dt id="MESSAGE_TYPE-constant" class="">MESSAGE_TYPE =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_bidirectional'>bidirectional</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+    <span class='label'>set_parameter_command:</span> <span class='int'>0x45</span><span class='comma'>,</span>
+    <span class='label'>set_parameter_reply:</span> <span class='int'>0x46</span>
+<span class='rbrace'>}</span><span class='rparen'>)</span></pre></dd>
+      
+        <dt id="COMMAND-constant" class="">COMMAND =
+          
+        </dt>
+        <dd><pre class="code"><span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_bidirectional'>bidirectional</span><span class='lparen'>(</span><span class='lbrace'>{</span>
+    <span class='label'>brightness:</span> <span class='int'>0x0110</span><span class='comma'>,</span>
+    <span class='label'>contrast:</span> <span class='int'>0x0112</span><span class='comma'>,</span>
+    <span class='label'>sharpness:</span> <span class='int'>0x018c</span><span class='comma'>,</span>
+    <span class='label'>colour_temp:</span> <span class='int'>0x0254</span><span class='comma'>,</span>
+    <span class='label'>volume:</span> <span class='int'>0x0062</span><span class='comma'>,</span>
+    <span class='label'>audio_mute:</span> <span class='int'>0x008d</span><span class='comma'>,</span>
+    <span class='label'>input:</span> <span class='int'>0x02cb</span><span class='comma'>,</span>
+    <span class='label'>aspect_ratio:</span> <span class='int'>0x02df</span><span class='comma'>,</span>
+    <span class='label'>power:</span> <span class='int'>0x0003</span>
+<span class='rbrace'>}</span><span class='rparen'>)</span></pre></dd>
+      
+        <dt id="PARAMS-constant" class="">PARAMS =
+          <div class="docstring">
+  <div class="discussion">
+    
+<p>Definitions for non-numeric command arguments</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='label'>colour_temp:</span> <span class='lbrace'>{</span>
+        <span class='label'>_9300K:</span> <span class='int'>0</span><span class='comma'>,</span>
+        <span class='label'>_6500K:</span> <span class='int'>1</span><span class='comma'>,</span>
+        <span class='label'>user:</span> <span class='int'>2</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>audio_mute:</span> <span class='lbrace'>{</span>
+        <span class='kw'>false</span> <span class='op'>=&gt;</span> <span class='int'>0</span><span class='comma'>,</span>
+        <span class='kw'>true</span> <span class='op'>=&gt;</span> <span class='int'>1</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>input:</span> <span class='lbrace'>{</span>
+        <span class='label'>vga:</span> <span class='int'>0</span><span class='comma'>,</span>
+        <span class='label'>dvi:</span> <span class='int'>1</span><span class='comma'>,</span>
+        <span class='label'>hdmi:</span> <span class='int'>2</span><span class='comma'>,</span>
+        <span class='label'>dp:</span> <span class='int'>3</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>aspect_ratio:</span> <span class='lbrace'>{</span>
+        <span class='label'>full:</span> <span class='int'>0</span><span class='comma'>,</span>
+        <span class='label'>_16_10:</span> <span class='int'>1</span><span class='comma'>,</span>
+        <span class='label'>_4_3:</span> <span class='int'>2</span>
+    <span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='label'>power:</span> <span class='lbrace'>{</span>
+        <span class='kw'>false</span> <span class='op'>=&gt;</span> <span class='int'>0</span><span class='comma'>,</span>
+        <span class='kw'>true</span> <span class='op'>=&gt;</span> <span class='int'>1</span>
+    <span class='rbrace'>}</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#build_packet-class_method" title="build_packet (class method)">.<strong>build_packet</strong>(op_code, value, monitor_id = :all)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Build a &#39;set_parameter_command&#39; packet ready for transmission to
+the device(s).</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#lookup-class_method" title="lookup (class method)">.<strong>lookup</strong>(command, param)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Map a symbolic command and parameter value to an [op_code, value].</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#parse_response-class_method" title="parse_response (class method)">.<strong>parse_response</strong>(packet)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Parse a response packet to a hash of its decoded components.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#resolve-class_method" title="resolve (class method)">.<strong>resolve</strong>(op_code, value)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Resolve an op_code and value back to a [command, param] (inverse of
+lookup).</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="build_packet-class_method">
+  
+    .<strong>build_packet</strong>(op_code, value, monitor_id = :all)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Build a &#39;set_parameter_command&#39; packet ready for transmission to
+the device(s).</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/x3m/displays/wall_display.rb', line 307</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_build_packet'>build_packet</span><span class='lparen'>(</span><span class='id identifier rubyid_op_code'>op_code</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='id identifier rubyid_monitor_id'>monitor_id</span> <span class='op'>=</span> <span class='symbol'>:all</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_message'>message</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+        <span class='const'><span class='object_link'><a href="#MARKER-constant" title="X3m::Displays::WallDisplay::Protocol::MARKER (constant)">MARKER</a></span></span><span class='lbracket'>[</span><span class='symbol'>:STX</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='op'>*</span><span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_encode'>encode</span><span class='lparen'>(</span><span class='id identifier rubyid_op_code'>op_code</span><span class='comma'>,</span> <span class='label'>length:</span> <span class='int'>4</span><span class='rparen'>)</span><span class='comma'>,</span>
+        <span class='op'>*</span><span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_encode'>encode</span><span class='lparen'>(</span><span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>length:</span> <span class='int'>4</span><span class='rparen'>)</span><span class='comma'>,</span>
+        <span class='const'><span class='object_link'><a href="#MARKER-constant" title="X3m::Displays::WallDisplay::Protocol::MARKER (constant)">MARKER</a></span></span><span class='lbracket'>[</span><span class='symbol'>:ETX</span><span class='rbracket'>]</span>
+    <span class='rbracket'>]</span>
+
+    <span class='id identifier rubyid_header'>header</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+        <span class='const'><span class='object_link'><a href="#MARKER-constant" title="X3m::Displays::WallDisplay::Protocol::MARKER (constant)">MARKER</a></span></span><span class='lbracket'>[</span><span class='symbol'>:SOH</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='const'><span class='object_link'><a href="#MARKER-constant" title="X3m::Displays::WallDisplay::Protocol::MARKER (constant)">MARKER</a></span></span><span class='lbracket'>[</span><span class='symbol'>:reserved</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='const'><span class='object_link'><a href="#MONITOR_ID-constant" title="X3m::Displays::WallDisplay::Protocol::MONITOR_ID (constant)">MONITOR_ID</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_monitor_id'>monitor_id</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='const'><span class='object_link'><a href="#MESSAGE_SENDER-constant" title="X3m::Displays::WallDisplay::Protocol::MESSAGE_SENDER (constant)">MESSAGE_SENDER</a></span></span><span class='lbracket'>[</span><span class='symbol'>:pc</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='const'><span class='object_link'><a href="#MESSAGE_TYPE-constant" title="X3m::Displays::WallDisplay::Protocol::MESSAGE_TYPE (constant)">MESSAGE_TYPE</a></span></span><span class='lbracket'>[</span><span class='symbol'>:set_parameter_command</span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='op'>*</span><span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_encode'>encode</span><span class='lparen'>(</span><span class='id identifier rubyid_message'>message</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span><span class='comma'>,</span> <span class='label'>length:</span> <span class='int'>2</span><span class='rparen'>)</span>
+    <span class='rbracket'>]</span>
+
+    <span class='comment'># XOR of byte 1 -&gt; end of message payload for checksum
+</span>    <span class='id identifier rubyid_bcc'>bcc</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='id identifier rubyid_header'>header</span><span class='period'>.</span><span class='id identifier rubyid_drop'>drop</span><span class='lparen'>(</span><span class='int'>1</span><span class='rparen'>)</span> <span class='op'>+</span> <span class='id identifier rubyid_message'>message</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_reduce'>reduce</span><span class='lparen'>(</span><span class='symbol'>:^</span><span class='rparen'>)</span>
+
+    <span class='id identifier rubyid_header'>header</span> <span class='op'>+</span> <span class='id identifier rubyid_message'>message</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_bcc'>bcc</span> <span class='op'>&lt;&lt;</span> <span class='const'><span class='object_link'><a href="#MARKER-constant" title="X3m::Displays::WallDisplay::Protocol::MARKER (constant)">MARKER</a></span></span><span class='lbracket'>[</span><span class='symbol'>:delimiter</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="lookup-class_method">
+  
+    .<strong>lookup</strong>(command, param)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Map a symbolic command and parameter value to an [op_code, value]</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/x3m/displays/wall_display.rb', line 275</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_lookup'>lookup</span><span class='lparen'>(</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_param'>param</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_op_code'>op_code</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#COMMAND-constant" title="X3m::Displays::WallDisplay::Protocol::COMMAND (constant)">COMMAND</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_command'>command</span><span class='rbracket'>]</span>
+
+    <span class='comment'># Volume is the only numeric value that&#39;s not 0-100. Normalise to match.
+</span>    <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span> <span class='op'>==</span> <span class='symbol'>:volume</span>
+                <span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_scale'>scale</span> <span class='id identifier rubyid_param'>param</span><span class='comma'>,</span> <span class='int'>100</span><span class='comma'>,</span> <span class='int'>30</span>
+            <span class='kw'>else</span>
+                <span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#PARAMS-constant" title="X3m::Displays::WallDisplay::Protocol::PARAMS (constant)">PARAMS</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_param'>param</span><span class='rparen'>)</span> <span class='op'>||</span> <span class='id identifier rubyid_param'>param</span>
+            <span class='kw'>end</span>
+
+    <span class='lbracket'>[</span><span class='id identifier rubyid_op_code'>op_code</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="parse_response-class_method">
+  
+    .<strong>parse_response</strong>(packet)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Parse a response packet to a hash of its decoded components.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/x3m/displays/wall_display.rb', line 331</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_parse_response'>parse_response</span><span class='lparen'>(</span><span class='id identifier rubyid_packet'>packet</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='ivar'>@rx_structure</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='id identifier rubyid_capture'>capture</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='id identifier rubyid_len'>len</span> <span class='op'>=</span> <span class='int'>1</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(?&lt;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_content'>&gt;.{</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_len'>len</span><span class='embexpr_end'>}</span><span class='tstring_content'>})</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+        <span class='id identifier rubyid_marker'>marker</span> <span class='op'>=</span> <span class='tlambda'>-&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> <span class='tlambeg'>{</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>\x</span><span class='tstring_end'>&#39;</span></span> <span class='op'>+</span> <span class='const'><span class='object_link'><a href="#MARKER-constant" title="X3m::Displays::WallDisplay::Protocol::MARKER (constant)">MARKER</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>2</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='rbrace'>}</span>
+
+        <span class='ivar'>@rx_structure</span> <span class='op'>=</span> <span class='tstring'><span class='regexp_beg'>%r{</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_marker'>marker</span><span class='lbracket'>[</span><span class='symbol'>:SOH</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_marker'>marker</span><span class='lbracket'>[</span><span class='symbol'>:reserved</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>receiver</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>monitor_id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>message_type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>message_len</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_marker'>marker</span><span class='lbracket'>[</span><span class='symbol'>:STX</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>result_code</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>op_code</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>4</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>op_code_type</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>2</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>max_value</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>4</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>value</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='int'>4</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_marker'>marker</span><span class='lbracket'>[</span><span class='symbol'>:ETX</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_capture'>capture</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>bcc</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+            </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_marker'>marker</span><span class='lbracket'>[</span><span class='symbol'>:delimiter</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'>
+        </span><span class='regexp_end'>}x</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_rx'>rx</span> <span class='op'>=</span> <span class='id identifier rubyid_packet'>packet</span><span class='period'>.</span><span class='id identifier rubyid_match'>match</span> <span class='ivar'>@rx_structure</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_rx'>rx</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>invalid packet structure</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_bcc'>bcc</span> <span class='op'>=</span> <span class='id identifier rubyid_packet'>packet</span><span class='period'>.</span><span class='id identifier rubyid_bytes'>bytes</span><span class='lbracket'>[</span><span class='int'>1</span><span class='op'>..</span><span class='op'>-</span><span class='int'>3</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_reduce'>reduce</span><span class='lparen'>(</span><span class='symbol'>:^</span><span class='rparen'>)</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_bcc'>bcc</span> <span class='op'>!=</span> <span class='id identifier rubyid_rx'>rx</span><span class='lbracket'>[</span><span class='symbol'>:bcc</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_ord'>ord</span>
+        <span class='id identifier rubyid_raise'>raise</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>invalid checksum</span><span class='tstring_end'>&#39;</span></span>
+    <span class='kw'>end</span>
+
+    <span class='id identifier rubyid_rx_data'>rx_data</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='lbracket'>[</span><span class='id identifier rubyid_rx'>rx</span><span class='period'>.</span><span class='id identifier rubyid_names'>names</span><span class='period'>.</span><span class='id identifier rubyid_zip'>zip</span> <span class='id identifier rubyid_rx'>rx</span><span class='period'>.</span><span class='id identifier rubyid_captures'>captures</span><span class='rbracket'>]</span>
+    <span class='id identifier rubyid_rx_data'>rx_data</span><span class='period'>.</span><span class='id identifier rubyid_transform_values!'>transform_values!</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_val'>val</span><span class='op'>|</span> <span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_decode'>decode</span> <span class='id identifier rubyid_val'>val</span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_param'>param</span> <span class='op'>=</span> <span class='id identifier rubyid_resolve'>resolve</span> <span class='id identifier rubyid_rx_data'>rx_data</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>op_code</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_rx_data'>rx_data</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>value</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
+
+    <span class='lbrace'>{</span>
+        <span class='label'>receiver:</span> <span class='const'><span class='object_link'><a href="#MESSAGE_SENDER-constant" title="X3m::Displays::WallDisplay::Protocol::MESSAGE_SENDER (constant)">MESSAGE_SENDER</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_rx_data'>rx_data</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>receiver</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='label'>monitor_id:</span> <span class='const'><span class='object_link'><a href="#MONITOR_ID-constant" title="X3m::Displays::WallDisplay::Protocol::MONITOR_ID (constant)">MONITOR_ID</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_rx_data'>rx_data</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>monitor_id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='label'>message_type:</span> <span class='const'><span class='object_link'><a href="#MESSAGE_TYPE-constant" title="X3m::Displays::WallDisplay::Protocol::MESSAGE_TYPE (constant)">MESSAGE_TYPE</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_rx_data'>rx_data</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>message_type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='comma'>,</span>
+        <span class='label'>success:</span> <span class='id identifier rubyid_rx_data'>rx_data</span><span class='period'>.</span><span class='id identifier rubyid_fetch'>fetch</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>result_code</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='op'>==</span> <span class='int'>0</span><span class='comma'>,</span>
+        <span class='label'>command:</span> <span class='id identifier rubyid_command'>command</span><span class='comma'>,</span>
+        <span class='label'>value:</span> <span class='id identifier rubyid_param'>param</span>
+    <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="resolve-class_method">
+  
+    .<strong>resolve</strong>(op_code, value)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Resolve an op_code and value back to a [command, param] (inverse of lookup)</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/x3m/displays/wall_display.rb', line 290</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_resolve'>resolve</span><span class='lparen'>(</span><span class='id identifier rubyid_op_code'>op_code</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_command'>command</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#COMMAND-constant" title="X3m::Displays::WallDisplay::Protocol::COMMAND (constant)">COMMAND</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_op_code'>op_code</span><span class='rbracket'>]</span>
+
+    <span class='comment'># As above, normalise volume to match the same range as other
+</span>    <span class='comment'># parameters.
+</span>    <span class='id identifier rubyid_param'>param</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span> <span class='op'>==</span> <span class='symbol'>:volume</span>
+                <span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_scale'>scale</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='int'>30</span><span class='comma'>,</span> <span class='int'>100</span>
+            <span class='kw'>else</span>
+                <span class='id identifier rubyid_mapped_value'>mapped_value</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#Util-constant" title="X3m::Displays::WallDisplay::Protocol::Util (constant)">Util</a></span></span><span class='period'>.</span><span class='id identifier rubyid_dig'>dig</span><span class='lparen'>(</span><span class='const'><span class='object_link'><a href="#PARAMS-constant" title="X3m::Displays::WallDisplay::Protocol::PARAMS (constant)">PARAMS</a></span></span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='rparen'>)</span>
+                <span class='id identifier rubyid_mapped_value'>mapped_value</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>?</span> <span class='id identifier rubyid_value'>value</span> <span class='op'>:</span> <span class='id identifier rubyid_mapped_value'>mapped_value</span>
+            <span class='kw'>end</span>
+
+    <span class='lbracket'>[</span><span class='id identifier rubyid_command'>command</span><span class='comma'>,</span> <span class='id identifier rubyid_param'>param</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:31 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Wolfvision::Eye14
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Wolfvision::Eye14";
+  relpath = '../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../_index.html">Index (E)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../Wolfvision.html" title="Wolfvision (module)">Wolfvision</a></span></span>
+     &raquo; 
+    <span class="title">Eye14</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Wolfvision::Eye14
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Wolfvision::Eye14</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  <dl>
+      <dt>Includes:</dt>
+      <dd>Orchestrator::Constants, Orchestrator::Transcoder</dd>
+  </dl>
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/wolfvision/eye14.rb</dd>
+  </dl>
+  
+</div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    
+<p>Documentation: <a
+href="https://www.wolfvision.com/wolf/protocol_command_wolfvision/protocol/commands_eye-14.pdf">www.wolfvision.com/wolf/protocol_command_wolfvision/protocol/commands_eye-14.pdf</a></p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div>
+  
+    <h2>
+      Constant Summary
+      <small><a href="#" class="constants_summary_toggle">collapse</a></small>
+    </h2>
+
+    <dl class="constants">
+      
+        <dt id="COMMANDS-constant" class="">COMMANDS =
+          
+        </dt>
+        <dd><pre class="code"><span class='lbrace'>{</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3000</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:power_cmd</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3001</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:power_inq</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2000</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:zoom_cmd</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2002</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:zoom_inq</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2200</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:iris_cmd</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2202</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:iris_inq</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3100</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:autofocus_cmd</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3101</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:autofocus_inq</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a700</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:laser_cmd</span><span class='comma'>,</span>
+    <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>a701</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='symbol'>:laser_inq</span>
+<span class='rbrace'>}</span></pre></dd>
+      
+    </dl>
+  
+
+
+
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#autofocus-instance_method" title="#autofocus (instance method)">#<strong>autofocus</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>set autofocus to on.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#autofocus%3F-instance_method" title="#autofocus? (instance method)">#<strong>autofocus?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#check_length-instance_method" title="#check_length (instance method)">#<strong>check_length</strong>(byte_str)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#connected-instance_method" title="#connected (instance method)">#<strong>connected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#disconnected-instance_method" title="#disconnected (instance method)">#<strong>disconnected</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#iris-instance_method" title="#iris (instance method)">#<strong>iris</strong>(position)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#iris%3F-instance_method" title="#iris? (instance method)">#<strong>iris?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#laser-instance_method" title="#laser (instance method)">#<strong>laser</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#laser%3F-instance_method" title="#laser? (instance method)">#<strong>laser?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_load-instance_method" title="#on_load (instance method)">#<strong>on_load</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_unload-instance_method" title="#on_unload (instance method)">#<strong>on_unload</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#on_update-instance_method" title="#on_update (instance method)">#<strong>on_update</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power-instance_method" title="#power (instance method)">#<strong>power</strong>(state)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#power%3F-instance_method" title="#power? (instance method)">#<strong>power?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#received-instance_method" title="#received (instance method)">#<strong>received</strong>(data, deferrable, command)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#send_cmd-instance_method" title="#send_cmd (instance method)">#<strong>send_cmd</strong>(cmd, options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#send_inq-instance_method" title="#send_inq (instance method)">#<strong>send_inq</strong>(inq, options = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#zoom-instance_method" title="#zoom (instance method)">#<strong>zoom</strong>(position)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>uses only optical zoom.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#zoom%3F-instance_method" title="#zoom? (instance method)">#<strong>zoom?</strong>  &#x21d2; Boolean </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="autofocus-instance_method">
+  
+    #<strong>autofocus</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>set autofocus to on</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+76
+77
+78</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 76</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_autofocus'>autofocus</span>
+    <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>310101</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:autofocus_cmd</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="autofocus?-instance_method">
+  
+    #<strong>autofocus?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+80
+81
+82</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 80</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_autofocus?'>autofocus?</span>
+    <span class='id identifier rubyid_send_inq'>send_inq</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3100</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:autofocus_inq</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="check_length-instance_method">
+  
+    #<strong>check_length</strong>(byte_str)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 182</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_check_length'>check_length</span><span class='lparen'>(</span><span class='id identifier rubyid_byte_str'>byte_str</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='id identifier rubyid_str_to_array'>str_to_array</span><span class='lparen'>(</span><span class='id identifier rubyid_byte_str'>byte_str</span><span class='rparen'>)</span>
+
+    <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&lt;=</span> <span class='int'>1</span> <span class='comment'># header is 2 bytes
+</span>
+    <span class='id identifier rubyid_len'>len</span> <span class='op'>=</span> <span class='id identifier rubyid_response'>response</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='int'>2</span> <span class='comment'># (data length + header)
+</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_response'>response</span><span class='period'>.</span><span class='id identifier rubyid_length'>length</span> <span class='op'>&gt;=</span> <span class='id identifier rubyid_len'>len</span>
+        <span class='kw'>return</span> <span class='id identifier rubyid_len'>len</span>
+    <span class='kw'>else</span>
+        <span class='kw'>return</span> <span class='kw'>false</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="connected-instance_method">
+  
+    #<strong>connected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 34</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_connected'>connected</span>
+    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_every'>every</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>60s</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span> <span class='kw'>do</span>
+        <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>-- Polling WolfVision Camera</span><span class='tstring_end'>&#39;</span></span>
+        <span class='id identifier rubyid_power?'>power?</span> <span class='kw'>do</span>
+            <span class='kw'>if</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='const'>On</span>
+                <span class='id identifier rubyid_zoom?'>zoom?</span>
+                <span class='id identifier rubyid_iris?'>iris?</span>
+                <span class='id identifier rubyid_autofocus?'>autofocus?</span>
+            <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="disconnected-instance_method">
+  
+    #<strong>disconnected</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+47
+48
+49
+50</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 47</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_disconnected'>disconnected</span>
+    <span class='comment'># Disconnected will be called before connect if initial connect fails
+</span>    <span class='id identifier rubyid_schedule'>schedule</span><span class='period'>.</span><span class='id identifier rubyid_clear'>clear</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="iris-instance_method">
+  
+    #<strong>iris</strong>(position)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+84
+85
+86
+87
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 84</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_iris'>iris</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_min</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_target</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>position in decimal is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_val'>val</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hex is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2202</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:iris_cmd</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="iris?-instance_method">
+  
+    #<strong>iris?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+92
+93
+94</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 92</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_iris?'>iris?</span>
+    <span class='id identifier rubyid_send_inq'>send_inq</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2200</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:iris_inq</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="laser-instance_method">
+  
+    #<strong>laser</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+100
+101
+102
+103
+104
+105
+106
+107
+108</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 100</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_laser'>laser</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_target'>target</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:laser_target</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_target'>target</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_target'>target</span> <span class='op'>==</span> <span class='const'>On</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:laser</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='const'>On</span>
+        <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>A70101</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:laser_cmd</span><span class='rparen'>)</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_target'>target</span> <span class='op'>==</span> <span class='const'>Off</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:laser</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='const'>Off</span>
+        <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>A70100</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:laser_cmd</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="laser?-instance_method">
+  
+    #<strong>laser?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+110
+111
+112</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 110</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_laser?'>laser?</span>
+    <span class='id identifier rubyid_send_inq'>send_inq</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>A700</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:laser_inq</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_load-instance_method">
+  
+    #<strong>on_load</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+21
+22
+23
+24
+25
+26</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 21</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_load'>on_load</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>3923</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>4094</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_min</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_unload-instance_method">
+  
+    #<strong>on_unload</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+31
+32</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 31</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_unload'>on_unload</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="on_update-instance_method">
+  
+    #<strong>on_update</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+28
+29</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 28</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_on_update'>on_update</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power-instance_method">
+  
+    #<strong>power</strong>(state)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+52
+53
+54
+55
+56
+57
+58
+59
+60</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 52</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power'>power</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_target'>target</span> <span class='op'>=</span> <span class='id identifier rubyid_is_affirmative?'>is_affirmative?</span><span class='lparen'>(</span><span class='id identifier rubyid_state'>state</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power_target</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_target'>target</span>
+    <span class='kw'>if</span> <span class='id identifier rubyid_target'>target</span> <span class='op'>==</span> <span class='const'>On</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='const'>On</span>
+        <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>300101</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:power_cmd</span><span class='rparen'>)</span>
+    <span class='kw'>elsif</span> <span class='id identifier rubyid_target'>target</span> <span class='op'>==</span> <span class='const'>Off</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='const'>Off</span>
+        <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>300100</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:power_cmd</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="power?-instance_method">
+  
+    #<strong>power?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+96
+97
+98</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 96</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_power?'>power?</span>
+    <span class='id identifier rubyid_send_inq'>send_inq</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>3000</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:power_inq</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="received-instance_method">
+  
+    #<strong>received</strong>(data, deferrable, command)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 140</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_received'>received</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='comma'>,</span> <span class='id identifier rubyid_deferrable'>deferrable</span><span class='comma'>,</span> <span class='id identifier rubyid_command'>command</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Received 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_byte_to_hex'>byte_to_hex</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_content'>\n</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_bytes'>bytes</span> <span class='op'>=</span> <span class='id identifier rubyid_str_to_array'>str_to_array</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span>
+
+    <span class='kw'>return</span> <span class='symbol'>:success</span> <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_command'>command</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+
+    <span class='id identifier rubyid_cmd'>cmd</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="#COMMANDS-constant" title="Wolfvision::Eye14::COMMANDS (constant)">COMMANDS</a></span></span><span class='lbracket'>[</span><span class='id identifier rubyid_byte_to_hex'>byte_to_hex</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='rparen'>)</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>..</span><span class='int'>3</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+
+    <span class='kw'>case</span> <span class='id identifier rubyid_cmd'>cmd</span>
+    <span class='kw'>when</span> <span class='symbol'>:power_cmd</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power_target</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:power_inq</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_bytes'>bytes</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='int'>1</span>
+    <span class='kw'>when</span> <span class='symbol'>:zoom_cmd</span>
+        <span class='comment'># for some reason the after changing the zoom position
+</span>        <span class='comment'># the first zoom inquiry sends &quot;2000&quot; regardless of the actaul zoom value
+</span>        <span class='comment'># consecutive zoom inquiries will then return the correct zoom value
+</span>        <span class='kw'>return</span> <span class='symbol'>:ignore</span> <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:zoom_inq</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_target</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:zoom_inq</span>
+        <span class='id identifier rubyid_hex'>hex</span> <span class='op'>=</span> <span class='id identifier rubyid_byte_to_hex'>byte_to_hex</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>2</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_hex'>hex</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
+    <span class='kw'>when</span> <span class='symbol'>:iris_cmd</span>
+        <span class='kw'>return</span> <span class='symbol'>:ignore</span> <span class='kw'>if</span> <span class='id identifier rubyid_command'>command</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='symbol'>:iris_inq</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris_target</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:iris_inq</span>
+        <span class='comment'># same thing as zoom inq happens here
+</span>        <span class='id identifier rubyid_hex'>hex</span> <span class='op'>=</span> <span class='id identifier rubyid_byte_to_hex'>byte_to_hex</span><span class='lparen'>(</span><span class='id identifier rubyid_data'>data</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>2</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:iris</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_hex'>hex</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
+    <span class='kw'>when</span> <span class='symbol'>:autofocus_cmd</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:autofocus</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='kw'>when</span> <span class='symbol'>:autofocus_inq</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:autofocus</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_bytes'>bytes</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='int'>1</span>
+    <span class='kw'>when</span> <span class='symbol'>:laser_cmd</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:laser</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:laser_target</span><span class='rbracket'>]</span>
+    <span class='kw'>when</span> <span class='symbol'>:laser_inq</span>
+        <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:laser</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_bytes'>bytes</span><span class='lbracket'>[</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='int'>1</span>
+    <span class='kw'>end</span>
+    <span class='kw'>return</span> <span class='symbol'>:success</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="send_cmd-instance_method">
+  
+    #<strong>send_cmd</strong>(cmd, options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+114
+115
+116
+117
+118
+119</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 114</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='id identifier rubyid_cmd'>cmd</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_req'>req</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>01</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_cmd'>cmd</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>tell -- 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_req'>req</span><span class='embexpr_end'>}</span><span class='tstring_content'> -- </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:hex_string</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_req'>req</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="send_inq-instance_method">
+  
+    #<strong>send_inq</strong>(inq, options = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+121
+122
+123
+124
+125
+126</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 121</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_send_inq'>send_inq</span><span class='lparen'>(</span><span class='id identifier rubyid_inq'>inq</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_req'>req</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>00</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inq'>inq</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ask -- 0x</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_inq'>inq</span><span class='embexpr_end'>}</span><span class='tstring_content'> -- </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_options'>options</span><span class='lbracket'>[</span><span class='symbol'>:hex_string</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>true</span>
+    <span class='id identifier rubyid_send'>send</span><span class='lparen'>(</span><span class='id identifier rubyid_req'>req</span><span class='comma'>,</span> <span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="zoom-instance_method">
+  
+    #<strong>zoom</strong>(position)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>uses only optical zoom</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+63
+64
+65
+66
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 63</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_zoom'>zoom</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_val'>val</span> <span class='op'>=</span> <span class='id identifier rubyid_in_range'>in_range</span><span class='lparen'>(</span><span class='id identifier rubyid_position'>position</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_max</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_min</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='symbol'>:zoom_target</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_val'>val</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>position in decimal is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_val'>val</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_debug'>debug</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>hex is </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span> <span class='rbrace'>}</span>
+    <span class='id identifier rubyid_send_cmd'>send_cmd</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>2002</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_val'>val</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_rjust'>rjust</span><span class='lparen'>(</span><span class='int'>4</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>0</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:zoom_cmd</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="zoom?-instance_method">
+  
+    #<strong>zoom?</strong>  &#x21d2; <tt>Boolean</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+71
+72
+73</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/wolfvision/eye14.rb', line 71</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_zoom?'>zoom?</span>
+    <span class='id identifier rubyid_send_inq'>send_inq</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2000</span><span class='tstring_end'>&#39;</span></span><span class='comma'>,</span> <span class='label'>priority:</span> <span class='int'>0</span><span class='comma'>,</span> <span class='label'>name:</span> <span class='symbol'>:zoom_inq</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:34 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>

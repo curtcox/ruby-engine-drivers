@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  Class: Aca::Meetings::EwsAppender
+  
+    &mdash; Documentation by YARD 0.9.20
+  
+</title>
+
+  <link rel="stylesheet" href="../../css/style.css" type="text/css" charset="utf-8" />
+
+  <link rel="stylesheet" href="../../css/common.css" type="text/css" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  pathId = "Aca::Meetings::EwsAppender";
+  relpath = '../../';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="../../js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="../../js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="../../class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="../../_index.html">Index (E)</a> &raquo;
+    <span class='title'><span class='object_link'><a href="../../Aca.html" title="Aca (module)">Aca</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Meetings.html" title="Aca::Meetings (module)">Meetings</a></span></span>
+     &raquo; 
+    <span class="title">EwsAppender</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="../../class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><h1>Class: Aca::Meetings::EwsAppender
+  
+  
+  
+</h1>
+<div class="box_info">
+  
+  <dl>
+    <dt>Inherits:</dt>
+    <dd>
+      <span class="inheritName">Object</span>
+      
+        <ul class="fullTree">
+          <li>Object</li>
+          
+            <li class="next">Aca::Meetings::EwsAppender</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+    </dd>
+  </dl>
+  
+
+  
+  
+  
+  
+  
+
+  
+
+  
+  <dl>
+    <dt>Defined in:</dt>
+    <dd>modules/aca/meetings/ews_appender.rb</dd>
+  </dl>
+  
+</div>
+
+
+
+
+
+  <h2>Instance Attribute Summary <small><a href="#" class="summary_toggle">collapse</a></small></h2>
+  <ul class="summary">
+    
+      <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#cli-instance_method" title="#cli (instance method)">#<strong>cli</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+    
+      <span class="note title readonly">readonly</span>
+    
+    
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Returns the value of attribute cli.</p>
+</div></span>
+  
+</li>
+
+    
+  </ul>
+
+
+
+
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#append_booking-instance_method" title="#append_booking (instance method)">#<strong>append_booking</strong>(request, additional_content)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_elem-instance_method" title="#get_elem (instance method)">#<strong>get_elem</strong>(elems, key)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Just a little helper method to retreive fields from EWS reponses.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_resources-instance_method" title="#get_resources (instance method)">#<strong>get_resources</strong>(attachment)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(uri, user, password, callback = nil, &amp;blk)  &#x21d2; EwsAppender </a>
+    
+
+    
+  </span>
+  
+  
+    <span class="note title constructor">constructor</span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>A new instance of EwsAppender.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#moderate_bookings-instance_method" title="#moderate_bookings (instance method)">#<strong>moderate_bookings</strong>  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#update_booking-instance_method" title="#update_booking (instance method)">#<strong>update_booking</strong>(organizer, booking_id, indicator, dial_in_text, send_update = &#39;SendToAllAndSaveCopy&#39;)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+<div id="constructor_details" class="method_details_list">
+  <h2>Constructor Details</h2>
+  
+    <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(uri, user, password, callback = nil, &amp;blk)  &#x21d2; <tt><span class='object_link'><a href="" title="Aca::Meetings::EwsAppender (class)">EwsAppender</a></span></tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns a new instance of EwsAppender</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+10
+11
+12
+13
+14
+15
+16
+17</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/meetings/ews_appender.rb', line 10</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='id identifier rubyid_password'>password</span><span class='comma'>,</span> <span class='id identifier rubyid_callback'>callback</span> <span class='op'>=</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_blk'>blk</span><span class='rparen'>)</span>
+    <span class='ivar'>@callback</span> <span class='op'>=</span> <span class='id identifier rubyid_callback'>callback</span> <span class='op'>||</span> <span class='id identifier rubyid_blk'>blk</span>
+
+    <span class='comment'># Create our EWS Client
+</span>    <span class='ivar'>@cli</span> <span class='op'>=</span> <span class='const'>Viewpoint</span><span class='op'>::</span><span class='const'>EWSClient</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='id identifier rubyid_password'>password</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http_opts</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ssl_verify_mode</span><span class='label_end'>&quot;:</span> <span class='int'>0</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+    <span class='ivar'>@moderator</span> <span class='op'>=</span> <span class='const'>Viewpoint</span><span class='op'>::</span><span class='const'>EWSClient</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='id identifier rubyid_uri'>uri</span><span class='comma'>,</span> <span class='id identifier rubyid_user'>user</span><span class='comma'>,</span> <span class='id identifier rubyid_password'>password</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http_opts</span><span class='label_end'>&quot;:</span> <span class='lbrace'>{</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ssl_verify_mode</span><span class='label_end'>&quot;:</span> <span class='int'>0</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+    <span class='ivar'>@appender</span> <span class='op'>=</span> <span class='kw'>self</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+  
+</div>
+
+  <div id="instance_attr_details" class="attr_details">
+    <h2>Instance Attribute Details</h2>
+    
+      
+      <span id=""></span>
+      <div class="method_details first">
+  <h3 class="signature first" id="cli-instance_method">
+  
+    #<strong>cli</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Returns the value of attribute cli</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+19
+20
+21</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/meetings/ews_appender.rb', line 19</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_cli'>cli</span>
+  <span class='ivar'>@cli</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="append_booking-instance_method">
+  
+    #<strong>append_booking</strong>(request, additional_content)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/meetings/ews_appender.rb', line 51</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_append_booking'>append_booking</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='comma'>,</span> <span class='id identifier rubyid_additional_content'>additional_content</span><span class='rparen'>)</span>
+    <span class='comment'># Impersonate the organizer so that we can retrieve the right calendar items
+</span>    <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_set_impersonation'>set_impersonation</span><span class='lparen'>(</span><span class='const'>Viewpoint</span><span class='op'>::</span><span class='const'>EWS</span><span class='op'>::</span><span class='const'>ConnectingSID</span><span class='lbracket'>[</span><span class='symbol'>:SMTP</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_request'>request</span><span class='lbracket'>[</span><span class='symbol'>:organizer</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_booking'>booking</span> <span class='op'>=</span> <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_get_item'>get_item</span><span class='lparen'>(</span><span class='id identifier rubyid_request'>request</span><span class='lbracket'>[</span><span class='symbol'>:booking_id</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='symbol'>:item_shape</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:base_shape</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>AllProperties</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+
+    <span class='comment'># Grab the body of the booking and parse it
+</span>    <span class='id identifier rubyid_html_doc'>html_doc</span> <span class='op'>=</span> <span class='const'>Nokogiri</span><span class='op'>::</span><span class='const'>HTML</span><span class='lparen'>(</span><span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='rparen'>)</span>
+
+    <span class='comment'># Add the appended text (assumes that content will be contained in a table)
+</span>    <span class='id identifier rubyid_html_doc'>html_doc</span><span class='period'>.</span><span class='id identifier rubyid_at'>at</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>body</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_after'>after</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;br /&gt;&lt;br /&gt;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_additional_content'>additional_content</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+    <span class='comment'># Add our input and update the item
+</span>    <span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_update_item!'>update_item!</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='symbol'>:body</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_html_doc'>html_doc</span><span class='period'>.</span><span class='id identifier rubyid_to_html'>to_html</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:send_meeting_invitations_or_cancellations</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SendToAllAndSaveCopy</span><span class='tstring_end'>&#39;</span></span><span class='rbrace'>}</span><span class='rparen'>)</span>
+
+    <span class='comment'># Delete all emails relating to this booking
+</span>    <span class='id identifier rubyid_request'>request</span><span class='lbracket'>[</span><span class='symbol'>:moderation_emails</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_item'>item</span><span class='op'>|</span>
+        <span class='id identifier rubyid_item'>item</span><span class='period'>.</span><span class='id identifier rubyid_delete!'>delete!</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_elem-instance_method">
+  
+    #<strong>get_elem</strong>(elems, key)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Just a little helper method to retreive fields from EWS reponses</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/meetings/ews_appender.rb', line 112</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_elem'>get_elem</span><span class='lparen'>(</span><span class='id identifier rubyid_elems'>elems</span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span> 
+    <span class='id identifier rubyid_elems'>elems</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_elem'>elem</span><span class='op'>|</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_elem'>elem</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span>
+          <span class='kw'>if</span> <span class='id identifier rubyid_key'>key</span> <span class='op'>==</span> <span class='symbol'>:resources</span>
+            <span class='kw'>return</span> <span class='id identifier rubyid_elem'>elem</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span>
+          <span class='kw'>elsif</span> <span class='id identifier rubyid_key'>key</span> <span class='op'>==</span> <span class='symbol'>:required_attendees</span>
+            <span class='kw'>return</span> <span class='id identifier rubyid_elem'>elem</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span>
+          <span class='kw'>elsif</span> <span class='id identifier rubyid_key'>key</span> <span class='op'>==</span> <span class='symbol'>:organizer</span>
+             <span class='kw'>return</span> <span class='id identifier rubyid_get_elem'>get_elem</span><span class='lparen'>(</span><span class='id identifier rubyid_elem'>elem</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:elems</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:mailbox</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:elems</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:email_address</span><span class='rparen'>)</span>
+          <span class='kw'>elsif</span> <span class='id identifier rubyid_key'>key</span> <span class='op'>==</span> <span class='symbol'>:conversation_id</span>
+             <span class='kw'>return</span> <span class='id identifier rubyid_elem'>elem</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:attribs</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span>
+          <span class='kw'>else</span>
+             <span class='kw'>return</span> <span class='id identifier rubyid_elem'>elem</span><span class='lbracket'>[</span><span class='id identifier rubyid_key'>key</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span>
+          <span class='kw'>end</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="get_resources-instance_method">
+  
+    #<strong>get_resources</strong>(attachment)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/meetings/ews_appender.rb', line 130</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_get_resources'>get_resources</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='rparen'>)</span>
+    <span class='comment'># Get the organiser&#39;s calendar ID
+</span>    <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_set_impersonation'>set_impersonation</span><span class='lparen'>(</span><span class='const'>Viewpoint</span><span class='op'>::</span><span class='const'>EWS</span><span class='op'>::</span><span class='const'>ConnectingSID</span><span class='lbracket'>[</span><span class='symbol'>:SMTP</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='lbracket'>[</span><span class='symbol'>:organizer</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_calendar_id'>calendar_id</span> <span class='op'>=</span> <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_get_folder'>get_folder</span><span class='lparen'>(</span><span class='symbol'>:calendar</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span>
+
+    <span class='id identifier rubyid_calendar_items'>calendar_items</span> <span class='op'>=</span> <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_find_items'>find_items</span><span class='lparen'>(</span><span class='label'>folder_id:</span> <span class='id identifier rubyid_calendar_id'>calendar_id</span><span class='comma'>,</span> <span class='label'>calendar_view:</span> <span class='lbrace'>{</span><span class='label'>start_date:</span> <span class='const'>DateTime</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>end_date:</span> <span class='const'>DateTime</span><span class='period'>.</span><span class='id identifier rubyid_parse'>parse</span><span class='lparen'>(</span><span class='id identifier rubyid_attachment'>attachment</span><span class='lbracket'>[</span><span class='symbol'>:end</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>shape:</span> <span class='symbol'>:id_only</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_calendar_items'>calendar_items</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_booking'>booking</span><span class='op'>|</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_get_all_properties!'>get_all_properties!</span><span class='lbracket'>[</span><span class='symbol'>:u_i_d</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='op'>==</span> <span class='id identifier rubyid_attachment'>attachment</span><span class='lbracket'>[</span><span class='symbol'>:uid</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_resource_booking'>resource_booking</span> <span class='op'>=</span> <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_get_item'>get_item</span><span class='lparen'>(</span><span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>item_shape:</span> <span class='lbrace'>{</span> <span class='label'>additional_properties:</span> <span class='lbrace'>{</span> <span class='label'>field_uRI:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>calendar:Resources</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span><span class='comma'>,</span> <span class='label'>base_shape:</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>AllProperties</span><span class='tstring_end'>&#39;</span></span><span class='rbrace'>}</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+
+            <span class='id identifier rubyid_elems'>elems</span> <span class='op'>=</span> <span class='id identifier rubyid_resource_booking'>resource_booking</span><span class='period'>.</span><span class='id identifier rubyid_ews_item'>ews_item</span><span class='lbracket'>[</span><span class='symbol'>:resources</span><span class='rbracket'>]</span>
+            <span class='id identifier rubyid_resources'>resources</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='id identifier rubyid_elems'>elems</span> 
+                <span class='id identifier rubyid_elems'>elems</span><span class='lbracket'>[</span><span class='symbol'>:elems</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:attendee</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:elems</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:mailbox</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:elems</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:email_address</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:text</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+            <span class='kw'>else</span>
+                <span class='lbracket'>[</span><span class='rbracket'>]</span>
+            <span class='kw'>end</span>
+
+            <span class='kw'>return</span> <span class='lbracket'>[</span><span class='id identifier rubyid_resources'>resources</span><span class='comma'>,</span> <span class='id identifier rubyid_booking'>booking</span><span class='rbracket'>]</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='lbracket'>[</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='kw'>nil</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="moderate_bookings-instance_method">
+  
+    #<strong>moderate_bookings</strong>  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/meetings/ews_appender.rb', line 21</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_moderate_bookings'>moderate_bookings</span>
+    <span class='comment'># Get our bookings
+</span>    <span class='id identifier rubyid_attachments'>attachments</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_find_attachments'>find_attachments</span>
+
+    <span class='id identifier rubyid_email_ids'>email_ids</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+
+    <span class='id identifier rubyid_attachments'>attachments</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span>
+        <span class='id identifier rubyid_email_ids'>email_ids</span><span class='lbracket'>[</span><span class='id identifier rubyid_a'>a</span><span class='lbracket'>[</span><span class='symbol'>:uid</span><span class='rbracket'>]</span><span class='rbracket'>]</span> <span class='op'>||=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+        <span class='id identifier rubyid_email_ids'>email_ids</span><span class='lbracket'>[</span><span class='id identifier rubyid_a'>a</span><span class='lbracket'>[</span><span class='symbol'>:uid</span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_push'>push</span><span class='lparen'>(</span><span class='id identifier rubyid_a'>a</span><span class='lbracket'>[</span><span class='symbol'>:item</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+    <span class='rbrace'>}</span>
+
+    <span class='comment'># Get to the point where we 
+</span>    <span class='id identifier rubyid_attachments'>attachments</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_e'>e</span><span class='op'>|</span>
+        <span class='lbrace'>{</span>
+            <span class='label'>organizer:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:organizer</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>uid:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:uid</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>location:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:location</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>attendees:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:attendees</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>start:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:start</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>end:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:end</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>resources:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:resources</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>booking_id:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:booking_id</span><span class='rbracket'>]</span><span class='comma'>,</span>
+            <span class='label'>subject:</span> <span class='id identifier rubyid_e'>e</span><span class='lbracket'>[</span><span class='symbol'>:subject</span><span class='rbracket'>]</span>
+        <span class='rbrace'>}</span>
+    <span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span><span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span>
+        <span class='id identifier rubyid_a'>a</span><span class='lbracket'>[</span><span class='symbol'>:moderation_emails</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id identifier rubyid_email_ids'>email_ids</span><span class='lbracket'>[</span><span class='id identifier rubyid_a'>a</span><span class='lbracket'>[</span><span class='symbol'>:uid</span><span class='rbracket'>]</span><span class='rbracket'>]</span>
+        <span class='ivar'>@callback</span><span class='period'>.</span><span class='id identifier rubyid_call'>call</span><span class='lparen'>(</span><span class='id identifier rubyid_a'>a</span><span class='comma'>,</span> <span class='ivar'>@appender</span><span class='rparen'>)</span>
+    <span class='rbrace'>}</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="update_booking-instance_method">
+  
+    #<strong>update_booking</strong>(organizer, booking_id, indicator, dial_in_text, send_update = &#39;SendToAllAndSaveCopy&#39;)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'modules/aca/meetings/ews_appender.rb', line 71</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_update_booking'>update_booking</span><span class='lparen'>(</span><span class='id identifier rubyid_organizer'>organizer</span><span class='comma'>,</span> <span class='id identifier rubyid_booking_id'>booking_id</span><span class='comma'>,</span> <span class='id identifier rubyid_indicator'>indicator</span><span class='comma'>,</span> <span class='id identifier rubyid_dial_in_text'>dial_in_text</span><span class='comma'>,</span> <span class='id identifier rubyid_send_update'>send_update</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>SendToAllAndSaveCopy</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+    <span class='comment'># Impersonate the organizer so that we can retrieve the right calendar items
+</span>    <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_set_impersonation'>set_impersonation</span><span class='lparen'>(</span><span class='const'>Viewpoint</span><span class='op'>::</span><span class='const'>EWS</span><span class='op'>::</span><span class='const'>ConnectingSID</span><span class='lbracket'>[</span><span class='symbol'>:SMTP</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='id identifier rubyid_organizer'>organizer</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_booking'>booking</span> <span class='op'>=</span> <span class='ivar'>@cli</span><span class='period'>.</span><span class='id identifier rubyid_get_item'>get_item</span><span class='lparen'>(</span><span class='id identifier rubyid_booking_id'>booking_id</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='symbol'>:item_shape</span> <span class='op'>=&gt;</span> <span class='lbrace'>{</span> <span class='symbol'>:base_shape</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>AllProperties</span><span class='tstring_end'>&#39;</span></span> <span class='rbrace'>}</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
+
+    <span class='comment'># Grab the body of the booking and parse it
+</span>    <span class='id identifier rubyid_html_doc'>html_doc</span> <span class='op'>=</span> <span class='const'>Nokogiri</span><span class='op'>::</span><span class='const'>HTML</span><span class='lparen'>(</span><span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='rparen'>)</span>
+
+    <span class='comment'># We actually want the largest table element that contains the text
+</span>    <span class='comment'># as tables can contain sub-tables and tables are not modified by exchange so much
+</span>    <span class='id identifier rubyid_el'>el</span> <span class='op'>=</span> <span class='kw'>nil</span>
+    <span class='id identifier rubyid_html_doc'>html_doc</span><span class='period'>.</span><span class='id identifier rubyid_css'>css</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>table</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_element'>element</span><span class='op'>|</span>
+        <span class='id identifier rubyid_text'>text</span> <span class='op'>=</span> <span class='id identifier rubyid_element'>element</span><span class='period'>.</span><span class='id identifier rubyid_inner_html'>inner_html</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_text'>text</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_indicator'>indicator</span><span class='embexpr_end'>}</span><span class='regexp_end'>/</span></span>
+            <span class='id identifier rubyid_el'>el</span> <span class='op'>=</span> <span class='id identifier rubyid_element'>element</span>
+            <span class='kw'>break</span>
+        <span class='kw'>end</span>
+    <span class='kw'>end</span>
+
+    <span class='kw'>if</span> <span class='id identifier rubyid_el'>el</span>
+        <span class='id identifier rubyid_el'>el</span><span class='period'>.</span><span class='id identifier rubyid_replace'>replace</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dial_in_text'>dial_in_text</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>else</span>
+        <span class='kw'>if</span> <span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_indicator'>indicator</span><span class='embexpr_end'>}</span><span class='regexp_end'>/</span></span>
+            <span class='id identifier rubyid_new_body'>new_body</span> <span class='op'>=</span> <span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>...</span><span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_body'>body</span><span class='period'>.</span><span class='id identifier rubyid_index'>index</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_indicator'>indicator</span><span class='embexpr_end'>}</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span><span class='rbracket'>]</span>
+
+            <span class='comment'># TODO:: this isn&#39;t very generic
+</span>            <span class='id identifier rubyid_previous_line'>previous_line</span> <span class='op'>=</span> <span class='id identifier rubyid_new_body'>new_body</span><span class='period'>.</span><span class='id identifier rubyid_rindex'>rindex</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>CONFERENCE Details</span><span class='tstring_end'>&quot;</span></span>
+            <span class='kw'>if</span> <span class='id identifier rubyid_previous_line'>previous_line</span>
+                <span class='id identifier rubyid_new_body'>new_body</span> <span class='op'>=</span> <span class='id identifier rubyid_new_body'>new_body</span><span class='lbracket'>[</span><span class='int'>0</span><span class='op'>...</span><span class='id identifier rubyid_previous_line'>previous_line</span><span class='rbracket'>]</span>
+            <span class='kw'>end</span>
+
+            <span class='id identifier rubyid_html_doc'>html_doc</span> <span class='op'>=</span> <span class='const'>Nokogiri</span><span class='op'>::</span><span class='const'>HTML</span><span class='lparen'>(</span><span class='id identifier rubyid_new_body'>new_body</span><span class='rparen'>)</span>
+        <span class='kw'>end</span>
+        <span class='id identifier rubyid_html_doc'>html_doc</span><span class='period'>.</span><span class='id identifier rubyid_at'>at</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>body</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_children'>children</span><span class='period'>.</span><span class='id identifier rubyid_last'>last</span><span class='period'>.</span><span class='id identifier rubyid_after'>after</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>&lt;br /&gt;&lt;br /&gt;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_dial_in_text'>dial_in_text</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+
+    <span class='comment'># Add our input and update the item
+</span>    <span class='id identifier rubyid_booking'>booking</span><span class='period'>.</span><span class='id identifier rubyid_update_item!'>update_item!</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='symbol'>:body</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_html_doc'>html_doc</span><span class='period'>.</span><span class='id identifier rubyid_to_html'>to_html</span><span class='rbrace'>}</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='symbol'>:send_meeting_invitations_or_cancellations</span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_send_update'>send_update</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+
+      <div id="footer">
+  Generated on Fri Jun 28 04:36:39 2019 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.20 (ruby-2.4.6).
+</div>
+
+    </div>
+  </body>
+</html>
