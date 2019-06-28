@@ -3,7 +3,6 @@ require 'set'
 
 module Qsc; end
 
-# Documentation: https://aca.im/driver_docs/QSC/QRCDocumentation.pdf
 # The older V1 protocol
 # http://q-syshelp.qschome.com/Content/External%20Control/Q-Sys%20External%20Control/007%20Q-Sys%20External%20Control%20Protocol.htm
 
