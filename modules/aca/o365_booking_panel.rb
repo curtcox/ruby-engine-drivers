@@ -239,24 +239,26 @@ class Aca::O365BookingPanel
             booking_start_epoch = Time.parse(booking[:Start]).to_i
             if booking[:isAllDay]
                 logger.warn { "RBP>#{@office_room}>CANCEL>ALL_DAY: An All Day booking was NOT deleted, with start time #{delete_start_epoch}" }
-            elsif booking[:email] == @office_room  # Bookings owned by the room need to be deleted, not declined
-                response = @client.delete_booking(booking_id: booking[:id], mailbox: system.email)
-                logger.warn { "RBP>#{@office_room}>CANCEL>ROOM_OWNED: A booking owned by the room was deleted, with start time #{delete_start_epoch}" }
             elsif booking_start_epoch == delete_start_epoch
-                # Decline the meeting, with the appropriate message to the booker
-                case reason
-                when RBP_AUTOCANCEL_TRIGGERED
-                    response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: self[:booking_timeout_email_message])
-                when RBP_STOP_PRESSED
-                    response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: self[:booking_cancel_email_message])
+                if booking[:email] == @office_room  # Bookings owned by the room need to be deleted, not declined
+                    response = @client.delete_booking(booking_id: booking[:id], mailbox: system.email)
+                    logger.warn { "RBP>#{@office_room}>CANCEL>ROOM_OWNED: A booking owned by the room was deleted, with start time #{delete_start_epoch}" }
                 else
-                    response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: "The booking was cancelled due to \"#{reason}\" ")
-                end
-                logger.warn { "RBP>#{@office_room}>CANCEL>SUCCESS: Declined booking due to \"#{reason}\", with start time #{delete_start_epoch}" }
-                if response == 200
-                    bookings_deleted += 1
-                    # self[:today].delete_at(i) This does not seem to notify the websocket, so call fetch_bookings instead
-                    fetch_bookings
+                    # Decline the meeting, with the appropriate message to the booker
+                    case reason
+                    when RBP_AUTOCANCEL_TRIGGERED
+                        response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: self[:booking_timeout_email_message])
+                    when RBP_STOP_PRESSED
+                        response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: self[:booking_cancel_email_message])
+                    else
+                        response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: "The booking was cancelled due to \"#{reason}\" ")
+                    end
+                    logger.warn { "RBP>#{@office_room}>CANCEL>SUCCESS: Declined booking due to \"#{reason}\", with start time #{delete_start_epoch}" }
+                    if response == 200
+                        bookings_deleted += 1
+                        # self[:today].delete_at(i) This does not seem to notify the websocket, so call fetch_bookings instead
+                        fetch_bookings
+                    end
                 end
             end
         end
