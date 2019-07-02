@@ -10,8 +10,6 @@ require 'set'
 class Aca::Tracking::DeskManagement
     include ::Orchestrator::Constants
 
-
-
     descriptive_name 'ACA Desk Management'
     generic_name :DeskManagement
     implements :logic
@@ -75,6 +73,25 @@ class Aca::Tracking::DeskManagement
         @user_identifier = setting(:user_identifier) || :login_name
         @timezone = setting(:timezone) || 'UTC'
 
+        # { "level_id": ["desk_id"] }
+        out_of_order = setting(:out_of_order) || {}
+        @out_of_order = {}
+        out_of_order.each do |level_id, desks|
+          self["#{level_id}:out_of_order"] = desks
+          @out_of_order[level_id.to_s] = Set.new(desks)
+        end
+
+        # { "level_id": {"desk_id": {reservation details}} }
+        @reservations = setting(:reservations) || {}
+        @reservations.each do |level_id, reservations|
+          self["#{level_id}:reservations"] = reservations.values
+        end
+
+        @occupied = setting(:occupied) || {}
+        @occupied.each do |level_id, occupied|
+          self["#{level_id}:occupied"] = occupied.values
+        end
+
         # { "switch_ip": { "port_id": "desk_id" } }
         @switch_mappings = setting(:mappings) || {}
         @desk_mappings = {}
@@ -105,6 +122,122 @@ class Aca::Tracking::DeskManagement
         @subscriptions.clear
         subscribe_disconnect
     end
+
+    # ========================
+    #  MANUAL DESK MANAGEMENT
+    # ========================
+    def reserve_desks(tag, desks, level_id)
+      level_id = level_id.to_s
+      reservations = @reservations[level_id] || {}
+      time = Time.now.to_i
+
+      # Grab the name of the user who reserved these desks
+      user = current_user
+      username = user.__send__(@user_identifier) if user
+
+      # For each desk id passed to the function, create the reservation object
+      # (This adds desks to the list of reserved desks - versus overriding anything already reserved)
+      Array(desks).each do |desk|
+        reservations[desk_id] = {
+          connected_at: time,
+          connected: true,
+          reserved: true,
+          reserved_for: tag,
+          username: username,
+          desk_id: desk_id
+        }
+      end
+
+      # Update the status variables
+      @reservations[level_id] = reservations
+      self["#{level_id}:reservations"] = reservations.values
+
+      # Save to DB
+      define_setting(:reservations, @reservations)
+      true
+    end
+
+    def checkin(level_id, desks, user_id)
+      level_id = level_id.to_s
+      occupied = @occupied[level_id] || {}
+      time = Time.now.to_i
+
+      # Grab the name of the user who reserved these desks
+      user = current_user
+      username = user.__send__(@user_identifier) if user
+
+      # For each desk id passed to the function, create the reservation object
+      # (This adds desks to the list of reserved desks - versus overriding anything already reserved)
+      Array(desks).each do |desk|
+        occupied[desk_id] = {
+          connected_at: time,
+          connected: true,
+          reserved: true,
+          reserved_for: user_id,
+          username: username,
+          desk_id: desk_id
+        }
+      end
+
+      # Update the status variables
+      @occupied[level_id] = occupied
+      self["#{level_id}:occupied"] = occupied.values
+
+      # Save to DB
+      define_setting(:occupied, @occupied)
+      true
+    end
+
+    def reset_desks(desks, user_id)
+      # Update tracking variables
+      Array(desks).each do |desk|
+        @out_of_order.each { |level, set| set.delete(desk) }
+        @reservations.each { |level, hash| hash.delete(desk) }
+        @occupied.each { |level, hash| hash.delete(desk) }
+      end
+
+      # Update exposed state
+      @out_of_order.each do |level_id, desks|
+        self["#{level_id}:out_of_order"] = desks.to_a
+      end
+
+      @reservations.each do |level_id, reservations|
+        self["#{level_id}:reservations"] = reservations.values
+      end
+
+      @occupied.each do |level_id, occupied|
+        self["#{level_id}:occupied"] = occupied.values
+      end
+
+      # Save details to the database
+      savable = {}
+      @out_of_order.each { |level, set_desks| savable[level] = set_desks.to_a }
+      define_setting(:out_of_order, savable)
+      define_setting(:reservations, @reservations)
+      define_setting(:occupied, @occupied)
+      true
+    end
+
+    def set_out_of_order(level_id, desks)
+      level_id = level_id.to_s
+
+      # Merge these desks into the existing out of order desks
+      out_of_order_desks = @out_of_order[level_id] || Set.new
+      out_of_order_desks.merge desks
+
+      # Expose the list of desks to the ["id1", "id2", ...] to the front end
+      @out_of_order[level_id] = out_of_order_desks
+      self["#{level_id}:out_of_order"] = out_of_order_desks
+
+      # Save details to the database (can't save sets as JSON)
+      savable = {}
+      @out_of_order.each { |level, set_desks| savable[level] = set_desks.to_a }
+      define_setting(:out_of_order, savable)
+      true
+    end
+    # =======================
+    #   END DESK MANAGEMENT
+    # =======================
 
     # Grab the list of desk ids in use on a floor
     #
