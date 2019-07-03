@@ -257,7 +257,20 @@ module Microsoft::Officenew::Events
         check_response(request)
         200
     end
-
+    
+    ##
+    # Decline a meeting
+    # 
+    # @param mailbox [String] The mailbox email which contains the booking to delete
+    # @param booking_id [String] The ID of the booking to be deleted
+    # @param comment [String] An optional message that will be included in the body of the automated email that will be sent to the host of the meeting
+    def delete_booking(mailbox:, booking_id:, comment: '')
+        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}/decline"
+        request = graph_request(request_method: 'post', endpoints: [endpoint], data: {comment: comment})
+        check_response(request)
+        200
+    end
+    
     protected
 
     def create_event_json(subject: nil, body: nil, start_param: nil, end_param: nil, timezone: nil, rooms: [], location: nil, attendees: nil, organizer_name: nil, organizer:nil, recurrence: nil, extensions: {}, is_private: false)
