@@ -264,7 +264,7 @@ module Microsoft::Officenew::Events
     # @param mailbox [String] The mailbox email which contains the booking to delete
     # @param booking_id [String] The ID of the booking to be deleted
     # @param comment [String] An optional message that will be included in the body of the automated email that will be sent to the host of the meeting
-    def delete_booking(mailbox:, booking_id:, comment: '')
+    def decline_meeting(mailbox:, booking_id:, comment: '')
         endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}/decline"
         request = graph_request(request_method: 'post', endpoints: [endpoint], data: {comment: comment})
         check_response(request)
