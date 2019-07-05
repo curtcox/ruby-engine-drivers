@@ -108,6 +108,7 @@ module Microsoft::Officenew::Events
         responses.each_with_index do |res, i|
             bookings = res['body']['value']
             is_available = true
+            next unless bookings
             # Go through each booking and extract more info from it
             bookings.each_with_index do |booking, i|
                 bookings[i] = Microsoft::Officenew::Event.new(client: self, event: booking, available_to: options[:available_to], available_from: options[:available_from]).event
