@@ -278,8 +278,8 @@ class Aca::OfficeBooking
             start_time  = start_utc.iso8601                                     # output looks like: "2019-05-21T15:50:00Z+08:00"
             end_time    = end_utc.iso8601
 
-            name =  booking.dig('organizer','name')  || booking.dig('attendees',0,'name')
-            email = booking.dig('organizer','email') || booking.dig('attendees',0,'email')
+            name =  booking.dig('organizer',:name)  || booking.dig('attendees',0,'name')
+            email = booking.dig('organizer',:email) || booking.dig('attendees',0,'email')
 
             subject = booking['subject']
             if ['private','confidential'].include?(booking['sensitivity'])
