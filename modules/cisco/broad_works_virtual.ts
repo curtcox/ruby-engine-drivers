@@ -1,6 +1,23 @@
 
 window.control.systems['sys-call-center'] = {
     CallCenter: [{
+        total_abandoned: 3,
+        longest_wait: 125,
+        longest_talk: 945,
+        achievements: [
+            {
+                "text": "<b>Nicki is amazing</b>, she got stuff done",
+                "icon": "star"
+            },
+            {
+                "text": "<b>Nicki is amazing</b>, she got stuff done",
+                "icon": "trophy"
+            },
+            {
+                "text": "<b>Nicki is amazing</b>, she got stuff done",
+                "icon": "phone"
+            }
+        ],
         queues: {
             "Police": {
               queue_length: 1,
@@ -72,9 +89,6 @@ window.control.systems['sys-call-center'] = {
               average_talk: 49,
               on_calls: 0
             }
-        },
-        total_abandoned: 3,
-        longest_wait: 125,
-        longest_talk: 945
+        }
     }]
 };
