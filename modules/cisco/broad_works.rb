@@ -226,7 +226,7 @@ class Cisco::BroadWorks
 
     # Non-event related calls
     def get_call_count(call_center_id)
-        get('/com.broadsoft.xsi-actions/v2.0/callcenter/#{call_center_id}/calls', name: "call_center_#{call_center_id}_calls") do |data, resolve, command|
+        get("/com.broadsoft.xsi-actions/v2.0/callcenter/#{call_center_id}/calls", name: "call_center_#{call_center_id}_calls") do |data, resolve, command|
             if data.status == 200
                 xml = Nokogiri::XML(data.body)
                 xml.remove_namespaces!
@@ -310,7 +310,7 @@ class Cisco::BroadWorks
     def current_calls(user_id)
         # i.e. an event isn't missed: /com.broadsoft.xsi-actions/v2.0/user/<userid>/calls
         # Returns an object with multiple <callId>callhalf-722:0</callId>
-        get('/com.broadsoft.xsi-actions/v2.0/callcenter/#{call_center_id}/calls', name: "current_#{user_id}_calls") do |data, resolve, command|
+        get("/com.broadsoft.xsi-actions/v2.0/callcenter/#{call_center_id}/calls", name: "current_#{user_id}_calls") do |data, resolve, command|
             if data.status == 200
                 xml = Nokogiri::XML(data.body)
                 xml.remove_namespaces!
