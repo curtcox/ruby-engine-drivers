@@ -114,7 +114,7 @@ class Aca::O365BookingPanel
         logger.debug "RBP>#{@office_room}>CREATE>INPUT:\n #{options}"
         req_params = {}
         req_params[:room_email] = @office_room
-        req_params[:organizer] = options.dig(:host, :email) || @office_room
+        req_params[:organizer] = { name: options.dig(:host, :name) || 'Anonymous', email: options.dig(:host, :email) || @office_room }
         req_params[:subject] = options[:title]
         req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.to_i
         req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.to_i
@@ -221,7 +221,7 @@ class Aca::O365BookingPanel
         booking_json = new_booking.to_json
         logger.debug "RBP>#{@office_room}>CREATE:\n #{booking_json}"
         begin
-            result = @client.create_booking(room_id: system.id, start_param: start_time, end_param: end_time, subject: subject, current_user:  {email: organizer, name: organizer})
+            result = @client.create_booking(mailbox: organizer[:email], start_param: start_time, end_param: end_time, options: {subject: subject, attendees: [system.email]})
         rescue => e
             logger.error "RBP>#{@office_room}>CREATE>ERROR: #{e}\nResponse:\n#{result}"
         else
