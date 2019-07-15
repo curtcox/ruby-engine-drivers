@@ -282,10 +282,10 @@ class Cisco::BroadWorks
                 abandoned: abandoned,
                 total_calls: calls.size,
                 # Time in milliseconds
-                average_wait: (calls.reduce(:+) || 0) / calls.size,
+                average_wait: (calls.reduce(:+) || 0) / [1, calls.size].max,
                 max_wait: calls.max.to_i,
 
-                average_talk: (times.reduce(:+) || 0) / times.size,
+                average_talk: (times.reduce(:+) || 0) / [1, times.size].max,
                 on_calls: num_on_call[id].to_i
             }
 
