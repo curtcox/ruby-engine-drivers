@@ -119,7 +119,7 @@ class Mediasite::Module
         self[:live] = live?
 
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/ActiveInputs"))
-        self[:dual] = res['ActiveInputs'].size >= 2
+        self[:dual] = res['ActiveInputs'].size >= 2 if res['ActiveInputs']
 
         res = get_request(create_url("/api/v1/Recorders('#{self[:device_id]}')/TimeRemaining"))
         self[:time_remaining] = res['SecondsRemaining']
