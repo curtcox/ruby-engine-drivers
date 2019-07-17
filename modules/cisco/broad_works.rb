@@ -117,6 +117,7 @@ class Cisco::BroadWorks
 
         # Lookup the callcenter in question
         call_center_id = @subscription_lookup[event[:subscription_id]]
+        logger.debug { "processing event #{event[:event_name]}" }
 
         # Otherwise process the event
         case event[:event_name]
@@ -162,14 +163,14 @@ class Cisco::BroadWorks
                 time: Time.now.to_i
             }
 
-            logger.debug { "tracking call #{call_id} handled by #{user_id}" }
+            logger.info { "tracking call #{call_id} handled by #{user_id}" }
             task { bw.get_user_events(user_id, "Basic Call") }
         when 'CallReleasedEvent'
             event_data = event[:event_data]
             call_id = event_data.xpath("//callId").inner_text
             call_details = @call_tracking.delete call_id
 
-            logger.debug { "call #{call_id} ended, was tracked: #{!!call_details}" }
+            logger.info { "call #{call_id} ended, was tracked: #{!!call_details}" }
 
             if call_details
                 call_center_id = call_details[:center]
@@ -183,7 +184,7 @@ class Cisco::BroadWorks
                 @talk_time[call_center_id] = talk_times
             end
         else
-            logger.debug { "ignoring event #{event[:event_name]}" }
+            logger.info { "ignoring event #{event[:event_name]}" }
         end
 
         if SHOULD_UPDATE.include?(event[:event_name])
@@ -324,7 +325,7 @@ class Cisco::BroadWorks
     def current_calls(user_id)
         # i.e. an event isn't missed: /com.broadsoft.xsi-actions/v2.0/user/<userid>/calls
         # Returns an object with multiple <callId>callhalf-722:0</callId>
-        get("/com.broadsoft.xsi-actions/v2.0/callcenter/#{call_center_id}/calls",
+        get("/com.broadsoft.xsi-actions/v2.0/user/#{user_id}/calls",
           name: "current_#{user_id}_calls",
           proxy: get_proxy_details,
           headers: {Authorization: [@username, @password]}
