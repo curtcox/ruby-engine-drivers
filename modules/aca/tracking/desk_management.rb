@@ -25,7 +25,9 @@ class Aca::Tracking::DeskManagement
         desk_hold_time: 5.minutes.to_i,
         desk_reserve_time: 2.hours.to_i,
         manual_reserve_time: 2.hours.to_i,
-        user_identifier: :login_name  # in user model
+        user_identifier: :login_name,  # in user model
+        # Group name of users allowed to reserve desks
+        reservation_group: 'administrators'
     })
 
     def on_load
@@ -70,6 +72,7 @@ class Aca::Tracking::DeskManagement
         self[:hold_time]    = setting(:desk_hold_time) || 5.minutes.to_i
         self[:reserve_time] = @desk_reserve_time = setting(:desk_reserve_time) || 2.hours.to_i
         self[:manual_reserve_time] = @manual_reserve_time = setting(:manual_reserve_time) || 2.hours.to_i
+        self[:reservation_group] = setting(:reservation_group) || ''
         @user_identifier = setting(:user_identifier) || :login_name
         @timezone = setting(:timezone) || 'UTC'
 
