@@ -134,14 +134,17 @@ class Nec::Display::All
         :video1 => 5,
         :video2 => 6,
         :svideo => 7,
-
+        :tuner => 9,
         :tv => 10,
         :dvd1 => 12,
         :option => 13,
         :dvd2 => 14,
         :display_port => 15,
+        :hdmi => 17,
+        :hdmi2 => 18,
+        :hdmi3 => 130,
+        :usb => 135
 
-        :hdmi => 17
     }
     INPUTS.merge!(INPUTS.invert)
 
