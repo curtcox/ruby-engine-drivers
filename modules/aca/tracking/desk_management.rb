@@ -129,7 +129,13 @@ class Aca::Tracking::DeskManagement
     # ========================
     #  MANUAL DESK MANAGEMENT
     # ========================
-    def reserve_desks(tag, desks, level_id)
+    def reserve_desks(args)
+      tag = args["tag"]
+      desks = args["desks"]
+      level_id = args["levelId"]
+
+      raise ArgumentError.new("missing one of tag, desks or levelId") unless tag && desks && level_id
+
       level_id = level_id.to_s
       reservations = @reservations[level_id] || {}
       time = Time.now.to_i
@@ -140,7 +146,7 @@ class Aca::Tracking::DeskManagement
 
       # For each desk id passed to the function, create the reservation object
       # (This adds desks to the list of reserved desks - versus overriding anything already reserved)
-      Array(desks).each do |desk|
+      Array(desks).each do |desk_id|
         reservations[desk_id] = {
           connected_at: time,
           connected: true,
@@ -160,6 +166,7 @@ class Aca::Tracking::DeskManagement
       true
     end
 
+    # TODO:: remove this function
     def checkin(level_id, desks, user_id)
       level_id = level_id.to_s
       occupied = @occupied[level_id] || {}
@@ -171,7 +178,7 @@ class Aca::Tracking::DeskManagement
 
       # For each desk id passed to the function, create the reservation object
       # (This adds desks to the list of reserved desks - versus overriding anything already reserved)
-      Array(desks).each do |desk|
+      Array(desks).each do |desk_id|
         occupied[desk_id] = {
           connected_at: time,
           connected: true,
@@ -191,7 +198,12 @@ class Aca::Tracking::DeskManagement
       true
     end
 
-    def reset_desks(desks, user_id)
+    def reset_desks(args)
+      desks = args["desks"]
+      user_id = args["userId"]
+
+      raise ArgumentError.new("missing one of desks or userId") unless desks && user_id
+
       # Update tracking variables
       Array(desks).each do |desk|
         @out_of_order.each { |level, set| set.delete(desk) }
@@ -222,6 +234,11 @@ class Aca::Tracking::DeskManagement
     end
 
     def set_out_of_order(level_id, desks)
+      level_id = args["levelId"]
+      desks = args["desks"]
+
+      raise ArgumentError.new("missing one of desks or levelId") unless desks && level_id
+
       level_id = level_id.to_s
 
       # Merge these desks into the existing out of order desks
