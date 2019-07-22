@@ -233,7 +233,7 @@ class Aca::Tracking::DeskManagement
       true
     end
 
-    def set_out_of_order(level_id, desks)
+    def set_out_of_order(args)
       level_id = args["levelId"]
       desks = args["desks"]
 
