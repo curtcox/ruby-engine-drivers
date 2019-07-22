@@ -41,6 +41,7 @@ class Cisco::BroadWorks
         @domain = setting(:events_domain)
         @proxy = setting(:proxy) || ENV["HTTPS_PROXY"] || ENV["https_proxy"]
         @callcenters = setting(:callcenters) || {}
+        self[:achievements] = setting(:achievements) || []
 
         # "sub_id" => "callcenter id"
         @subscription_lookup ||= {}
