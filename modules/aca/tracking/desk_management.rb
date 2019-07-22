@@ -247,7 +247,7 @@ class Aca::Tracking::DeskManagement
 
       # Expose the list of desks to the ["id1", "id2", ...] to the front end
       @out_of_order[level_id] = out_of_order_desks
-      self["#{level_id}:out_of_order"] = out_of_order_desks
+      self["#{level_id}:out_of_order"] = out_of_order_desks.to_a
 
       # Save details to the database (can't save sets as JSON)
       savable = {}
