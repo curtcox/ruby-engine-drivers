@@ -101,7 +101,7 @@ class Cisco::BroadWorks
         nil
     end
 
-    SHOULD_UPDATE = Set.new(['ACDCallAddedEvent', 'ACDCallAbandonedEvent', 'CallReleasedEvent', 'ACDCallStrandedEvent', 'ACDCallAnsweredByAgentEvent', 'CallReleasedEvent'])
+    SHOULD_UPDATE = Set.new(['ACDCallAddedEvent', 'ACDCallAbandonedEvent', 'ACDCallReleasedEvent', 'ACDCallStrandedEvent', 'ACDCallAnsweredByAgentEvent', 'CallReleasedEvent'])
 
     def process_event(event)
         # Check if the connection was terminated
@@ -133,7 +133,7 @@ class Cisco::BroadWorks
 
             count = @queued_calls[call_center_id]
             @queued_calls[call_center_id] = count.to_i - 1
-        when 'CallReleasedEvent', 'ACDCallStrandedEvent'
+        when 'ACDCallStrandedEvent'
             # Not entirely sure when this happens
             count = @queued_calls[call_center_id]
             @queued_calls[call_center_id] = count.to_i - 1
@@ -164,9 +164,10 @@ class Cisco::BroadWorks
                 time: Time.now.to_i
             }
 
+            bw = @bw
             logger.info { "tracking call #{call_id} handled by #{user_id}" }
             task { bw.get_user_events(user_id, "Basic Call") }
-        when 'CallReleasedEvent'
+        when 'CallReleasedEvent', 'ACDCallReleasedEvent'
             event_data = event[:event_data]
             call_id = event_data.xpath("//callId").inner_text
             call_details = @call_tracking.delete call_id
@@ -223,6 +224,19 @@ class Cisco::BroadWorks
                 retries += 1
                 retry unless retries > 3
             end
+        end
+
+        user_ids = []
+        @call_tracking.each do |key, value|
+            user_ids << value[:user]
+        end
+        return if user_ids.empty?
+        begin
+            task {
+                user_ids.each { |id| bw.get_user_events(id, "Basic Call") }
+            }.value
+        rescue => e
+            logger.error "monitoring users\n#{e.message}"
         end
     end
 
