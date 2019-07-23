@@ -30,7 +30,7 @@ class Cisco::BroadWorks
         @terminated = false
 
         # TODO:: Load todays stats from the database if they exist
-        reset_stats
+        # reset_stats (we don't want to reset these)
 
         on_update
     end
