@@ -123,8 +123,8 @@ class Aca::O365BookingPanel
         begin
             id = create_o365_booking req_params
         rescue Exception => e
-            logger.debug e.message
-            logger.debug e.backtrace.inspect
+            logger.error e.message
+            logger.error e.backtrace.join("\n")
             raise e
         end
         logger.debug { "successfully created booking: #{id}" }
@@ -223,7 +223,7 @@ class Aca::O365BookingPanel
         begin
             result = @client.create_booking(mailbox: organizer[:email], start_param: start_time, end_param: end_time, options: {subject: subject, attendees: [system.email]})
         rescue => e
-            logger.error "RBP>#{@office_room}>CREATE>ERROR: #{e}\nResponse:\n#{result}"
+            logger.error "RBP>#{@office_room}>CREATE>ERROR: #{e.message}\n#{e.backtrace.join("\n")}"
         else
             logger.debug "RBP>#{@office_room}>CREATE>SUCCESS:\n #{result}"
         end
