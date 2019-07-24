@@ -2,7 +2,8 @@ module Microsoft::Officenew::Events
     ##
     # For every mailbox (email) passed in, this method will grab all the bookings and, if
     # requested, return the availability of the mailboxes for some time range.
-    # 
+    # https://docs.microsoft.com/en-us/graph/api/user-list-events?view=graph-rest-1.0&tabs=http
+    #
     # @param mailboxes [Array] An array of mailbox emails to pull bookings from. These are generally rooms but could be users.
     # @option options [Integer] :created_from Get all the bookings created after this seconds epoch
     # @option options [Integer] :start_param Get all the bookings that occurr between this seconds epoch and end_param
@@ -123,11 +124,12 @@ module Microsoft::Officenew::Events
     ##
     # Create an Office365 event in the mailbox passed in. This may have rooms and other 
     # attendees associated with it and thus create events in other mailboxes also.
-    # 
+    # https://docs.microsoft.com/en-us/graph/api/user-post-events?view=graph-rest-1.0&tabs=http
+    #
     # @param mailbox [String] The mailbox email in which the event is to be created. This could be a user or a room though is generally a user
     # @param start_param [Integer] A seconds epoch which denotes the start of the booking
     # @param end_param [Integer] A seconds epoch which denotes the end of the booking
-    # @option options [Array] :room_emails An array of room resource emails to be added to the booking
+    # @option options [Array] :rooms An array of room resource emails to be added to the booking. They will get added to attendees[] with "type: resource"
     # @option options [String] :subject A subject for the booking
     # @option options [String] :description A description to be added to the body of the event
     # @option options [String] :organizer_name The name of the organizer
@@ -184,7 +186,7 @@ module Microsoft::Officenew::Events
     # @param mailbox [String] The mailbox email in which the event is to be created. This could be a user or a room though is generally a user
     # @option options [Integer] :start_param A seconds epoch which denotes the start of the booking
     # @option options [Integer] :end_param A seconds epoch which denotes the end of the booking
-    # @option options [Array] :room_emails An array of room resource emails to be added to the booking
+    # @option options [Array] :rooms An array of room resource emails to be added to the booking. They will get added to attendees[] with "type: resource"    
     # @option options [String] :subject A subject for the booking
     # @option options [String] :description A description to be added to the body of the event
     # @option options [String] :organizer_name The name of the organizer
