@@ -129,6 +129,7 @@ class Microsoft::Officenew::Client
     end
 
     def log_graph_request(request_method, data, query, headers, graph_path, endpoints=nil)
+        return unless ENV['RAILS_ENV'] == "development"
         STDERR.puts "--------------NEW GRAPH REQUEST------------"
         STDERR.puts "#{request_method} to #{graph_path}"
         STDERR.puts "Data:"
@@ -144,7 +145,7 @@ class Microsoft::Officenew::Client
     end
 
     def check_response(response)
-        STDERR.puts "GRAPH API Response:\n #{response}"
+        STDOUT.puts "GRAPH API Response:\n #{response}" if ENV['RAILS_ENV'] == "development"
         case response.status
         when 200, 201, 204
             return
