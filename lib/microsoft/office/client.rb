@@ -114,7 +114,7 @@ class Microsoft::Officenew::Client
 
         headers['Authorization'] = "Bearer #{graph_token}"
         headers['Content-Type'] = ENV['GRAPH_CONTENT_TYPE'] || "application/json"
-        headers['Prefer'] = ENV['GRAPH_PREFER'] || 'outlook.timezone="Australia/Sydney"'
+        headers['Prefer'] = ENV['GRAPH_PREFER'] || "outlook.timezone=\"#{ENV['TZ']}\""
 
         log_graph_request(request_method, data, query, headers, graph_path, endpoints)
 
@@ -144,6 +144,7 @@ class Microsoft::Officenew::Client
     end
 
     def check_response(response)
+        STDERR.puts "GRAPH API Response:\n #{response}"
         case response.status
         when 200, 201, 204
             return

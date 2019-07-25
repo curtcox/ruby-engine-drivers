@@ -303,12 +303,12 @@ module Microsoft::Officenew::Events
         }
 
         event_json[:start] = {
-            dateTime: ActiveSupport::TimeZone.new(timezone).at(start_param),
+            dateTime: ActiveSupport::TimeZone.new(timezone).at(start_param).strftime('%FT%R'),
             timeZone: timezone
         } if start_param
 
         event_json[:end] = {
-            dateTime: ActiveSupport::TimeZone.new(timezone).at(end_param),
+            dateTime: ActiveSupport::TimeZone.new(timezone).at(end_param).strftime('%FT%R'),
             timeZone: timezone
         } if end_param
 
