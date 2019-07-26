@@ -66,7 +66,7 @@ class Aca::O365BookingPanel
         self[:booking_endable] = setting(:booking_endable)
         self[:booking_ask_cancel] = setting(:booking_ask_cancel)
         self[:booking_ask_end] = setting(:booking_ask_end)
-        self[:booking_default_title] = setting(:booking_default_title)
+        self[:booking_default_title] = setting(:booking_default_title) || "On the spot booking"
         self[:booking_select_free] = setting(:booking_select_free)
         self[:booking_hide_all] = setting(:booking_hide_all) || false
 
@@ -91,6 +91,7 @@ class Aca::O365BookingPanel
         self[:last_meeting_started] = setting(:last_meeting_started)
         self[:cancel_meeting_after] = setting(:cancel_meeting_after)
 
+        self[:today] = []
         fetch_bookings
         schedule.clear
         schedule.every(setting(:update_every) || '5m') { fetch_bookings }
@@ -101,35 +102,34 @@ class Aca::O365BookingPanel
         self[:today] = expose_bookings(response)
     end
 
-    def create_meeting(options)
-        # Check that the required params exist
+    def create_meeting(params)
         required_fields = ["start", "end"]
-        check = required_fields - options.keys
+        check = required_fields - params.keys
         if check != []
-            # There are missing required fields
-            logger.info "Required fields missing: #{check}"
-            raise "missing required fields: #{check}"
+            logger.debug "Required fields missing: #{check}"
+            raise "Required fields missing: #{check}"
         end
 
-        logger.debug "RBP>#{@office_room}>CREATE>INPUT:\n #{options}"
-        req_params = {}
-        req_params[:room_email] = @office_room
-        req_params[:organizer] = { name: options.dig(:host, :name) || 'Anonymous', email: options.dig(:host, :email) || @office_room }
-        req_params[:subject] = options[:title]
-        req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.to_i
-        req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.to_i
-
-        # TODO:: Catch error for booking failure
+        logger.debug "RBP>#{@office_room}>CREATE>INPUT:\n #{params}"
         begin
-            id = create_o365_booking req_params
+            result = @client.create_booking(
+                        mailbox:        params.dig(:host, :email) || @office_room, 
+                        start_param:    epoch(params[:start]), 
+                        end_param:      epoch(params[:end]), 
+                        options: {
+                            subject:    params[:title] || setting(:booking_default_title),
+                            attendees:  [ {email: @office_room, type: "resource"} ],
+                            timezone:   ENV['TZ']   
+                        }
+                    )
         rescue Exception => e
-            logger.error e.message
-            logger.error e.backtrace.join("\n")
+            logger.error "RBP>#{@office_room}>CREATE>ERROR: #{e.message}\n#{e.backtrace.join("\n")}"
             raise e
-        end
-        logger.debug { "successfully created booking: #{id}" }
-        schedule.in('2s') do
-            fetch_bookings
+        else
+            logger.debug { "RBP>#{@office_room}>CREATE>SUCCESS:\n #{result}" }
+            schedule.in('2s') do
+                fetch_bookings
+            end
         end
         "Ok"
     end
@@ -150,23 +150,28 @@ class Aca::O365BookingPanel
         too_late_to_cancel = self[:booking_cancel_timeout] ?  (now > (start_epoch + self[:booking_cancel_timeout] + 180)) : false   # "180": allow up to 3mins of slippage, in case endpoint is not NTP synced
         bookings_to_cancel = bookings_with_start_time(start_epoch)
 
-        if bookings_to_cancel == 1
-            if reason == RBP_STOP_PRESSED
+        if bookings_to_cancel > 1
+            logger.warn { "RBP>#{@office_room}>CANCEL>CLASH: No bookings cancelled as Multiple bookings (#{bookings_to_cancel}) were found with same start time #{start_time}" } 
+            return
+        end
+        if bookings_to_cancel == 0
+            logger.warn { "RBP>#{@office_room}>CANCEL>NOT_FOUND: Could not find booking to cancel with start time #{start_time}" }
+            return
+        end
+
+        case reason
+        when RBP_STOP_PRESSED
+            delete_o365_booking(start_epoch, reason)
+        when RBP_AUTOCANCEL_TRIGGERED
+            if !too_early_to_cancel && !too_late_to_cancel
                 delete_o365_booking(start_epoch, reason)
-            elsif reason == RBP_AUTOCANCEL_TRIGGERED
-                if !too_early_to_cancel && !too_late_to_cancel
-                    delete_o365_booking(start_epoch, reason)
-                else
-                    logger.warn { "RBP>#{@office_room}>CANCEL>TOO_EARLY: Booking not cancelled with start time #{start_time}" } if too_early_to_cancel
-                    logger.warn { "RBP>#{@office_room}>CANCEL>TOO_LATE: Booking not cancelled with start time #{start_time}" } if too_late_to_cancel
-                end
-            else  # an unsupported reason, just cancel the booking and add support to this driver.
-                logger.error { "RBP>#{@office_room}>CANCEL>UNKNOWN_REASON: Cancelled booking with unknown reason, with start time #{start_time}" }
-                delete_o365_booking(start_epoch, reason)
+            else
+                logger.warn { "RBP>#{@office_room}>CANCEL>TOO_EARLY: Booking NOT cancelled with start time #{start_time}" } if too_early_to_cancel
+                logger.warn { "RBP>#{@office_room}>CANCEL>TOO_LATE: Booking NOT cancelled with start time #{start_time}" } if too_late_to_cancel
             end
-        else
-            logger.warn { "RBP>#{@office_room}>CANCEL>CLASH: No bookings cancelled as Multiple bookings (#{bookings_to_cancel}) were found with same start time #{start_time}" } if bookings_to_cancel > 1
-            logger.warn { "RBP>#{@office_room}>CANCEL>NOT_FOUND: Could not find booking to cancel with start time #{start_time}" } if bookings_to_cancel == 0
+        else    # an unsupported reason, just cancel the booking and add support to this driver.
+            logger.error { "RBP>#{@office_room}>CANCEL>UNKNOWN_REASON: Cancelled booking with unknown reason, with start time #{start_time}" }
+            delete_o365_booking(start_epoch, reason)
         end
     
         self[:last_meeting_started] = ms_epoch
@@ -207,63 +212,58 @@ class Aca::O365BookingPanel
         self[:meeting_ending] = self[:last_meeting_started]
     end
 
+
+    
     protected
 
-    def create_o365_booking(user_email: nil, subject: 'On the spot booking', room_email:, start_time:, end_time:, organizer:)
-        new_booking = {
-            subject:    subject,
-            start:      { dateTime: start_time, timeZone: "UTC" },
-            end:        { dateTime: end_time, timeZone: "UTC" },
-            location:   { displayName: @office_room, locationEmailAddress: @office_room },
-            attendees:  organizer ? [ emailAddress: { address: organizer, name: "User"}] : []
-        }
-
-        booking_json = new_booking.to_json
-        logger.debug "RBP>#{@office_room}>CREATE:\n #{booking_json}"
-        begin
-            result = @client.create_booking(mailbox: organizer[:email], start_param: start_time, end_param: end_time, options: {subject: subject, attendees: [system.email]})
-        rescue => e
-            logger.error "RBP>#{@office_room}>CREATE>ERROR: #{e.message}\n#{e.backtrace.join("\n")}"
+    # convert an unknown epoch type (s, ms, micros) to s (seconds) epoch
+    def epoch(input)
+        case input.digits.count
+        when 1..12       #(s is typically 10 digits)
+            input
+        when 13..15       #(ms is typically 13 digits)
+            input/1000
         else
-            logger.debug "RBP>#{@office_room}>CREATE>SUCCESS:\n #{result}"
+            input/1000000
         end
-        result['id']
+    end
+
+    def delete_or_decline(booking, comment = nil)
+        if booking[:email] == @office_room
+            logger.warn { "RBP>#{@office_room}>CANCEL>ROOM_OWNED: Deleting booking owned by the room, with start time #{booking[:Start]}" }
+            response = @client.delete_booking(booking_id: booking[:id], mailbox: system.email)  # Bookings owned by the room need to be deleted, instead of declined
+        else
+            logger.warn { "RBP>#{@office_room}>CANCEL>SUCCESS: Declining booking, with start time #{booking[:Start]}" }
+            response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: comment)
+        end
     end
 
     def delete_o365_booking(delete_start_epoch, reason)
         bookings_deleted = 0
-        return bookings_deleted unless self[:today]     # Exist if no bookings
         delete_start_time = Time.at(delete_start_epoch)
 
+        # Find a booking with a matching start time to delete
         self[:today].each_with_index do |booking, i|
-            booking_start_epoch = Time.parse(booking[:Start]).to_i
+            booking_start_epoch = Time.parse(booking[:Start]).to_i 
+            next if booking_start_epoch != delete_start_epoch
             if booking[:isAllDay]
                 logger.warn { "RBP>#{@office_room}>CANCEL>ALL_DAY: An All Day booking was NOT deleted, with start time #{delete_start_epoch}" }
-            elsif booking_start_epoch == delete_start_epoch
-                if booking[:email] == @office_room  # Bookings owned by the room need to be deleted, not declined
-                    response = @client.delete_booking(booking_id: booking[:id], mailbox: system.email)
-                    logger.warn { "RBP>#{@office_room}>CANCEL>ROOM_OWNED: A booking owned by the room was deleted, with start time #{delete_start_epoch}" }
-                else
-                    # Decline the meeting, with the appropriate message to the booker
-                    case reason
-                    when RBP_AUTOCANCEL_TRIGGERED
-                        response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: self[:booking_timeout_email_message])
-                    when RBP_STOP_PRESSED
-                        response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: self[:booking_cancel_email_message])
-                    else
-                        response = @client.decline_meeting(booking_id: booking[:id], mailbox: system.email, comment: "The booking was cancelled due to \"#{reason}\" ")
-                    end
-                    logger.warn { "RBP>#{@office_room}>CANCEL>SUCCESS: Declined booking due to \"#{reason}\", with start time #{delete_start_epoch}" }
-                    if response == 200
-                        bookings_deleted += 1
-                        # self[:today].delete_at(i) This does not seem to notify the websocket, so call fetch_bookings instead
-                        fetch_bookings
-                    end
-                end
+                next
+            end
+
+            case reason
+            when RBP_AUTOCANCEL_TRIGGERED
+                response = delete_or_decline(booking, self[:booking_timeout_email_message])
+            when RBP_STOP_PRESSED
+                response = delete_or_decline(booking, self[:booking_cancel_email_message])
+            else
+                response = delete_or_decline(booking, "The booking was cancelled due to \"#{reason}\"")
+            end
+            if response.between?(200,204)
+                bookings_deleted += 1
+                fetch_bookings  # self[:today].delete_at(i) This does not seem to notify the websocket, so call fetch_bookings instead
             end
         end
-        # Return the number of meetings removed
-        bookings_deleted
     end
 
     def expose_bookings(bookings)
