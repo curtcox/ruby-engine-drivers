@@ -54,6 +54,12 @@ class Cisco::BroadWorks
         # "call_id" => {user: user_id, center: "callcenter id", time: 435643}
         @call_tracking ||= {}
 
+        @queued_calls ||= {}
+        @abandoned_calls ||= {}
+        @calls_taken ||= {}
+        @talk_time ||= {}
+        @call_tracking ||= {}
+
         @poll_sched&.cancel
         @reset_sched&.cancel
 
@@ -356,8 +362,8 @@ class Cisco::BroadWorks
         self[:total_abandoned] = total_abandoned
 
         # TODO:: confirm if this is longest in the day or in the current queue?
-        self[:longest_wait] = [all_calls.max, @saved_longest_wait || 0].max
-        self[:longest_talk] = [all_times.max, @saved_longest_talk || 0].max
+        self[:longest_wait] = [all_calls.max.to_i, @saved_longest_wait || 0].max
+        self[:longest_talk] = [all_times.max.to_i, @saved_longest_talk || 0].max
 
         # save the details in the database
         define_setting(:last_known_stats, {
