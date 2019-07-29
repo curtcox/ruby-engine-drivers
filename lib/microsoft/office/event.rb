@@ -11,7 +11,19 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
         'attendees' => 'old_attendees',
         'iCalUId' => 'icaluid',
         'showAs' => 'show_as',
-        'createdDateTime' => 'created'
+        'isCancelled' => 'isCancelled',
+        'isAllDay' => 'isAllDay',
+        'sensitivity' => 'sensitivity',
+        'location' => 'location',
+        'locations' => 'locations',
+        'recurrence' => 'recurrence',
+        'seriesMasterId' => 'seriesMasterId',
+        'type' => 'type',
+        'createdDateTime' => 'created',
+        'changeKey' => 'changeKey',
+        'lastModifiedDateTime' => 'lastModifiedDateTime',
+        'originalStartTimeZone' => 'originalStartTimeZone',
+        'originalEndTimeZone' => 'originalEndTimeZone'
     }
 
     NEW_FIELDS = [
