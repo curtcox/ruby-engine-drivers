@@ -29,8 +29,14 @@ class Cisco::BroadWorks
         HTTPI.log = false
         @terminated = false
 
-        # TODO:: Load todays stats from the database if they exist
-        # reset_stats (we don't want to reset these)
+        last_known = setting(:last_known_stats) || {
+          stats: {},
+          longest_wait: 0,
+          longest_talk: 0
+        }
+        @saved_stats = last_known[:stats]
+        @saved_longest_wait = last_known[:longest_wait]
+        @saved_longest_talk = last_known[:longest_talk]
 
         on_update
     end
@@ -77,6 +83,16 @@ class Cisco::BroadWorks
         # We reset the call tracker
         # Probably not needed but might accumulate calls over time
         @call_tracking = {}
+
+        @saved_stats = {}
+        @saved_longest_wait = 0
+        @saved_longest_talk = 0
+        define_setting(:last_known_stats, {
+            stats: {},
+            longest_wait: 0,
+            longest_talk: 0
+        })
+        true
     end
 
     def on_unload
@@ -287,7 +303,7 @@ class Cisco::BroadWorks
         @callcenters.each do |id, name|
             calls = Array(@calls_taken[id])
             abandoned = @abandoned_calls[id].to_i
-            total_abandoned += abandoned
+            # total_abandoned += abandoned
             all_calls.concat calls
 
             times = Array(@talk_time[id])
@@ -308,13 +324,48 @@ class Cisco::BroadWorks
             queues[name] = details
         end
 
+        # saved details
+        @saved_stats.each do |name, details|
+          queue = queues[name]
+          next unless queue
+
+          # the .to_i handles nil cases
+          total_calls = details[:total_calls].to_i + queue[:total_calls].to_i
+          if details[:average_wait]
+            # the .to_i handles nil cases
+            avg = (queue[:average_wait].to_i * queue[:total_calls].to_i + details[:average_wait].to_i * details[:total_calls].to_i) / total_calls
+            queue[:average_wait] = avg
+          end
+          if details[:average_talk]
+            avg = (queue[:average_talk].to_i * queue[:total_calls].to_i + details[:average_talk].to_i * details[:total_calls].to_i) / total_calls
+            queue[:average_wait] = avg
+          end
+
+          queue[:abandoned] += details[:abandoned] || 0
+          queue[:total_calls] = total_calls
+          queue[:max_wait] = [queue[:max_wait], details[:max_wait] || 0].max
+        end
+
+        # calculate abandoned
+        queues.each do |name, details|
+          total_abandoned += details[:abandoned] || 0
+        end
+
         # Expose the state
         self[:queues] = queues
         self[:total_abandoned] = total_abandoned
 
         # TODO:: confirm if this is longest in the day or in the current queue?
-        self[:longest_wait] = all_calls.max
-        self[:longest_talk] = all_times.max
+        self[:longest_wait] = [all_calls.max, @saved_longest_wait || 0].max
+        self[:longest_talk] = [all_times.max, @saved_longest_talk || 0].max
+
+        # save the details in the database
+        define_setting(:last_known_stats, {
+            stats: queues,
+            longest_wait: self[:longest_wait],
+            longest_talk: self[:longest_talk]
+        })
+        true
     end
 
     # Ensure the calls that are active are still active:
