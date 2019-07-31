@@ -23,14 +23,11 @@ class Aca::OfficeBooking
     })
 
     def on_load
+        self[:today] = []
         on_update
     end
 
     def on_update
-        self[:swiped] ||= 0
-        @last_swipe_at = 0
-        @use_act_as = setting(:use_act_as)
-
         self[:room_name] = setting(:room_name) || system.name
         self[:hide_all] = setting(:hide_all) || false
         self[:touch_enabled] = setting(:touch_enabled) || false
@@ -42,6 +39,7 @@ class Aca::OfficeBooking
         self[:icon] = setting(:icon)
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
 
+        self[:timeout] = setting(:timeout)
         self[:booking_cancel_timeout] = UV::Scheduler.parse_duration(setting(:booking_cancel_timeout)) / 1000 if setting(:booking_cancel_timeout)   # convert '1m2s' to '62'
         self[:booking_cancel_email_message] = setting(:booking_cancel_email_message)
         self[:booking_timeout_email_message] = setting(:booking_timeout_email_message)
