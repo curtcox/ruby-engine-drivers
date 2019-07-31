@@ -23,14 +23,11 @@ class Aca::OfficeBooking
     })
 
     def on_load
+        self[:today] = []
         on_update
     end
 
     def on_update
-        self[:swiped] ||= 0
-        @last_swipe_at = 0
-        @use_act_as = setting(:use_act_as)
-
         self[:room_name] = setting(:room_name) || system.name
         self[:hide_all] = setting(:hide_all) || false
         self[:touch_enabled] = setting(:touch_enabled) || false

@@ -24,14 +24,11 @@ class Aca::O365BookingPanel
     })
 
     def on_load
+        self[:today] = []
         on_update
     end
 
     def on_update
-        self[:swiped] ||= 0
-        @last_swipe_at = 0
-        @use_act_as = setting(:use_act_as)
-
         self[:room_name] = setting(:room_name) || system.name
         self[:hide_all] = setting(:hide_all) || false
         self[:touch_enabled] = setting(:touch_enabled) || false
@@ -73,13 +70,9 @@ class Aca::O365BookingPanel
 
         office_client_id = setting(:office_client_id)
         office_secret = setting(:office_secret)
-        office_scope = setting(:office_scope)
-        office_site = setting(:office_site)
         office_token_url = setting(:office_token_url)
-        office_user_email = setting(:office_user_email)
-        office_user_password = setting(:office_user_password)
         @office_room = (setting(:office_room) || system.email)
-        office_https_proxy = setting(:office_https_proxy)
+        #office_https_proxy = setting(:office_https_proxy)
 
         logger.debug "RBP>#{@office_room}>INIT: Instantiating o365 Graph API client"
 
@@ -92,7 +85,6 @@ class Aca::O365BookingPanel
         self[:last_meeting_started] = setting(:last_meeting_started)
         self[:cancel_meeting_after] = setting(:cancel_meeting_after)
 
-        self[:today] = []
         fetch_bookings
         schedule.clear
         schedule.every(setting(:update_every) || '5m') { fetch_bookings }
