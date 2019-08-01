@@ -11,7 +11,7 @@ Vagrant.configure('2') do |config|
 
     config.vm.box = 'acaengine/dev-env'
 
-    config.vm.synced_folder DRIVERS_PATH, '/etc/aca/aca-device-modules' \
+    config.vm.synced_folder DRIVERS_PATH, '/etc/aca/ruby-engine-drivers' \
         unless DRIVERS_PATH.nil?
 
     config.vm.synced_folder WWW_PATH, '/etc/aca/www' \
