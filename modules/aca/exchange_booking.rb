@@ -188,7 +188,7 @@ class Aca::ExchangeBooking
         req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.iso8601.chop
         req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.iso8601.chop
 
-        make_ews_booking req_params
+        id = make_ews_booking req_params
         logger.info { "successfully created booking: #{id}" }
         schedule.in('2s') do
             fetch_bookings
@@ -370,6 +370,7 @@ class Aca::ExchangeBooking
             }
         end
         results.compact!
+        results
     end
 
     def meeting_extendable?
