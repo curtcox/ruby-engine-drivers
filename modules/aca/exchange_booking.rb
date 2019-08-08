@@ -1,31 +1,12 @@
-# For rounding up to the nearest 15min
-# See: http://stackoverflow.com/questions/449271/how-to-round-a-time-down-to-the-nearest-15-minutes-in-ruby
-class ActiveSupport::TimeWithZone
-    def ceil(seconds = 60)
-        return self if seconds.zero?
-        Time.at(((self - self.utc_offset).to_f / seconds).ceil * seconds).in_time_zone + self.utc_offset
-    end
-end
-
 require 'microsoft/exchange'
 
 module Aca; end
-
-# NOTE:: Requires Settings:
-# ========================
-# room_alias: 'rs.au.syd.L16Aitken',
-# building: 'DP3',
-# level: '16'
-
 class Aca::ExchangeBooking
     include ::Orchestrator::Constants
-    EMAIL_CACHE = ::Concurrent::Map.new
-    CAN_LDAP = begin
-        require 'net/ldap'
-        true
-    rescue LoadError
-        false
-    end
+    descriptive_name 'MS Exchange (EWS) Room Booking Panel Logic'
+    generic_name :Bookings
+    implements :logic
+
     CAN_EWS = begin
         require 'viewpoint2'
         true
@@ -39,41 +20,9 @@ class Aca::ExchangeBooking
         false
     end
 
-
-    descriptive_name 'Exchange Room Bookings'
-    generic_name :Bookings
-    implements :logic
-
-
     # The room we are interested in
     default_settings({
         update_every: '2m',
-
-        # Moved to System or Zone Setting
-        # cancel_meeting_after: 900
-
-        # Card reader IDs if we want to listen for swipe events
-        card_readers: ['reader_id_1', 'reader_id_2'],
-
-        # Optional LDAP creds for looking up emails
-        ldap_creds: {
-            host: 'ldap.org.com',
-            port: 636,
-            encryption: {
-                method: :simple_tls,
-                tls_options: {
-                    verify_mode: 0
-                }
-            },
-            auth: {
-                  method: :simple,
-                  username: 'service account',
-                  password: 'password'
-            }
-        },
-        tree_base: "ou=User,ou=Accounts,dc=org,dc=com",
-
-        # Optional EWS for creating and removing bookings
         ews_creds: [
             'https://company.com/EWS/Exchange.asmx',
             'service account',
@@ -85,62 +34,54 @@ class Aca::ExchangeBooking
 
 
     def on_load
+        self[:today] = []
         on_update
     end
 
     def on_update
-        self[:swiped] ||= 0
-        @last_swipe_at = 0
         @use_act_as = setting(:use_act_as)
-
+        self[:room_name] = setting(:room_name) || system.name
         self[:hide_all] = setting(:hide_all) || false
         self[:touch_enabled] = setting(:touch_enabled) || false
-        self[:name] = self[:room_name] = setting(:room_name) || system.name
-        self[:description] = setting(:description) || nil
-        self[:title] = setting(:title) || nil
-        self[:timeout] = setting(:timeout) || false
-        self[:booking_endable] = setting(:booking_endable) || false
-        self[:booking_ask_end] = setting(:booking_ask_end) || false
-
+        self[:arrow_direction] = setting(:arrow_direction)
+        self[:hearing_assistance] = setting(:hearing_assistance)
+        self[:timeline_start] = setting(:timeline_start)
+        self[:timeline_end] = setting(:timeline_end)
+        self[:description] = setting(:description)
+        self[:icon] = setting(:icon)
         self[:control_url] = setting(:booking_control_url) || system.config.support_url
+
+        self[:timeout] = setting(:timeout)
+        self[:booking_cancel_timeout] = UV::Scheduler.parse_duration(setting(:booking_cancel_timeout)) / 1000 if setting(:booking_cancel_timeout)   # convert '1m2s' to '62'
+        self[:booking_cancel_email_message] = setting(:booking_cancel_email_message)
+        self[:booking_timeout_email_message] = setting(:booking_timeout_email_message)
         self[:booking_controls] = setting(:booking_controls)
         self[:booking_catering] = setting(:booking_catering)
         self[:booking_hide_details] = setting(:booking_hide_details)
         self[:booking_hide_availability] = setting(:booking_hide_availability)
         self[:booking_hide_user] = setting(:booking_hide_user)
+        self[:booking_hide_modal] = setting(:booking_hide_modal)
+        self[:booking_hide_title] = setting(:booking_hide_title)
         self[:booking_hide_description] = setting(:booking_hide_description)
         self[:booking_hide_timeline] = setting(:booking_hide_timeline)
-        self[:last_meeting_started] = setting(:last_meeting_started)
-        self[:cancel_meeting_after] = setting(:cancel_meeting_after)
-        self[:booking_min_duration] = setting(:booking_min_duration)
+        self[:booking_set_host] = setting(:booking_set_host)
+        self[:booking_set_title] = setting(:booking_set_title)
+        self[:booking_set_ext] = setting(:booking_set_ext)
+        self[:booking_search_user] = setting(:booking_search_user)
         self[:booking_disable_future] = setting(:booking_disable_future)
+        self[:booking_min_duration] = setting(:booking_min_duration)
         self[:booking_max_duration] = setting(:booking_max_duration)
-        self[:booking_cancel_timeout] = setting(:booking_cancel_timeout)
-        self[:hide_all_day_bookings] = setting(:hide_all_day_bookings)
-        self[:timeout] = setting(:timeout)
-        self[:arrow_direction] = setting(:arrow_direction)
-        self[:icon] = setting(:icon)
+        self[:booking_duration_step] = setting(:booking_duration_step)
+        self[:booking_endable] = setting(:booking_endable)
+        self[:booking_ask_cancel] = setting(:booking_ask_cancel)
+        self[:booking_ask_end] = setting(:booking_ask_end)
+        self[:booking_default_title] = setting(:booking_default_title) || "On the spot booking"
+        self[:booking_select_free] = setting(:booking_select_free)
+        self[:booking_hide_all] = setting(:booking_hide_all) || false
         @hide_all_day_bookings = Boolean(setting(:hide_all_day_bookings))
 
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
-
-        # Skype join button available 2min before the start of a meeting
-        @skype_start_offset = setting(:skype_start_offset) || 120
-        @skype_check_offset = setting(:skype_check_offset) || 380 # 5min + 20 seconds
-
-        # Skype join button not available in the last 8min of a meeting
-        @skype_end_offset = setting(:skype_end_offset) || 480
-        @force_skype_extract = setting(:force_skype_extract)
-
-        # Because restarting the modules results in a 'swipe' of the last read card
-        ignore_first_swipe = true
-
-        # Is there catering available for this room?
-        self[:catering] = setting(:catering_system_id)
-        if self[:catering]
-            self[:menu] = setting(:menu)
-        end
 
         # Do we want to look up the users email address?
         if CAN_LDAP
@@ -167,46 +108,8 @@ class Aca::ExchangeBooking
             logger.warn "viewpoint gem not available" if setting(:ews_creds)
         end
 
-        # Load the last known values (persisted to the DB)
-        self[:waiter_status] = (setting(:waiter_status) || :idle).to_sym
-        self[:waiter_call] = self[:waiter_status] != :idle
-
-        self[:catering_status] = setting(:last_catering_status) || {}
-        self[:order_status] = :idle
-
         self[:last_meeting_started] = setting(:last_meeting_started)
         self[:cancel_meeting_after] = setting(:cancel_meeting_after)
-
-
-        # unsubscribe to all swipe IDs if any are subscribed
-        if @subs.present?
-            @subs.each do |sub|
-                unsubscribe(sub)
-            end
-
-            @subs = nil
-        end
-
-        # Are there any swipe card integrations
-        if system.exists? :Security
-            readers = setting(:card_readers)
-            if readers.present?
-                security = system[:Security]
-
-                readers = readers.is_a?(Array) ? readers : [readers]
-                sys = system
-                @subs = []
-                readers.each do |id|
-                    @subs << sys.subscribe(:Security, 1, id.to_s) do |notice|
-                        if ignore_first_swipe
-                            ignore_first_swipe = false
-                        else
-                            swipe_occured(notice.value)
-                        end
-                    end
-                end
-            end
-        end
 
         schedule.clear
         schedule.in(rand(10000)) {
@@ -218,151 +121,14 @@ class Aca::ExchangeBooking
     end
 
 
-    def set_light_status(status)
-        lightbar = system[:StatusLight]
-        return if lightbar.nil?
-
-        case status.to_sym
-        when :unavailable
-            lightbar.colour(:red)
-        when :available
-            lightbar.colour(:green)
-        when :pending
-            lightbar.colour(:orange)
-        else
-            lightbar.colour(:off)
-        end
-    end
-
-    def directory_search(q, limit: 30)
-        # Ensure only a single search is occuring at a time
-        if @dir_search
-            @dir_search = q
-            return
-        end
-
-        ews = ::Microsoft::Exchange.new({
-            ews_url: ENV['EWS_URL'] || 'https://outlook.office365.com/ews/Exchange.asmx',
-            service_account_email: ENV['OFFICE_ACCOUNT_EMAIL'],
-            service_account_password: ENV['OFFICE_ACCOUNT_PASSWORD'],
-            internet_proxy: ENV['INTERNET_PROXY']
-        })
-
-        @dir_search = q
-        self[:searching] = true
-        begin
-            # sip_spd:Auto sip_num:email@address.com
-            entries = []
-            task { ews.get_users(q: q, limit: limit) }.value.each do |entry|
-                phone = entry['phone']
-
-                entries << entry
-                entries << ({
-                    name: entry['name'],
-                    phone: phone.gsub(/\D+/, '')
-                }) if phone
-            end
-
-            # Ensure the results are unique and pushed to the client
-            entries[0][:id] = rand(10000) if entries.length > 0
-            self[:directory] = entries
-        rescue => e
-            logger.print_error e, 'searching directory'
-            self[:directory] = []
-        end
-
-        # Update the search if a change was requested while a search was occuring
-        if @dir_search != q
-            q = @dir_search
-            thread.next_tick { directory_search(q, limit) }
-        else
-            self[:searching] = false
-        end
-
-        @dir_search = nil
-    end
-
-    # ======================================
-    # Waiter call information
-    # ======================================
-    def waiter_call(state)
-        status = is_affirmative?(state)
-
-        self[:waiter_call] = status
-
-        # Used to highlight the service button
-        if status
-            self[:waiter_status] = :pending
-        else
-            self[:waiter_status] = :idle
-        end
-
-        define_setting(:waiter_status, self[:waiter_status])
-    end
-
-    def call_acknowledged
-        self[:waiter_status] = :accepted
-        define_setting(:waiter_status, self[:waiter_status])
-    end
-
-
-    # ======================================
-    # Catering Management
-    # ======================================
-    def catering_status(details)
-        self[:catering_status] = details
-
-        # We'll turn off the green light on the waiter call button
-        if self[:waiter_status] != :idle && details[:progress] == 'visited'
-            self[:waiter_call] = false
-            self[:waiter_status] = :idle
-            define_setting(:waiter_status, self[:waiter_status])
-        end
-
-        define_setting(:last_catering_status, details)
-    end
-
-    def commit_order(order_details)
-        self[:order_status] = :pending
-        status = self[:catering_status]
-
-        if status && status[:progress] == 'visited'
-            status = status.dup
-            status[:progress] = 'cleaned'
-            self[:catering_status] = status
-        end
-
-        if self[:catering]
-            sys = system
-            @oid ||= 1
-            systems(self[:catering])[:Orders].add_order({
-                id: "#{sys.id}_#{@oid}",
-                created_at: Time.now.to_i,
-                room_id: sys.id,
-                room_name: sys.name,
-                order: order_details
-            })
-        end
-    end
-
-    def order_accepted
-        self[:order_status] = :accepted
-    end
-
-    def order_complete
-        self[:order_status] = :idle
-    end
-
-
 
     # ======================================
     # ROOM BOOKINGS:
     # ======================================
     def fetch_bookings(first=false)
         logger.debug { "looking up todays emails for #{@ews_room}" }
-        skype_exists = system.exists?(:Skype)
         task {
-            todays_bookings(first, skype_exists)
+            todays_bookings(first)
         }.then(proc { |bookings|
             self[:today] = bookings
             if @check_meeting_ending
@@ -449,29 +215,10 @@ class Aca::ExchangeBooking
         req_params[:start_time] = Time.at(options[:start].to_i / 1000).utc.iso8601.chop
         req_params[:end_time] = Time.at(options[:end].to_i / 1000).utc.iso8601.chop
 
-        task {
-            username = options[:user]
-            if username.present?
-
-                user_email = ldap_lookup_email(username)
-                if user_email
-                    req_params[:user_email] = user_email
-                    make_ews_booking req_params
-                else
-                    raise "couldn't find user: #{username}"
-                end
-
-            else
-                make_ews_booking req_params
-            end
-        }.then(proc { |id|
-            fetch_bookings
-            logger.debug { "successfully created booking: #{id}" }
-            "Ok"
-        }, proc { |error|
-            logger.print_error error, 'creating ad hoc booking'
-            thread.reject error # propogate the error
-        })
+        make_ews_booking req_params
+        fetch_bookings
+        logger.debug { "successfully created booking: #{id}" }
+        "Ok"
     end
 
     def should_notify?
@@ -540,86 +287,6 @@ class Aca::ExchangeBooking
 
 
     protected
-
-
-    def swipe_occured(info)
-        # Update the user details
-        @last_swipe_at = Time.now.to_i
-        self[:fullname] = "#{info[:firstname]} #{info[:lastname]}"
-        self[:username] = info[:staff_id]
-        email = nil
-
-        if self[:username] && @ldap_creds
-            email = EMAIL_CACHE[self[:username]]
-            if email
-                set_email(email)
-                logger.debug { "email #{email} found in cache" }
-            else
-                # Cache username here as self[:username] might change while we
-                #  looking up the previous username
-                username = self[:username]
-
-                logger.debug { "looking up email for #{username} - #{self[:fullname]}" }
-                task {
-                    ldap_lookup_email username
-                }.then do |email|
-                    if email
-                        logger.debug { "email #{email} found in LDAP" }
-                        EMAIL_CACHE[username] = email
-                        set_email(email)
-                    else
-                        logger.warn "no email found in LDAP for #{username}"
-                        set_email nil
-                    end
-                end
-            end
-        else
-            logger.warn "no staff ID for user #{self[:fullname]}"
-            set_email nil
-        end
-    end
-
-    def set_email(email)
-        self[:email] = email
-        self[:swiped] += 1
-    end
-
-    # ====================================
-    # LDAP lookup to occur in worker thread
-    # ====================================
-    def ldap_lookup_email(username)
-        email = EMAIL_CACHE[username]
-        return email if email
-
-        ldap = Net::LDAP.new @ldap_creds
-        ldap.authenticate @ldap_user[:username], @ldap_user[:password] if @ldap_user
-
-        login_filter = Net::LDAP::Filter.eq('sAMAccountName', username)
-        object_filter = Net::LDAP::Filter.eq('objectClass', '*')
-        treebase = @tree_base
-        search_attributes = ['mail']
-
-        email = nil
-        ldap.bind
-        ldap.search({
-            base: treebase,
-            filter: object_filter & login_filter,
-            attributes: search_attributes
-        }) do |entry|
-            email = get_attr(entry, 'mail')
-        end
-
-        # Returns email as a promise
-        EMAIL_CACHE[username] = email
-        email
-    end
-
-    def get_attr(entry, attr_name)
-        if attr_name != "" && attr_name != nil
-            entry[attr_name].is_a?(Array) ? entry[attr_name].first : entry[attr_name]
-        end
-    end
-    # ====================================
 
 
     # =======================================
@@ -701,12 +368,10 @@ class Aca::ExchangeBooking
                 count += 1
             end
         end
-
-        # Return the number of meetings removed
         count
     end
 
-    def todays_bookings(first=false, skype_exists=false)
+    def todays_bookings(first=false)
         now = Time.now
         if @timezone
             start  = now.in_time_zone(@timezone).midnight
@@ -730,8 +395,6 @@ class Aca::ExchangeBooking
             items = cli.find_items({:folder_id => :calendar, :calendar_view => {:start_date => start.utc.iso8601, :end_date => ending.utc.iso8601}})
         end
 
-        set_skype_url = skype_exists
-        set_skype_url = true if @force_skype_extract
         now_int = now.to_i
 
         # items.select! { |booking| !booking.cancelled? }
@@ -744,54 +407,7 @@ class Aca::ExchangeBooking
             real_end = Time.parse(ending)
 
             # Extract the skype meeting URL
-            if set_skype_url
-                start_integer = real_start.to_i - @skype_check_offset
-                join_integer = real_start.to_i - @skype_start_offset
-                end_integer = real_end.to_i - @skype_end_offset
-
-                if now_int > start_integer && now_int < end_integer
-                    if first
-                        self[:last_meeting_started] = start_integer * 1000
-                    end
-                    meeting.get_all_properties!
-
-                    if meeting.body
-                        match = meeting.body.match(/\"pexip\:\/\/(.+?)\"/)
-                        if match
-                            set_skype_url = false
-                            self[:pexip_meeting_uid] = start_integer
-                            self[:pexip_meeting_address] = match[1]
-                        else
-                            links = URI.extract(meeting.body).select { |url| url.start_with?('https://meet.lync') }
-                            if links.empty?
-                                # Lync: <a name="OutJoinLink">
-                                # Skype: <a name="x_OutJoinLink">
-                                body_parts = meeting.body.split('OutJoinLink"')
-                                if body_parts.length > 1
-                                    links = body_parts[-1].split('"').select { |link| link.start_with?('https://') }
-                                end
-                            end
-
-                            if links[0].present?
-                                if now_int > join_integer
-                                    self[:can_join_skype_meeting] = true
-                                    self[:skype_meeting_pending] = true
-                                else
-                                    self[:skype_meeting_pending] = true
-                                end
-                                set_skype_url = false
-                                self[:skype_meeting_address] = links[0]
-                                system[:Skype].set_uri(links[0]) if skype_exists
-                            end
-                        end
-                    end
-                end
-
-                if @timezone
-                    start = real_start.in_time_zone(@timezone).iso8601[0..18]
-                    ending = real_end.in_time_zone(@timezone).iso8601[0..18]
-                end
-            elsif @timezone
+            if @timezone
                 start = Time.parse(start).in_time_zone(@timezone).iso8601[0..18]
                 ending = Time.parse(ending).in_time_zone(@timezone).iso8601[0..18]
             end
@@ -801,9 +417,6 @@ class Aca::ExchangeBooking
             if @hide_all_day_bookings
                 next if Time.parse(ending) - Time.parse(start) > 86399
             end
-
-            # Prevent connections handing with TIME_WAIT
-            # cli.ews.connection.httpcli.reset_all
 
             if ["Private", "Confidential"].include?(meeting.sensitivity)
                 subject = meeting.sensitivity
@@ -825,15 +438,5 @@ class Aca::ExchangeBooking
             }
         end
         results.compact!
-
-        if set_skype_url
-            self[:pexip_meeting_address] = nil
-            self[:can_join_skype_meeting] = false
-            self[:skype_meeting_pending] = false
-            system[:Skype].set_uri(nil) if skype_exists
-        end
-
-        results
     end
-    # =======================================
 end
