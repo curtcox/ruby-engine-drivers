@@ -23,15 +23,12 @@ class Aca::ExchangeBooking
     # The room we are interested in
     default_settings({
         update_every: '2m',
-        ews_creds: [
-            'https://company.com/EWS/Exchange.asmx',
-            'service account',
-            'password',
-            { http_opts: { ssl_verify_mode: 0 } }
-        ],
-        ews_room: 'room@email.address'
+        ews_url: 'https://example.com/EWS/Exchange.asmx',
+        ews_user: 'service_account',
+        ews_password: 'service account password',
+        booking_cancel_email_message: 'The Stop button was pressed on the room booking panel',
+        booking_timeout_email_message: 'The Start button was not pressed on the room booking panel'
     })
-
 
     def on_load
         self[:today] = []
@@ -98,6 +95,13 @@ class Aca::ExchangeBooking
 
         # Do we want to use exchange web services to manage bookings
         if CAN_EWS
+
+            office_client_id = setting(:office_client_id)
+            office_secret = setting(:office_secret)
+            office_token_url = setting(:office_token_url)
+            @office_room = (setting(:office_room) || system.email)
+            
+
             @ews_creds = setting(:ews_creds)
             @ews_room = (setting(:ews_room) || system.email) if @ews_creds
             # supports: SMTP, PSMTP, SID, UPN (user principle name)
