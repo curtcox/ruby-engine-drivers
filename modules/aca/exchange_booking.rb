@@ -24,7 +24,7 @@ class Aca::ExchangeBooking
     default_settings({
         update_every: '2m',
         ews_url: 'https://example.com/EWS/Exchange.asmx',
-        ews_user: 'service_account',
+        ews_username: 'service_account',
         ews_password: 'service account password',
         booking_cancel_email_message: 'The Stop button was pressed on the room booking panel',
         booking_timeout_email_message: 'The Start button was not pressed on the room booking panel'
@@ -80,36 +80,18 @@ class Aca::ExchangeBooking
         @check_meeting_ending = setting(:check_meeting_ending) # seconds before meeting ending
         @extend_meeting_by = setting(:extend_meeting_by) || 15.minutes.to_i
 
-        # Do we want to look up the users email address?
-        if CAN_LDAP
-            @ldap_creds = setting(:ldap_creds)
-            if @ldap_creds
-                encrypt = @ldap_creds[:encryption]
-                encrypt[:method] = encrypt[:method].to_sym if encrypt && encrypt[:method]
-                @tree_base = setting(:tree_base)
-                @ldap_user = @ldap_creds.delete :auth
-            end
-        else
-            logger.warn "net/ldap gem not available" if setting(:ldap_creds)
-        end
-
-        # Do we want to use exchange web services to manage bookings
         if CAN_EWS
-
-            office_client_id = setting(:office_client_id)
-            office_secret = setting(:office_secret)
-            office_token_url = setting(:office_token_url)
-            @office_room = (setting(:office_room) || system.email)
-            
-
-            @ews_creds = setting(:ews_creds)
-            @ews_room = (setting(:ews_room) || system.email) if @ews_creds
-            # supports: SMTP, PSMTP, SID, UPN (user principle name)
-            # NOTE:: Using UPN we might be able to remove the LDAP requirement
-            @ews_connect_type = (setting(:ews_connect_type) || :SMTP).to_sym
-            @timezone = setting(:room_timezone)
+            @ews_creds = [
+                setting(:ews_url),
+                setting(:ews_username),
+                setting(:ews_password),
+                { http_opts: { ssl_verify_mode: 0 } }
+            ]
+            @ews_room = setting(:room_mailbox) || system.email
+            @ews_connect_type = (setting(:ews_connect_type) || :SMTP).to_sym    # supports: SMTP, PSMTP, SID, UPN
+            @timezone = setting(:timezone) || ENV['TZ']
         else
-            logger.warn "viewpoint gem not available" if setting(:ews_creds)
+            logger.error "Viewpoint gem not available"
         end
 
         self[:last_meeting_started] = setting(:last_meeting_started)
