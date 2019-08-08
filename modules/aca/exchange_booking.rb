@@ -23,7 +23,7 @@ class Aca::ExchangeBooking
     # The room we are interested in
     default_settings({
         update_every: '2m',
-        ews_url: 'https://example.com/EWS/Exchange.asmx',
+        ews_url: 'https://outlook.office365.com/EWS/Exchange.asmx',
         ews_username: 'service_account',
         ews_password: 'service account password',
         booking_cancel_email_message: 'The Stop button was pressed on the room booking panel',
