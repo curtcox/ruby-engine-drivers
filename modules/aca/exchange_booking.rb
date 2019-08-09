@@ -359,6 +359,7 @@ class Aca::ExchangeBooking
 
             {
                 :id => item.dig(:item_id,:attribs,:id),
+                :icaluid => item.dig(:item_id,:attribs,:id),
                 :Start => start,
                 :End => ending,
                 :Subject => subject,
