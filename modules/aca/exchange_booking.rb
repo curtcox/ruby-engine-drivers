@@ -317,7 +317,6 @@ class Aca::ExchangeBooking
 
         cli = Viewpoint::EWSClient.new(*@ews_creds)
 
-
         if @ews_impersonate_room
             opts = {}
             opts[:act_as] = @room_mailbox
@@ -340,8 +339,8 @@ class Aca::ExchangeBooking
             real_end = Time.parse(ending)
 
             if @timezone
-                start = Time.parse(start).in_time_zone(@timezone).iso8601[0..18]
-                ending = Time.parse(ending).in_time_zone(@timezone).iso8601[0..18]
+                start = Time.parse(start).in_time_zone(@timezone)
+                ending = Time.parse(ending).in_time_zone(@timezone)
             end
 
             logger.debug { item.inspect }
