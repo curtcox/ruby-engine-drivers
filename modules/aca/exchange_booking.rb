@@ -339,8 +339,8 @@ class Aca::ExchangeBooking
             real_end = Time.parse(ending)
 
             if @timezone
-                start = Time.parse(start).in_time_zone(@timezone)
-                ending = Time.parse(ending).in_time_zone(@timezone)
+                start = Time.parse(start).in_time_zone(@timezone).iso8601
+                ending = Time.parse(ending).in_time_zone(@timezone).iso8601
             end
 
             logger.debug { item.inspect }
