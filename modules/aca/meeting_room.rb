@@ -578,6 +578,7 @@ class Aca::MeetingRoom < Aca::Joiner
 
             # Update the mic mappings
             self[:mics] = mode[:mics] || setting(:mics)
+            self[:doors] = mode[:doors] || setting(:doors)
 
             # Update the preview mappings
             self[:has_preview] = mode[:has_preview] || setting(:has_preview)
