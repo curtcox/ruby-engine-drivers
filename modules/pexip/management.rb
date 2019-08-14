@@ -19,6 +19,10 @@ class Pexip::Management
     end
 
     def on_update
+        defaults({
+            timeout: 10_000
+        })
+
         # NOTE:: base URI https://pexip.company.com
         @username = setting(:username)
         @password = setting(:password)
@@ -34,21 +38,25 @@ class Pexip::Management
     end
 
     MeetingTypes = ["conference", "lecture", "two_stage_dialing", "test_call"]
-    def new_meeting(name, type = "conference", pin: rand(9999), **options)
+    def new_meeting(name = nil, type = "conference", pin: rand(9999), **options)
         type = type.to_s.strip.downcase
         raise "unknown meeting type" unless MeetingTypes.include?(type)
+
+        conf_alias = SecureRandom.uuid
+        name ||= conf_alias
 
         post('/api/admin/configuration/v1/conference/', body: {
             name: name.to_s,
             service_type: type,
-            pin: pin.to_s.rjust(4, '0')
+            pin: pin.to_s.rjust(4, '0'),
+            aliases: [{"alias" => conf_alias}]
         }.merge(options).to_json, headers: {
             'Authorization' => [@username, @password],
             'Content-Type' => 'application/json',
             'Accept' => 'application/json'
         }) do |data|
             if (200...300).include?(data.status)
-                get_meeting URI(data['location']).path
+                URI(data['Location']).path.split("/").reject(&:empty?)[-1]
             else
                 :retry
             end
