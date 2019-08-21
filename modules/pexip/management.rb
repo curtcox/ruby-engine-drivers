@@ -23,6 +23,12 @@ class Pexip::Management
             timeout: 10_000
         })
 
+        # fallback if meetings are not ended correctly
+        @vmr_ids ||= setting(:vmr_ids) || {}
+        clean_up_after = setting(:clean_up_after) || 24.hours.to_i
+        schedule.clear
+        schedule.every("30m") { cleanup_meetings(clean_up_after) }
+
         # NOTE:: base URI https://pexip.company.com
         @username = setting(:username)
         @password = setting(:password)
@@ -38,11 +44,11 @@ class Pexip::Management
     end
 
     MeetingTypes = ["conference", "lecture", "two_stage_dialing", "test_call"]
-    def new_meeting(name = nil, type = "conference", pin: rand(9999), **options)
+    def new_meeting(name = nil, conf_alias = nil, type = "conference", pin: rand(9999), **options)
         type = type.to_s.strip.downcase
         raise "unknown meeting type" unless MeetingTypes.include?(type)
 
-        conf_alias = SecureRandom.uuid
+        conf_alias ||= SecureRandom.uuid
         name ||= conf_alias
 
         post('/api/admin/configuration/v1/conference/', body: {
@@ -56,7 +62,10 @@ class Pexip::Management
             'Accept' => 'application/json'
         }) do |data|
             if (200...300).include?(data.status)
-                URI(data['Location']).path.split("/").reject(&:empty?)[-1]
+                vmr_id = URI(data['Location']).path.split("/").reject(&:empty?)[-1]
+                @vmr_ids[vmr_id] = Time.now.to_i
+                define_setting(:vmr_ids, @vmr_ids)
+                vmr_id
             else
                 :retry
             end
@@ -82,7 +91,7 @@ class Pexip::Management
         end
     end
 
-    def end_meeting(meeting)
+    def end_meeting(meeting, update_ids = true)
       meeting = "/api/admin/configuration/v1/conference/#{meeting}/" unless meeting.to_s.include?("/")
 
       delete(meeting, headers: {
@@ -92,12 +101,28 @@ class Pexip::Management
       }) do |data|
             case data.status
             when (200...300)
+              define_setting(:vmr_ids, @vmr_ids) if update_ids && @vmr_ids.delete(meeting.to_s)
               :success
             when 404
+              define_setting(:vmr_ids, @vmr_ids) if update_ids && @vmr_ids.delete(meeting.to_s)
               :success
             else
               :retry
             end
         end
+    end
+
+    def cleanup_meetings(older_than)
+      time = Time.now.to_i
+      delete = []
+      @vmr_ids.each do |id, created|
+        delete << id if (created + older_than) >= time
+      end
+      promises = delete.map { |id| end_meeting(id, false) }
+      thread.all(*promises).then do
+        delete.each { |id| @vmr_ids.delete(id) }
+        define_setting(:vmr_ids, @vmr_ids)
+      end
+      nil
     end
 end
