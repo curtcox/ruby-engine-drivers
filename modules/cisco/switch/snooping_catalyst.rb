@@ -79,6 +79,9 @@ class Cisco::Switch::SnoopingCatalyst
     end
 
     def on_update
+        @temp_interface_macs ||= {}
+        @interface_macs ||= {}
+
         @remote_address = remote_address.downcase
         @ignore_macs = ::Set.new((setting(:ignore_macs) || {}).values)
         @temporary = ::Set.new((setting(:temporary_macs) || {}).values)
@@ -118,13 +121,26 @@ class Cisco::Switch::SnoopingCatalyst
         do_send 'show interfaces status'
     end
 
+    def query_mac_addresses
+        @temp_interface_macs.clear
+        do_send 'show mac address-table'
+    end
+
     def query_connected_devices
         logger.debug { "Querying for connected devices" }
         query_interface_status.then do
             schedule.in(3000) do
-                p = query_snooping_bindings
-                p.then { schedule.in(10000) { check_reservations } } if @reserve_time > 0
+                query_mac_addresses.then do
+                    schedule.in(3000) do
+                        p = query_snooping_bindings
+                        p.then { schedule.in(10000) { check_reservations; nil }; nil } if @reserve_time > 0
+                        nil
+                    end
+                    nil
+                end
+                nil
             end
+            nil
         end
         nil
     end
@@ -151,6 +167,19 @@ class Cisco::Switch::SnoopingCatalyst
         # ==> --More--
         if data =~ /More/
             send(' ', priority: 99, retries: 0)
+            return :success
+        end
+
+        # Interface MAC Address detection
+        # 33    e4b9.7aa5.aa7f    STATIC      Gi3/0/8
+        # 10    f4db.e618.10a4    DYNAMIC     Te2/0/40
+        if data =~ /STATIC|DYNAMIC/
+            parts = data.split(/\s+/).reject(&:empty?)
+            mac = format(parts[1])
+            interface = normalise(parts[-1])
+
+            @temp_interface_macs[interface] = mac if mac && interface
+
             return :success
         end
 
@@ -189,18 +218,19 @@ class Cisco::Switch::SnoopingCatalyst
             logger.debug { "Processing #{@snooping.length} bindings" }
 
             checked = Set.new
-            checked_interfaces = Set.new
+            @interface_macs = @temp_interface_macs unless @temp_interface_macs.empty?
+            #checked_interfaces = Set.new
 
             # Newest lease first
-            @snooping.sort! { |a, b| b[0] <=> a[0] }
+            # @snooping.sort! { |a, b| b[0] <=> a[0] }
 
             # NOTE:: Same as snooping_catalyst_snmp.rb
             # Ignore any duplicates
             @snooping.each do |lease, mac, ip, interface|
-                next if checked_interfaces.include?(interface)
-                checked_interfaces << interface
-                checked << interface
+                next unless @check_interface.include?(interface)
+                next unless @interface_macs[interface] == mac
 
+                checked << interface
                 iface = self[interface] || ::Aca::Tracking::StaticDetails.new
 
                 if iface.ip != ip || iface.mac != mac
@@ -252,9 +282,9 @@ class Cisco::Switch::SnoopingCatalyst
                 end
             end
 
-            @connected_interfaces = checked
-            self[:interfaces] = checked.to_a
-            (@check_interface - checked).each { |iface| remove_lookup(iface) }
+            # @interface_macs
+            @connected_interfaces = @check_interface
+            self[:interfaces] = @connected_interfaces.to_a
             self[:reserved] = @reserved_interface.to_a
             @snooping.clear
 
