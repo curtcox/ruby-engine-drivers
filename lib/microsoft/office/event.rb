@@ -94,10 +94,10 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
 
             # Compare the domain of this attendee's email against the internal domain
             mail_object = ::Mail::Address.new(attendee_email)
-            mail_domain = mail_object.domain
+            mail_domain = mail_object.domain&.downcase
             is_visitor = !(internal_domains.map{|d|
                 d.downcase
-            }.include?(mail_domain.downcase))
+            }.include?(mail_domain))
 
             # Alias the attendee fields, mark whether this is a visitor and pull organisation details from the email
             attendee_object = {
@@ -105,7 +105,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
                 name: attendee['emailAddress']['name'],
                 visitor: is_visitor,
                 external: is_visitor,
-                organisation: attendee_email.split('@')[1..-1].join("").split('.')[0].capitalize
+                organisation: attendee_email.split('@')[1..-1].join("").split('.')[0]&.capitalize
             }
             new_attendees.push(attendee_object) if attendee['type'] != 'resource'
         end
