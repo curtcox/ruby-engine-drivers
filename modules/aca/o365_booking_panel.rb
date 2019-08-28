@@ -20,7 +20,10 @@ class Aca::O365BookingPanel
     default_settings({
         update_every: '2m',
         booking_cancel_email_message: 'The Stop button was presseed on the room booking panel',
-        booking_timeout_email_message: 'The Start button was not pressed on the room booking panel'
+        booking_timeout_email_message: 'The Start button was not pressed on the room booking panel',
+        office_client_id: "enter client ID",
+        office_secret: "enter client secret",
+        office_token_url: "/tenant_name_or_ID.onMicrosoft.com/oauth2/v2.0/token"
     })
 
     def on_load
