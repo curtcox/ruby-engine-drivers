@@ -23,7 +23,7 @@ class Aca::O365BookingPanel
         booking_timeout_email_message: 'The Start button was not pressed on the room booking panel',
         office_client_id: "enter client ID",
         office_secret: "enter client secret",
-        office_token: "tenant_name_or_ID.onMicrosoft.com"
+        office_tenant: "tenant_name_or_ID.onMicrosoft.com"
     })
 
     def on_load
@@ -74,7 +74,7 @@ class Aca::O365BookingPanel
         office_client_id  = setting(:office_client_id)  || ENV['OFFICE_CLIENT_ID']
         office_secret     = setting(:office_secret)     || ENV["OFFICE_CLIENT_SECRET"]
         office_token_path = setting(:office_token_path) || "/oauth2/v2.0/token"
-        office_token_url  = setting(:office_token_url)  || ENV["OFFICE_TOKEN_URL"]  || "/" + setting(:office_token) + office_token_path
+        office_token_url  = setting(:office_token_url)  || ENV["OFFICE_TOKEN_URL"]  || "/" + setting(:office_tenant) + office_token_path
         @office_room = (setting(:office_room) || system.email)
         #office_https_proxy = setting(:office_https_proxy)
 
