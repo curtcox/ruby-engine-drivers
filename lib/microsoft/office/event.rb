@@ -60,7 +60,7 @@ class Microsoft::Officenew::Event < Microsoft::Officenew::Model
     def get_extensions(new_event, old_event)
         if old_event.key?('extensions')
             old_event['extensions'].each do |ext|
-                if ext['id'] == "Microsoft.OutlookServices.OpenTypeExtension.Com.Acaprojects.Extensions"
+                if ext&.dig('id') == "Microsoft.OutlookServices.OpenTypeExtension.Com.Acaprojects.Extensions"
                     ext.each do |ext_key, ext_val|
                         new_event[ext_key] = ext_val if !['@odata.type', '@odata.context', 'id','extensionName'].include?(ext_key)
                     end
