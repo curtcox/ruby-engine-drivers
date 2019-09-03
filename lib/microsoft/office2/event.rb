@@ -1,5 +1,5 @@
 require 'mail'
-class Microsoft::Officenew::Event < Microsoft::Officenew::Model
+class Microsoft::Office2::Event < Microsoft::Office2::Model
 
     # These are the fields which we just want to alias or pull out of the O365 model without any processing
     ALIAS_FIELDS = {

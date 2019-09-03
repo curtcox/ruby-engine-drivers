@@ -1,4 +1,4 @@
-class Microsoft::Officenew::User < Microsoft::Officenew::Model
+class Microsoft::Office2::User < Microsoft::Office2::Model
 
     ALIAS_FIELDS = {
         'id' => 'id',

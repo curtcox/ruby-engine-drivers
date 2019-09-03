@@ -1,4 +1,4 @@
-module Microsoft::Officenew::Events
+module Microsoft::Office2::Events
     ##
     # For every mailbox (email) passed in, this method will grab all the bookings and, if
     # requested, return the availability of the mailboxes for some time range.
@@ -112,7 +112,7 @@ module Microsoft::Officenew::Events
             next unless bookings
             # Go through each booking and extract more info from it
             bookings.each_with_index do |booking, i|
-                bookings[i] = Microsoft::Officenew::Event.new(client: self, event: booking, available_to: options[:available_to], available_from: options[:available_from]).event
+                bookings[i] = Microsoft::Office2::Event.new(client: self, event: booking, available_to: options[:available_to], available_from: options[:available_from]).event
                 is_available = false if !bookings[i]['is_free'] && !options[:ignore_bookings].include?(bookings[i]['id'])
             end
             bookings_by_room[mailboxes[res['id'].to_i]] = {available: is_available, bookings: bookings}
@@ -176,7 +176,7 @@ module Microsoft::Officenew::Events
         # Make the request and check the response
         request = graph_request(request_method: 'post', endpoints: ["/v1.0/users/#{mailbox}/events"], data: event_json)
         check_response(request)
-        Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body)).event
+        Microsoft::Office2::Event.new(client: self, event: JSON.parse(request.body)).event
     end
 
     ##
@@ -246,7 +246,7 @@ module Microsoft::Officenew::Events
         request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}/events/#{booking_id}"], data: event_json)
         check_response(request)
  
-        Microsoft::Officenew::Event.new(client: self, event: JSON.parse(request.body).merge({'extensions' => [ext_data]})).event
+        Microsoft::Office2::Event.new(client: self, event: JSON.parse(request.body).merge({'extensions' => [ext_data]})).event
     end
 
     ##

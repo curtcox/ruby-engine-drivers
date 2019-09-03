@@ -1,4 +1,4 @@
-module Microsoft::Officenew::Users
+module Microsoft::Office2::Users
     ##
     # Retrieve a list of users stored in Office365
     # 
@@ -37,6 +37,6 @@ module Microsoft::Officenew::Users
         check_response(request)
 
         # Return the parsed user data
-        JSON.parse(request.body)['value'].map {|u| Microsoft::Officenew::User.new(client: self, user: u).user}
+        JSON.parse(request.body)['value'].map {|u| Microsoft::Office2::User.new(client: self, user: u).user}
     end
 end

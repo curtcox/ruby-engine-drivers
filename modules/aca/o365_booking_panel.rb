@@ -1,8 +1,8 @@
 # encoding: ASCII-8BIT
 require 'faraday'
 require 'uv-rays'
-require 'microsoft/officenew'
-require 'microsoft/office/client'
+require 'microsoft/office2'
+require 'microsoft/office2/client'
 Faraday.default_adapter = :libuv
 
 module Aca; end
@@ -80,7 +80,7 @@ class Aca::O365BookingPanel
 
         logger.debug "RBP>#{@office_room}>INIT: Instantiating o365 Graph API client"
 
-        @client = ::Microsoft::Officenew::Client.new({
+        @client = ::Microsoft::Office2::Client.new({
             client_id:                  office_client_id,
             client_secret:              office_secret,
             app_token_url:              office_token_url

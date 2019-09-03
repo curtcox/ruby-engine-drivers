@@ -38,7 +38,7 @@ describe "office365 event reading" do
                 extensions: @extensions
             }
         }
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         @booking = nil
         reactor.run {
             @booking = @office.create_booking(@booking_body)
@@ -46,7 +46,7 @@ describe "office365 event reading" do
     end
 
     it 'should return events within the passed in time range INCLUSIVE of start and end time' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         bookings = nil
         reactor.run {
             bookings = @office.get_bookings(mailboxes: [ @mailbox ], options: { bookings_from: @start_time.to_i, bookings_to: @end_time.to_i })
@@ -59,7 +59,7 @@ describe "office365 event reading" do
     end
 
     it 'should not return events outside the passed in time range' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         bookings = nil
         reactor.run {
             bookings = @office.get_bookings(mailboxes: [ @mailbox ], options: { bookings_from: (@start_time + 2.hours).to_i, bookings_to: (@end_time + 3.hours).to_i })
@@ -71,7 +71,7 @@ describe "office365 event reading" do
     end
 
     it 'should return the room as unavailable when checking availability in the time range' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         bookings = nil
         reactor.run {
             bookings = @office.get_bookings(mailboxes: [ @mailbox ], options: { available_from: @start_time.to_i, available_to: @end_time.to_i })
@@ -83,7 +83,7 @@ describe "office365 event reading" do
     end
 
     it 'should return the room as available if the conflicting booking ID is passed to the ignore_bookings param' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         bookings = nil
         reactor.run {
             bookings = @office.get_bookings(mailboxes: [ @mailbox ], options: { available_from: @start_time.to_i, available_to: @end_time.to_i, ignore_bookings: [@booking['id']] })
@@ -95,7 +95,7 @@ describe "office365 event reading" do
     end
 
     it 'should return events with their extension data at the root of the event' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         bookings = nil
         reactor.run {
             bookings = @office.get_bookings(mailboxes: [ @mailbox ], options: { bookings_from: @start_time.to_i, bookings_to: @end_time.to_i })

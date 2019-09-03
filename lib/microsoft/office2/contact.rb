@@ -1,4 +1,4 @@
-class Microsoft::Officenew::Contact < Microsoft::Officenew::Model
+class Microsoft::Office2::Contact < Microsoft::Office2::Model
 
     ALIAS_FIELDS = {
         'id' => 'id',
