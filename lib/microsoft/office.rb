@@ -178,7 +178,7 @@ class Microsoft::Office
     def check_response(response)
         case response.status
         when 200, 201, 204
-            return
+            return response.status
         when 400
             if response['error']['code'] == 'ErrorInvalidIdMalformed'
                 raise Microsoft::Error::ErrorInvalidIdMalformed.new(response.body)
