@@ -1,13 +1,14 @@
 require 'active_support/time'
 require 'oauth2'
-require 'microsoft/officenew'
-require 'microsoft/office/model'
-require 'microsoft/office/user'
-require 'microsoft/office/users'
-require 'microsoft/office/contact'
-require 'microsoft/office/contacts'
-require 'microsoft/office/event'
-require 'microsoft/office/events'
+require 'microsoft/office2'
+require 'microsoft/office2/model'
+require 'microsoft/office2/user'
+require 'microsoft/office2/users'
+require 'microsoft/office2/contact'
+require 'microsoft/office2/contacts'
+require 'microsoft/office2/event'
+require 'microsoft/office2/events'
+require 'microsoft/office2/calendars'
 module Microsoft
     class Error < StandardError
         class ResourceNotFound < Error; end
@@ -18,16 +19,16 @@ module Microsoft
     end
 end
 
-class Microsoft::Officenew; end
+class Microsoft::Office2; end
 
 ##
 # This class provides a client to interface between Microsoft Graph API and ACA Engine. Instances of this class are
 # primarily only used for:
 #   -
-class Microsoft::Officenew::Client
-    include Microsoft::Officenew::Events
-    include Microsoft::Officenew::Users
-    include Microsoft::Officenew::Contacts
+class Microsoft::Office2::Client
+    include Microsoft::Office2::Events
+    include Microsoft::Office2::Users
+    include Microsoft::Office2::Contacts
 
     ##
     # Initialize the client for making requests to the Office365 API.

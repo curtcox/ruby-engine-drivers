@@ -37,7 +37,7 @@ describe "office365 event updating" do
                 extensions: @extensions
             }
         }
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         @booking = nil
         reactor.run {
             @booking = @office.create_booking(@booking_body)
@@ -69,7 +69,7 @@ describe "office365 event updating" do
     end
 
     it 'should return updated events with the passed in time' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         updated_booking = nil
         reactor.run {
             updated_booking = @office.update_booking(@update_body)
@@ -81,7 +81,7 @@ describe "office365 event updating" do
     end
 
     it 'should return updated events with the passed in attendees' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         updated_booking = nil
         reactor.run {
             updated_booking = @office.update_booking(@update_body)
@@ -94,7 +94,7 @@ describe "office365 event updating" do
         }
     end
     it 'should return updated events with the passed in subject' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         updated_booking = nil
         reactor.run {
             updated_booking = @office.update_booking(@update_body)
@@ -108,7 +108,7 @@ describe "office365 event updating" do
     end
 
     it 'should return updated events with the passed in time' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         updated_booking = nil
         reactor.run {
             updated_booking = @office.update_booking(@update_body)

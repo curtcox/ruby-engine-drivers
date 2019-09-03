@@ -1,4 +1,4 @@
-module Microsoft::Officenew::Calendars
+module Microsoft::Office2::Calendars
     ##
     # CRUD for MS Graph API Calendars
     # https://docs.microsoft.com/en-us/graph/api/resources/calendar?view=graph-rest-1.0

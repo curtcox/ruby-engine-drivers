@@ -40,12 +40,12 @@ describe "office365 event creation" do
     end
 
     it "should initialize with client application details" do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         expect(@office).not_to be_nil
     end
 
     it 'should create events in o365 at the passed in time' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         booking = nil
         reactor.run {
             booking = @office.create_booking(@booking_body)
@@ -57,7 +57,7 @@ describe "office365 event creation" do
     end
 
     it 'should create events in o365 with the passed in attendees' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         booking = nil
         reactor.run {
             booking = @office.create_booking(@booking_body)
@@ -72,7 +72,7 @@ describe "office365 event creation" do
     end
 
     it 'should create events in o365 containing the passed in rooms' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         booking = nil
         reactor.run {
             booking = @office.create_booking(@booking_body)
@@ -85,7 +85,7 @@ describe "office365 event creation" do
     end
 
     it 'should create events in o365 with the passed in title' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         booking = nil
         reactor.run {
             booking = @office.create_booking(@booking_body)
@@ -98,7 +98,7 @@ describe "office365 event creation" do
     end
 
     it 'should create events in o365 with the body as the passed in description' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         booking = nil
         reactor.run {
             booking = @office.create_booking(@booking_body)
@@ -111,7 +111,7 @@ describe "office365 event creation" do
     end
 
     it 'should create events in o365 with any passed in extensions at the root of the event' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         booking = nil
         reactor.run {
             booking = @office.create_booking(@booking_body)

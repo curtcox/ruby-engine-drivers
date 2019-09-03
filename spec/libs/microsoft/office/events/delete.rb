@@ -38,7 +38,7 @@ describe "office365 event reading" do
                 extensions: @extensions
             }
         }
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         @booking = nil
         reactor.run {
             @booking = @office.create_booking(@booking_body)
@@ -46,7 +46,7 @@ describe "office365 event reading" do
     end
 
     it 'should return 200 when an event is successfully deleted' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         repsonse = nil
         reactor.run {
             repsonse = @office.delete_booking(mailbox: @mailbox, booking_id: @booking['id'])

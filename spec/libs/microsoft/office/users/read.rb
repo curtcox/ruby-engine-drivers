@@ -23,7 +23,7 @@ describe "office365 user reading" do
     end
 
     it 'should return all users with name or email matching query string' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         users = nil
         reactor.run {
             users = @office.get_users(q: @query)
@@ -34,7 +34,7 @@ describe "office365 user reading" do
     end
 
     it 'should return one user if an email is passed' do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         users = nil
         reactor.run {
             users = @office.get_users(q: @email)

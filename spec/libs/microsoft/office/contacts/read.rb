@@ -25,7 +25,7 @@ describe "office365 contact reading" do
         @organisation = "Company inc"
         @title = "Mr"
         @phone = "0404851331"
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         @contact = nil
         reactor.run {
             @contact = @office.create_contact(mailbox: @mailbox, email: @email, first_name: @first_name, last_name: @last_name, options:{ title: @title, phone: @phone, organisation: @organisation })

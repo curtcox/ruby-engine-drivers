@@ -1,4 +1,4 @@
-class Microsoft::Officenew::Model
+class Microsoft::Office2::Model
 
     def create_aliases(object, alias_fields, new_fields, model)
         aliased_contact = object.each_with_object({}) do |(k,v), h|

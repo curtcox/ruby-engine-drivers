@@ -28,7 +28,7 @@ describe "office365 contact creation" do
     end
 
     it "should create a contact with corresponding details" do
-        @office = ::Microsoft::Officenew::Client.new(@office_credentials)
+        @office = ::Microsoft::Office2::Client.new(@office_credentials)
         contact = nil
         reactor.run {
             contact = @office.create_contact(mailbox: @mailbox, email: @email, first_name: @first_name, last_name: @last_name, options:{ title: @title, phone: @phone, organisation: @organisation })
