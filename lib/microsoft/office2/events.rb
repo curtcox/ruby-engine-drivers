@@ -39,7 +39,7 @@ module Microsoft::Office2::Events
     #       ...
     #     }
     #   }
-    def get_bookings(mailboxes:, options:{})
+    def get_bookings(mailboxes:, calendargroup_id: nil, calendar_id: nil, options:{})
         default_options = {
             created_from: nil,  
             bookings_from: nil,
@@ -69,13 +69,8 @@ module Microsoft::Office2::Events
              options[:available_to] = options[:bookings_to]
         end
 
-        # If we are using created_from then we cannot use the calendarView and must use events
-        endpoint = ( options[:created_from].nil? ? "calendarView" : "events" )
-
-        # Get all of the endpoints for our bulk request
-        all_endpoints = mailboxes.map do |email|
-            "/users/#{email}/#{endpoint}"
-        end
+        calendar_endpoint = calendar_path(calendargroup_id, calendar_id) + (options[:created_from] ? "/events" : "/calendarView")   # If we are using created_from then we cannot use the calendarView and must use events
+        all_endpoints = mailboxes.map { |email| "/users/#{email}#{calendar_endpoint}" }
 
         # This is currently the max amount of queries per bulk request
         slice_size = 20
@@ -141,7 +136,7 @@ module Microsoft::Office2::Events
     # @option options [String] :timezone The timezone of the booking. This will be overridden by a timezone in the room's settings
     # @option options [Hash] :extensions A hash holding a list of extensions to be added to the booking
     # @option options [String] :location The location field to set. This will not be used if a room is passed in
-    def create_booking(mailbox:, start_param:, end_param:, options: {})
+    def create_booking(mailbox:, start_param:, end_param:, calendargroup_id: nil, calendar_id: nil, options: {})
         default_options = {
             rooms: [],
             subject: "Meeting",
@@ -172,9 +167,9 @@ module Microsoft::Office2::Events
             extensions: options[:extensions],
             is_private: options[:is_private]
         )
-
+        
         # Make the request and check the response
-        request = graph_request(request_method: 'post', endpoints: ["/v1.0/users/#{mailbox}/events"], data: event_json)
+        request = graph_request(request_method: 'post', endpoints: ["/v1.0/users/#{mailbox}#{calendar_path(calendargroup_id, calendar_id)}/events"], data: event_json)
         check_response(request)
         Microsoft::Office2::Event.new(client: self, event: JSON.parse(request.body)).event
     end
@@ -198,7 +193,7 @@ module Microsoft::Office2::Events
     # @option options [String] :timezone The timezone of the booking. This will be overridden by a timezone in the room's settings
     # @option options [Hash] :extensions A hash holding a list of extensions to be added to the booking
     # @option options [String] :location The location field to set. This will not be used if a room is passed in
-    def update_booking(booking_id:, mailbox:, options: {})
+    def update_booking(booking_id:, mailbox:, calendargroup_id: nil, calendar_id: nil, options: {})
         default_options = {
             start_param: nil,
             end_param: nil,
@@ -243,7 +238,7 @@ module Microsoft::Office2::Events
         end
 
         # Make the request and check the response
-        request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}/events/#{booking_id}"], data: event_json)
+        request = graph_request(request_method: 'patch', endpoints: ["/v1.0/users/#{mailbox}#{calendar_path(calendargroup_id, calendar_id)}/events/#{booking_id}"], data: event_json)
         check_response(request)
  
         Microsoft::Office2::Event.new(client: self, event: JSON.parse(request.body).merge({'extensions' => [ext_data]})).event
@@ -254,8 +249,8 @@ module Microsoft::Office2::Events
     # 
     # @param mailbox [String] The mailbox email which contains the booking to delete
     # @param booking_id [String] The ID of the booking to be deleted
-    def delete_booking(mailbox:, booking_id:)
-        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}"
+    def delete_booking(mailbox:, booking_id:, calendargroup_id: nil, calendar_id: nil)
+        endpoint = "/v1.0/users/#{mailbox}#{calendar_path(calendargroup_id, calendar_id)}/events/#{booking_id}"
         request = graph_request(request_method: 'delete', endpoints: [endpoint])
         check_response(request)
         200
@@ -267,14 +262,20 @@ module Microsoft::Office2::Events
     # @param mailbox [String] The mailbox email which contains the booking to delete
     # @param booking_id [String] The ID of the booking to be deleted
     # @param comment [String] An optional message that will be included in the body of the automated email that will be sent to the host of the meeting
-    def decline_meeting(mailbox:, booking_id:, comment: '')
-        endpoint = "/v1.0/users/#{mailbox}/events/#{booking_id}/decline"
+    def decline_meeting(mailbox:, booking_id:, comment: '', calendargroup_id: nil, calendar_id: nil)
+        endpoint = "/v1.0/users/#{mailbox}#{calendar_path(calendargroup_id, calendar_id)}/events/#{booking_id}/decline"
         request = graph_request(request_method: 'post', endpoints: [endpoint], data: {comment: comment})
         check_response(request)
         200
     end
     
     protected
+
+    def calendar_path(calendargroup_id, calendar_id)
+        result  = ""
+        result += "/calendarGroups/#{calendargroup_id}" if calendargroup_id
+        result += "/calendars/#{calendar_id}"           if calendar_id
+    end
 
     def create_event_json(subject: nil, body: nil, start_param: nil, end_param: nil, timezone: nil, rooms: [], location: nil, attendees: nil, organizer_name: nil, organizer:nil, recurrence: nil, extensions: {}, is_private: false)
         # Put the attendees into the MS Graph expeceted format
@@ -349,6 +350,4 @@ module Microsoft::Office2::Events
         event_json.reject!{|k,v| v.nil?} 
         event_json
     end
-
-
 end
