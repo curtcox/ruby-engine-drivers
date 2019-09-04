@@ -36,9 +36,11 @@ class Aca::ExchangeBooking
     end
 
     def on_update
-        # Set to true if the EWS service account does not have access to directly read room mailboxes, but has access to impersonate room mailboxes
+        # Set to true if the EWS service account has access to directly read room mailboxes.
+        # If left as the default (false), the driver will attempt to use Impersonation access to read the room mailbox
         # https://docs.microsoft.com/en-us/exchange/client-developer/exchange-web-services/impersonation-and-ews-in-exchange
-        @ews_impersonate_room = setting(:ews_impersonate_room) || setting(:use_act_as)  
+        # https://www.rubydoc.info/github/zenchild/Viewpoint/Viewpoint%2FEWS%2FFolderAccessors:get_folder
+        @ews_delegate_accesss = setting(:ews_delegate_accesss) || setting(:use_act_as)  
         
         self[:room_name] = setting(:room_name) || system.name
         self[:hide_all] = setting(:hide_all) || false
@@ -212,7 +214,7 @@ class Aca::ExchangeBooking
             cli = Viewpoint::EWSClient.new(*@ews_creds)
             opts = {}
 
-            if @ews_impersonate_room
+            if @ews_delegate_accesss
                 opts[:act_as] = @room_mailbox
             else
                 cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @room_mailbox)
@@ -247,7 +249,7 @@ class Aca::ExchangeBooking
         cli = Viewpoint::EWSClient.new(*@ews_creds)
         opts = {}
 
-        if @ews_impersonate_room
+        if @ews_delegate_accesss
             opts[:act_as] = @room_mailbox
         else
             cli.set_impersonation(Viewpoint::EWS::ConnectingSID[@ews_connect_type], @room_mailbox)
@@ -280,7 +282,7 @@ class Aca::ExchangeBooking
 
         cli = Viewpoint::EWSClient.new(*@ews_creds)
 
-        if @ews_impersonate_room
+        if @ews_delegate_accesss
             opts = {}
             opts[:act_as] = @room_mailbox
 
@@ -317,7 +319,7 @@ class Aca::ExchangeBooking
 
         cli = Viewpoint::EWSClient.new(*@ews_creds)
 
-        if @ews_impersonate_room
+        if @ews_delegate_accesss
             opts = {}
             opts[:act_as] = @room_mailbox
 
