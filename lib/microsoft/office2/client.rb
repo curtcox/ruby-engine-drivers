@@ -29,6 +29,7 @@ class Microsoft::Office2::Client
     include Microsoft::Office2::Events
     include Microsoft::Office2::Users
     include Microsoft::Office2::Contacts
+    include Microsoft::Office2::Calendars
 
     ##
     # Initialize the client for making requests to the Office365 API.
@@ -164,6 +165,8 @@ class Microsoft::Office2::Client
             raise Microsoft::Error::ErrorAccessDenied.new(response.body)
         when 404
             raise Microsoft::Error::ResourceNotFound.new(response.body)
+        when 409
+            raise Microsoft::Error::ErrorFolderExists.new(response.body)
         end
     end
 
