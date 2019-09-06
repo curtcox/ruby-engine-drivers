@@ -45,6 +45,7 @@ class Microsoft::Office2::Client
             app_site: "https://login.microsoftonline.com",
             app_scope: "https://graph.microsoft.com/.default",
             graph_domain: "https://graph.microsoft.com",
+            https_proxy: nil,
             save_token: Proc.new{ |token| User.bucket.set("office-token", token) },
             get_token: Proc.new{ User.bucket.get("office-token", quiet: true) }
         )
@@ -56,8 +57,9 @@ class Microsoft::Office2::Client
         @graph_domain = graph_domain
         @get_token = get_token
         @save_token = save_token
+        @https_proxy = https_proxy
         oauth_options = { site: @app_site,  token_url: @app_token_url }
-        oauth_options[:connection_opts] = { proxy: @internet_proxy } if @internet_proxy
+        oauth_options[:connection_opts] = { proxy: @https_proxy } if @https_proxy
         @graph_client ||= OAuth2::Client.new(
             @client_id,
             @client_secret,
