@@ -75,6 +75,12 @@ class Cisco::BroadWorks
         connect
     end
 
+    def set_achievements(achievements)
+      achievements ||= []
+      define_setting(:achievements, achievements)
+      self[:achievements] = achievements
+    end
+
     def reset_stats
         # "callcenter id" => count
         @queued_calls = {}
