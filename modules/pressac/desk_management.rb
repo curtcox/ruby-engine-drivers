@@ -55,7 +55,7 @@ class ::Pressac::DeskManagement
                 new_busy_desks = notification.value.map{|d| @desks[d]}
                 new_free_desks = system[sensor][:free_desks].map{|d| @desks[d] || d} || []
                 zones.each  { |zone| self[zone] = (self[zone] | new_busy_desks) - new_free_desks }
-                zones.each  { |zone| self[zone + ":desk_ids"] = (self[zone + ":desk_ids"] | new_busy_desks) - new_free_desks }
+                zones.each  { |zone| self[zone + ":desk_ids"] = (self[zone + ":desk_ids"] | new_busy_desks) }
             end
         end
     end
