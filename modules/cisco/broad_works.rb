@@ -75,6 +75,12 @@ class Cisco::BroadWorks
         connect
     end
 
+    def set_achievements(achievements)
+      achievements ||= []
+      define_setting(:achievements, achievements)
+      self[:achievements] = achievements
+    end
+
     def reset_stats
         # "callcenter id" => count
         @queued_calls = {}
@@ -153,17 +159,17 @@ class Cisco::BroadWorks
             count = @abandoned_calls[call_center_id]
             @abandoned_calls[call_center_id] = count.to_i + 1
 
-            count = @queued_calls[call_center_id]
-            @queued_calls[call_center_id] = count.to_i - 1
+            count = @queued_calls[call_center_id].to_i - 1
+            @queued_calls[call_center_id] = count < 0 ? 0 : count
         when 'ACDCallStrandedEvent'
             # Not entirely sure when this happens
-            count = @queued_calls[call_center_id]
-            @queued_calls[call_center_id] = count.to_i - 1
+            count = @queued_calls[call_center_id].to_i - 1
+            @queued_calls[call_center_id] = count < 0 ? 0 : count
         when 'ACDCallAnsweredByAgentEvent'
             # TODO:: Call answered by "0278143573@det.nsw.edu.au"
             # Possibly we can monitor the time this conversion goes for?
-            count = @queued_calls[call_center_id]
-            @queued_calls[call_center_id] = count.to_i - 1
+            count = @queued_calls[call_center_id].to_i - 1
+            @queued_calls[call_center_id] = count < 0 ? 0 : count
 
             # Extract wait time...
             event_data = event[:event_data]
