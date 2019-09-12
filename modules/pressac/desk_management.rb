@@ -52,10 +52,14 @@ class ::Pressac::DeskManagement
             # Subscribe to live updates from the sensors
             device,index = sensor.split('_')
             @subscriptions << system.subscribe(device, index.to_i, :busy_desks) do |notification|
-                new_busy_desks = notification.value.map{|d| @desks[d]}
-                new_free_desks = system[sensor][:free_desks].map{|d| @desks[d] || d} || []
+                new_busy_desks    = notification.value.map{|d| @desks[d] || d}
+                new_free_desks    = system[sensor][:free_desks].map{|d| @desks[d] || d} || []
+                all_sensors_desks = system[sensor][:all_desks].map{|d| @desks[d] || d}
+                puts "new busy desks: #{new_busy_desks}"
+                puts "new free desks: #{new_free_desks}"
+                puts "all sensor's desks: #{all_sensors_desks}"
                 zones.each  { |zone| self[zone] = (self[zone] | new_busy_desks) - new_free_desks }
-                zones.each  { |zone| self[zone + ":desk_ids"] = (self[zone + ":desk_ids"] | new_busy_desks) }
+                zones.each  { |zone| self[zone + ":desk_ids"] = (self[zone + ":desk_ids"] | all_sensors_desks) }
             end
         end
     end
