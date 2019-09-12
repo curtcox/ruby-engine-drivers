@@ -10,5 +10,10 @@ Desk sensor:
 
 Environment sensor:
 {
-    "deviceid":"05189BE4","devicename":"PEnvironSensor-02","dbm":"-44","devicetype":"CO2-Temperature-and-Humidity","concentration":"1740","temperature":"27.2","humidity":"55"
+    "deviceid":"05189BE4",
+    "devicename":"PEnvironSensor-02","dbm":"-44",
+    "devicetype":"CO2-Temperature-and-Humidity",
+    "concentration":"1740",
+    "temperature":"27.2",
+    "humidity":"55"
 }
