@@ -26,14 +26,16 @@ class Pressac::Sensors::WsProtocol
     })
 
     def on_load
+        status = setting(:status) || {}
+        self[:desk]       = status[:desk]       || {}   # A hash of all desk names to their sensor values: { desk_name: {data: value, ..}, .. }
+        self[:busy_desks] = status[:busy_desks] || []   # Array of desk names
+        self[:free_desks] = status[:free_desks] || []
+        self[:all_desks]  = status[:all_desks]  || []
+        self[:environment] = {}                         # Environment sensor values (temp, humidity)
+        @busy_desks = self[:busy_desks].to_set
+        @free_desks = self[:free_desks].to_set
+        
         on_update
-        self[:desks] = {}
-        self[:busy_desks] = []
-        self[:free_desks] = []
-        self[:all_desks]  = []
-        self[:environment] = {}
-        @busy_desks  = Set.new
-        @free_desks = Set.new
     end
 
     # Called after dependency reload and settings updates
@@ -47,6 +49,7 @@ class Pressac::Sensors::WsProtocol
 
     def disconnected
     end
+
 
     protected
 
@@ -91,7 +94,7 @@ class Pressac::Sensors::WsProtocol
             self[:busy_desks] = @busy_desks.to_a
             self[:free_desks] = @free_desks.to_a
             self[:all_desks]  = self[:all_desks] | [id]
-            self[:desks][id]  = {
+            self[:desk][id]  = {
                 motion:  occupied,
                 voltage: sensor[:supplyVoltage],
                 id:      sensor[:deviceid]
@@ -105,6 +108,15 @@ class Pressac::Sensors::WsProtocol
                 id:             sensor[:deviceid]
             }
         end
+
+        # Save the current status to database, so that it can retrieved when engine restarts
+        status = {
+            busy_desks: self[:busy_desks],
+            free_desks: self[:free_desks],
+            all_desks:  self[:all_desks],
+            desk:       self[:desk]
+        }
+        define_setting(:status, status)
     end
 
     # connection is closing
