@@ -26,7 +26,6 @@ class Pressac::Sensors::WsProtocol
     })
 
     def on_load
-        on_update
         self[:desks] = {}
         self[:busy_desks] = []
         self[:free_desks] = []
@@ -34,6 +33,8 @@ class Pressac::Sensors::WsProtocol
         self[:environment] = {}
         @busy_desks  = Set.new
         @free_desks = Set.new
+        
+        on_update
     end
 
     # Called after dependency reload and settings updates
