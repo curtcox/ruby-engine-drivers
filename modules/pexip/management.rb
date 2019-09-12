@@ -44,7 +44,7 @@ class Pexip::Management
     end
 
     MeetingTypes = ["conference", "lecture", "two_stage_dialing", "test_call"]
-    def new_meeting(name = nil, conf_alias = nil, type = "conference", pin: rand(9999), **options)
+    def new_meeting(name = nil, conf_alias = nil, type = "conference", pin: rand(9999), expire: true, **options)
         type = type.to_s.strip.downcase
         raise "unknown meeting type" unless MeetingTypes.include?(type)
 
@@ -63,13 +63,20 @@ class Pexip::Management
         }) do |data|
             if (200...300).include?(data.status)
                 vmr_id = URI(data['Location']).path.split("/").reject(&:empty?)[-1]
-                @vmr_ids[vmr_id] = Time.now.to_i
-                define_setting(:vmr_ids, @vmr_ids)
+                if expire
+                  @vmr_ids[vmr_id] = Time.now.to_i
+                  define_setting(:vmr_ids, @vmr_ids)
+                end
                 vmr_id
             else
                 :retry
             end
         end
+    end
+
+    def add_meeting_to_expire(vmr_id)
+      @vmr_ids[vmr_id] = Time.now.to_i
+      define_setting(:vmr_ids, @vmr_ids)
     end
 
     def get_meeting(meeting)
