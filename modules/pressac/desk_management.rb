@@ -33,37 +33,55 @@ class ::Pressac::DeskManagement
 
     def on_update
         @sensors = setting('sensor_to_zone_mappings') || {}
-        @desks = setting('sensor_name_to_desk_mappings') || {}
+        @desk_ids = setting('sensor_name_to_desk_mappings') || {}
 
         @subscriptions ||= []
         @subscriptions.each { |ref| unsubscribe(ref) }
         @subscriptions.clear
-        
+
+        # Initialize all zone status variables to [] or 0, but keep existing values if they exist (||=)
+        all_zone_ids = @sensors.values.flatten.compact.uniq
+        all_zone_ids.each do |z|
+            self[z] ||= []                     # occupied (busy) desk ids in this zone
+            self[z+':desk_ids']       ||= []   # all desk ids in this zone
+            self[z+':occupied_count'] ||= 0
+            self[z+':desk_count']     ||= 0
+        end
+
         @sensors.each do |sensor,zones|
-            # Populate our initial status with the current data from all given Sensors
             zones.each do |zone|
-                busy_desks = self[zone] ||= []
-                all_desks  = self[zone + ":desk_ids"] ||= []
-                #self[zone:desk_ids] is an array of all desks in this zone (zones may have multiple sensors)
-                self[zone + ":desk_ids"] = all_desks | system[sensor][:all_desks].map{|d| @desks[d] || d}
-                #self[zone] is an array of all occupied desks in this zone
-                self[zone] = (self[zone] | system[sensor][:busy_desks].map{|d| @desks[d] || d}) - system[sensor][:free_desks].map{|d| @desks[d] || d}
-            end
-            # Subscribe to live updates from the sensors
-            device,index = sensor.split('_')
-            @subscriptions << system.subscribe(device, index.to_i, :busy_desks) do |notification|
-                new_busy_desks    = notification.value.map{|d| @desks[d] || d}
-                new_free_desks    = system[sensor][:free_desks].map{|d| @desks[d] || d} || []
-                all_sensors_desks = system[sensor][:all_desks].map{|d| @desks[d] || d}
-                puts "new busy desks: #{new_busy_desks}"
-                puts "new free desks: #{new_free_desks}"
-                puts "all sensor's desks: #{all_sensors_desks}"
-                zones.each  { |zone| self[zone] = (self[zone] | new_busy_desks) - new_free_desks }
-                zones.each  { |zone| self[zone + ":desk_ids"] = (self[zone + ":desk_ids"] | all_sensors_desks) }
+                # Populate our initial status with the current data from all given Sensors
+                update_zone(zone, sensor)
+
+                # Subscribe to live updates from the sensors
+                device,index = sensor.split('_')
+                @subscriptions << system.subscribe(device, index.to_i, :free_desks) do |notification|
+                    update_zone(zone, sensor)
+                end
             end
         end
     end
 
+    # Update one zone with the current data from ONE sensor (there may be multiple sensors serving a zone)
+    def update_zone(zone, sensor)
+        # The below values reflect just this ONE sensor, not neccesarily the whole zone
+        all_desks  = id system[sensor][:all_desks]
+        busy_desks = id system[sensor][:busy_desks]
+        free_desks = all_desks - busy_desks
+
+        # add the desks from this sensor to the other sensors in the zone
+        self[zone+':desk_ids'] = self[zone] | all_desks
+        self[zone] = (self[zone] | busy_desks) - free_desks
+
+        self[zone+':occupied_count'] = self[zone].count
+        self[zone+':desk_count']     = self[zone+':desk_ids'].count
+    end
+
+
     protected
 
+    def id(array)
+        return [] if array.nil?
+        array.map { |i| @desk_ids[i] || i } 
+    end
 end
