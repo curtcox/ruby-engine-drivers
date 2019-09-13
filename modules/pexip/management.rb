@@ -123,7 +123,7 @@ class Pexip::Management
       time = Time.now.to_i
       delete = []
       @vmr_ids.each do |id, created|
-        delete << id if (created + older_than) >= time
+        delete << id if (created + older_than) <= time
       end
       promises = delete.map { |id| end_meeting(id, false) }
       thread.all(*promises).then do
