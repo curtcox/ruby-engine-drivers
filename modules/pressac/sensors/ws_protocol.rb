@@ -31,6 +31,7 @@ class Pressac::Sensors::WsProtocol
         self[:busy_desks] = status[:busy_desks] || []   # Array of desk names
         self[:free_desks] = status[:free_desks] || []
         self[:all_desks]  = status[:all_desks]  || []
+        self[:last_update] = status[:last_update]  || "Never"
         self[:environment] = {}                         # Environment sensor values (temp, humidity)
         @busy_desks = self[:busy_desks].to_set
         @free_desks = self[:free_desks].to_set
@@ -109,13 +110,15 @@ class Pressac::Sensors::WsProtocol
             }
         end
 
+        self[:last_update] = Time.now.in_time_zone($TZ).to_s
         # Save the current status to database, so that it can retrieved when engine restarts
         status = {
-            busy_desks: self[:busy_desks],
-            free_desks: self[:free_desks],
-            all_desks:  self[:all_desks],
-            desk:       self[:desk]
-        }
+            busy_desks:  self[:busy_desks],
+            free_desks:  self[:free_desks],
+            all_desks:   self[:all_desks],
+            desk:        self[:desk]
+            last_update: self[:last_update],
+    }
         define_setting(:status, status)
     end
 

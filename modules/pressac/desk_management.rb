@@ -75,7 +75,7 @@ class ::Pressac::DeskManagement
 
         self[zone+':occupied_count'] = self[zone].count
         self[zone+':desk_count']     = self[zone+':desk_ids'].count
-        self[last_update] = Time.now.in_time_zone($TZ).to_s
+        self[:last_update] = Time.now.in_time_zone($TZ).to_s
     end
 
     # Grab the list of desk ids in use on a floor
