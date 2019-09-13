@@ -75,8 +75,22 @@ class ::Pressac::DeskManagement
 
         self[zone+':occupied_count'] = self[zone].count
         self[zone+':desk_count']     = self[zone+':desk_ids'].count
+        self[last_update] = Time.now.in_time_zone($TZ).to_s
     end
 
+    # Grab the list of desk ids in use on a floor
+    #
+    # @param level [String] the level id of the floor
+    def desk_usage(zone)
+        self[zone] || []
+    end
+
+
+    # Since this driver cannot know which user is at which desk, just return nil
+    # @param desk_id [String] the unique id that represents a desk
+    def desk_details(*desk_ids)
+        nil
+    end
 
     protected
 
