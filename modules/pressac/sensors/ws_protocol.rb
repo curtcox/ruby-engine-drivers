@@ -116,8 +116,8 @@ class Pressac::Sensors::WsProtocol
             busy_desks:  self[:busy_desks],
             free_desks:  self[:free_desks],
             all_desks:   self[:all_desks],
-            desk:        self[:desk]
-            last_update: self[:last_update],
+            desk:        self[:desk],
+            last_update: self[:last_update]
     }
         define_setting(:status, status)
     end
