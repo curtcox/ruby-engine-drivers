@@ -146,10 +146,6 @@ class Mediasite::Module
           if start_time <= current_time && current_time <= end_time
               presentation = get_request(schedule['ScheduleLink'] + '/Presentations')
               live = presentation['value'][0]['Status'] == 'Live'
-              self[:current] = {
-                  'state' => STATES[self[:state]],
-                  'start_time' => start_time.in_time_zone('Sydney')
-              }
               break
           end
       end
