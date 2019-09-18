@@ -12,7 +12,7 @@ class Visionect::Joan
 
     # If the driver points to a static API endpoint that is likely to be the
     # same across all instances, you can define that here.
-    uri_base 'https://api.chucknorris.io'
+    uri_base 'https://api.visionect.com/'
     # Alertnatively, to force the base URI to be entered per instance the above
     # can be ommitted in place of...
     # implements :service
@@ -28,7 +28,7 @@ class Visionect::Joan
     # See https://developer.acaprojects.com/#/driver-development/logging-and-security?id=security
     # for information on restricting access.
     def roundhouse_me
-        logger.debug 'One Chuck Norris fact coming up...'
+        logger.debug 'One Chuck Norris '
 
         # Perform an asynconous HTTP request
         get('/jokes/random', query: { category: 'dev' }) do |data|
@@ -41,6 +41,40 @@ class Visionect::Joan
             end
 
         end
+    end
+
+    def display(url)
+        logger.debug "Setting panel to #{url}"
+
+        # Perform an asynconous HTTP request
+        get('/jokes/random', query: { category: 'dev' }) do |data|
+
+            # Handle the response (when we get it)
+            parse(data) do |response|
+                # Push some information into the exposed module state. This
+                # is available for client to 'bind' to
+                self[:last_fact] = response[:value]
+            end
+
+        end
+    end
+
+    def reboot
+        uuid = '47001e00-0150-4d35-5232-312000000000'
+        logger.debug "Rebooting device"
+
+        # Perform an asynconous HTTP request
+        response = post("/api/device/#{uuid}/reboot", headers: {Authorization: 'value'}) do |data|
+            logger.debug "Rebooting device"
+
+            # Handle the response (when we get it)
+            parse(data) do |response|
+              logger.debug "Parsed OK"
+            end
+
+        end
+        response.then {logger.debug "Success"}
+                .catch {logger.error "Error"}
     end
 
     protected
